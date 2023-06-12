@@ -1,0 +1,56 @@
+syntax = "proto3";
+package OpenIMEnterprise.common;
+option go_package = "github.com/OpenIMSDK/chat/pkg/proto/common";
+
+
+message UserFullInfo{
+  string  userID = 1;
+  string  password = 2;
+  string  account = 3;
+  string  phoneNumber = 4;
+  string  areaCode = 5;
+  string  email = 6;
+  string  nickname = 7;
+  string  faceURL = 8;
+  int32  gender = 9;
+  int32  level = 10;
+  int32  forbidden = 11;
+  int64 birth = 12;
+  int32  allowAddFriend = 13;
+  int32  allowBeep = 14;
+  int32  allowVibration = 15;
+}
+
+message UserPublicInfo{
+  string  userID = 1;
+  string  account = 2;
+  string  email = 3;
+  string  nickname = 4;
+  string  faceURL = 5;
+  int32  gender = 6;
+  int32  level = 7;
+}
+
+message UserIdentity {
+  string email = 1;
+  string areaCode = 2;
+  string phoneNumber = 3;
+  string deviceID = 4;
+  int32 platform = 5;
+  string account = 6;
+}
+
+
+message AppletInfo  {
+  string id = 1;
+  string name = 2;
+  string appID = 3;
+  string icon = 4;
+  string url = 5;
+  string md5 = 6;
+  int64 size = 7;
+  string version = 8;
+  uint32 priority = 9;
+  uint32 status = 10;
+  int64 createTime = 11;
+}

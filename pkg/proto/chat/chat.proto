@@ -1,0 +1,252 @@
+syntax = "proto3";
+import "pub/wrapperspb.proto";
+import "pub/sdkws.proto";
+import "common/common.proto";
+option go_package = "github.com/OpenIMSDK/chat/pkg/proto/chat";
+package OpenIMEnterprise.chat;
+
+message UserIdentity {
+  string email = 1;
+  string areaCode = 2;
+  string phoneNumber = 3;
+  string deviceID = 4;
+  int32 platform = 5;
+  string account = 6;
+}
+
+
+message UpdateUserInfoReq{
+  string  userID = 1;
+  OpenIMServer.protobuf.StringValue  account = 2;
+  OpenIMServer.protobuf.StringValue  phoneNumber = 3;
+  OpenIMServer.protobuf.StringValue  areaCode = 4;
+  OpenIMServer.protobuf.StringValue  email = 5;
+  OpenIMServer.protobuf.StringValue  nickname = 6;
+  OpenIMServer.protobuf.StringValue  faceURL = 7;
+  OpenIMServer.protobuf.Int32Value  gender = 8;
+  OpenIMServer.protobuf.Int32Value  level = 9;
+  OpenIMServer.protobuf.Int32Value  forbidden = 10;
+  OpenIMServer.protobuf.Int64Value birth = 11;
+  OpenIMServer.protobuf.Int32Value  allowAddFriend = 12;
+  OpenIMServer.protobuf.Int32Value  allowBeep = 13;
+  OpenIMServer.protobuf.Int32Value  allowVibration = 14;
+}
+
+message UpdateUserInfoResp{
+}
+
+message FindUserPublicInfoReq{
+  repeated  string userIDs = 1;
+}
+
+message FindUserPublicInfoResp{
+  repeated OpenIMEnterprise.common.UserPublicInfo users = 1;
+}
+
+message SearchUserPublicInfoReq{
+  string keyword = 1;
+  OpenIMServer.sdkws.RequestPagination pagination = 2;
+  repeated int32 genders = 3;
+}
+
+message SearchUserPublicInfoResp{
+  uint32 total = 1;
+  repeated OpenIMEnterprise.common.UserPublicInfo users = 2;
+}
+
+message FindUserFullInfoReq{
+  repeated string userIDs = 1;
+}
+
+message FindUserFullInfoResp{
+  repeated OpenIMEnterprise.common.UserFullInfo users = 1;
+}
+
+
+message SearchUserFullInfoReq{
+  string keyword = 1;
+  OpenIMServer.sdkws.RequestPagination pagination = 2;
+  repeated int32 genders = 3;
+}
+
+message SearchUserFullInfoResp{
+  uint32 total = 1;
+  repeated OpenIMEnterprise.common.UserFullInfo users = 2;
+}
+
+message SendVerifyCodeReq {
+  int32 usedFor = 1;
+  string ip = 2;
+  string invitationCode = 3;
+  string deviceID = 4;
+  int32 platform = 5;
+  string areaCode = 6;
+  string phoneNumber = 7;
+}
+
+message SendVerifyCodeResp {
+}
+
+message VerifyCodeReq {
+  string areaCode = 1;
+  string phoneNumber = 2;
+  string verifyCode = 3;
+}
+
+message VerifyCodeResp {
+}
+
+message RegisterUserInfo {
+  string userID = 1;
+  string nickname = 2;
+  string faceURL = 3;
+  int64 birth = 4;
+  int32 gender = 5;
+  string areaCode = 6;
+  string phoneNumber = 7;
+  string email = 8;
+  string account = 9;
+  string password = 10;
+}
+
+message RegisterUserReq {
+  string invitationCode = 1;
+  string verifyCode = 2;
+  string ip = 3;
+  string deviceID = 4;
+  int32 platform = 5;
+  bool autoLogin = 6;
+  RegisterUserInfo user = 7;
+}
+
+message RegisterUserResp {
+  string userID = 1;
+  string imToken = 2;
+  string chatToken = 3;
+}
+
+message LoginReq {
+  string areaCode = 1;
+  string phoneNumber = 2;
+  string verifyCode = 3;
+  string account = 4;
+  string password = 5;
+  int32 platform = 6;
+  string deviceID = 7;
+  string ip = 8;
+}
+
+message LoginResp {
+  string imToken = 1;
+  string chatToken = 2;
+  string userID = 3;
+}
+
+message ResetPasswordReq {
+  string areaCode = 1;
+  string phoneNumber = 2;
+  string verifyCode = 3;
+  string password = 4;
+}
+
+message ResetPasswordResp {
+}
+
+message ChangePasswordReq {
+  string userID = 1;
+  string password = 2;
+}
+
+message ChangePasswordResp {
+}
+
+message FindUserAccountReq {
+  repeated string userIDs = 1;
+}
+
+
+message FindUserAccountResp {
+  map<string, string> userAccountMap = 1; // userID  account
+}
+
+message FindAccountUserReq {
+  repeated string accounts = 1;
+}
+
+message FindAccountUserResp {
+  map<string, string> accountUserMap = 1; // account  userID
+}
+
+message SignalRecord {
+  string fileName = 1;
+  string mediaType = 2;
+  string roomType = 3;
+  string senderID = 4;
+  string senderNickname = 5;
+  string recvID = 6;
+  string recvNickname = 7;
+  string groupID = 8;
+  string groupName = 9;
+  repeated OpenIMEnterprise.common.UserPublicInfo inviterUserList = 10;
+  int32 duration = 11;
+  int64 createTime = 12;
+  string size = 13;
+  string downloadURL = 14;
+}
+
+message AddSignalRecordReq {
+  SignalRecord signalRecord = 1;
+  string operationID = 2;
+}
+
+message AddSignalRecordResp {
+}
+
+message GetSignalRecordsReq {
+  OpenIMServer.sdkws.RequestPagination pagination = 1;
+  string senderID = 2;
+  string recvID = 3;
+  string mediaType = 4;
+  int64 createTime = 5;
+  string operationID = 6;
+}
+
+message GetSignalRecordsResp {
+  uint32 totalNumber = 1;
+  repeated SignalRecord signalRecords = 2;
+}
+
+message OpenIMCallbackReq {
+  string command = 1;
+  string body = 2;
+}
+
+message OpenIMCallbackResp {
+
+}
+
+service chat {
+  //编辑个人资料 自己或者管理员调用
+  rpc UpdateUserInfo(UpdateUserInfoReq) returns(UpdateUserInfoResp);
+  //获取用户的公开信息   陌生人调用
+  rpc SearchUserPublicInfo(SearchUserPublicInfoReq) returns(SearchUserPublicInfoResp);
+  rpc FindUserPublicInfo(FindUserPublicInfoReq) returns(FindUserPublicInfoResp);
+  //搜索用户信息 管理员调用 其他用户调用时返回public字段
+  rpc SearchUserFullInfo(SearchUserFullInfoReq) returns(SearchUserFullInfoResp);
+  rpc FindUserFullInfo(FindUserFullInfoReq) returns(FindUserFullInfoResp);
+
+  rpc SendVerifyCode(SendVerifyCodeReq) returns(SendVerifyCodeResp);
+  rpc VerifyCode(VerifyCodeReq) returns(VerifyCodeResp);
+  rpc RegisterUser(RegisterUserReq) returns(RegisterUserResp);
+  rpc Login(LoginReq) returns(LoginResp);
+  rpc ResetPassword(ResetPasswordReq) returns(ResetPasswordResp);
+  rpc ChangePassword(ChangePasswordReq) returns(ChangePasswordResp);
+
+  rpc FindUserAccount(FindUserAccountReq) returns(FindUserAccountResp);
+  rpc FindAccountUser(FindAccountUserReq) returns(FindAccountUserResp);
+
+  rpc AddSignalRecord(AddSignalRecordReq) returns(AddSignalRecordResp);
+  rpc GetSignalRecords(GetSignalRecordsReq) returns(GetSignalRecordsResp);
+
+  rpc OpenIMCallback(OpenIMCallbackReq) returns(OpenIMCallbackResp);
+}

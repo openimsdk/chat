@@ -1,0 +1,135 @@
+package admin
+
+import (
+	"context"
+	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/mcontext"
+	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
+	"github.com/OpenIMSDK/Open-IM-Server/pkg/proto/wrapperspb"
+	"github.com/OpenIMSDK/Open-IM-Server/pkg/utils"
+	"github.com/OpenIMSDK/chat/pkg/common/db/dbutil"
+	"github.com/OpenIMSDK/chat/pkg/common/db/table"
+	"github.com/OpenIMSDK/chat/pkg/common/mctx"
+	"github.com/OpenIMSDK/chat/pkg/proto/admin"
+	"github.com/OpenIMSDK/chat/pkg/proto/chat"
+	"strings"
+	"time"
+)
+
+func (o *adminServer) CancellationUser(ctx context.Context, req *admin.CancellationUserReq) (*admin.CancellationUserResp, error) {
+	if _, err := mctx.CheckAdmin(ctx); err != nil {
+		return nil, err
+	}
+	if err := o.OpenIM.ForceOffline(ctx, req.UserID); err != nil {
+		return nil, err
+	}
+	empty := wrapperspb.String("")
+	update := &chat.UpdateUserInfoReq{UserID: req.UserID, Account: empty, AreaCode: empty, PhoneNumber: empty, Email: empty}
+	if err := o.Chat.UpdateUser(ctx, update); err != nil {
+		return nil, err
+	}
+	return &admin.CancellationUserResp{}, nil
+}
+
+func (o *adminServer) BlockUser(ctx context.Context, req *admin.BlockUserReq) (*admin.BlockUserResp, error) {
+	if _, err := mctx.CheckAdmin(ctx); err != nil {
+		return nil, err
+	}
+	_, err := o.Database.GetBlockInfo(ctx, req.UserID)
+	if err == nil {
+		return nil, errs.ErrArgs.Wrap("user already blocked")
+	} else if !dbutil.IsNotFound(err) {
+		return nil, err
+	}
+	if err := o.OpenIM.ForceOffline(ctx, req.UserID); err != nil {
+		return nil, err
+	}
+	t := &table.ForbiddenAccount{
+		UserID:         req.UserID,
+		Reason:         req.Reason,
+		OperatorUserID: mcontext.GetOpUserID(ctx),
+		CreateTime:     time.Now(),
+	}
+	if err := o.Database.BlockUser(ctx, []*table.ForbiddenAccount{t}); err != nil {
+		return nil, err
+	}
+	return &admin.BlockUserResp{}, nil
+}
+
+func (o *adminServer) UnblockUser(ctx context.Context, req *admin.UnblockUserReq) (*admin.UnblockUserResp, error) {
+	if _, err := mctx.CheckAdmin(ctx); err != nil {
+		return nil, err
+	}
+	if len(req.UserIDs) == 0 {
+		return nil, errs.ErrArgs.Wrap("empty user id")
+	}
+	if utils.Duplicate(req.UserIDs) {
+		return nil, errs.ErrArgs.Wrap("duplicate user id")
+	}
+	bs, err := o.Database.FindBlockInfo(ctx, req.UserIDs)
+	if err != nil {
+		return nil, err
+	}
+	if len(req.UserIDs) != len(bs) {
+		ids := utils.Single(req.UserIDs, utils.Slice(bs, func(info *table.ForbiddenAccount) string { return info.UserID }))
+		return nil, errs.ErrArgs.Wrap("user not blocked " + strings.Join(ids, ", "))
+	}
+	if err := o.Database.DelBlockUser(ctx, req.UserIDs); err != nil {
+		return nil, err
+	}
+	return &admin.UnblockUserResp{}, nil
+}
+
+func (o *adminServer) SearchBlockUser(ctx context.Context, req *admin.SearchBlockUserReq) (*admin.SearchBlockUserResp, error) {
+	if _, err := mctx.CheckAdmin(ctx); err != nil {
+		return nil, err
+	}
+	total, infos, err := o.Database.SearchBlockUser(ctx, req.Keyword, req.Pagination.PageNumber, req.Pagination.ShowNumber)
+	if err != nil {
+		return nil, err
+	}
+	userIDs := utils.Slice(infos, func(info *table.ForbiddenAccount) string { return info.UserID })
+	userMap, err := o.Chat.MapUserFullInfo(ctx, userIDs)
+	if err != nil {
+		return nil, err
+	}
+	users := make([]*admin.BlockUserInfo, 0, len(infos))
+	for _, info := range infos {
+		user := &admin.BlockUserInfo{
+			UserID:     info.UserID,
+			Reason:     info.Reason,
+			OpUserID:   info.OperatorUserID,
+			CreateTime: info.CreateTime.UnixMilli(),
+		}
+		if userFull := userMap[info.UserID]; userFull != nil {
+			user.Account = userFull.Account
+			user.PhoneNumber = userFull.PhoneNumber
+			user.AreaCode = userFull.AreaCode
+			user.Email = userFull.Email
+			user.Nickname = userFull.Nickname
+			user.FaceURL = userFull.FaceURL
+			user.Gender = userFull.Gender
+		}
+		users = append(users, user)
+	}
+	return &admin.SearchBlockUserResp{Total: total, Users: users}, nil
+}
+
+func (o *adminServer) FindUserBlockInfo(ctx context.Context, req *admin.FindUserBlockInfoReq) (*admin.FindUserBlockInfoResp, error) {
+	if _, err := mctx.CheckAdmin(ctx); err != nil {
+		return nil, err
+	}
+	list, err := o.Database.FindBlockUser(ctx, req.UserIDs)
+	if err != nil {
+		return nil, err
+	}
+	blocks := make([]*admin.BlockInfo, 0, len(list))
+	for _, info := range list {
+		blocks = append(blocks, &admin.BlockInfo{
+			UserID:     info.UserID,
+			Reason:     info.Reason,
+			OpUserID:   info.OperatorUserID,
+			CreateTime: info.CreateTime.UnixMilli(),
+		})
+	}
+	return &admin.FindUserBlockInfoResp{Blocks: blocks}, nil
+}
