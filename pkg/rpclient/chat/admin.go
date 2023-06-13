@@ -9,17 +9,17 @@ import (
 	"github.com/OpenIMSDK/chat/pkg/proto/admin"
 )
 
-func NewAdmin(zk discoveryregistry.SvcDiscoveryRegistry) *Admin {
-	return &Admin{
+func NewAdmin(zk discoveryregistry.SvcDiscoveryRegistry) *AdminClient {
+	return &AdminClient{
 		zk: zk,
 	}
 }
 
-type Admin struct {
+type AdminClient struct {
 	zk discoveryregistry.SvcDiscoveryRegistry
 }
 
-func (o *Admin) client(ctx context.Context) (admin.AdminClient, error) {
+func (o *AdminClient) client(ctx context.Context) (admin.AdminClient, error) {
 	conn, err := o.zk.GetConn(ctx, config.Config.RpcRegisterName.OpenImAdminName)
 	if err != nil {
 		return nil, err
@@ -27,7 +27,7 @@ func (o *Admin) client(ctx context.Context) (admin.AdminClient, error) {
 	return admin.NewAdminClient(conn), nil
 }
 
-func (o *Admin) GetConfig(ctx context.Context) (map[string]string, error) {
+func (o *AdminClient) GetConfig(ctx context.Context) (map[string]string, error) {
 	client, err := o.client(ctx)
 	if err != nil {
 		return nil, err
@@ -42,7 +42,7 @@ func (o *Admin) GetConfig(ctx context.Context) (map[string]string, error) {
 	return conf.Config, nil
 }
 
-func (o *Admin) CheckInvitationCode(ctx context.Context, invitationCode string) error {
+func (o *AdminClient) CheckInvitationCode(ctx context.Context, invitationCode string) error {
 	client, err := o.client(ctx)
 	if err != nil {
 		return err
@@ -60,7 +60,7 @@ func (o *Admin) CheckInvitationCode(ctx context.Context, invitationCode string) 
 	return nil
 }
 
-func (o *Admin) CheckRegister(ctx context.Context, ip string) error {
+func (o *AdminClient) CheckRegister(ctx context.Context, ip string) error {
 	client, err := o.client(ctx)
 	if err != nil {
 		return err
@@ -69,7 +69,7 @@ func (o *Admin) CheckRegister(ctx context.Context, ip string) error {
 	return err
 }
 
-func (o *Admin) CheckLogin(ctx context.Context, userID string, ip string) error {
+func (o *AdminClient) CheckLogin(ctx context.Context, userID string, ip string) error {
 	client, err := o.client(ctx)
 	if err != nil {
 		return err
@@ -78,7 +78,7 @@ func (o *Admin) CheckLogin(ctx context.Context, userID string, ip string) error 
 	return err
 }
 
-func (o *Admin) UseInvitationCode(ctx context.Context, userID string, invitationCode string) error {
+func (o *AdminClient) UseInvitationCode(ctx context.Context, userID string, invitationCode string) error {
 	client, err := o.client(ctx)
 	if err != nil {
 		return err
@@ -87,7 +87,7 @@ func (o *Admin) UseInvitationCode(ctx context.Context, userID string, invitation
 	return err
 }
 
-func (o *Admin) CheckNilOrAdmin(ctx context.Context) (bool, error) {
+func (o *AdminClient) CheckNilOrAdmin(ctx context.Context) (bool, error) {
 	if !mctx.HaveOpUser(ctx) {
 		return false, nil
 	}
@@ -98,7 +98,7 @@ func (o *Admin) CheckNilOrAdmin(ctx context.Context) (bool, error) {
 	return true, nil
 }
 
-func (o *Admin) CreateToken(ctx context.Context, userID string, userType int32) (*admin.CreateTokenResp, error) {
+func (o *AdminClient) CreateToken(ctx context.Context, userID string, userType int32) (*admin.CreateTokenResp, error) {
 	client, err := o.client(ctx)
 	if err != nil {
 		return nil, err
@@ -106,7 +106,7 @@ func (o *Admin) CreateToken(ctx context.Context, userID string, userType int32) 
 	return client.CreateToken(ctx, &admin.CreateTokenReq{UserID: userID, UserType: userType})
 }
 
-func (o *Admin) GetDefaultFriendUserID(ctx context.Context) ([]string, error) {
+func (o *AdminClient) GetDefaultFriendUserID(ctx context.Context) ([]string, error) {
 	client, err := o.client(ctx)
 	if err != nil {
 		return nil, err
@@ -118,7 +118,7 @@ func (o *Admin) GetDefaultFriendUserID(ctx context.Context) ([]string, error) {
 	return resp.UserIDs, nil
 }
 
-func (o *Admin) GetDefaultGroupID(ctx context.Context) ([]string, error) {
+func (o *AdminClient) GetDefaultGroupID(ctx context.Context) ([]string, error) {
 	client, err := o.client(ctx)
 	if err != nil {
 		return nil, err

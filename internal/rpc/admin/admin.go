@@ -46,7 +46,7 @@ func Start(zk discoveryregistry.SvcDiscoveryRegistry, server *grpc.Server) error
 
 type adminServer struct {
 	Database database.AdminDatabaseInterface
-	Chat     *chat.Chat
+	Chat     *chat.ChatClient
 	OpenIM   *openim.OpenIM
 }
 

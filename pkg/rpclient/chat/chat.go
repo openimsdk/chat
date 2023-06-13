@@ -3,23 +3,24 @@ package chat
 import (
 	"context"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/discoveryregistry"
+	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/utils"
 	"github.com/OpenIMSDK/chat/pkg/common/config"
 	"github.com/OpenIMSDK/chat/pkg/proto/chat"
 	"github.com/OpenIMSDK/chat/pkg/proto/common"
 )
 
-func NewChat(zk discoveryregistry.SvcDiscoveryRegistry) *Chat {
-	return &Chat{
+func NewChat(zk discoveryregistry.SvcDiscoveryRegistry) *ChatClient {
+	return &ChatClient{
 		zk: zk,
 	}
 }
 
-type Chat struct {
+type ChatClient struct {
 	zk discoveryregistry.SvcDiscoveryRegistry
 }
 
-func (o *Chat) getClient(ctx context.Context) (chat.ChatClient, error) {
+func (o *ChatClient) getClient(ctx context.Context) (chat.ChatClient, error) {
 	conn, err := o.zk.GetConn(ctx, config.Config.RpcRegisterName.OpenImChatName)
 	if err != nil {
 		return nil, err
@@ -27,7 +28,7 @@ func (o *Chat) getClient(ctx context.Context) (chat.ChatClient, error) {
 	return chat.NewChatClient(conn), nil
 }
 
-func (o *Chat) FindUserPublicInfo(ctx context.Context, userIDs []string) ([]*common.UserPublicInfo, error) {
+func (o *ChatClient) FindUserPublicInfo(ctx context.Context, userIDs []string) ([]*common.UserPublicInfo, error) {
 	if len(userIDs) == 0 {
 		return []*common.UserPublicInfo{}, nil
 	}
@@ -42,7 +43,7 @@ func (o *Chat) FindUserPublicInfo(ctx context.Context, userIDs []string) ([]*com
 	return resp.Users, nil
 }
 
-func (o *Chat) MapUserPublicInfo(ctx context.Context, userIDs []string) (map[string]*common.UserPublicInfo, error) {
+func (o *ChatClient) MapUserPublicInfo(ctx context.Context, userIDs []string) (map[string]*common.UserPublicInfo, error) {
 	users, err := o.FindUserPublicInfo(ctx, userIDs)
 	if err != nil {
 		return nil, err
@@ -52,7 +53,7 @@ func (o *Chat) MapUserPublicInfo(ctx context.Context, userIDs []string) (map[str
 	}), nil
 }
 
-func (o *Chat) FindUserFullInfo(ctx context.Context, userIDs []string) ([]*common.UserFullInfo, error) {
+func (o *ChatClient) FindUserFullInfo(ctx context.Context, userIDs []string) ([]*common.UserFullInfo, error) {
 	if len(userIDs) == 0 {
 		return []*common.UserFullInfo{}, nil
 	}
@@ -67,7 +68,7 @@ func (o *Chat) FindUserFullInfo(ctx context.Context, userIDs []string) ([]*commo
 	return resp.Users, nil
 }
 
-func (o *Chat) MapUserFullInfo(ctx context.Context, userIDs []string) (map[string]*common.UserFullInfo, error) {
+func (o *ChatClient) MapUserFullInfo(ctx context.Context, userIDs []string) (map[string]*common.UserFullInfo, error) {
 	users, err := o.FindUserFullInfo(ctx, userIDs)
 	if err != nil {
 		return nil, err
@@ -79,7 +80,29 @@ func (o *Chat) MapUserFullInfo(ctx context.Context, userIDs []string) (map[strin
 	return userMap, nil
 }
 
-func (o *Chat) UpdateUser(ctx context.Context, req *chat.UpdateUserInfoReq) error {
+func (o *ChatClient) GetUserFullInfo(ctx context.Context, userID string) (*common.UserFullInfo, error) {
+	users, err := o.FindUserFullInfo(ctx, []string{userID})
+	if err != nil {
+		return nil, err
+	}
+	if len(users) == 0 {
+		return nil, errs.ErrUserIDNotFound.Wrap()
+	}
+	return users[0], nil
+}
+
+func (o *ChatClient) GetUserPublicInfo(ctx context.Context, userID string) (*common.UserPublicInfo, error) {
+	users, err := o.FindUserPublicInfo(ctx, []string{userID})
+	if err != nil {
+		return nil, err
+	}
+	if len(users) == 0 {
+		return nil, errs.ErrUserIDNotFound.Wrap()
+	}
+	return users[0], nil
+}
+
+func (o *ChatClient) UpdateUser(ctx context.Context, req *chat.UpdateUserInfoReq) error {
 	client, err := o.getClient(ctx)
 	if err != nil {
 		return err

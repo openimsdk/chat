@@ -42,7 +42,7 @@ func Start(zk discoveryregistry.SvcDiscoveryRegistry, server *grpc.Server) error
 
 type chatSvr struct {
 	Database database.ChatDatabaseInterface
-	Admin    *chatClient.Admin
+	Admin    *chatClient.AdminClient
 	OpenIM   *openim.OpenIM
 	SMS      sms.SMS
 }
