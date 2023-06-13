@@ -10,7 +10,7 @@ import (
 	"github.com/OpenIMSDK/chat/pkg/proto/common"
 )
 
-func NewChat(zk discoveryregistry.SvcDiscoveryRegistry) *ChatClient {
+func NewChatClient(zk discoveryregistry.SvcDiscoveryRegistry) *ChatClient {
 	return &ChatClient{
 		zk: zk,
 	}

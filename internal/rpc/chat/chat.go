@@ -33,7 +33,7 @@ func Start(zk discoveryregistry.SvcDiscoveryRegistry, server *grpc.Server) error
 	}
 	chat.RegisterChatServer(server, &chatSvr{
 		Database: database.NewChatDatabase(db),
-		Admin:    chatClient.NewAdmin(zk),
+		Admin:    chatClient.NewAdminClient(zk),
 		OpenIM:   openim.NewOpenIM(zk),
 		SMS:      s,
 	})

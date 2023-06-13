@@ -9,7 +9,7 @@ import (
 	"github.com/OpenIMSDK/chat/pkg/proto/admin"
 )
 
-func NewAdmin(zk discoveryregistry.SvcDiscoveryRegistry) *AdminClient {
+func NewAdminClient(zk discoveryregistry.SvcDiscoveryRegistry) *AdminClient {
 	return &AdminClient{
 		zk: zk,
 	}

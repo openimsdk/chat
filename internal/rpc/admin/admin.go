@@ -38,7 +38,7 @@ func Start(zk discoveryregistry.SvcDiscoveryRegistry, server *grpc.Server) error
 	}
 	admin.RegisterAdminServer(server, &adminServer{
 		Database: database.NewAdminDatabase(db),
-		Chat:     chat.NewChat(zk),
+		Chat:     chat.NewChatClient(zk),
 		OpenIM:   openim.NewOpenIM(zk),
 	})
 	return nil
