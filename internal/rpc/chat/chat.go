@@ -34,7 +34,7 @@ func Start(zk discoveryregistry.SvcDiscoveryRegistry, server *grpc.Server) error
 	chat.RegisterChatServer(server, &chatSvr{
 		Database: database.NewChatDatabase(db),
 		Admin:    chatClient.NewAdminClient(zk),
-		OpenIM:   openim.NewOpenIM(zk),
+		OpenIM:   openim.NewOpenIMClient(zk),
 		SMS:      s,
 	})
 	return nil
@@ -43,6 +43,6 @@ func Start(zk discoveryregistry.SvcDiscoveryRegistry, server *grpc.Server) error
 type chatSvr struct {
 	Database database.ChatDatabaseInterface
 	Admin    *chatClient.AdminClient
-	OpenIM   *openim.OpenIM
+	OpenIM   *openim.OpenIMClient
 	SMS      sms.SMS
 }

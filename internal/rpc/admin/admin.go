@@ -39,7 +39,7 @@ func Start(zk discoveryregistry.SvcDiscoveryRegistry, server *grpc.Server) error
 	admin.RegisterAdminServer(server, &adminServer{
 		Database: database.NewAdminDatabase(db),
 		Chat:     chat.NewChatClient(zk),
-		OpenIM:   openim.NewOpenIM(zk),
+		OpenIM:   openim.NewOpenIMClient(zk),
 	})
 	return nil
 }
@@ -47,7 +47,7 @@ func Start(zk discoveryregistry.SvcDiscoveryRegistry, server *grpc.Server) error
 type adminServer struct {
 	Database database.AdminDatabaseInterface
 	Chat     *chat.ChatClient
-	OpenIM   *openim.OpenIM
+	OpenIM   *openim.OpenIMClient
 }
 
 func (o *adminServer) GetAdminInfo(ctx context.Context, req *admin.GetAdminInfoReq) (*admin.GetAdminInfoResp, error) {

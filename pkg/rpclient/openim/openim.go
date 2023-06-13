@@ -15,17 +15,17 @@ import (
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/proto/user"
 )
 
-func NewOpenIM(zk discoveryregistry.SvcDiscoveryRegistry) *OpenIM {
-	return &OpenIM{
+func NewOpenIMClient(zk discoveryregistry.SvcDiscoveryRegistry) *OpenIMClient {
+	return &OpenIMClient{
 		zk: zk,
 	}
 }
 
-type OpenIM struct {
+type OpenIMClient struct {
 	zk discoveryregistry.SvcDiscoveryRegistry
 }
 
-func (o *OpenIM) getUserClient(ctx context.Context) (user.UserClient, error) {
+func (o *OpenIMClient) getUserClient(ctx context.Context) (user.UserClient, error) {
 	conn, err := o.zk.GetConn(ctx, config.Config.RpcRegisterName.OpenImUserName)
 	if err != nil {
 		return nil, err
@@ -33,7 +33,7 @@ func (o *OpenIM) getUserClient(ctx context.Context) (user.UserClient, error) {
 	return user.NewUserClient(conn), nil
 }
 
-func (o *OpenIM) getFriendClient(ctx context.Context) (friend.FriendClient, error) {
+func (o *OpenIMClient) getFriendClient(ctx context.Context) (friend.FriendClient, error) {
 	conn, err := o.zk.GetConn(ctx, config.Config.RpcRegisterName.OpenImFriendName)
 	if err != nil {
 		return nil, err
@@ -41,7 +41,7 @@ func (o *OpenIM) getFriendClient(ctx context.Context) (friend.FriendClient, erro
 	return friend.NewFriendClient(conn), nil
 }
 
-func (o *OpenIM) getGroupClient(ctx context.Context) (group.GroupClient, error) {
+func (o *OpenIMClient) getGroupClient(ctx context.Context) (group.GroupClient, error) {
 	conn, err := o.zk.GetConn(ctx, config.Config.RpcRegisterName.OpenImGroupName)
 	if err != nil {
 		return nil, err
@@ -49,7 +49,7 @@ func (o *OpenIM) getGroupClient(ctx context.Context) (group.GroupClient, error) 
 	return group.NewGroupClient(conn), nil
 }
 
-func (o *OpenIM) getAuthClient(ctx context.Context) (auth.AuthClient, error) {
+func (o *OpenIMClient) getAuthClient(ctx context.Context) (auth.AuthClient, error) {
 	name := config.Config.RpcRegisterName.OpenImAuthName
 	conn, err := o.zk.GetConn(ctx, name)
 	if err != nil {
@@ -58,7 +58,7 @@ func (o *OpenIM) getAuthClient(ctx context.Context) (auth.AuthClient, error) {
 	return auth.NewAuthClient(conn), nil
 }
 
-func (o *OpenIM) UpdateUser(ctx context.Context, req *user.UpdateUserInfoReq) error {
+func (o *OpenIMClient) UpdateUser(ctx context.Context, req *user.UpdateUserInfoReq) error {
 	client, err := o.getUserClient(ctx)
 	if err != nil {
 		return err
@@ -67,7 +67,7 @@ func (o *OpenIM) UpdateUser(ctx context.Context, req *user.UpdateUserInfoReq) er
 	return err
 }
 
-func (o *OpenIM) UserRegister(ctx context.Context, req *sdkws.UserInfo) error {
+func (o *OpenIMClient) UserRegister(ctx context.Context, req *sdkws.UserInfo) error {
 	client, err := o.getUserClient(ctx)
 	if err != nil {
 		return err
@@ -76,7 +76,7 @@ func (o *OpenIM) UserRegister(ctx context.Context, req *sdkws.UserInfo) error {
 	return err
 }
 
-func (o *OpenIM) AddDefaultFriend(ctx context.Context, userID string, friendUserIDs []string) error {
+func (o *OpenIMClient) AddDefaultFriend(ctx context.Context, userID string, friendUserIDs []string) error {
 	client, err := o.getFriendClient(ctx)
 	if err != nil {
 		return err
@@ -88,7 +88,7 @@ func (o *OpenIM) AddDefaultFriend(ctx context.Context, userID string, friendUser
 	return err
 }
 
-func (o *OpenIM) AddDefaultGroup(ctx context.Context, userID string, groupID string) error {
+func (o *OpenIMClient) AddDefaultGroup(ctx context.Context, userID string, groupID string) error {
 	client, err := o.getGroupClient(ctx)
 	if err != nil {
 		return err
@@ -101,7 +101,7 @@ func (o *OpenIM) AddDefaultGroup(ctx context.Context, userID string, groupID str
 	return err
 }
 
-func (o *OpenIM) UserToken(ctx context.Context, userID string, platformID int32) (*auth.UserTokenResp, error) {
+func (o *OpenIMClient) UserToken(ctx context.Context, userID string, platformID int32) (*auth.UserTokenResp, error) {
 	client, err := o.getAuthClient(ctx)
 	if err != nil {
 		return nil, err
@@ -109,7 +109,7 @@ func (o *OpenIM) UserToken(ctx context.Context, userID string, platformID int32)
 	return client.UserToken(ctx, &auth.UserTokenReq{PlatformID: platformID, UserID: userID})
 }
 
-func (o *OpenIM) FindGroup(ctx context.Context, groupIDs []string) ([]*sdkws.GroupInfo, error) {
+func (o *OpenIMClient) FindGroup(ctx context.Context, groupIDs []string) ([]*sdkws.GroupInfo, error) {
 	client, err := o.getGroupClient(ctx)
 	if err != nil {
 		return nil, err
@@ -121,7 +121,7 @@ func (o *OpenIM) FindGroup(ctx context.Context, groupIDs []string) ([]*sdkws.Gro
 	return resp.GroupInfos, nil
 }
 
-func (o *OpenIM) MapGroup(ctx context.Context, groupIDs []string) (map[string]*sdkws.GroupInfo, error) {
+func (o *OpenIMClient) MapGroup(ctx context.Context, groupIDs []string) (map[string]*sdkws.GroupInfo, error) {
 	groups, err := o.FindGroup(ctx, groupIDs)
 	if err != nil {
 		return nil, err
@@ -133,7 +133,7 @@ func (o *OpenIM) MapGroup(ctx context.Context, groupIDs []string) (map[string]*s
 	return groupMap, nil
 }
 
-func (o *OpenIM) ForceOffline(ctx context.Context, userID string) error {
+func (o *OpenIMClient) ForceOffline(ctx context.Context, userID string) error {
 	client, err := o.getAuthClient(ctx)
 	if err != nil {
 		return err
@@ -148,4 +148,16 @@ func (o *OpenIM) ForceOffline(ctx context.Context, userID string) error {
 		}
 	}
 	return nil
+}
+
+func (o *OpenIMClient) GetGroupMember(ctx context.Context, groupID string) ([]string, error) {
+	client, err := o.getGroupClient(ctx)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := client.GetGroupMemberUserIDs(ctx, &group.GetGroupMemberUserIDsReq{GroupID: groupID})
+	if err != nil {
+		return nil, err
+	}
+	return resp.UserIDs, nil
 }
