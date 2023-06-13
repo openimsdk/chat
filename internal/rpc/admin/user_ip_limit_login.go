@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/utils"
-	"github.com/OpenIMSDK/chat/pkg/common/db/table"
+	admin2 "github.com/OpenIMSDK/chat/pkg/common/db/table/admin"
 	"github.com/OpenIMSDK/chat/pkg/common/mctx"
 	"github.com/OpenIMSDK/chat/pkg/proto/admin"
 	"time"
@@ -18,7 +18,7 @@ func (o *adminServer) SearchUserIPLimitLogin(ctx context.Context, req *admin.Sea
 	if err != nil {
 		return nil, err
 	}
-	userIDs := utils.Slice(list, func(info *table.LimitUserLoginIP) string { return info.UserID })
+	userIDs := utils.Slice(list, func(info *admin2.LimitUserLoginIP) string { return info.UserID })
 	userMap, err := o.Chat.MapUserPublicInfo(ctx, utils.Distinct(userIDs))
 	if err != nil {
 		return nil, err
@@ -43,9 +43,9 @@ func (o *adminServer) AddUserIPLimitLogin(ctx context.Context, req *admin.AddUse
 		return nil, errs.ErrArgs.Wrap("limits is empty")
 	}
 	now := time.Now()
-	ts := make([]*table.LimitUserLoginIP, 0, len(req.Limits))
+	ts := make([]*admin2.LimitUserLoginIP, 0, len(req.Limits))
 	for _, limit := range req.Limits {
-		ts = append(ts, &table.LimitUserLoginIP{
+		ts = append(ts, &admin2.LimitUserLoginIP{
 			UserID:     limit.UserID,
 			IP:         limit.Ip,
 			CreateTime: now,
@@ -64,12 +64,12 @@ func (o *adminServer) DelUserIPLimitLogin(ctx context.Context, req *admin.DelUse
 	if len(req.Limits) == 0 {
 		return nil, errs.ErrArgs.Wrap("limits is empty")
 	}
-	ts := make([]*table.LimitUserLoginIP, 0, len(req.Limits))
+	ts := make([]*admin2.LimitUserLoginIP, 0, len(req.Limits))
 	for _, limit := range req.Limits {
 		if limit.UserID == "" || limit.Ip == "" {
 			return nil, errs.ErrArgs.Wrap("user_id or ip is empty")
 		}
-		ts = append(ts, &table.LimitUserLoginIP{
+		ts = append(ts, &admin2.LimitUserLoginIP{
 			UserID: limit.UserID,
 			IP:     limit.Ip,
 		})

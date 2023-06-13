@@ -2,9 +2,9 @@ package chat
 
 import (
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/discoveryregistry"
-	"github.com/OpenIMSDK/chat/internal/rpc/dbconn"
 	"github.com/OpenIMSDK/chat/pkg/common/db/database"
-	"github.com/OpenIMSDK/chat/pkg/common/db/table"
+	chat2 "github.com/OpenIMSDK/chat/pkg/common/db/table/chat"
+	"github.com/OpenIMSDK/chat/pkg/common/dbconn"
 	"github.com/OpenIMSDK/chat/pkg/proto/chat"
 	chatClient "github.com/OpenIMSDK/chat/pkg/rpclient/chat"
 	"github.com/OpenIMSDK/chat/pkg/rpclient/openim"
@@ -18,11 +18,11 @@ func Start(zk discoveryregistry.SvcDiscoveryRegistry, server *grpc.Server) error
 		return err
 	}
 	tables := []any{
-		table.Account{},
-		table.Register{},
-		table.Attribute{},
-		table.VerifyCode{},
-		table.UserLoginRecord{},
+		chat2.Account{},
+		chat2.Register{},
+		chat2.Attribute{},
+		chat2.VerifyCode{},
+		chat2.UserLoginRecord{},
 	}
 	if err := db.AutoMigrate(tables...); err != nil {
 		return err

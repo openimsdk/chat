@@ -4,8 +4,8 @@ import (
 	"context"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/db/tx"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
-	"github.com/OpenIMSDK/chat/pkg/common/db/gormimpl"
-	"github.com/OpenIMSDK/chat/pkg/common/db/table"
+	"github.com/OpenIMSDK/chat/pkg/common/db/gormimpl/chat"
+	table "github.com/OpenIMSDK/chat/pkg/common/db/table/chat"
 	"gorm.io/gorm"
 	"time"
 )
@@ -38,11 +38,11 @@ type ChatDatabaseInterface interface {
 func NewChatDatabase(db *gorm.DB) ChatDatabaseInterface {
 	return &ChatDatabase{
 		tx:              tx.NewGorm(db),
-		register:        gormimpl.NewRegister(db),
-		account:         gormimpl.NewAccount(db),
-		attribute:       gormimpl.NewAttribute(db),
-		userLoginRecord: gormimpl.NewUserLoginRecord(db),
-		verifyCode:      gormimpl.NewVerifyCode(db),
+		register:        chat.NewRegister(db),
+		account:         chat.NewAccount(db),
+		attribute:       chat.NewAttribute(db),
+		userLoginRecord: chat.NewUserLoginRecord(db),
+		verifyCode:      chat.NewVerifyCode(db),
 	}
 }
 

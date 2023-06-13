@@ -5,7 +5,7 @@ import (
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/utils"
 	"github.com/OpenIMSDK/chat/pkg/common/constant"
-	"github.com/OpenIMSDK/chat/pkg/common/db/table"
+	admin2 "github.com/OpenIMSDK/chat/pkg/common/db/table/admin"
 	"github.com/OpenIMSDK/chat/pkg/common/mctx"
 	"github.com/OpenIMSDK/chat/pkg/proto/admin"
 	"github.com/OpenIMSDK/chat/pkg/proto/common"
@@ -27,7 +27,7 @@ func (o *adminServer) AddApplet(ctx context.Context, req *admin.AddAppletReq) (*
 	if !(req.Status == constant.StatusOnShelf || req.Status == constant.StatusUnShelf) {
 		return nil, errs.ErrArgs.Wrap("invalid status")
 	}
-	m := table.Applet{
+	m := admin2.Applet{
 		ID:         req.Id,
 		Name:       req.Name,
 		AppID:      req.AppID,
@@ -60,7 +60,7 @@ func (o *adminServer) DelApplet(ctx context.Context, req *admin.DelAppletReq) (*
 	if err != nil {
 		return nil, err
 	}
-	if ids := utils.Single(req.AppletIds, utils.Slice(applets, func(e *table.Applet) string { return e.ID })); len(ids) > 0 {
+	if ids := utils.Single(req.AppletIds, utils.Slice(applets, func(e *admin2.Applet) string { return e.ID })); len(ids) > 0 {
 		return nil, errs.ErrArgs.Wrap("ids not found: " + strings.Join(ids, ", "))
 	}
 	if err := o.Database.DelApplet(ctx, req.AppletIds); err != nil {

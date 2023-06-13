@@ -2,11 +2,11 @@ package chat
 
 import (
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/utils"
-	"github.com/OpenIMSDK/chat/pkg/common/db/table"
+	"github.com/OpenIMSDK/chat/pkg/common/db/table/chat"
 	"github.com/OpenIMSDK/chat/pkg/proto/common"
 )
 
-func DbToPbAttribute(attribute *table.Attribute) *common.UserPublicInfo {
+func DbToPbAttribute(attribute *chat.Attribute) *common.UserPublicInfo {
 	if attribute == nil {
 		return nil
 	}
@@ -21,11 +21,11 @@ func DbToPbAttribute(attribute *table.Attribute) *common.UserPublicInfo {
 	}
 }
 
-func DbToPbAttributes(attributes []*table.Attribute) []*common.UserPublicInfo {
+func DbToPbAttributes(attributes []*chat.Attribute) []*common.UserPublicInfo {
 	return utils.Slice(attributes, DbToPbAttribute)
 }
 
-func DbToPbUserFullInfo(attribute *table.Attribute) *common.UserFullInfo {
+func DbToPbUserFullInfo(attribute *chat.Attribute) *common.UserFullInfo {
 	return &common.UserFullInfo{
 		UserID:      attribute.UserID,
 		Password:    "",
@@ -45,6 +45,6 @@ func DbToPbUserFullInfo(attribute *table.Attribute) *common.UserFullInfo {
 	}
 }
 
-func DbToPbUserFullInfos(attributes []*table.Attribute) []*common.UserFullInfo {
+func DbToPbUserFullInfos(attributes []*chat.Attribute) []*common.UserFullInfo {
 	return utils.Slice(attributes, DbToPbUserFullInfo)
 }

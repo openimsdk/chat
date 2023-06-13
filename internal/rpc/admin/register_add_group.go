@@ -5,7 +5,7 @@ import (
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/proto/sdkws"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/utils"
-	"github.com/OpenIMSDK/chat/pkg/common/db/table"
+	admin2 "github.com/OpenIMSDK/chat/pkg/common/db/table/admin"
 	"github.com/OpenIMSDK/chat/pkg/common/mctx"
 	"github.com/OpenIMSDK/chat/pkg/proto/admin"
 	"strings"
@@ -37,9 +37,9 @@ func (o *adminServer) AddDefaultGroup(ctx context.Context, req *admin.AddDefault
 		return nil, errs.ErrGroupIDExisted.Wrap(strings.Join(exists, ", "))
 	}
 	now := time.Now()
-	ms := make([]*table.RegisterAddGroup, 0, len(req.GroupIDs))
+	ms := make([]*admin2.RegisterAddGroup, 0, len(req.GroupIDs))
 	for _, groupID := range req.GroupIDs {
-		ms = append(ms, &table.RegisterAddGroup{
+		ms = append(ms, &admin2.RegisterAddGroup{
 			GroupID:    groupID,
 			CreateTime: now,
 		})
@@ -68,9 +68,9 @@ func (o *adminServer) DelDefaultGroup(ctx context.Context, req *admin.DelDefault
 		return nil, errs.ErrGroupIDNotFound.Wrap(strings.Join(ids, ", "))
 	}
 	now := time.Now()
-	ms := make([]*table.RegisterAddGroup, 0, len(req.GroupIDs))
+	ms := make([]*admin2.RegisterAddGroup, 0, len(req.GroupIDs))
 	for _, groupID := range req.GroupIDs {
-		ms = append(ms, &table.RegisterAddGroup{
+		ms = append(ms, &admin2.RegisterAddGroup{
 			GroupID:    groupID,
 			CreateTime: now,
 		})
@@ -100,7 +100,7 @@ func (o *adminServer) SearchDefaultGroup(ctx context.Context, req *admin.SearchD
 	if err != nil {
 		return nil, err
 	}
-	groupIDs := utils.Slice(infos, func(info *table.RegisterAddGroup) string { return info.GroupID })
+	groupIDs := utils.Slice(infos, func(info *admin2.RegisterAddGroup) string { return info.GroupID })
 	groupMap, err := o.OpenIM.MapGroup(ctx, groupIDs)
 	if err != nil {
 		return nil, err

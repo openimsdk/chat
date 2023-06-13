@@ -7,7 +7,7 @@ import (
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/proto/wrapperspb"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/utils"
 	"github.com/OpenIMSDK/chat/pkg/common/db/dbutil"
-	"github.com/OpenIMSDK/chat/pkg/common/db/table"
+	admin2 "github.com/OpenIMSDK/chat/pkg/common/db/table/admin"
 	"github.com/OpenIMSDK/chat/pkg/common/mctx"
 	"github.com/OpenIMSDK/chat/pkg/proto/admin"
 	"github.com/OpenIMSDK/chat/pkg/proto/chat"
@@ -43,13 +43,13 @@ func (o *adminServer) BlockUser(ctx context.Context, req *admin.BlockUserReq) (*
 	if err := o.OpenIM.ForceOffline(ctx, req.UserID); err != nil {
 		return nil, err
 	}
-	t := &table.ForbiddenAccount{
+	t := &admin2.ForbiddenAccount{
 		UserID:         req.UserID,
 		Reason:         req.Reason,
 		OperatorUserID: mcontext.GetOpUserID(ctx),
 		CreateTime:     time.Now(),
 	}
-	if err := o.Database.BlockUser(ctx, []*table.ForbiddenAccount{t}); err != nil {
+	if err := o.Database.BlockUser(ctx, []*admin2.ForbiddenAccount{t}); err != nil {
 		return nil, err
 	}
 	return &admin.BlockUserResp{}, nil
@@ -70,7 +70,7 @@ func (o *adminServer) UnblockUser(ctx context.Context, req *admin.UnblockUserReq
 		return nil, err
 	}
 	if len(req.UserIDs) != len(bs) {
-		ids := utils.Single(req.UserIDs, utils.Slice(bs, func(info *table.ForbiddenAccount) string { return info.UserID }))
+		ids := utils.Single(req.UserIDs, utils.Slice(bs, func(info *admin2.ForbiddenAccount) string { return info.UserID }))
 		return nil, errs.ErrArgs.Wrap("user not blocked " + strings.Join(ids, ", "))
 	}
 	if err := o.Database.DelBlockUser(ctx, req.UserIDs); err != nil {
@@ -87,7 +87,7 @@ func (o *adminServer) SearchBlockUser(ctx context.Context, req *admin.SearchBloc
 	if err != nil {
 		return nil, err
 	}
-	userIDs := utils.Slice(infos, func(info *table.ForbiddenAccount) string { return info.UserID })
+	userIDs := utils.Slice(infos, func(info *admin2.ForbiddenAccount) string { return info.UserID })
 	userMap, err := o.Chat.MapUserFullInfo(ctx, userIDs)
 	if err != nil {
 		return nil, err

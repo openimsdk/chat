@@ -3,8 +3,8 @@ package database
 import (
 	"context"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/db/tx"
-	"github.com/OpenIMSDK/chat/pkg/common/db/gormimpl"
-	"github.com/OpenIMSDK/chat/pkg/common/db/table"
+	"github.com/OpenIMSDK/chat/pkg/common/db/gormimpl/admin"
+	table "github.com/OpenIMSDK/chat/pkg/common/db/table/admin"
 	"gorm.io/gorm"
 )
 
@@ -54,15 +54,15 @@ type AdminDatabaseInterface interface {
 func NewAdminDatabase(db *gorm.DB) AdminDatabaseInterface {
 	return &AdminDatabase{
 		tx:                 tx.NewGorm(db),
-		admin:              gormimpl.NewAdmin(db),
-		ipForbidden:        gormimpl.NewIPForbidden(db),
-		forbiddenAccount:   gormimpl.NewForbiddenAccount(db),
-		limitUserLoginIP:   gormimpl.NewLimitUserLoginIP(db),
-		invitationRegister: gormimpl.NewInvitationRegister(db),
-		registerAddFriend:  gormimpl.NewRegisterAddFriend(db),
-		registerAddGroup:   gormimpl.NewRegisterAddGroup(db),
-		applet:             gormimpl.NewApplet(db),
-		clientConfig:       gormimpl.NewClientConfig(db),
+		admin:              admin.NewAdmin(db),
+		ipForbidden:        admin.NewIPForbidden(db),
+		forbiddenAccount:   admin.NewForbiddenAccount(db),
+		limitUserLoginIP:   admin.NewLimitUserLoginIP(db),
+		invitationRegister: admin.NewInvitationRegister(db),
+		registerAddFriend:  admin.NewRegisterAddFriend(db),
+		registerAddGroup:   admin.NewRegisterAddGroup(db),
+		applet:             admin.NewApplet(db),
+		clientConfig:       admin.NewClientConfig(db),
 	}
 }
 

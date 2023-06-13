@@ -11,7 +11,7 @@ import (
 	"github.com/OpenIMSDK/chat/pkg/common/config"
 	"github.com/OpenIMSDK/chat/pkg/common/constant"
 	"github.com/OpenIMSDK/chat/pkg/common/db/dbutil"
-	"github.com/OpenIMSDK/chat/pkg/common/db/table"
+	chat2 "github.com/OpenIMSDK/chat/pkg/common/db/table/chat"
 	"github.com/OpenIMSDK/chat/pkg/eerrs"
 	"github.com/OpenIMSDK/chat/pkg/proto/chat"
 	"math/rand"
@@ -88,7 +88,7 @@ func (o *chatSvr) SendVerifyCode(ctx context.Context, req *chat.SendVerifyCodeRe
 	if verifyCode.MaxCount < int(count) {
 		return nil, eerrs.ErrVerifyCodeSendFrequently.Wrap()
 	}
-	t := &table.VerifyCode{
+	t := &chat2.VerifyCode{
 		Account:    o.verifyCodeJoin(req.AreaCode, req.PhoneNumber),
 		Code:       o.genVerifyCode(),
 		Duration:   uint(config.Config.VerifyCode.ValidTime),
@@ -262,7 +262,7 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 			return nil, err
 		}
 	}
-	register := &table.Register{
+	register := &chat2.Register{
 		UserID:      req.User.UserID,
 		DeviceID:    req.DeviceID,
 		IP:          req.Ip,
@@ -271,14 +271,14 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 		Mode:        constant.UserMode,
 		CreateTime:  time.Now(),
 	}
-	account := &table.Account{
+	account := &chat2.Account{
 		UserID:         req.User.UserID,
 		Password:       req.User.Password,
 		OperatorUserID: mcontext.GetOpUserID(ctx),
 		ChangeTime:     register.CreateTime,
 		CreateTime:     register.CreateTime,
 	}
-	attribute := &table.Attribute{
+	attribute := &chat2.Attribute{
 		UserID:         req.User.UserID,
 		Account:        req.User.Account,
 		PhoneNumber:    req.User.PhoneNumber,
@@ -352,7 +352,7 @@ func (o *chatSvr) Login(ctx context.Context, req *chat.LoginReq) (*chat.LoginRes
 		return nil, errs.ErrArgs.Wrap("password or code must be set")
 	}
 	var err error
-	var attribute *table.Attribute
+	var attribute *chat2.Attribute
 	if req.Account != "" {
 		attribute, err = o.Database.GetAttributeByAccount(ctx, req.Account)
 	} else if req.PhoneNumber != "" {
@@ -396,7 +396,7 @@ func (o *chatSvr) Login(ctx context.Context, req *chat.LoginReq) (*chat.LoginRes
 	if err != nil {
 		return nil, err
 	}
-	record := &table.UserLoginRecord{
+	record := &chat2.UserLoginRecord{
 		UserID:    attribute.UserID,
 		LoginTime: time.Now(),
 		IP:        req.Ip,

@@ -4,11 +4,11 @@ import (
 	"context"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/mcontext"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/discoveryregistry"
-	"github.com/OpenIMSDK/chat/internal/rpc/dbconn"
 	"github.com/OpenIMSDK/chat/pkg/common/constant"
 	"github.com/OpenIMSDK/chat/pkg/common/db/database"
 	"github.com/OpenIMSDK/chat/pkg/common/db/dbutil"
-	"github.com/OpenIMSDK/chat/pkg/common/db/table"
+	admin2 "github.com/OpenIMSDK/chat/pkg/common/db/table/admin"
+	"github.com/OpenIMSDK/chat/pkg/common/dbconn"
 	"github.com/OpenIMSDK/chat/pkg/common/mctx"
 	"github.com/OpenIMSDK/chat/pkg/eerrs"
 	"github.com/OpenIMSDK/chat/pkg/proto/admin"
@@ -23,15 +23,15 @@ func Start(zk discoveryregistry.SvcDiscoveryRegistry, server *grpc.Server) error
 		return err
 	}
 	tables := []any{
-		table.Admin{},
-		table.Applet{},
-		table.ForbiddenAccount{},
-		table.InvitationRegister{},
-		table.IPForbidden{},
-		table.LimitUserLoginIP{},
-		table.RegisterAddFriend{},
-		table.RegisterAddGroup{},
-		table.ClientConfig{},
+		admin2.Admin{},
+		admin2.Applet{},
+		admin2.ForbiddenAccount{},
+		admin2.InvitationRegister{},
+		admin2.IPForbidden{},
+		admin2.LimitUserLoginIP{},
+		admin2.RegisterAddFriend{},
+		admin2.RegisterAddGroup{},
+		admin2.ClientConfig{},
 	}
 	if err := db.AutoMigrate(tables...); err != nil {
 		return err
