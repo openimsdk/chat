@@ -150,7 +150,7 @@ func (o *OpenIMClient) ForceOffline(ctx context.Context, userID string) error {
 	return nil
 }
 
-func (o *OpenIMClient) GetGroupMember(ctx context.Context, groupID string) ([]string, error) {
+func (o *OpenIMClient) GetGroupMemberID(ctx context.Context, groupID string) ([]string, error) {
 	client, err := o.getGroupClient(ctx)
 	if err != nil {
 		return nil, err
