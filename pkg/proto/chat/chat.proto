@@ -1,9 +1,9 @@
 syntax = "proto3";
+package OpenIMChat.chat;
 import "pub/wrapperspb.proto";
 import "pub/sdkws.proto";
 import "common/common.proto";
 option go_package = "github.com/OpenIMSDK/chat/pkg/proto/chat";
-package OpenIMEnterprise.chat;
 
 message UserIdentity {
   string email = 1;
@@ -40,7 +40,7 @@ message FindUserPublicInfoReq{
 }
 
 message FindUserPublicInfoResp{
-  repeated OpenIMEnterprise.common.UserPublicInfo users = 1;
+  repeated OpenIMChat.common.UserPublicInfo users = 1;
 }
 
 message SearchUserPublicInfoReq{
@@ -51,7 +51,7 @@ message SearchUserPublicInfoReq{
 
 message SearchUserPublicInfoResp{
   uint32 total = 1;
-  repeated OpenIMEnterprise.common.UserPublicInfo users = 2;
+  repeated OpenIMChat.common.UserPublicInfo users = 2;
 }
 
 message FindUserFullInfoReq{
@@ -59,7 +59,7 @@ message FindUserFullInfoReq{
 }
 
 message FindUserFullInfoResp{
-  repeated OpenIMEnterprise.common.UserFullInfo users = 1;
+  repeated OpenIMChat.common.UserFullInfo users = 1;
 }
 
 
@@ -71,7 +71,7 @@ message SearchUserFullInfoReq{
 
 message SearchUserFullInfoResp{
   uint32 total = 1;
-  repeated OpenIMEnterprise.common.UserFullInfo users = 2;
+  repeated OpenIMChat.common.UserFullInfo users = 2;
 }
 
 message SendVerifyCodeReq {
@@ -187,7 +187,7 @@ message SignalRecord {
   string recvNickname = 7;
   string groupID = 8;
   string groupName = 9;
-  repeated OpenIMEnterprise.common.UserPublicInfo inviterUserList = 10;
+  repeated OpenIMChat.common.UserPublicInfo inviterUserList = 10;
   int32 duration = 11;
   int64 createTime = 12;
   string size = 13;

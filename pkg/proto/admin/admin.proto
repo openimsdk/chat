@@ -1,15 +1,9 @@
 syntax = "proto3";
+package OpenIMChat.admin;
 import "pub/wrapperspb.proto";
 import "pub/sdkws.proto";
 import "common/common.proto";
 option go_package = "github.com/OpenIMSDK/chat/pkg/proto/admin";
-
-package OpenIMEnterprise.admin;
-
-// ################### 公共 ###################
-
-
-// ################### 管理员 ###################
 
 //登录
 message LoginReq  {
@@ -46,7 +40,6 @@ message ChangePasswordResp  {}
 
 
 message GetAdminInfoReq {
-  //  string account = 1;
 }
 
 message GetAdminInfoResp {
@@ -87,7 +80,7 @@ message SearchDefaultFriendReq {
 message DefaultFriendAttribute {
   string userID = 1;
   int64 createTime = 2;
-  common.UserPublicInfo user = 3;
+  OpenIMChat.common.UserPublicInfo user = 3;
 }
 
 message SearchDefaultFriendResp {
@@ -175,7 +168,7 @@ message InvitationRegister {
   string invitationCode = 1;
   int64 createTime = 2;
   string usedUserID = 3;
-  OpenIMEnterprise.common.UserPublicInfo usedUser = 4;
+  OpenIMChat.common.UserPublicInfo usedUser = 4;
 }
 
 
@@ -204,7 +197,7 @@ message LimitUserLoginIP {
   string userID = 1;
   string ip = 2;
   int64 createTime = 3;
-  OpenIMEnterprise.common.UserPublicInfo user = 4;
+  OpenIMChat.common.UserPublicInfo user = 4;
 }
 
 message SearchUserIPLimitLoginResp {
@@ -417,7 +410,7 @@ message FindAppletReq {
 }
 
 message FindAppletResp {
-  repeated OpenIMEnterprise.common.AppletInfo applets = 1;
+  repeated OpenIMChat.common.AppletInfo applets = 1;
 }
 
 message SearchAppletReq {
@@ -427,7 +420,7 @@ message SearchAppletReq {
 
 message SearchAppletResp {
   uint32 total = 1;
-  repeated OpenIMEnterprise.common.AppletInfo applets = 2;
+  repeated OpenIMChat.common.AppletInfo applets = 2;
 }
 
 

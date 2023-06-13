@@ -1,5 +1,5 @@
 syntax = "proto3";
-package OpenIMEnterprise.common;
+package OpenIMChat.common;
 option go_package = "github.com/OpenIMSDK/chat/pkg/proto/common";
 
 
