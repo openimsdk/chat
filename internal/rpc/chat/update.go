@@ -3,6 +3,7 @@ package chat
 import (
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
 	"github.com/OpenIMSDK/chat/pkg/proto/chat"
+	"time"
 )
 
 func ToDBAttributeUpdate(req *chat.UpdateUserInfoReq) (map[string]any, error) {
@@ -32,7 +33,7 @@ func ToDBAttributeUpdate(req *chat.UpdateUserInfoReq) (map[string]any, error) {
 		update["level"] = req.Level.Value
 	}
 	if req.Birth != nil {
-		update["birth_time"] = req.Birth.Value
+		update["birth_time"] = time.UnixMilli(req.Birth.Value)
 	}
 	if req.AllowAddFriend != nil {
 		update["allow_add_friend"] = req.AllowAddFriend.Value

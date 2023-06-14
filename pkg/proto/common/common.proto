@@ -14,11 +14,10 @@ message UserFullInfo{
   string  faceURL = 8;
   int32  gender = 9;
   int32  level = 10;
-  int32  forbidden = 11;
-  int64 birth = 12;
-  int32  allowAddFriend = 13;
-  int32  allowBeep = 14;
-  int32  allowVibration = 15;
+  int64 birth = 11;
+  int32  allowAddFriend = 12;
+  int32  allowBeep = 13;
+  int32  allowVibration = 14;
 }
 
 message UserPublicInfo{
