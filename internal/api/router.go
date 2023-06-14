@@ -9,21 +9,21 @@ func NewChatRoute(router gin.IRouter, zk discoveryregistry.SvcDiscoveryRegistry)
 	mw := NewMW(zk)
 	chat := NewChat(zk)
 	account := router.Group("/account")
-	account.POST("/code/send", chat.SendVerifyCode)       //发送验证码
-	account.POST("/code/verify", chat.VerifyCode)         //校验验证码
-	account.POST("/register", chat.RegisterUser)          //注册
-	account.POST("/login", chat.Login)                    //登录
-	account.POST("/password/reset", chat.ResetPassword)   //忘记密码
-	account.POST("/password/change", chat.ChangePassword) //修改密码
+	account.POST("/code/send", chat.SendVerifyCode)                      //发送验证码
+	account.POST("/code/verify", chat.VerifyCode)                        //校验验证码
+	account.POST("/register", chat.RegisterUser)                         //注册
+	account.POST("/login", chat.Login)                                   //登录
+	account.POST("/password/reset", chat.ResetPassword)                  //忘记密码
+	account.POST("/password/change", mw.CheckToken, chat.ChangePassword) //修改密码
 
-	user := router.Group("/user", mw.CheckUser)
+	user := router.Group("/user", mw.CheckToken)
 	user.POST("/update", chat.UpdateUserInfo)              //编辑个人资料
 	user.POST("/find/public", chat.FindUserPublicInfo)     //获取用户公开信息
 	user.POST("/find/full", chat.FindUserFullInfo)         //获取用户所有信息
 	user.POST("/search/full", chat.SearchUserFullInfo)     //搜索用户公开信息
 	user.POST("/search/public", chat.SearchUserPublicInfo) //搜索用户所有信息
 
-	router.Group("/applet").POST("/find", mw.CheckUser, chat.FindApplet) //小程序列表
+	router.Group("/applet").POST("/find", mw.CheckToken, chat.FindApplet) //小程序列表
 
 	router.Group("/client_config").POST("/get", chat.GetClientConfig) //获取客户端初始化配置
 

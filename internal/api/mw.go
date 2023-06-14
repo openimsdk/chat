@@ -90,7 +90,3 @@ func (o *MW) CheckUser(c *gin.Context) {
 	}
 	o.setToken(c, userID, constant.NormalUser)
 }
-
-func (o *MW) CheckAdminOrNil(c *gin.Context) {
-
-}
