@@ -28,7 +28,7 @@ func (o *chatSvr) ResetPassword(ctx context.Context, req *chat.ResetPasswordReq)
 }
 
 func (o *chatSvr) ChangePassword(ctx context.Context, req *chat.ChangePasswordReq) (*chat.ChangePasswordResp, error) {
-	if req.Password == "" {
+	if req.NewPassword == "" {
 		return nil, errs.ErrArgs.Wrap("new password must be set")
 	}
 	opUserID, userType, err := mctx.Check(ctx)
@@ -50,11 +50,16 @@ func (o *chatSvr) ChangePassword(ctx context.Context, req *chat.ChangePasswordRe
 	default:
 		return nil, errs.ErrInternalServer.Wrap("invalid user type")
 	}
-	_, err = o.Database.GetUser(ctx, req.UserID)
+	user, err := o.Database.GetUser(ctx, req.UserID)
 	if err != nil {
 		return nil, err
 	}
-	if err := o.Database.UpdatePassword(ctx, req.UserID, req.Password); err != nil {
+	if userType != constant.AdminUser {
+		if user.Password != req.CurrentPassword {
+			return nil, errs.ErrNoPermission.Wrap("current password is wrong")
+		}
+	}
+	if err := o.Database.UpdatePassword(ctx, req.UserID, req.NewPassword); err != nil {
 		return nil, err
 	}
 	return &chat.ChangePasswordResp{}, nil

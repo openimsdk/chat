@@ -153,7 +153,8 @@ message ResetPasswordResp {
 
 message ChangePasswordReq {
   string userID = 1;
-  string password = 2;
+  string currentPassword = 2;
+  string newPassword = 3;
 }
 
 message ChangePasswordResp {
