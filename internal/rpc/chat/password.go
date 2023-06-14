@@ -31,6 +31,9 @@ func (o *chatSvr) ChangePassword(ctx context.Context, req *chat.ChangePasswordRe
 	if req.NewPassword == "" {
 		return nil, errs.ErrArgs.Wrap("new password must be set")
 	}
+	if req.NewPassword == req.CurrentPassword {
+		return nil, errs.ErrArgs.Wrap("new password == current password")
+	}
 	opUserID, userType, err := mctx.Check(ctx)
 	if err != nil {
 		return nil, err
@@ -59,8 +62,10 @@ func (o *chatSvr) ChangePassword(ctx context.Context, req *chat.ChangePasswordRe
 			return nil, errs.ErrNoPermission.Wrap("current password is wrong")
 		}
 	}
-	if err := o.Database.UpdatePassword(ctx, req.UserID, req.NewPassword); err != nil {
-		return nil, err
+	if user.Password != req.NewPassword {
+		if err := o.Database.UpdatePassword(ctx, req.UserID, req.NewPassword); err != nil {
+			return nil, err
+		}
 	}
 	return &chat.ChangePasswordResp{}, nil
 }
