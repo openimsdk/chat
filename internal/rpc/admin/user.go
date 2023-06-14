@@ -37,7 +37,7 @@ func (o *adminServer) BlockUser(ctx context.Context, req *admin.BlockUserReq) (*
 	_, err := o.Database.GetBlockInfo(ctx, req.UserID)
 	if err == nil {
 		return nil, errs.ErrArgs.Wrap("user already blocked")
-	} else if !dbutil.IsNotFound(err) {
+	} else if !dbutil.IsGormNotFound(err) {
 		return nil, err
 	}
 	if err := o.OpenIM.ForceOffline(ctx, req.UserID); err != nil {

@@ -92,7 +92,7 @@ func (o *adminServer) AdminUpdateInfo(ctx context.Context, req *admin.AdminUpdat
 func (o *adminServer) Login(ctx context.Context, req *admin.LoginReq) (*admin.LoginResp, error) {
 	a, err := o.Database.GetAdmin(ctx, req.Account)
 	if err != nil {
-		if dbutil.IsNotFound(err) {
+		if dbutil.IsGormNotFound(err) {
 			return nil, eerrs.ErrAccountNotFound.Wrap()
 		}
 		return nil, err

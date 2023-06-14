@@ -115,7 +115,7 @@ func (o *chatSvr) verifyCode(ctx context.Context, account string, verifyCode str
 	}
 	last, err := o.Database.TakeLastVerifyCode(ctx, account)
 	if err != nil {
-		if dbutil.IsNotFound(err) {
+		if dbutil.IsGormNotFound(err) {
 			return 0, eerrs.ErrVerifyCodeExpired.Wrap()
 		}
 		return 0, err
@@ -219,7 +219,7 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 			_, err := o.Database.GetUser(ctx, req.User.UserID)
 			if err == nil {
 				continue
-			} else if dbutil.IsNotFound(err) {
+			} else if dbutil.IsGormNotFound(err) {
 				req.User.UserID = userID
 				break
 			} else {
@@ -233,7 +233,7 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 		_, err := o.Database.GetUser(ctx, req.User.UserID)
 		if err == nil {
 			return nil, errs.ErrArgs.Wrap("appoint user id already register")
-		} else if !dbutil.IsNotFound(err) {
+		} else if !dbutil.IsGormNotFound(err) {
 			return nil, err
 		}
 	}

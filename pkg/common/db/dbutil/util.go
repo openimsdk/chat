@@ -5,6 +5,6 @@ import (
 	"gorm.io/gorm"
 )
 
-func IsNotFound(err error) bool {
+func IsGormNotFound(err error) bool {
 	return errs.Unwrap(err) == gorm.ErrRecordNotFound
 }
