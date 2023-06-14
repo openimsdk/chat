@@ -24,9 +24,9 @@ func (o *chatSvr) UpdateUserInfo(ctx context.Context, req *chat.UpdateUserInfoRe
 		if req.UserID != opUserID {
 			return nil, errs.ErrNoPermission.Wrap("only admin can update other user info")
 		}
-		if req.Email != nil {
-			return nil, errs.ErrNoPermission.Wrap("email can not be updated")
-		}
+		//if req.Email != nil {
+		//	return nil, errs.ErrNoPermission.Wrap("email can not be updated")
+		//}
 		if req.AreaCode != nil {
 			return nil, errs.ErrNoPermission.Wrap("areaCode can not be updated")
 		}

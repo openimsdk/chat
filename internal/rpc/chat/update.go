@@ -31,11 +31,8 @@ func ToDBAttributeUpdate(req *chat.UpdateUserInfoReq) (map[string]any, error) {
 	if req.Level != nil {
 		update["level"] = req.Level.Value
 	}
-	if req.Forbidden != nil {
-		update["forbidden"] = req.Forbidden.Value
-	}
 	if req.Birth != nil {
-		update["birth"] = req.Birth.Value
+		update["birth_time"] = req.Birth.Value
 	}
 	if req.AllowAddFriend != nil {
 		update["allow_add_friend"] = req.AllowAddFriend.Value

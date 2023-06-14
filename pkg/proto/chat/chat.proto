@@ -25,11 +25,10 @@ message UpdateUserInfoReq{
   OpenIMServer.protobuf.StringValue  faceURL = 7;
   OpenIMServer.protobuf.Int32Value  gender = 8;
   OpenIMServer.protobuf.Int32Value  level = 9;
-  OpenIMServer.protobuf.Int32Value  forbidden = 10;
-  OpenIMServer.protobuf.Int64Value birth = 11;
-  OpenIMServer.protobuf.Int32Value  allowAddFriend = 12;
-  OpenIMServer.protobuf.Int32Value  allowBeep = 13;
-  OpenIMServer.protobuf.Int32Value  allowVibration = 14;
+  OpenIMServer.protobuf.Int64Value birth = 10;
+  OpenIMServer.protobuf.Int32Value  allowAddFriend = 11;
+  OpenIMServer.protobuf.Int32Value  allowBeep = 12;
+  OpenIMServer.protobuf.Int32Value  allowVibration = 13;
 }
 
 message UpdateUserInfoResp{
