@@ -3,7 +3,7 @@ package database
 import (
 	"context"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/db/tx"
-	"github.com/OpenIMSDK/chat/pkg/common/db/gormimpl/admin"
+	"github.com/OpenIMSDK/chat/pkg/common/db/model/admin"
 	table "github.com/OpenIMSDK/chat/pkg/common/db/table/admin"
 	"gorm.io/gorm"
 )
