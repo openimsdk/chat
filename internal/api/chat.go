@@ -129,7 +129,7 @@ func (o *Chat) ResetPassword(c *gin.Context) {
 }
 
 func (o *Chat) ChangePassword(c *gin.Context) {
-	a2r.Call(chat.ChatClient.ResetPassword, o.chatClient, c)
+	a2r.Call(chat.ChatClient.ChangePassword, o.chatClient, c)
 }
 
 // ################## USER ##################
