@@ -2,6 +2,7 @@ package mctx
 
 import (
 	"context"
+	constant2 "github.com/OpenIMSDK/Open-IM-Server/pkg/common/constant"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
 	"github.com/OpenIMSDK/chat/pkg/common/constant"
 	"github.com/OpenIMSDK/chat/pkg/common/tokenverify"
@@ -82,4 +83,9 @@ func CheckAdminOr(ctx context.Context, userIDs ...string) error {
 		}
 	}
 	return errs.ErrNoPermission.Wrap("not admin or not in userIDs")
+}
+
+func GetOpUserID(ctx context.Context) string {
+	userID, _ := ctx.Value(constant2.OpUserID).(string)
+	return userID
 }
