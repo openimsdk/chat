@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
 	"github.com/OpenIMSDK/chat/pkg/common/constant"
+	"github.com/OpenIMSDK/chat/pkg/common/tokenverify"
 	"strconv"
 )
 
@@ -65,4 +66,20 @@ func CheckAdminOrUser(ctx context.Context) (string, int32, error) {
 		return "", 0, err
 	}
 	return userID, userType, nil
+}
+
+func CheckAdminOr(ctx context.Context, userIDs ...string) error {
+	userID, userType, err := Check(ctx)
+	if err != nil {
+		return err
+	}
+	if userType == tokenverify.TokenAdmin {
+		return nil
+	}
+	for _, id := range userIDs {
+		if userID == id {
+			return nil
+		}
+	}
+	return errs.ErrNoPermission.Wrap("not admin or not in userIDs")
 }
