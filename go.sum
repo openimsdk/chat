@@ -369,6 +369,8 @@ github.com/OpenIMSDK/Open-IM-Server v1.0.8-0.20230620023235-df888d22e746 h1:lSB1
 github.com/OpenIMSDK/Open-IM-Server v1.0.8-0.20230620023235-df888d22e746/go.mod h1:GBrMkMbTcw7fq9HddKKHLtbui9J7bVx6eCCur41z+5U=
 github.com/OpenIMSDK/Open-IM-Server v1.0.8-0.20230620064910-fbbd651f056a h1:IWLo5wLrqugVtPhBN1TvOg/9KqCPwvwfsxb6EHPdzyw=
 github.com/OpenIMSDK/Open-IM-Server v1.0.8-0.20230620064910-fbbd651f056a/go.mod h1:GBrMkMbTcw7fq9HddKKHLtbui9J7bVx6eCCur41z+5U=
+github.com/OpenIMSDK/Open-IM-Server v1.0.8-0.20230620090320-a1fc6e4e659e h1:MuBtS1VZO8MRpavyEGVzl8omkvPhvHeos423ESHHMW4=
+github.com/OpenIMSDK/Open-IM-Server v1.0.8-0.20230620090320-a1fc6e4e659e/go.mod h1:GBrMkMbTcw7fq9HddKKHLtbui9J7bVx6eCCur41z+5U=
 github.com/OpenIMSDK/openKeeper v0.0.11 h1:woElBVvXZ90seBKRwHxkY4is7tpIiQNMkSgl27DMwzI=
 github.com/OpenIMSDK/openKeeper v0.0.11/go.mod h1:HwHgo+p3E+aAeiLOSyDwVB2zFJtu+QvnFNlfNjFG9vA=
 github.com/OpenIMSDK/open_utils v1.0.8 h1:IopxWgJwEF5ZAPsRuiZZOfcxNOQOCt/p8VDENcHN9r4=
