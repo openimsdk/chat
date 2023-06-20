@@ -2,8 +2,8 @@ package admin
 
 import (
 	"context"
-	"github.com/OpenIMSDK/chat/internal/tokenverify"
 	"github.com/OpenIMSDK/chat/pkg/common/config"
+	"github.com/OpenIMSDK/chat/pkg/common/tokenverify"
 	"github.com/OpenIMSDK/chat/pkg/proto/admin"
 )
 

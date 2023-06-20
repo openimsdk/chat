@@ -3,14 +3,15 @@ package tokenverify
 import (
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
 	"github.com/OpenIMSDK/chat/pkg/common/config"
+	"github.com/OpenIMSDK/chat/pkg/common/constant"
 	utils "github.com/OpenIMSDK/open_utils"
 	"github.com/golang-jwt/jwt/v4"
 	"time"
 )
 
 const (
-	TokenUser  = 1
-	TokenAdmin = 2
+	TokenUser  = constant.NormalUser
+	TokenAdmin = constant.AdminUser
 )
 
 type claims struct {
