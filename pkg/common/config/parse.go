@@ -46,9 +46,9 @@ func InitConfig() error {
 	if err := yaml.NewDecoder(bytes.NewReader(data)).Decode(&Config); err != nil {
 		return fmt.Errorf("parse loacl openIMConfig file error: %w", err)
 	}
-	zk, err := openKeeper.NewClient(openIMConfig.Config.Zookeeper.ZkAddr, openIMConfig.Config.Zookeeper.Schema,
-		openKeeper.WithFreq(time.Hour), openKeeper.WithUserNameAndPassword(openIMConfig.Config.Zookeeper.UserName,
-			openIMConfig.Config.Zookeeper.Password), openKeeper.WithRoundRobin(), openKeeper.WithTimeout(10), openKeeper.WithLogger(log.NewZkLogger()))
+	zk, err := openKeeper.NewClient(Config.Zookeeper.ZkAddr, Config.Zookeeper.Schema,
+		openKeeper.WithFreq(time.Hour), openKeeper.WithUserNameAndPassword(Config.Zookeeper.UserName,
+			Config.Zookeeper.Password), openKeeper.WithRoundRobin(), openKeeper.WithTimeout(10), openKeeper.WithLogger(log.NewZkLogger()))
 	if err != nil {
 		return fmt.Errorf("conn zk error: %w", err)
 	}
