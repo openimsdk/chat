@@ -5,7 +5,6 @@ import (
 	"fmt"
 	openIMConfig "github.com/OpenIMSDK/Open-IM-Server/pkg/common/config"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/constant"
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/log"
 	openKeeper "github.com/OpenIMSDK/Open-IM-Server/pkg/discoveryregistry/zookeeper"
 	"gopkg.in/yaml.v3"
 	"os"
@@ -48,7 +47,7 @@ func InitConfig() error {
 	}
 	zk, err := openKeeper.NewClient(Config.Zookeeper.ZkAddr, Config.Zookeeper.Schema,
 		openKeeper.WithFreq(time.Hour), openKeeper.WithUserNameAndPassword(Config.Zookeeper.UserName,
-			Config.Zookeeper.Password), openKeeper.WithRoundRobin(), openKeeper.WithTimeout(10), openKeeper.WithLogger(log.NewZkLogger()))
+			Config.Zookeeper.Password), openKeeper.WithRoundRobin(), openKeeper.WithTimeout(10), openKeeper.WithLogger(&zkLogger{}))
 	if err != nil {
 		return fmt.Errorf("conn zk error: %w", err)
 	}
@@ -77,4 +76,10 @@ func InitConfig() error {
 	Config.Log.IsJson = openIMConfig.Config.Log.IsJson
 
 	return nil
+}
+
+type zkLogger struct{}
+
+func (l *zkLogger) Printf(format string, a ...interface{}) {
+	fmt.Printf("zk get config %s\n", fmt.Sprintf(format, a...))
 }
