@@ -4,17 +4,16 @@ import (
 	"flag"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/log"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/mw"
+	openKeeper "github.com/OpenIMSDK/Open-IM-Server/pkg/discoveryregistry/zookeeper"
 	"github.com/OpenIMSDK/chat/internal/api"
 	"github.com/OpenIMSDK/chat/pkg/common/config"
-	"github.com/OpenIMSDK/openKeeper"
+	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"math/rand"
 	"net"
 	"strconv"
 	"time"
-
-	"github.com/gin-gonic/gin"
 )
 
 func main() {

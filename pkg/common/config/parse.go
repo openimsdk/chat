@@ -5,7 +5,7 @@ import (
 	"fmt"
 	openIMConfig "github.com/OpenIMSDK/Open-IM-Server/pkg/common/config"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/constant"
-	"github.com/OpenIMSDK/openKeeper"
+	openKeeper "github.com/OpenIMSDK/Open-IM-Server/pkg/discoveryregistry/zookeeper"
 	"gopkg.in/yaml.v3"
 	"os"
 	"path/filepath"

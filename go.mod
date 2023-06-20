@@ -22,8 +22,7 @@ require (
 )
 
 require (
-	github.com/OpenIMSDK/Open-IM-Server v1.0.8-0.20230619022250-c5dd8ad548ee
-	github.com/OpenIMSDK/openKeeper v0.0.11
+	github.com/OpenIMSDK/Open-IM-Server v1.0.8-0.20230619050255-e2cdc6a64520
 	github.com/alibabacloud-go/darabonba-openapi v0.2.1
 	github.com/alibabacloud-go/dysmsapi-20170525/v2 v2.0.18
 	github.com/alibabacloud-go/tea v1.1.20
