@@ -2,7 +2,7 @@ module github.com/OpenIMSDK/chat
 
 go 1.18
 
-// go get -u github.com/OpenIMSDK/Open-IM-Server@errcode
+// go get -u github.com/OpenIMSDK/Open-IM-Server@ver3
 require (
 	github.com/OpenIMSDK/open_utils v1.0.8
 	github.com/gin-gonic/gin v1.9.1
@@ -22,7 +22,7 @@ require (
 )
 
 require (
-	github.com/OpenIMSDK/Open-IM-Server v1.0.8-0.20230620090320-a1fc6e4e659e
+	github.com/OpenIMSDK/Open-IM-Server v1.0.8-0.20230621033912-41023a440474
 	github.com/alibabacloud-go/darabonba-openapi v0.2.1
 	github.com/alibabacloud-go/dysmsapi-20170525/v2 v2.0.18
 	github.com/alibabacloud-go/tea v1.1.20

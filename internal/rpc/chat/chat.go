@@ -12,7 +12,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-func Start(zk discoveryregistry.SvcDiscoveryRegistry, server *grpc.Server) error {
+func Start(discov discoveryregistry.SvcDiscoveryRegistry, server *grpc.Server) error {
 	db, err := dbconn.NewGormDB()
 	if err != nil {
 		return err
@@ -33,8 +33,8 @@ func Start(zk discoveryregistry.SvcDiscoveryRegistry, server *grpc.Server) error
 	}
 	chat.RegisterChatServer(server, &chatSvr{
 		Database: database.NewChatDatabase(db),
-		Admin:    chatClient.NewAdminClient(zk),
-		OpenIM:   openim.NewOpenIMClient(zk),
+		Admin:    chatClient.NewAdminClient(discov),
+		OpenIM:   openim.NewOpenIMClient(discov),
 		SMS:      s,
 	})
 	return nil

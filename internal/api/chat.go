@@ -16,28 +16,21 @@ import (
 	"net"
 )
 
-func NewChat(zk discoveryregistry.SvcDiscoveryRegistry) *Chat {
-	return &Chat{zk: zk}
+func NewChat(discov discoveryregistry.SvcDiscoveryRegistry) *Chat {
+	chatConn, err := discov.GetConn(context.Background(), config.Config.RpcRegisterName.OpenImChatName)
+	if err != nil {
+		panic(err)
+	}
+	adminConn, err := discov.GetConn(context.Background(), config.Config.RpcRegisterName.OpenImAdminName)
+	if err != nil {
+		panic(err)
+	}
+	return &Chat{chatClient: chat.NewChatClient(chatConn), adminClient: admin.NewAdminClient(adminConn)}
 }
 
 type Chat struct {
-	zk discoveryregistry.SvcDiscoveryRegistry
-}
-
-func (o *Chat) chatClient(ctx context.Context) (chat.ChatClient, error) {
-	conn, err := o.zk.GetConn(ctx, config.Config.RpcRegisterName.OpenImChatName)
-	if err != nil {
-		return nil, err
-	}
-	return chat.NewChatClient(conn), nil
-}
-
-func (o *Chat) adminClient(ctx context.Context) (admin.AdminClient, error) {
-	conn, err := o.zk.GetConn(ctx, config.Config.RpcRegisterName.OpenImAdminName)
-	if err != nil {
-		return nil, err
-	}
-	return admin.NewAdminClient(conn), nil
+	chatClient  chat.ChatClient
+	adminClient admin.AdminClient
 }
 
 // ################## ACCOUNT ##################
@@ -54,18 +47,12 @@ func (o *Chat) SendVerifyCode(c *gin.Context) {
 		return
 	}
 	req.Ip = ip
-	client, err := o.chatClient(c)
-	if err != nil {
-		apiresp.GinError(c, err)
-		return
-	}
-	resp, err := client.SendVerifyCode(c, &req)
+	resp, err := o.chatClient.SendVerifyCode(c, &req)
 	if err != nil {
 		apiresp.GinError(c, err)
 		return
 	}
 	apiresp.GinSuccess(c, resp)
-	//a2r.Call(chat.ChatClient.SendVerifyCode, o.chatClient, c)
 }
 
 func (o *Chat) VerifyCode(c *gin.Context) {
@@ -84,12 +71,7 @@ func (o *Chat) RegisterUser(c *gin.Context) {
 		return
 	}
 	req.Ip = ip
-	client, err := o.chatClient(c)
-	if err != nil {
-		apiresp.GinError(c, err)
-		return
-	}
-	resp, err := client.RegisterUser(c, &req)
+	resp, err := o.chatClient.RegisterUser(c, &req)
 	if err != nil {
 		apiresp.GinError(c, err)
 		return
@@ -110,18 +92,12 @@ func (o *Chat) Login(c *gin.Context) {
 		return
 	}
 	req.Ip = ip
-	client, err := o.chatClient(c)
-	if err != nil {
-		apiresp.GinError(c, err)
-		return
-	}
-	resp, err := client.Login(c, &req)
+	resp, err := o.chatClient.Login(c, &req)
 	if err != nil {
 		apiresp.GinError(c, err)
 		return
 	}
 	apiresp.GinSuccess(c, resp)
-	//a2r.Call(chat.ChatClient.Login, o.chatClient, c)
 }
 
 func (o *Chat) ResetPassword(c *gin.Context) {
@@ -178,16 +154,11 @@ func (o *Chat) OpenIMCallback(c *gin.Context) {
 		apiresp.GinError(c, err)
 		return
 	}
-	cli, err := o.chatClient(c)
-	if err != nil {
-		apiresp.GinError(c, err)
-		return
-	}
 	req := &chat.OpenIMCallbackReq{
 		Command: c.Query(constant.CallbackCommand),
 		Body:    string(body),
 	}
-	if _, err := cli.OpenIMCallback(c, req); err != nil {
+	if _, err := o.chatClient.OpenIMCallback(c, req); err != nil {
 		apiresp.GinError(c, err)
 		return
 	}

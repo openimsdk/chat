@@ -10,33 +10,26 @@ import (
 	"github.com/OpenIMSDK/chat/pkg/proto/common"
 )
 
-func NewChatClient(zk discoveryregistry.SvcDiscoveryRegistry) *ChatClient {
-	return &ChatClient{
-		zk: zk,
+func NewChatClient(discov discoveryregistry.SvcDiscoveryRegistry) *ChatClient {
+	conn, err := discov.GetConn(context.Background(), config.Config.RpcRegisterName.OpenImChatName)
+	if err != nil {
+		panic(err)
 	}
+	client := chat.NewChatClient(conn)
+	return &ChatClient{Client: client}
 }
 
 type ChatClient struct {
-	zk discoveryregistry.SvcDiscoveryRegistry
+	Client chat.ChatClient
 }
 
-func (o *ChatClient) getClient(ctx context.Context) (chat.ChatClient, error) {
-	conn, err := o.zk.GetConn(ctx, config.Config.RpcRegisterName.OpenImChatName)
-	if err != nil {
-		return nil, err
-	}
-	return chat.NewChatClient(conn), nil
-}
+//type ChatClient Chat
 
 func (o *ChatClient) FindUserPublicInfo(ctx context.Context, userIDs []string) ([]*common.UserPublicInfo, error) {
 	if len(userIDs) == 0 {
 		return []*common.UserPublicInfo{}, nil
 	}
-	client, err := o.getClient(ctx)
-	if err != nil {
-		return nil, err
-	}
-	resp, err := client.FindUserPublicInfo(ctx, &chat.FindUserPublicInfoReq{UserIDs: userIDs})
+	resp, err := o.Client.FindUserPublicInfo(ctx, &chat.FindUserPublicInfoReq{UserIDs: userIDs})
 	if err != nil {
 		return nil, err
 	}
@@ -57,11 +50,7 @@ func (o *ChatClient) FindUserFullInfo(ctx context.Context, userIDs []string) ([]
 	if len(userIDs) == 0 {
 		return []*common.UserFullInfo{}, nil
 	}
-	client, err := o.getClient(ctx)
-	if err != nil {
-		return nil, err
-	}
-	resp, err := client.FindUserFullInfo(ctx, &chat.FindUserFullInfoReq{UserIDs: userIDs})
+	resp, err := o.Client.FindUserFullInfo(ctx, &chat.FindUserFullInfoReq{UserIDs: userIDs})
 	if err != nil {
 		return nil, err
 	}
@@ -103,10 +92,6 @@ func (o *ChatClient) GetUserPublicInfo(ctx context.Context, userID string) (*com
 }
 
 func (o *ChatClient) UpdateUser(ctx context.Context, req *chat.UpdateUserInfoReq) error {
-	client, err := o.getClient(ctx)
-	if err != nil {
-		return err
-	}
-	_, err = client.UpdateUserInfo(ctx, req)
+	_, err := o.Client.UpdateUserInfo(ctx, req)
 	return err
 }

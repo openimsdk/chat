@@ -2,7 +2,7 @@ package api
 
 import (
 	"context"
-	a2r "github.com/OpenIMSDK/Open-IM-Server/pkg/a2r"
+	"github.com/OpenIMSDK/Open-IM-Server/pkg/a2r"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/discoveryregistry"
 	"github.com/OpenIMSDK/chat/pkg/common/config"
 	"github.com/OpenIMSDK/chat/pkg/proto/admin"
@@ -10,28 +10,21 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func NewAdmin(zk discoveryregistry.SvcDiscoveryRegistry) *Admin {
-	return &Admin{zk: zk}
+func NewAdmin(discov discoveryregistry.SvcDiscoveryRegistry) *Admin {
+	chatConn, err := discov.GetConn(context.Background(), config.Config.RpcRegisterName.OpenImChatName)
+	if err != nil {
+		panic(err)
+	}
+	adminConn, err := discov.GetConn(context.Background(), config.Config.RpcRegisterName.OpenImAdminName)
+	if err != nil {
+		panic(err)
+	}
+	return &Admin{chatClient: chat.NewChatClient(chatConn), adminClient: admin.NewAdminClient(adminConn)}
 }
 
 type Admin struct {
-	zk discoveryregistry.SvcDiscoveryRegistry
-}
-
-func (o *Admin) adminClient(ctx context.Context) (admin.AdminClient, error) {
-	conn, err := o.zk.GetConn(ctx, config.Config.RpcRegisterName.OpenImAdminName)
-	if err != nil {
-		return nil, err
-	}
-	return admin.NewAdminClient(conn), nil
-}
-
-func (o *Admin) chatClient(ctx context.Context) (chat.ChatClient, error) {
-	conn, err := o.zk.GetConn(ctx, config.Config.RpcRegisterName.OpenImChatName)
-	if err != nil {
-		return nil, err
-	}
-	return chat.NewChatClient(conn), nil
+	chatClient  chat.ChatClient
+	adminClient admin.AdminClient
 }
 
 func (o *Admin) AdminLogin(c *gin.Context) {
