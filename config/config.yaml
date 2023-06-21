@@ -17,6 +17,17 @@ rpcregistername:
   openImAdminName: admin
   openImChatName: chat
 mysql:
+  # 没有配置代表和openIM保持一致
+  # dbMysqlAddress: [ 127.0.0.1:13306 ] #mysql地址 目前仅支持单机，默认即可
+  # dbMysqlUserName: root #mysql用户名，建议修改
+  # dbMysqlPassword: openIM123 # mysql密码，建议修改
+  # dbTableName: eMsg #默认即可
+  # dbMsgTableNum: 1
+  # dbMaxOpenConns: 100
+  # dbMaxIdleConns: 10
+  # dbMaxLifeTime: 5
+  # logLevel: 4 #1=slient 2=error 3=warn 4=info
+  # slowThreshold: 500
   dbMysqlDatabaseName: openim_enterprise
 
 tokenPolicy:

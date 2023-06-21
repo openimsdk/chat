@@ -29,24 +29,24 @@ var Config struct {
 		OpenImChatName  string `yaml:"openImChatName"`
 	} `yaml:"rpcregistername"`
 	Mysql struct {
-		DBAddress      []string `yaml:"dbMysqlAddress"`
-		DBUserName     string   `yaml:"dbMysqlUserName"`
-		DBPassword     string   `yaml:"dbMysqlPassword"`
-		DBDatabaseName string   `yaml:"dbMysqlDatabaseName"`
-		DBMaxOpenConns int      `yaml:"dbMaxOpenConns"`
-		DBMaxIdleConns int      `yaml:"dbMaxIdleConns"`
-		DBMaxLifeTime  int      `yaml:"dbMaxLifeTime"`
-		LogLevel       int      `yaml:"logLevel"`
-		SlowThreshold  int      `yaml:"slowThreshold"`
+		DBAddress      *[]string `yaml:"dbMysqlAddress"`
+		DBUserName     *string   `yaml:"dbMysqlUserName"`
+		DBPassword     *string   `yaml:"dbMysqlPassword"`
+		DBDatabaseName *string   `yaml:"dbMysqlDatabaseName"`
+		DBMaxOpenConns *int      `yaml:"dbMaxOpenConns"`
+		DBMaxIdleConns *int      `yaml:"dbMaxIdleConns"`
+		DBMaxLifeTime  *int      `yaml:"dbMaxLifeTime"`
+		LogLevel       *int      `yaml:"logLevel"`
+		SlowThreshold  *int      `yaml:"slowThreshold"`
 	}
 	Log struct {
-		StorageLocation     string `yaml:"storageLocation"`
-		RotationTime        int    `yaml:"rotationTime"`
-		RemainRotationCount uint   `yaml:"remainRotationCount"`
-		RemainLogLevel      int    `yaml:"remainLogLevel"`
-		IsStdout            bool   `yaml:"isStdout"`
-		WithStack           bool   `yaml:"withStack"`
-		IsJson              bool   `yaml:"isJson"`
+		StorageLocation     *string `yaml:"storageLocation"`
+		RotationTime        *int    `yaml:"rotationTime"`
+		RemainRotationCount *uint   `yaml:"remainRotationCount"`
+		RemainLogLevel      *int    `yaml:"remainLogLevel"`
+		IsStdout            *bool   `yaml:"isStdout"`
+		WithStack           *bool   `yaml:"withStack"`
+		IsJson              *bool   `yaml:"isJson"`
 	}
 	TokenPolicy struct {
 		AccessSecret string `yaml:"accessSecret"`

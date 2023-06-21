@@ -15,7 +15,7 @@ import (
 
 func NewMysqlGormDB() (*gorm.DB, error) {
 	dsn := fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8mb4&parseTime=true&loc=Local",
-		config.Config.Mysql.DBUserName, config.Config.Mysql.DBPassword, config.Config.Mysql.DBAddress[0], "mysql")
+		config.Config.Mysql.DBUserName, config.Config.Mysql.DBPassword, (*config.Config.Mysql.DBAddress)[0], "mysql")
 	db, err := gorm.Open(mysql.Open(dsn), nil)
 	if err != nil {
 		time.Sleep(time.Duration(30) * time.Second)
@@ -35,8 +35,8 @@ func NewMysqlGormDB() (*gorm.DB, error) {
 		return nil, fmt.Errorf("init db %w", err)
 	}
 	dsn = fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8mb4&parseTime=true&loc=Local",
-		config.Config.Mysql.DBUserName, config.Config.Mysql.DBPassword, config.Config.Mysql.DBAddress[0], config.Config.Mysql.DBDatabaseName)
-	sqlLogger := log.NewSqlLogger(logger.LogLevel(config.Config.Mysql.LogLevel), true, time.Duration(config.Config.Mysql.SlowThreshold)*time.Millisecond)
+		config.Config.Mysql.DBUserName, config.Config.Mysql.DBPassword, (*config.Config.Mysql.DBAddress)[0], config.Config.Mysql.DBDatabaseName)
+	sqlLogger := log.NewSqlLogger(logger.LogLevel(*config.Config.Mysql.LogLevel), true, time.Duration(*config.Config.Mysql.SlowThreshold)*time.Millisecond)
 	db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{
 		Logger: sqlLogger,
 	})
@@ -47,9 +47,9 @@ func NewMysqlGormDB() (*gorm.DB, error) {
 	if err != nil {
 		return nil, err
 	}
-	sqlDB.SetConnMaxLifetime(time.Second * time.Duration(config.Config.Mysql.DBMaxLifeTime))
-	sqlDB.SetMaxOpenConns(config.Config.Mysql.DBMaxOpenConns)
-	sqlDB.SetMaxIdleConns(config.Config.Mysql.DBMaxIdleConns)
+	sqlDB.SetConnMaxLifetime(time.Second * time.Duration(*config.Config.Mysql.DBMaxLifeTime))
+	sqlDB.SetMaxOpenConns(*config.Config.Mysql.DBMaxOpenConns)
+	sqlDB.SetMaxIdleConns(*config.Config.Mysql.DBMaxIdleConns)
 	return db, nil
 }
 

@@ -11,7 +11,7 @@ func main() {
 	if err := config.InitConfig(); err != nil {
 		panic(err)
 	}
-	if err := log.InitFromConfig("chat.log", "chat-rpc", config.Config.Log.RemainLogLevel, config.Config.Log.IsStdout, config.Config.Log.IsJson, config.Config.Log.StorageLocation, config.Config.Log.RemainRotationCount); err != nil {
+	if err := log.InitFromConfig("chat.log", "chat-rpc", *config.Config.Log.RemainLogLevel, *config.Config.Log.IsStdout, *config.Config.Log.IsJson, *config.Config.Log.StorageLocation, *config.Config.Log.RemainRotationCount); err != nil {
 		panic(err)
 	}
 	err := startrpc.Start(config.Config.RpcPort.OpenImChatPort[0], config.Config.RpcRegisterName.OpenImChatName, 0, chat.Start)

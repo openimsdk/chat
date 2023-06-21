@@ -58,24 +58,32 @@ func InitConfig() error {
 	if err := yaml.NewDecoder(bytes.NewReader(openIMConfigData)).Decode(&openIMConfig.Config); err != nil {
 		return fmt.Errorf("parse zk openIMConfig: %w", err)
 	}
-	Config.Mysql.DBAddress = openIMConfig.Config.Mysql.DBAddress
-	Config.Mysql.DBUserName = openIMConfig.Config.Mysql.DBUserName
-	Config.Mysql.DBPassword = openIMConfig.Config.Mysql.DBPassword
-	Config.Mysql.DBMaxOpenConns = openIMConfig.Config.Mysql.DBMaxOpenConns
-	Config.Mysql.DBMaxIdleConns = openIMConfig.Config.Mysql.DBMaxIdleConns
-	Config.Mysql.DBMaxLifeTime = openIMConfig.Config.Mysql.DBMaxLifeTime
-	Config.Mysql.LogLevel = openIMConfig.Config.Mysql.LogLevel
-	Config.Mysql.SlowThreshold = openIMConfig.Config.Mysql.SlowThreshold
 
-	Config.Log.StorageLocation = openIMConfig.Config.Log.StorageLocation
-	Config.Log.RotationTime = openIMConfig.Config.Log.RotationTime
-	Config.Log.RemainRotationCount = openIMConfig.Config.Log.RemainRotationCount
-	Config.Log.RemainLogLevel = openIMConfig.Config.Log.RemainLogLevel
-	Config.Log.IsStdout = openIMConfig.Config.Log.IsStdout
-	Config.Log.WithStack = openIMConfig.Config.Log.WithStack
-	Config.Log.IsJson = openIMConfig.Config.Log.IsJson
+	configFieldCopy(&Config.Mysql.DBAddress, openIMConfig.Config.Mysql.DBAddress)
+	configFieldCopy(&Config.Mysql.DBUserName, openIMConfig.Config.Mysql.DBUserName)
+	configFieldCopy(&Config.Mysql.DBPassword, openIMConfig.Config.Mysql.DBPassword)
+	configFieldCopy(&Config.Mysql.DBDatabaseName, openIMConfig.Config.Mysql.DBDatabaseName)
+	configFieldCopy(&Config.Mysql.DBMaxOpenConns, openIMConfig.Config.Mysql.DBMaxOpenConns)
+	configFieldCopy(&Config.Mysql.DBMaxIdleConns, openIMConfig.Config.Mysql.DBMaxIdleConns)
+	configFieldCopy(&Config.Mysql.DBMaxLifeTime, openIMConfig.Config.Mysql.DBMaxLifeTime)
+	configFieldCopy(&Config.Mysql.LogLevel, openIMConfig.Config.Mysql.LogLevel)
+	configFieldCopy(&Config.Mysql.SlowThreshold, openIMConfig.Config.Mysql.SlowThreshold)
+
+	configFieldCopy(&Config.Log.StorageLocation, openIMConfig.Config.Log.StorageLocation)
+	configFieldCopy(&Config.Log.RotationTime, openIMConfig.Config.Log.RotationTime)
+	configFieldCopy(&Config.Log.RemainRotationCount, openIMConfig.Config.Log.RemainRotationCount)
+	configFieldCopy(&Config.Log.RemainLogLevel, openIMConfig.Config.Log.RemainLogLevel)
+	configFieldCopy(&Config.Log.IsStdout, openIMConfig.Config.Log.IsStdout)
+	configFieldCopy(&Config.Log.WithStack, openIMConfig.Config.Log.WithStack)
+	configFieldCopy(&Config.Log.IsJson, openIMConfig.Config.Log.IsJson)
 
 	return nil
+}
+
+func configFieldCopy[T any](local **T, remote T) {
+	if *local == nil {
+		*local = &remote
+	}
 }
 
 type zkLogger struct{}
