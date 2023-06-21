@@ -1,6 +1,5 @@
 # chat
 
-
 ## 修改配置项
 
 参考config/config.yaml的配置说明，重点关注与DB相关的配置项，以保持和IM一致。
@@ -16,7 +15,7 @@ cd script
 
  ```
  cd script
- ./start_rpc_service.sh
+ ./start_all.sh
  ```
 
 ## 检测
