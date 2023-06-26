@@ -25,5 +25,5 @@ type DepartmentInterface interface {
 	GetList(ctx context.Context, departmentIdList []string) ([]*Department, error)
 	UpdateParentID(ctx context.Context, oldParentID, newParentID string) error
 	Delete(ctx context.Context, departmentIDList []string) error
+	GetDepartment(ctx context.Context, departmentID string) (*Department, error)
 }
- 

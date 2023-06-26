@@ -65,7 +65,7 @@ func (o *organizationSvr) GetDepartmentMemberNum(ctx context.Context, parentID s
 		return nil, err
 	}
 
-	members, err := o.Database.FindDepartmentMember(departmentIDList)
+	members, err := o.Database.FindDepartmentMember(ctx, departmentIDList)
 	if err != nil {
 		return nil, err
 	}

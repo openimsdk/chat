@@ -25,4 +25,5 @@ type DepartmentMemberInterface interface {
 	Create(ctx context.Context, m *DepartmentMember) error
 	Get(ctx context.Context, userID string) ([]*DepartmentMember, error)
 	DeleteByKey(ctx context.Context, userID string, departmentID string) error
+	Update(ctx context.Context, m *DepartmentMember) error
 }

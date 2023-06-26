@@ -48,3 +48,8 @@ func (o *DepartmentMember) Get(ctx context.Context, userID string) ([]*table.Dep
 func (o *DepartmentMember) DeleteByKey(ctx context.Context, userID, departmentID string) error {
 	return utils.Wrap(o.db.WithContext(ctx).Where("user_id = ? AND department_id = ?", userID, departmentID).Delete(&table.DepartmentMember{}).Error, "")
 }
+
+func (o *DepartmentMember) Update(ctx context.Context, m *table.DepartmentMember) error {
+	m.ChangeTime = time.Now()
+	return utils.Wrap(o.db.Where("user_id = ? AND department_id = ?", m.UserID, m.DepartmentID).Updates(m).Error, "")
+}

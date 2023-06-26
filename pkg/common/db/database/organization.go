@@ -14,8 +14,7 @@ type OrganizationDatabaseInterface interface {
 	CreateDepartment(ctx context.Context, department ...*table.Department) error
 	UpdateDepartment(ctx context.Context, department *table.Department) error
 	GetParent(ctx context.Context, parentID string) ([]*table.Department, error)
-	FindDepartmentMember(ctx context.Context, list []string) ([]*table.DepartmentMember, error)
-	GetDepartment(ctx context.Context, departmentID string) ([]*table.DepartmentMember, error)
+	GetDepartment(ctx context.Context, departmentID string) (*table.Department, error)
 	GetList(ctx context.Context, departmentIDList []string) ([]*table.Department, error)
 	DeleteDepartment(ctx context.Context, departmentIDList []string) error
 	UpdateParentID(ctx context.Context, oldParentID, newParentID string) error
@@ -26,6 +25,7 @@ type OrganizationDatabaseInterface interface {
 	DeleteDepartmentIDList(ctx context.Context, departmentIDList []string) error
 	DeleteDepartmentMemberByUserID(ctx context.Context, userID string) error
 	DeleteDepartmentMemberByKey(ctx context.Context, userID string, departmentID string) error
+	UpdateDepartmentMember(ctx context.Context, DepartmentMember *table.DepartmentMember) error
 	//organizationUser
 	CreateOrganizationUser(ctx context.Context, OrganizationUser *table.OrganizationUser) error
 	UpdateOrganizationUser(ctx context.Context, OrganizationUser *table.OrganizationUser) error
@@ -47,8 +47,32 @@ type OrganizationDatabase struct {
 	OrganizationUser table.OrganizationUserInterface
 }
 
+func (o *OrganizationDatabase) GetDepartmentMember(ctx context.Context, userID string) ([]*table.DepartmentMember, error) {
+	return o.DepartmentMember.Get(ctx, userID)
+}
+
+func (o *OrganizationDatabase) CreateDepartmentMember(ctx context.Context, DepartmentMember *table.DepartmentMember) error {
+	return o.DepartmentMember.Create(ctx, DepartmentMember)
+}
+
+func (o *OrganizationDatabase) DeleteDepartmentMemberByUserID(ctx context.Context, userID string) error {
+	return o.DepartmentMember.DeleteByUserID(ctx, userID)
+}
+
+func (o *OrganizationDatabase) DeleteDepartmentMemberByKey(ctx context.Context, userID string, departmentID string) error {
+	return o.DepartmentMember.DeleteByKey(ctx, userID, departmentID)
+}
+
+func (o *OrganizationDatabase) UpdateDepartmentMember(ctx context.Context, DepartmentMember *table.DepartmentMember) error {
+	return o.DepartmentMember.Update(ctx, DepartmentMember)
+}
+
+func (o *OrganizationDatabase) GetOrganizationUser(ctx context.Context, userID string) (*table.OrganizationUser, error) {
+	return o.OrganizationUser.Get(ctx, userID)
+}
+
 func (o *OrganizationDatabase) DeleteDepartmentMember(ctx context.Context, userID string) error {
-	return o.OrganizationUser
+	return o.DepartmentMember.DeleteByUserID(ctx, userID)
 }
 
 func (o *OrganizationDatabase) DeleteOrganizationUser(ctx context.Context, userID string) error {
@@ -99,6 +123,6 @@ func (o *OrganizationDatabase) CreateDepartment(ctx context.Context, department 
 	return o.Department.Create(ctx, department...)
 }
 
-func (o *OrganizationDatabase) GetDepartment(ctx context.Context, departmentID string) ([]*table.DepartmentMember, error) {
-	return o.DepartmentMember.GetDepartment(ctx, departmentID)
+func (o *OrganizationDatabase) GetDepartment(ctx context.Context, departmentID string) (*table.Department, error) {
+	return o.Department.GetDepartment(ctx, departmentID)
 }

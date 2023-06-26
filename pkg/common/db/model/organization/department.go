@@ -56,3 +56,8 @@ func (o *Department) Delete(ctx context.Context, departmentIDList []string) erro
 	}
 	return utils.Wrap(o.db.WithContext(ctx).Where("department_id in (?)", departmentIDList).Delete(&table.Department{}).Error, "")
 }
+
+func (o *Department) GetDepartment(ctx context.Context, departmentId string) (*table.Department, error) {
+	var m table.Department
+	return &m, utils.Wrap(o.db.WithContext(ctx).Where("department_id = ?", departmentId).First(&m).Error, "")
+}
