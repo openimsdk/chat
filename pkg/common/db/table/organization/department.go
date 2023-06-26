@@ -21,5 +21,8 @@ type DepartmentInterface interface {
 	Create(ctx context.Context, department ...*Department) error
 	FindOne(ctx context.Context, departmentID string) (*Department, error)
 	Update(ctx context.Context, department *Department) error
-	GetParent(ctx context.Context, id string) ([]Department, error)
+	GetParent(ctx context.Context, id string) ([]*Department, error)
+	GetList(ctx context.Context, departmentIdList []string) ([]*Department, error)
+	UpdateParentID(ctx context.Context, oldParentID, newParentID string) error
+	Delete(ctx context.Context, departmentIDList []string) error
 }

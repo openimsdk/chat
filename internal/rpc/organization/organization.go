@@ -4,8 +4,8 @@ import (
 	"context"
 	"errors"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/discoveryregistry"
+	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
 	"github.com/OpenIMSDK/chat/pkg/common/db/database"
-	chat2 "github.com/OpenIMSDK/chat/pkg/common/db/table/chat"
 	table "github.com/OpenIMSDK/chat/pkg/common/db/table/organization"
 	"github.com/OpenIMSDK/chat/pkg/common/dbconn"
 	"github.com/OpenIMSDK/chat/pkg/proto/common"
@@ -26,11 +26,8 @@ func Start(discov discoveryregistry.SvcDiscoveryRegistry, server *grpc.Server) e
 	}
 	//todo:修改
 	tables := []any{
-		chat2.Account{},
-		chat2.Register{},
-		chat2.Attribute{},
-		chat2.VerifyCode{},
-		chat2.UserLoginRecord{},
+		table.Department{},
+		table.DepartmentMember{},
 	}
 	if err := db.AutoMigrate(tables...); err != nil {
 		return err
@@ -75,18 +72,13 @@ func (o *organizationSvr) CreateDepartment(ctx context.Context, req *organizatio
 	if req.DepartmentInfo.ParentID != "" {
 		_, err := o.Database.GetDepartmentByID(ctx, req.DepartmentInfo.ParentID)
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			resp.CommonResp.ErrCode = constant.RecordNotFound
-			resp.CommonResp.ErrMsg = "parent department not found"
-			return resp, nil
+			return nil, errs.ErrArgs.Wrap("parent department not found")
 		} else if err != nil {
-			resp.CommonResp.ErrCode = constant.ErrDB.ErrCode
-			resp.CommonResp.ErrMsg = constant.ErrDB.ErrMsg + err.Error()
-			return resp, nil
+			return nil, err
 		}
 	}
 	if err := o.Database.CreateDepartment(ctx, &department); err != nil {
-		resp.CommonResp.ErrCode = constant.ErrDB.ErrCode
-		resp.CommonResp.ErrMsg = constant.ErrDB.ErrMsg + err.Error()
+		return nil, err
 	}
 	return resp, nil
 }
@@ -168,16 +160,44 @@ func (o *organizationSvr) GetOrganizationDepartment(ctx context.Context, req *or
 	}
 
 	if err := getSubDepartmentList("", &resp.DepartmentList); err != nil {
-		resp.CommonResp.ErrCode = constant.ErrDB.ErrCode
-		resp.CommonResp.ErrMsg = constant.ErrDB.ErrMsg + err.Error()
-		return resp, nil
+		return nil, err
 	}
 	return resp, nil
 }
 
 func (o *organizationSvr) DeleteDepartment(ctx context.Context, req *organization.DeleteDepartmentReq) (*organization.DeleteDepartmentResp, error) {
-	//TODO implement me
-	panic("implement me")
+	resp := &organization.DeleteDepartmentResp{CommonResp: &common.CommonResp{}}
+	departmentList, err := o.Database.GetList(ctx, req.DepartmentIDList)
+	if err != nil {
+		resp.CommonResp.ErrCode = constant.ErrDB.ErrCode
+		resp.CommonResp.ErrMsg = constant.ErrDB.ErrMsg + err.Error()
+		return resp, nil
+	}
+	if len(departmentList) == 0 {
+		return resp, nil
+	}
+	// 修改删除的子部门的父部门为删除的上级
+	for _, department := range departmentList {
+		err := o.Database.UpdateParentID(ctx, department.DepartmentID, department.ParentID)
+		if err != nil {
+			resp.CommonResp.ErrCode = constant.ErrDB.ErrCode
+			resp.CommonResp.ErrMsg = constant.ErrDB.ErrMsg + "update parent_id " + err.Error()
+			return resp, nil
+		}
+	}
+	// 删除部门
+	if err := o.Database.Delete(ctx, req.DepartmentIDList); err != nil {
+		resp.CommonResp.ErrCode = constant.ErrDB.ErrCode
+		resp.CommonResp.ErrMsg = constant.ErrDB.ErrMsg + err.Error()
+		return resp, nil
+	}
+	// 删除职位信息
+	if err := o.Database.DeleteDepartmentIDList(ctx, req.DepartmentIDList); err != nil {
+		resp.CommonResp.ErrCode = constant.ErrDB.ErrCode
+		resp.CommonResp.ErrMsg = constant.ErrDB.ErrMsg + err.Error()
+		return resp, nil
+	}
+	return resp, nil
 }
 
 func (o *organizationSvr) GetDepartment(ctx context.Context, req *organization.GetDepartmentReq) (*organization.GetDepartmentResp, error) {
@@ -186,18 +206,75 @@ func (o *organizationSvr) GetDepartment(ctx context.Context, req *organization.G
 }
 
 func (o *organizationSvr) CreateOrganizationUser(ctx context.Context, req *organization.CreateOrganizationUserReq) (*organization.CreateOrganizationUserResp, error) {
-	//TODO implement me
-	panic("implement me")
+	resp := &organization.CreateOrganizationUserResp{CommonResp: &common.CommonResp{}}
+	if req.OrganizationUser == nil {
+		resp.CommonResp.ErrCode = constant.ErrArgs.ErrCode
+		resp.CommonResp.ErrMsg = constant.ErrArgs.ErrMsg + " req.OrganizationUser is nil"
+		return resp, nil
+	}
+	err := o.Database.CreateOrganizationUser(ctx, &table.OrganizationUser{
+		UserID:      req.OrganizationUser.UserID,
+		Nickname:    req.OrganizationUser.Nickname,
+		EnglishName: req.OrganizationUser.EnglishName,
+		FaceURL:     req.OrganizationUser.FaceURL,
+		Gender:      req.OrganizationUser.Gender,
+		Mobile:      req.OrganizationUser.Mobile,
+		Telephone:   req.OrganizationUser.Telephone,
+		Birth:       time.UnixMilli(req.OrganizationUser.Birth),
+		Email:       req.OrganizationUser.Email,
+		Status:      req.OrganizationUser.Status,
+		Station:     req.OrganizationUser.Station,
+		AreaCode:    req.OrganizationUser.AreaCode,
+	})
+	if err != nil {
+		resp.CommonResp.ErrCode = constant.ErrDB.ErrCode
+		resp.CommonResp.ErrMsg = constant.ErrDB.ErrMsg + err.Error()
+	}
+	return resp, nil
 }
 
 func (o *organizationSvr) UpdateOrganizationUser(ctx context.Context, req *organization.UpdateOrganizationUserReq) (*organization.UpdateOrganizationUserResp, error) {
-	//TODO implement me
-	panic("implement me")
+	resp := &organization.UpdateOrganizationUserResp{CommonResp: &common.CommonResp{}}
+	if req.OrganizationUser == nil {
+		resp.CommonResp.ErrCode = constant.ErrArgs.ErrCode
+		resp.CommonResp.ErrMsg = constant.ErrArgs.ErrMsg + " req.OrganizationUser is nil"
+		return resp, nil
+	}
+	err := o.Database.UpdateOrganizationUser(ctx, &table.OrganizationUser{
+		UserID:      req.OrganizationUser.UserID,
+		Nickname:    req.OrganizationUser.Nickname,
+		EnglishName: req.OrganizationUser.EnglishName,
+		FaceURL:     req.OrganizationUser.FaceURL,
+		Gender:      req.OrganizationUser.Gender,
+		Mobile:      req.OrganizationUser.Mobile,
+		Telephone:   req.OrganizationUser.Telephone,
+		Birth:       time.UnixMilli(req.OrganizationUser.Birth),
+		Email:       req.OrganizationUser.Email,
+		Status:      req.OrganizationUser.Status,
+		Station:     req.OrganizationUser.Station,
+		AreaCode:    req.OrganizationUser.AreaCode,
+	})
+	if err != nil {
+		resp.CommonResp.ErrCode = constant.ErrDB.ErrCode
+		resp.CommonResp.ErrMsg = constant.ErrDB.ErrMsg + err.Error()
+	}
+	return resp, nil
 }
 
 func (o *organizationSvr) DeleteOrganizationUser(ctx context.Context, req *organization.DeleteOrganizationUserReq) (*organization.DeleteOrganizationUserResp, error) {
-	//TODO implement me
-	panic("implement me")
+	resp := &organization.DeleteOrganizationUserResp{CommonResp: &common.CommonResp{}}
+	err := o.Database.DeleteOrganizationUser(ctx, req.UserID)
+	if err != nil {
+		resp.CommonResp.ErrCode = constant.ErrDB.ErrCode
+		resp.CommonResp.ErrMsg = constant.ErrDB.ErrMsg + err.Error()
+		return resp, nil
+	}
+	err = o.Database.DeleteDepartmentMember(ctx, req.UserID)
+	if err != nil {
+		resp.CommonResp.ErrCode = constant.ErrDB.ErrCode
+		resp.CommonResp.ErrMsg = constant.ErrDB.ErrMsg + err.Error()
+	}
+	return resp, nil
 }
 
 func (o *organizationSvr) CreateDepartmentMember(ctx context.Context, req *organization.CreateDepartmentMemberReq) (*organization.CreateDepartmentMemberResp, error) {
