@@ -27,4 +27,5 @@ type OrganizationUserInterface interface {
 	Create(ctx context.Context, m *OrganizationUser) error
 	Update(ctx context.Context, m *OrganizationUser) error
 	Delete(ctx context.Context, userID string) error
+	Get(ctx context.Context, userID string) (*OrganizationUser, error)
 }

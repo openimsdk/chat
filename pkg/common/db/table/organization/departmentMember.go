@@ -21,5 +21,8 @@ type DepartmentMember struct {
 type DepartmentMemberInterface interface {
 	Find(ctx context.Context, departmentIDList []string) ([]*DepartmentMember, error)
 	DeleteDepartmentIDList(ctx context.Context, departmentIDList []string) error
-	Delete(ctx context.Context, userID string) error
+	DeleteByUserID(ctx context.Context, userID string) error
+	Create(ctx context.Context, m *DepartmentMember) error
+	Get(ctx context.Context, userID string) ([]*DepartmentMember, error)
+	DeleteByKey(ctx context.Context, userID string, departmentID string) error
 }

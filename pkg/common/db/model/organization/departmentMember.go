@@ -5,6 +5,7 @@ import (
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/utils"
 	table "github.com/OpenIMSDK/chat/pkg/common/db/table/organization"
 	"gorm.io/gorm"
+	"time"
 )
 
 func NewDepartmentMember(db *gorm.DB) *DepartmentMember {
@@ -27,4 +28,23 @@ func (o *DepartmentMember) Find(ctx context.Context, departmentIDList []string) 
 
 func (o *DepartmentMember) DeleteDepartmentIDList(ctx context.Context, departmentIDList []string) error {
 	return utils.Wrap(o.db.WithContext(ctx).Where("department_id in (?)", departmentIDList).Delete(&table.DepartmentMember{}).Error, "")
+}
+
+func (o *DepartmentMember) DeleteByUserID(ctx context.Context, userID string) error {
+	return utils.Wrap(o.db.WithContext(ctx).Where("user_id = ? ", userID).Delete(&table.DepartmentMember{}).Error, "")
+}
+
+func (o *DepartmentMember) Create(ctx context.Context, m *table.DepartmentMember) error {
+	m.CreateTime = time.Now()
+	m.ChangeTime = time.Now()
+	return utils.Wrap(o.db.WithContext(ctx).Create(m).Error, "")
+}
+
+func (o *DepartmentMember) Get(ctx context.Context, userID string) ([]*table.DepartmentMember, error) {
+	var ms []*table.DepartmentMember
+	return ms, utils.Wrap(o.db.WithContext(ctx).Where("user_id = ?", userID).Find(ms).Error, "")
+}
+
+func (o *DepartmentMember) DeleteByKey(ctx context.Context, userID, departmentID string) error {
+	return utils.Wrap(o.db.WithContext(ctx).Where("user_id = ? AND department_id = ?", userID, departmentID).Delete(&table.DepartmentMember{}).Error, "")
 }

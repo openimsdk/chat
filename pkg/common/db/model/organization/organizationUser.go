@@ -32,3 +32,8 @@ func (tb *OrganizationUser) Update(ctx context.Context, m *table.OrganizationUse
 func (tb *OrganizationUser) Delete(ctx context.Context, userID string) error {
 	return utils.Wrap(tb.db.WithContext(ctx).Where("user_id = ?", userID).Delete(&table.OrganizationUser{}).Error, "")
 }
+
+func (tb *OrganizationUser) Get(ctx context.Context, userID string) (*table.OrganizationUser, error) {
+	var m table.OrganizationUser
+	return &m, utils.Wrap(tb.db.Where("user_id = ?", userID).First(&m).Error, "")
+}
