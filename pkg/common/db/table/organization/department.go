@@ -26,3 +26,4 @@ type DepartmentInterface interface {
 	UpdateParentID(ctx context.Context, oldParentID, newParentID string) error
 	Delete(ctx context.Context, departmentIDList []string) error
 }
+ 

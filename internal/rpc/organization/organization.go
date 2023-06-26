@@ -26,9 +26,11 @@ func Start(discov discoveryregistry.SvcDiscoveryRegistry, server *grpc.Server) e
 	}
 	//todo:修改
 	tables := []any{
-		table.Department{},
-		table.DepartmentMember{},
-		table.OrganizationUser{},
+		chat2.Account{},
+		chat2.Register{},
+		chat2.Attribute{},
+		chat2.VerifyCode{},
+		chat2.UserLoginRecord{},
 	}
 	if err := db.AutoMigrate(tables...); err != nil {
 		return err
@@ -183,8 +185,8 @@ func (o *organizationSvr) DeleteDepartment(ctx context.Context, req *organizatio
 }
 
 func (o *organizationSvr) GetDepartment(ctx context.Context, req *organization.GetDepartmentReq) (*organization.GetDepartmentResp, error) {
-	//TODO implement me
-	panic("implement me")
+	
+
 }
 
 func (o *organizationSvr) CreateOrganizationUser(ctx context.Context, req *organization.CreateOrganizationUserReq) (*organization.CreateOrganizationUserResp, error) {
