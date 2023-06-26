@@ -85,3 +85,64 @@ func NewAdminRoute(router gin.IRouter, zk discoveryregistry.SvcDiscoveryRegistry
 	initGroup.POST("/set", admin.SetClientConfig) //设置客户端初始化配置
 	initGroup.POST("/get", admin.GetClientConfig) //获取客户端初始化配置
 }
+func NewOrganizationRoute(router gin.IRouter, zk discoveryregistry.SvcDiscoveryRegistry) {
+	mw := NewMW(zk)
+	org := NewOrg(zk)
+	userGroup := router.Group("/user")
+	{
+		userGroup.POST("/reset_password", mw.CheckToken, org.UpdateUserPassword) // 修改密码
+		userGroup.POST("/login", org.UserLogin)                                  // 登录
+		//userGroup.POST("/get_token", org.GetUserToken)            // 使用管理员token或者secret获取用户token
+		userGroup.POST("/update", mw.CheckUser, org.UpdateUserInfo)          // 修改用户信息
+		userGroup.POST("/info", mw.CheckToken, org.GetUserInfo)              // 获取用户信息
+		userGroup.POST("/delete", mw.CheckAdmin, org.DeleteOrganizationUser) // 删除用户
+
+		userGroup.POST("/get_users_full_info", org.GetUserFullList)        // 获取用户信息
+		userGroup.POST("/search_users_full_info", org.SearchUsersFullInfo) // 搜索用户信息
+
+		userGroup.POST("/callback", org.Callback)
+	}
+
+	organizationGroup := router.Group("/organization")
+	{
+		//部门  增删改查
+		organizationGroup.POST("/create_department", mw.CheckAdmin, org.CreateDepartment) // 创建部门
+		organizationGroup.POST("/update_department", mw.CheckAdmin, org.UpdateDepartment) // 修改部门
+		organizationGroup.POST("/delete_department", mw.CheckAdmin, org.DeleteDepartment) // 删除部门
+		organizationGroup.POST("/get_department", mw.CheckToken, org.GetDepartment)       // 获取部门
+
+		//用户 增删改查
+		organizationGroup.POST("/create_organization_user", mw.CheckAdmin, org.CreateOrganizationUser) // 创建用户 在某个部门或公司中新增
+		organizationGroup.POST("/update_organization_user", mw.CheckAdmin, org.UpdateOrganizationUser) // 修改用户信息
+		organizationGroup.POST("/delete_organization_user", org.DeleteOrganizationUser)                // 删除用户
+
+		//查询用户所在的部门信息以及个人资料
+		organizationGroup.POST("/get_user_in_department", mw.CheckToken, org.GetUserInDepartment)       // 获取用户所在部门
+		organizationGroup.POST("/create_department_member", mw.CheckAdmin, org.CreateDepartmentMember)  // 创建部门成员 在某个部门或公司中新增
+		organizationGroup.POST("/update_user_in_department", mw.CheckAdmin, org.UpdateUserInDepartment) // 修改用户部门
+		//删除
+		//organizationGroup.POST("/get_department_member", organization.GetDepartmentMember)        // 获取部门成员
+		organizationGroup.POST("/delete_user_in_department", mw.CheckAdmin, org.DeleteUserInDepartment) // 删除部门成员 批量
+
+		organizationGroup.POST("/get_search_user", mw.CheckAdmin, org.GetSearchUserList) // 搜索列表 后端
+
+		organizationGroup.POST("/set_organization", mw.CheckAdmin, org.SetOrganization)        // 设置公司信息
+		organizationGroup.POST("/get_organization", mw.CheckToken, org.GetOrganization)        // 获取公司信息
+		organizationGroup.POST("/move_user_department", mw.CheckAdmin, org.MoveUserDepartment) // 移动用户部门
+
+		organizationGroup.POST("/get_sub_department", mw.CheckToken, org.GetSubDepartment) // 获取部门的人和同级部门
+
+		organizationGroup.POST("/get_search_department_user", mw.CheckToken, org.GetSearchDepartmentUser) // 搜索部门和用户
+		organizationGroup.POST("/get_search_department_user_without_token", org.GetSearchDepartmentUserWithoutToken)
+
+		organizationGroup.POST("/get_organization_department", mw.CheckToken, org.GetOrganizationDepartment) // 获取组织部门
+
+		organizationGroup.POST("/sort_department", mw.CheckAdmin, org.SortDepartmentList)
+		organizationGroup.POST("/sort_organization_user", mw.CheckAdmin, org.SortOrganizationUserList)
+
+		organizationGroup.POST("/create_new_organization_member", mw.CheckAdmin, org.CreateNewOrganizationMember) // 创建用户的同时为其添加部门
+
+		organizationGroup.POST("/import", org.BatchImport)                 // 批量导入
+		organizationGroup.GET("/import_template", org.BatchImportTemplate) // 批量导入模板
+	}
+}

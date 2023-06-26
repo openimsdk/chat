@@ -1,0 +1,524 @@
+syntax = "proto3";
+import "common/common.proto";
+option go_package = "github.com/OpenIMSDK/chat/pkg/proto/organization";
+package OpenIMChat.organization;
+
+
+message CreateDepartmentReq{
+  string operationID = 1;
+  string opUserID = 2;
+  OpenIMChat.common.Department departmentInfo = 3;
+}
+
+message CreateDepartmentResp{
+  OpenIMChat.common.CommonResp commonResp = 1;
+  OpenIMChat.common.Department departmentInfo = 2;
+}
+
+message UpdateDepartmentReq{
+  string operationID = 1;
+  string opUserID = 2;
+  OpenIMChat.common.Department departmentInfo = 3;
+}
+
+message UpdateDepartmentResp{
+  OpenIMChat.common.CommonResp commonResp = 1;
+}
+
+
+message GetOrganizationDepartmentReq{
+  string operationID = 1;
+  string opUserID = 2;
+}
+
+message DepartmentInfo {
+  OpenIMChat.common.Department department = 1;
+  repeated DepartmentInfo subDepartmentList = 2;
+}
+
+
+message GetOrganizationDepartmentResp{
+  OpenIMChat.common.CommonResp commonResp = 1;
+  repeated DepartmentInfo departmentList = 2;
+}
+
+message DeleteDepartmentReq{
+  string operationID = 1;
+  string opUserID = 2;
+  repeated string departmentIDList = 3;
+}
+
+message DeleteDepartmentResp{
+  OpenIMChat.common.CommonResp commonResp = 1;
+}
+
+message GetDepartmentParentIDListReq {
+  string departmentID = 1;
+  string operationID = 2;
+}
+
+message GetDepartmentParentIDListResp {
+  OpenIMChat.common.CommonResp commonResp = 1;
+  repeated string parentIDList = 2;
+}
+
+
+message CreateOrganizationUserReq{
+  string operationID = 1;
+  string opUserID = 2;
+  OpenIMChat.common.OrganizationUser organizationUser = 3;
+}
+
+
+message CreateOrganizationUserResp{
+  OpenIMChat.common.CommonResp commonResp = 1;
+}
+
+
+message UpdateOrganizationUserReq{
+  string operationID = 1;
+  string opUserID = 2;
+  OpenIMChat.common.OrganizationUser organizationUser = 3;
+}
+
+
+message UpdateOrganizationUserResp{
+  OpenIMChat.common.CommonResp commonResp = 1;
+}
+
+
+
+
+message CreateDepartmentMemberReq{
+  string operationID = 1;
+  string opUserID = 2;
+  OpenIMChat.common.DepartmentMember departmentMember = 3;
+}
+message CreateDepartmentMemberResp{
+  OpenIMChat.common.CommonResp commonResp = 1;
+}
+
+
+message GetUserInDepartmentReq{
+  string operationID = 1;
+  string opUserID = 2;
+  string userID = 3;
+}
+message GetUserInDepartmentResp{
+  OpenIMChat.common.CommonResp commonResp = 1;
+  OpenIMChat.common.UserInDepartment userInDepartment = 3;
+}
+
+
+message UpdateUserInDepartmentReq{
+  string operationID = 1;
+  string opUserID = 2;
+  OpenIMChat.common.DepartmentMember departmentMember = 3;
+}
+message UpdateUserInDepartmentResp{
+  OpenIMChat. common.CommonResp commonResp = 1;
+}
+
+
+message DeleteUserInDepartmentReq{
+  string operationID = 1;
+  string opUserID = 2;
+  string userID = 3;
+  string departmentID = 4;
+}
+message DeleteUserInDepartmentResp{
+  OpenIMChat.common.CommonResp commonResp = 1;
+}
+
+message DeleteOrganizationUserReq{
+  string operationID = 1;
+  string opUserID = 2;
+  string userID = 3;
+}
+message DeleteOrganizationUserResp{
+  OpenIMChat.common.CommonResp commonResp = 1;
+}
+
+
+//message GetDepartmentMemberReq{
+//  string operationID = 1;
+//  string opUserID = 2;
+//  string departmentID = 3;
+//}
+//
+//message GetDepartmentMemberResp{
+//  common.CommonResp commonResp = 1;
+//  repeated  common.UserDepartmentMember userDepartmentMemberList = 3;
+//}
+
+message GetDepartmentRelatedGroupIDListReq {
+  string operationID = 1;
+  string opUserID = 2;
+  repeated string departmentIDList = 3;
+}
+
+message GetDepartmentRelatedGroupIDListResp {
+  OpenIMChat.common.CommonResp commonResp = 1;
+  repeated string groupIDList = 3;
+}
+
+message GetUserInOrganizationReq{
+  repeated string userIDList = 1;
+  string operationID = 2;
+}
+
+message GetUserInOrganizationResp{
+  OpenIMChat.common.CommonResp commonResp = 1;
+  repeated OpenIMChat.common.OrganizationUser organizationUsers = 3;
+}
+
+// ####################################
+
+message GetCompleteOrganizationReq {
+  string operationID = 1;
+  string opUserID = 2;
+}
+
+message CompleteOrganization {
+  uint32 peopleNumber = 1;
+  repeated CompleteOrganization list = 2;
+  string departmentID = 3;
+  string faceURL = 4;
+  string name = 5;
+  string parentID = 6;
+  int32 order = 7;
+  int32 departmentType = 8;
+  uint32 createTime = 9;
+  string ex = 10;
+}
+
+message GetCompleteOrganizationResp {
+  OpenIMChat.common.CommonResp commonResp = 1;
+  repeated CompleteOrganization list = 3;
+}
+
+
+
+message GetUsersInDepartmentReq{
+  string operationID = 1;
+  string opUserID = 2;
+  repeated string userIDList = 3;
+}
+
+message GetUsersInDepartmentResp{
+  OpenIMChat.common.CommonResp commonResp = 1;
+  repeated OpenIMChat.common.UserInDepartment list = 3;
+}
+
+
+
+
+message GetSearchUserListReq {
+  string operationID = 1;
+  string opUserID = 2;
+  uint32 pageNumber = 3;
+  uint32 showNumber = 4;
+  string text = 5;
+  repeated GetSearchUserListSort sorts = 6;
+  repeated string departmentIDList = 7;
+  repeated string positionList = 8;
+
+}
+
+message GetSearchUserListSort {
+  string field = 1;
+  string rule = 2;
+}
+
+
+message GetSearchUserListResp {
+  OpenIMChat.common.CommonResp commonResp = 1;
+  repeated OpenIMChat.common.UserInDepartment userList = 2;
+  uint32 Total = 3;
+}
+
+
+message SetOrganizationReq {
+  string operationID = 1;
+  string opUserID = 2;
+  OpenIMChat.common.Organization organization = 3;
+}
+
+message SetOrganizationResp {
+  OpenIMChat.common.CommonResp commonResp = 1;
+}
+
+message GetOrganizationReq {
+  string operationID = 1;
+  string opUserID = 2;
+}
+
+message GetOrganizationResp {
+  OpenIMChat.common.CommonResp commonResp = 1;
+  OpenIMChat.common.Organization organization = 2;
+}
+
+
+
+message GetSubDepartmentReq {
+  string operationID = 1;
+  string opUserID = 2;
+  string  departmentID = 3;
+}
+
+message GetSubDepartmentResp {
+  OpenIMChat.common.CommonResp commonResp = 1;
+  repeated OpenIMChat.common.DepartmentMember departmentMemberList = 2;
+  repeated OpenIMChat.common.Department departmentList = 3;
+  repeated OpenIMChat.common.Department departmentDirectoryList = 4;
+}
+
+
+message GetSearchDepartmentUserReq {
+  string operationID = 1;
+  string opUserID = 2;
+  string keyword = 3;
+  bool IsGetAllDepartment = 4;
+}
+
+
+message GetSearchDepartmentUserOrganizationUser{
+  OpenIMChat.common.OrganizationUser organizationUser = 1;
+  repeated OpenIMChat.common.Department departmentList = 2;
+  string position = 3;
+}
+
+message GetSearchDepartmentUserResp {
+  OpenIMChat.common.CommonResp commonResp = 1;
+  repeated OpenIMChat.common.Department departmentList = 2;
+  repeated GetSearchDepartmentUserOrganizationUser organizationUserList = 3;
+}
+
+message SortDepartmentListReq {
+  string operationID = 1;
+  string opUserID = 2;
+  string departmentID = 3;
+  string parentID = 4;
+  string nextDepartmentID = 5;
+}
+
+message SortDepartmentListResp {
+  OpenIMChat.common.CommonResp commonResp = 1;
+}
+
+message SortOrganizationUserListReq {
+  string operationID = 1;
+  string opUserID = 2;
+  string departmentID = 3;
+  string userID = 4;
+  string nextUserID = 5;
+}
+
+message SortOrganizationUserListResp {
+  OpenIMChat.common.CommonResp commonResp = 1;
+}
+
+
+message GetDepartmentReq {
+  string operationID = 1;
+  string opUserID = 2;
+  string departmentID = 3;
+}
+
+message GetDepartmentResp {
+  OpenIMChat.common.CommonResp commonResp = 1;
+  OpenIMChat.common.Department department = 2;
+}
+
+
+message CreateNewOrganizationMemberReq {
+  string operationID = 1;
+  string opUserID = 2;
+  OpenIMChat.common.OrganizationUser organizationUser = 3;
+  repeated OpenIMChat.common.DepartmentMember departmentMemberList = 4;
+  OpenIMChat.common.UserIdentity userIdentity = 5;
+}
+
+message CreateNewOrganizationMemberResp {
+  OpenIMChat.common.CommonResp commonResp = 1;
+}
+
+
+message GetUserInfoReq {
+  string operationID = 1;
+  string opUserID = 2;
+  string userID = 3;
+}
+
+message GetUserInfoResp {
+  OpenIMChat.common.CommonResp commonResp = 1;
+  OpenIMChat.common.OrganizationUser user = 2;
+}
+
+message BatchImportUserDepartmentName {
+  repeated string  hierarchyName = 1;
+}
+
+message BatchImportUserDepartmentNamePosition {
+  repeated string  hierarchyName = 1;
+  string position = 2;
+}
+
+message BatchImportUser {
+  string userID = 1;
+  string  nickname = 2;
+  string   englishName = 3;
+  string  faceURL = 4;
+  int32   gender = 5;
+  string   mobile = 6;
+  string telephone = 7;
+  int64 birth = 8;
+  string  email = 9;
+  string account = 10;
+  string password = 11;
+  repeated BatchImportUserDepartmentNamePosition userDepartmentNameList = 12;
+  int32 order = 13;
+  int32 status = 14;
+  string  areaCode = 15;
+  string  station = 16;
+}
+
+message BatchImportDepartment {
+  string departmentID = 1;
+  string faceURL = 2;
+  string name = 3;
+  string parentID = 4;
+  int32 order = 5;
+  int32 departmentType = 6;
+  string  relatedGroupID = 7;
+  BatchImportUserDepartmentName parentDepartmentName = 11;
+}
+
+
+message BatchImportReq {
+  string operationID = 1;
+  string opUserID = 2;
+  repeated BatchImportUser userList = 3;
+  repeated BatchImportDepartment departmentList = 4;
+  //  repeated common.DepartmentMember departmentMemberList = 5;
+  //  repeated common.Organization organizationList = 6;
+  //  string defaultPassword = 7;
+}
+
+message BatchImportResp {
+  OpenIMChat.common.CommonResp commonResp = 1;
+}
+
+//message BatchExportReq {
+//  string operationID = 1;
+//  string opUserID = 2;
+//}
+//
+//message BatchExportResp {
+//  common.CommonResp commonResp = 1;
+//  repeated common.OrganizationUser organizationUserList = 2;
+//  repeated common.Department departmentList = 3;
+//  repeated common.DepartmentMember departmentMemberList = 4;
+//  repeated common.Organization organizationList = 5;
+//}
+
+message MoveUserDepartment {
+  string userID = 1;
+  string departmentID = 2;
+  string  currentDepartmentID = 3;
+  string position = 4;
+  int32 leader = 5;
+  int32 status = 6;
+  int64 entryTime = 7;
+  int64 terminationTime = 8;
+  int32  order = 9;
+}
+
+message MoveUserDepartmentReq {
+  string operationID = 1;
+  string opUserID = 2;
+  repeated MoveUserDepartment moveUserDepartmentList = 3;
+}
+
+message MoveUserDepartmentResp {
+  OpenIMChat.common.CommonResp commonResp = 1;
+}
+
+message GetUserFullListReq {
+  string operationID = 1;
+  string opUserID = 2;
+  int32 pageNumber = 3;
+  int32 showNumber = 4;
+  repeated string  userIDList = 5;
+}
+
+message GetUserFullListResp {
+  OpenIMChat.common.CommonResp commonResp = 1;
+  repeated OpenIMChat.common.OrganizationUser organizationUserList = 2;
+  int32 total = 3;
+}
+
+message SearchUsersFullInfoReq{
+  OpenIMChat.common.Operation operation = 1;
+  OpenIMChat.common.RequestPagination pagination = 2;
+  OpenIMChat.common.UserPublicInfo userPublicInfo = 3;
+  string content = 4;
+}
+
+
+message SearchUsersFullInfoResp{
+  OpenIMChat.common.CommonResp commonResp = 1;
+  repeated OpenIMChat.common.OrganizationUser organizationUserList = 2;
+  int32 total = 3;
+}
+
+
+service organization{
+  rpc CreateDepartment(CreateDepartmentReq) returns(CreateDepartmentResp);
+  rpc UpdateDepartment(UpdateDepartmentReq) returns(UpdateDepartmentResp);
+  rpc GetOrganizationDepartment(GetOrganizationDepartmentReq) returns(GetOrganizationDepartmentResp);
+  rpc DeleteDepartment(DeleteDepartmentReq) returns(DeleteDepartmentResp);
+  rpc GetDepartment(GetDepartmentReq) returns(GetDepartmentResp);
+
+  rpc CreateOrganizationUser(CreateOrganizationUserReq) returns(CreateOrganizationUserResp);
+  rpc UpdateOrganizationUser(UpdateOrganizationUserReq) returns(UpdateOrganizationUserResp);
+  rpc DeleteOrganizationUser(DeleteOrganizationUserReq) returns(DeleteOrganizationUserResp);
+
+
+  rpc CreateDepartmentMember(CreateDepartmentMemberReq) returns(CreateDepartmentMemberResp);
+  rpc GetUserInDepartment(GetUserInDepartmentReq) returns(GetUserInDepartmentResp);
+  rpc DeleteUserInDepartment(DeleteUserInDepartmentReq) returns(DeleteUserInDepartmentResp);
+  rpc UpdateUserInDepartment(UpdateUserInDepartmentReq) returns(UpdateUserInDepartmentResp);
+
+  rpc GetSearchUserList(GetSearchUserListReq) returns(GetSearchUserListResp);
+
+  rpc SetOrganization(SetOrganizationReq) returns(SetOrganizationResp);
+  rpc GetOrganization(GetOrganizationReq) returns(GetOrganizationResp);
+
+
+  rpc GetSubDepartment(GetSubDepartmentReq)returns(GetSubDepartmentResp);
+
+  rpc GetSearchDepartmentUser(GetSearchDepartmentUserReq)returns(GetSearchDepartmentUserResp);
+
+
+  rpc SortDepartmentList(SortDepartmentListReq)returns(SortDepartmentListResp);
+  rpc SortOrganizationUserList(SortOrganizationUserListReq)returns(SortOrganizationUserListResp);
+
+  rpc CreateNewOrganizationMember(CreateNewOrganizationMemberReq) returns(CreateNewOrganizationMemberResp);
+
+  rpc GetUserInfo(GetUserInfoReq)returns(GetUserInfoResp);
+
+
+  rpc BatchImport(BatchImportReq)returns(BatchImportResp);
+  //  rpc BatchExport(BatchExportReq)returns(BatchExportResp);
+
+
+  rpc MoveUserDepartment(MoveUserDepartmentReq)returns(MoveUserDepartmentResp);
+
+  rpc GetUserFullList(GetUserFullListReq)returns(GetUserFullListResp);
+  rpc SearchUsersFullInfo(SearchUsersFullInfoReq)returns(SearchUsersFullInfoResp);
+
+}
+
+
+

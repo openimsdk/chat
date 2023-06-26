@@ -10,12 +10,17 @@ chatapi:
 adminapi:
   openImAdminApiPort: [ 10009 ]
   listenIP: 0.0.0.0
+organizationapi:
+  openImOrganizationApiPort: [ 10010 ]
+  listenIP: 0.0.0.0
 rpcport:
   openImAdminPort: [ 30200 ]
   openImChatPort: [ 30300 ]
+  openImOrganizationPort: [ 30400 ]
 rpcregistername:
   openImAdminName: admin
   openImChatName: chat
+  openImOrganizationName: organization
 mysql:
   # 没有配置代表和openIM保持一致
   # dbMysqlAddress: [ 127.0.0.1:13306 ] #mysql地址 目前仅支持单机，默认即可
@@ -51,3 +56,6 @@ verifycode:
 
 proxyheader: "" # 获取ip的header 空字符串没有代理
 #proxyheader: "X-Forwarded-For"
+businessServerAddress: "http://127.0.0.1:10008"
+
+importTemplate: "template.xlsx" # 批量导入模板

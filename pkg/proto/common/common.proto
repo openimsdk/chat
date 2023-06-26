@@ -53,3 +53,80 @@ message AppletInfo  {
   uint32 status = 10;
   int64 createTime = 11;
 }
+
+message Department {
+  string departmentID = 1;
+  string faceURL = 2;
+  string name = 3;
+  string parentID = 4;
+  int32 order = 5;
+  int32 departmentType = 6;
+  string  relatedGroupID = 7;
+  int64 createTime = 8;
+  uint32 memberNum = 9;
+  string position = 10;
+}
+
+message CommonResp {
+  int32  errCode = 1;
+  string errMsg = 2;
+}
+
+message OrganizationUser  {
+  string userID = 1;
+  string  nickname = 2;
+  string   englishName = 3;
+  string  faceURL = 4;
+  int32   gender = 5;
+  string   mobile = 6;
+  string telephone = 7;
+  int64 birth = 8;
+  string  email = 9;
+  int32 order = 10;
+  int32 status = 11;
+  int64   createTime = 12;
+  string ex = 13;
+  repeated DepartmentMember departmentMemberList = 14;
+  string station = 15;
+  string areaCode = 16;
+}
+
+message DepartmentMember {
+  string userID = 1;
+  string departmentID = 2;
+  int32 order = 3;
+  string position = 4;
+  int32 leader = 5;
+  int32 status = 6;
+  string ex = 7;
+  int64  entryTime = 8;
+  int64  terminationTime = 9;
+  int64 createTime = 10;
+  Department department = 11;
+  OrganizationUser organizationUser = 12;
+}
+
+message  UserInDepartment {
+  OrganizationUser organizationUser = 1;
+  repeated DepartmentMember departmentMemberList = 2;
+}
+
+message Organization {
+  string  logoURL = 1;
+  string    name = 2;
+  string  homepage = 3;
+  string   relatedGroupID = 4;
+  string  introduction = 5;
+  int64  createTime = 6;
+  int64  defaultPassword = 7;
+}
+
+message RequestPagination {
+  int32 pageNumber = 1;
+  int32 showNumber = 2;
+}
+
+message Operation {
+  string opUserID = 1;
+  string operationID = 2;
+}

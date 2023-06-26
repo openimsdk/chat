@@ -6,6 +6,9 @@ import _ "embed"
 var Version string
 
 var Config struct {
+	ImportTemplate        string `yaml:"importTemplate"`
+	BusinessServerAddress string `yaml:"businessServerAddress"`
+
 	Zookeeper struct {
 		Schema   string   `yaml:"schema"`
 		ZkAddr   []string `yaml:"zkAddr"`
@@ -20,13 +23,19 @@ var Config struct {
 		GinPort  []int  `yaml:"openImAdminApiPort"`
 		ListenIP string `yaml:"listenIP"`
 	}
+	OrganizationApi struct {
+		GinPort  []int  `yaml:"openImOrganizationApiPort"`
+		ListenIP string `yaml:"listenIP"`
+	}
 	RpcPort struct {
-		OpenImAdminPort []int `yaml:"openImAdminPort"`
-		OpenImChatPort  []int `yaml:"openImChatPort"`
+		OpenImAdminPort        []int `yaml:"openImAdminPort"`
+		OpenImChatPort         []int `yaml:"openImChatPort"`
+		OpenImOrganizationPort []int `yaml:"openImOrganizationPort"`
 	} `yaml:"rpcport"`
 	RpcRegisterName struct {
-		OpenImAdminName string `yaml:"openImAdminName"`
-		OpenImChatName  string `yaml:"openImChatName"`
+		OpenImAdminName        string `yaml:"openImAdminName"`
+		OpenImChatName         string `yaml:"openImChatName"`
+		OpenImOrganizationName string `yaml:"openImOrganizationName"`
 	} `yaml:"rpcregistername"`
 	Mysql struct {
 		DBAddress      *[]string `yaml:"dbMysqlAddress"`
