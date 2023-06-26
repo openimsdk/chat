@@ -185,8 +185,29 @@ func (o *organizationSvr) DeleteDepartment(ctx context.Context, req *organizatio
 }
 
 func (o *organizationSvr) GetDepartment(ctx context.Context, req *organization.GetDepartmentReq) (*organization.GetDepartmentResp, error) {
-	
+	resp := &organization.GetDepartmentResp{CommonResp: &common.CommonResp{}}
 
+	department, err := o.Database.GetDepartment(ctx, req.DepartmentID)
+	if err == nil {
+		resp.Department = &common.Department{
+			DepartmentID:   department.DepartmentID,
+			FaceURL:        department.FaceURL,
+			Name:           department.Name,
+			ParentID:       department.ParentID,
+			Order:          department.Order,
+			DepartmentType: department.DepartmentType,
+			RelatedGroupID: department.RelatedGroupID,
+			CreateTime:     department.CreateTime.UnixMilli(),
+		}
+	} else if errors.Is(err, gorm.ErrRecordNotFound) {
+		resp.CommonResp.ErrCode = constant.RecordNotFound
+		resp.CommonResp.ErrMsg = "department not found"
+	} else {
+		resp.CommonResp.ErrCode = constant.ErrDB.ErrCode
+		resp.CommonResp.ErrMsg = constant.ErrDB.ErrMsg + err.Error()
+	}
+
+	return resp, nil
 }
 
 func (o *organizationSvr) CreateOrganizationUser(ctx context.Context, req *organization.CreateOrganizationUserReq) (*organization.CreateOrganizationUserResp, error) {
