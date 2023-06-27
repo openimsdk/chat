@@ -2,6 +2,7 @@ package organization
 
 import (
 	"context"
+	"github.com/OpenIMSDK/chat/pkg/proto/organization"
 	"time"
 )
 
@@ -28,4 +29,8 @@ type OrganizationUserInterface interface {
 	Update(ctx context.Context, m *OrganizationUser) error
 	Delete(ctx context.Context, userID string) error
 	Get(ctx context.Context, userID string) (*OrganizationUser, error)
+	SearchPage(ctx context.Context, positionList, userIDList []string, text string, sort []*organization.GetSearchUserListSort, pageNumber uint32, showNumber uint32) (uint32, []*OrganizationUser, error)
+	GetNoDepartmentUserIDList(ctx context.Context) ([]string, error)
+	GetList(ctx context.Context, userIDList []string) ([]*OrganizationUser, error)
+	Search(ctx context.Context, positionList, userIDList []string, text string, sort []*organization.GetSearchUserListSort) ([]*OrganizationUser, error)
 }

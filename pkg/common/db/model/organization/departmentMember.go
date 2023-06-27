@@ -18,7 +18,7 @@ type DepartmentMember struct {
 	db *gorm.DB
 }
 
-func (o *DepartmentMember) Find(ctx context.Context, departmentIDList []string) ([]*table.DepartmentMember, error) {
+func (o *DepartmentMember) FindByDepartmentID(ctx context.Context, departmentIDList []string) ([]*table.DepartmentMember, error) {
 	if len(departmentIDList) == 0 {
 		return []*table.DepartmentMember{}, nil
 	}
@@ -51,5 +51,26 @@ func (o *DepartmentMember) DeleteByKey(ctx context.Context, userID, departmentID
 
 func (o *DepartmentMember) Update(ctx context.Context, m *table.DepartmentMember) error {
 	m.ChangeTime = time.Now()
-	return utils.Wrap(o.db.Where("user_id = ? AND department_id = ?", m.UserID, m.DepartmentID).Updates(m).Error, "")
+	return utils.Wrap(o.db.WithContext(ctx).Where("user_id = ? AND department_id = ?", m.UserID, m.DepartmentID).Updates(m).Error, "")
+}
+
+func (o *DepartmentMember) FindByUserID(ctx context.Context, userIDList []string) ([]*table.DepartmentMember, error) {
+	if len(userIDList) == 0 {
+		return []*table.DepartmentMember{}, nil
+	}
+	var ms []*table.DepartmentMember
+	return ms, utils.Wrap(o.db.WithContext(ctx).Where("user_id in (?)", userIDList).Find(ms).Error, "")
+}
+
+func (o *DepartmentMember) GetUserListInDepartment(ctx context.Context, departmentID string, userIDList []string) ([]*table.DepartmentMember, error) {
+	if len(userIDList) == 0 {
+		return []*table.DepartmentMember{}, nil
+	}
+	var ms []*table.DepartmentMember
+	return ms, utils.Wrap(o.db.WithContext(ctx).Where("department_id = ? AND user_id in (?)", departmentID, userIDList).Find(&ms).Error, "")
+}
+
+func (o *DepartmentMember) GetByDepartmentID(ctx context.Context, departmentID string) ([]*table.DepartmentMember, error) {
+	var ms []*table.DepartmentMember
+	return ms, utils.Wrap(o.db.WithContext(ctx).Where("department_id = ?", departmentID).Find(ms).Error, "")
 }

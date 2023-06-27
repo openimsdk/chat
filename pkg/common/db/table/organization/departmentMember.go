@@ -19,11 +19,14 @@ type DepartmentMember struct {
 }
 
 type DepartmentMemberInterface interface {
-	Find(ctx context.Context, departmentIDList []string) ([]*DepartmentMember, error)
+	FindByDepartmentID(ctx context.Context, departmentIDList []string) ([]*DepartmentMember, error)
 	DeleteDepartmentIDList(ctx context.Context, departmentIDList []string) error
 	DeleteByUserID(ctx context.Context, userID string) error
 	Create(ctx context.Context, m *DepartmentMember) error
 	Get(ctx context.Context, userID string) ([]*DepartmentMember, error)
 	DeleteByKey(ctx context.Context, userID string, departmentID string) error
 	Update(ctx context.Context, m *DepartmentMember) error
+	FindByUserID(ctx context.Context, userIDList []string) ([]*DepartmentMember, error)
+	GetUserListInDepartment(ctx context.Context, departmentID string, userIDList []string) ([]*DepartmentMember, error)
+	GetByDepartmentID(ctx context.Context, departmentID string) ([]*DepartmentMember, error)
 }
