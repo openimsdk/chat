@@ -155,4 +155,3 @@ const (
 	DefaultAllowAddFriend = 1
 )
 
-const NilTimestamp = 0 // *time.Time == nil 对应的时间戳

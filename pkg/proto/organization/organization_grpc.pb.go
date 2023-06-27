@@ -307,7 +307,6 @@ type OrganizationServer interface {
 	MoveUserDepartment(context.Context, *MoveUserDepartmentReq) (*MoveUserDepartmentResp, error)
 	GetUserFullList(context.Context, *GetUserFullListReq) (*GetUserFullListResp, error)
 	SearchUsersFullInfo(context.Context, *SearchUsersFullInfoReq) (*SearchUsersFullInfoResp, error)
-	mustEmbedUnimplementedOrganizationServer()
 }
 
 // UnimplementedOrganizationServer must be embedded to have forward compatible implementations.

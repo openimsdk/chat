@@ -856,8 +856,93 @@ func (o *organizationSvr) CreateNewOrganizationMember(ctx context.Context, req *
 }
 
 func (o *organizationSvr) GetUserInfo(ctx context.Context, req *organization.GetUserInfoReq) (*organization.GetUserInfoResp, error) {
-	//TODO implement me
-	panic("implement me")
+	resp := &organization.GetUserInfoResp{CommonResp: &common.CommonResp{}}
+
+	user, err := o.Database.GetOrganizationUser(ctx, req.UserID)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			resp.CommonResp.ErrCode = constant.ErrRecordNotFound.ErrCode
+			resp.CommonResp.ErrMsg = "user id not found"
+		} else {
+			resp.CommonResp.ErrCode = constant.ErrDB.ErrCode
+			resp.CommonResp.ErrMsg = constant.ErrDB.ErrMsg + err.Error()
+		}
+		return resp, nil
+	}
+
+	memberList, err := o.Database.GetDepartmentMemberByUserID(ctx, req.UserID)
+	if err != nil {
+		resp.CommonResp.ErrCode = constant.ErrDB.ErrCode
+		resp.CommonResp.ErrMsg = constant.ErrDB.ErrMsg + err.Error()
+		return resp, nil
+	}
+
+	departmentMap := make(map[string]*common.Department)
+	if len(memberList) > 0 {
+		departmentIDList := make([]string, 0, len(memberList))
+		for _, member := range memberList {
+			departmentIDList = append(departmentIDList, member.DepartmentID)
+		}
+		departmentList, err := o.Database.GetList(ctx, departmentIDList)
+		if err != nil {
+			resp.CommonResp.ErrCode = constant.ErrDB.ErrCode
+			resp.CommonResp.ErrMsg = constant.ErrDB.ErrMsg + err.Error()
+			return resp, nil
+		}
+		for _, department := range departmentList {
+			departmentMap[department.DepartmentID] = &common.Department{
+				DepartmentID:   department.DepartmentID,
+				FaceURL:        department.FaceURL,
+				Name:           department.Name,
+				ParentID:       department.ParentID,
+				Order:          department.Order,
+				DepartmentType: department.DepartmentType,
+				RelatedGroupID: department.RelatedGroupID,
+				CreateTime:     department.CreateTime.UnixMilli(),
+			}
+		}
+	}
+
+	resp.User = &common.OrganizationUser{
+		UserID:               user.UserID,
+		Nickname:             user.Nickname,
+		EnglishName:          user.EnglishName,
+		FaceURL:              user.FaceURL,
+		Gender:               user.Gender,
+		Mobile:               user.Mobile,
+		Telephone:            user.Telephone,
+		Birth:                user.Birth.UnixMilli(),
+		Email:                user.Email,
+		Order:                user.Order,
+		Status:               user.Status,
+		CreateTime:           user.CreateTime.UnixMilli(),
+		DepartmentMemberList: make([]*common.DepartmentMember, 0, len(memberList)),
+		Station:              user.Station,
+		AreaCode:             user.AreaCode,
+	}
+
+	for _, member := range memberList {
+		var terminationTime int64
+		if member.TerminationTime == nil {
+			terminationTime = constant.NilTimestamp
+		} else {
+			terminationTime = member.TerminationTime.UnixMilli()
+		}
+		resp.User.DepartmentMemberList = append(resp.User.DepartmentMemberList, &common.DepartmentMember{
+			UserID:          member.UserID,
+			DepartmentID:    member.DepartmentID,
+			Order:           member.Order,
+			Position:        member.Position,
+			Leader:          member.Leader,
+			Status:          member.Status,
+			EntryTime:       member.EntryTime.UnixMilli(),
+			TerminationTime: terminationTime,
+			CreateTime:      member.CreateTime.UnixMilli(),
+			Department:      departmentMap[member.DepartmentID],
+		})
+	}
+
+	return resp, nil
 }
 
 func (o *organizationSvr) BatchImport(ctx context.Context, req *organization.BatchImportReq) (*organization.BatchImportResp, error) {
@@ -971,7 +1056,7 @@ func (o *organizationSvr) BatchImport(ctx context.Context, req *organization.Bat
 
 		log.NewInfo(req.OperationID, utils.GetSelfFuncName(), "user parse end", len(req.UserList))
 
-		users, err := o.Database.GetUserList(ctx, idList)
+		users, err := o.Database.GetOrganizationUserList(ctx, idList)
 		if err != nil {
 			return nil, err
 		}
