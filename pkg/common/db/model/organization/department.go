@@ -2,11 +2,12 @@ package organization
 
 import (
 	"context"
+	"time"
+
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/utils"
 	table "github.com/OpenIMSDK/chat/pkg/common/db/table/organization"
 	"gorm.io/gorm"
-	"time"
 )
 
 func NewDepartment(db *gorm.DB) *Department {
@@ -60,4 +61,9 @@ func (o *Department) Delete(ctx context.Context, departmentIDList []string) erro
 func (o *Department) GetDepartment(ctx context.Context, departmentId string) (*table.Department, error) {
 	var m table.Department
 	return &m, utils.Wrap(o.db.WithContext(ctx).Where("department_id = ?", departmentId).First(&m).Error, "")
+}
+
+func (o *Department) GetByName(ctx context.Context, name, parentID string) (*table.Department, error) {
+	var m table.Department
+	return &m, utils.Wrap(o.db.Where("name = ? AND parent_id = ?", name, parentID).First(&m).Error, "")
 }

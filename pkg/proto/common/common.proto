@@ -28,6 +28,7 @@ message UserPublicInfo{
   string  faceURL = 5;
   int32  gender = 6;
   int32  level = 7;
+  string password = 8;
 }
 
 message UserIdentity {

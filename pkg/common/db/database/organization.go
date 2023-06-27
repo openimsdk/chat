@@ -2,6 +2,7 @@ package database
 
 import (
 	"context"
+
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/db/tx"
 	"github.com/OpenIMSDK/chat/pkg/common/db/model/organization"
 	table "github.com/OpenIMSDK/chat/pkg/common/db/table/organization"
@@ -42,6 +43,9 @@ type OrganizationDatabaseInterface interface {
 	//organizaiton
 	SetOrganization(ctx context.Context, Organization *table.Organization) error
 	GetOrganization(ctx context.Context) (*table.Organization, error)
+	BeginTransaction(ctx context.Context) (*gorm.DB, error)
+	GetDepartmentMemberByKey(ctx context.Context, userID, departmentID string) (*table.DepartmentMember, error)
+	GetDepartmentByName(ctx context.Context, name, parentID string) (*table.Department, error)
 }
 
 func NewOrganizationDatabase(db *gorm.DB) OrganizationDatabaseInterface {
@@ -172,4 +176,16 @@ func (o *OrganizationDatabase) CreateDepartment(ctx context.Context, department 
 
 func (o *OrganizationDatabase) GetDepartment(ctx context.Context, departmentID string) (*table.Department, error) {
 	return o.Department.GetDepartment(ctx, departmentID)
+}
+
+func (o *OrganizationDatabase) BeginTransaction(ctx context.Context) (*gorm.DB, error) {
+	return o.Organization.BeginTransaction(ctx)
+}
+
+func (o *OrganizationDatabase) GetDepartmentMemberByKey(ctx context.Context, userID, departmentID string) (*table.DepartmentMember, error) {
+	return o.DepartmentMember.GetByKey(ctx, userID, departmentID)
+}
+
+func (o *OrganizationDatabase) GetDepartmentByName(ctx context.Context, name, parentID string) (*table.Department, error) {
+	return o.Department.GetByName(ctx, name, parentID)
 }

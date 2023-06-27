@@ -2,10 +2,11 @@ package organization
 
 import (
 	"context"
+	"time"
+
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/utils"
 	table "github.com/OpenIMSDK/chat/pkg/common/db/table/organization"
 	"gorm.io/gorm"
-	"time"
 )
 
 func NewOrganization(db *gorm.DB) *Organization {
@@ -41,4 +42,8 @@ func (o *Organization) Get(ctx context.Context) (*table.Organization, error) {
 		return nil, utils.Wrap(err, "")
 	}
 	return &m, nil
+}
+
+func (o *Organization) BeginTransaction(ctx context.Context) (*gorm.DB, error) {
+	return o.db.WithContext(ctx).Begin(), nil
 }

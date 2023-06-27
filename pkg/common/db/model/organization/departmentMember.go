@@ -2,10 +2,11 @@ package organization
 
 import (
 	"context"
+	"time"
+
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/utils"
 	table "github.com/OpenIMSDK/chat/pkg/common/db/table/organization"
 	"gorm.io/gorm"
-	"time"
 )
 
 func NewDepartmentMember(db *gorm.DB) *DepartmentMember {
@@ -73,4 +74,9 @@ func (o *DepartmentMember) GetUserListInDepartment(ctx context.Context, departme
 func (o *DepartmentMember) GetByDepartmentID(ctx context.Context, departmentID string) ([]*table.DepartmentMember, error) {
 	var ms []*table.DepartmentMember
 	return ms, utils.Wrap(o.db.WithContext(ctx).Where("department_id = ?", departmentID).Find(ms).Error, "")
+}
+
+func (o *DepartmentMember) GetByKey(ctx context.Context, userID, departmentID string) (*table.DepartmentMember, error) {
+	var ms *table.DepartmentMember
+	return ms, utils.Wrap(o.db.Where("user_id = ? and department_id = ?", userID, departmentID).First(ms).Error, "")
 }
