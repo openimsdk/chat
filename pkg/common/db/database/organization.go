@@ -129,8 +129,8 @@ func (o *OrganizationDatabase) DeleteOrganizationUser(ctx context.Context, userI
 func (o *OrganizationDatabase) UpdateOrganizationUser(ctx context.Context, OrganizationUser *table.OrganizationUser) error {
 	return o.OrganizationUser.Update(ctx, OrganizationUser)
 }
-
 func (o *OrganizationDatabase) CreateOrganizationUser(ctx context.Context, OrganizationUser *table.OrganizationUser) error {
+
 	return o.OrganizationUser.Create(ctx, OrganizationUser)
 }
 
