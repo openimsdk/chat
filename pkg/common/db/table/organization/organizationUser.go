@@ -2,8 +2,9 @@ package organization
 
 import (
 	"context"
-	"github.com/OpenIMSDK/chat/pkg/proto/organization"
 	"time"
+
+	"github.com/OpenIMSDK/chat/pkg/proto/organization"
 )
 
 type OrganizationUser struct {
@@ -33,4 +34,5 @@ type OrganizationUserInterface interface {
 	GetNoDepartmentUserIDList(ctx context.Context) ([]string, error)
 	GetList(ctx context.Context, userIDList []string) ([]*OrganizationUser, error)
 	Search(ctx context.Context, positionList, userIDList []string, text string, sort []*organization.GetSearchUserListSort) ([]*OrganizationUser, error)
+	SearchV2(ctx context.Context, text string, userIDList []string, pageNumber, showNumber int) (int64, []*OrganizationUser, error)
 }

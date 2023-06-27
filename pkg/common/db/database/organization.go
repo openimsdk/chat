@@ -46,6 +46,7 @@ type OrganizationDatabaseInterface interface {
 	BeginTransaction(ctx context.Context) (*gorm.DB, error)
 	GetDepartmentMemberByKey(ctx context.Context, userID, departmentID string) (*table.DepartmentMember, error)
 	GetDepartmentByName(ctx context.Context, name, parentID string) (*table.Department, error)
+	SearchV2(ctx context.Context, keyword string, userIDList []string, pageNumber, showNumber int) (int64, []*table.OrganizationUser, error)
 }
 
 func NewOrganizationDatabase(db *gorm.DB) OrganizationDatabaseInterface {
@@ -188,4 +189,9 @@ func (o *OrganizationDatabase) GetDepartmentMemberByKey(ctx context.Context, use
 
 func (o *OrganizationDatabase) GetDepartmentByName(ctx context.Context, name, parentID string) (*table.Department, error) {
 	return o.Department.GetByName(ctx, name, parentID)
+}
+
+// SearchV2(ctx context.Context, text string, userIDList []string, pageNumber, showNumber int) (int, []*table.OrganizationUser, error)
+func (o *OrganizationDatabase) SearchV2(ctx context.Context, keyword string, userIDList []string, pageNumber, showNumber int) (int64, []*table.OrganizationUser, error) {
+	return o.OrganizationUser.SearchV2(ctx, keyword, userIDList, pageNumber, showNumber)
 }

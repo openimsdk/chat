@@ -3,12 +3,13 @@ package organization
 import (
 	"context"
 	"fmt"
+	"strings"
+	"time"
+
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/utils"
 	table "github.com/OpenIMSDK/chat/pkg/common/db/table/organization"
 	"github.com/OpenIMSDK/chat/pkg/proto/organization"
 	"gorm.io/gorm"
-	"strings"
-	"time"
 )
 
 func NewOrganizationUser(db *gorm.DB) *OrganizationUser {
@@ -144,4 +145,19 @@ func (tb *OrganizationUser) Search(ctx context.Context, positionList, userIDList
 	db = db.WithContext(ctx).Order("`order` ASC, `create_time` ASC")
 	var ms []*table.OrganizationUser
 	return ms, utils.Wrap(db.Find(ms).Error, "")
+}
+
+func (tb *OrganizationUser) SearchV2(ctx context.Context, keyword string, orUserIDList []string, pageNumber, showNumber int) (int64, []*table.OrganizationUser, error) {
+	db := tb.db.Model(&OrganizationUser{})
+	if keyword != "" {
+		vague := "%" + keyword + "%"
+		db = db.Where("user_id in (?) OR mobile = ? OR telephone = ? OR email = ? OR nickname like ? OR english_name like ?", append(orUserIDList, keyword), keyword, keyword, keyword, vague, vague)
+	}
+	var count int64
+	if err := db.Count(&count).Error; err != nil {
+		return 0, nil, utils.Wrap(err, "")
+	}
+	db = db.Order("`order` ASC, `create_time` ASC").Offset(int(pageNumber) * int(showNumber)).Limit(int(showNumber))
+	var ms []*table.OrganizationUser
+	return count, ms, utils.Wrap(db.Find(&ms).Error, "")
 }
