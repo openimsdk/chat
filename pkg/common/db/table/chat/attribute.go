@@ -38,4 +38,6 @@ type AttributeInterface interface {
 	TakePhone(ctx context.Context, areaCode string, phoneNumber string) (*Attribute, error)
 	TakeAccount(ctx context.Context, account string) (*Attribute, error)
 	Take(ctx context.Context, userID string) (*Attribute, error)
+	GetAccountList(ctx context.Context, accountList []string) ([]*Attribute, error)
+	ExistPhoneNumber(ctx context.Context, areaCode, phoneNumber string) (bool, error)
 }

@@ -7,18 +7,22 @@ import (
 	table "github.com/OpenIMSDK/chat/pkg/common/db/table/organization"
 	rpc "github.com/OpenIMSDK/chat/pkg/proto/organization"
 	"gorm.io/gorm"
+	"time"
 )
 
 type OrganizationDatabaseInterface interface {
 	//department
 	GetDepartmentByID(ctx context.Context, departmentID string) (*table.Department, error)
-	CreateDepartment(ctx context.Context, department ...*table.Department) error
+	CreateDepartment(ctx context.Context, department *table.Department) error
 	UpdateDepartment(ctx context.Context, department *table.Department) error
 	GetParent(ctx context.Context, parentID string) ([]*table.Department, error)
 	GetDepartment(ctx context.Context, departmentID string) (*table.Department, error)
 	GetList(ctx context.Context, departmentIDList []string) ([]*table.Department, error)
 	DeleteDepartment(ctx context.Context, departmentIDList []string) error
 	UpdateParentID(ctx context.Context, oldParentID, newParentID string) error
+	GetMaxOrder(ctx context.Context, parentID string) (int32, error)
+	UpdateOrderIncrement(ctx context.Context, parentID string, startOrder int32) error
+	UpdateParentIDOrder(ctx context.Context, departmentID, parentID string, order int32) error
 	//departmentMember
 	FindDepartmentMember(ctx context.Context, departmentIDList []string) ([]*table.DepartmentMember, error)
 	GetDepartmentMemberByUserID(ctx context.Context, userID string) ([]*table.DepartmentMember, error)
@@ -30,6 +34,7 @@ type OrganizationDatabaseInterface interface {
 	FindDepartmentMemberByUserID(ctx context.Context, userIDList []string) ([]*table.DepartmentMember, error)
 	GetUserListInDepartment(ctx context.Context, departmentID string, userIDList []string) ([]*table.DepartmentMember, error)
 	GetDepartmentMemberByDepartmentID(ctx context.Context, departmentID string) ([]*table.DepartmentMember, error)
+	CreateDepartmentMemberList(ctx context.Context, members []*table.DepartmentMember) error
 	//organizationUser
 	CreateOrganizationUser(ctx context.Context, OrganizationUser *table.OrganizationUser) error
 	UpdateOrganizationUser(ctx context.Context, OrganizationUser *table.OrganizationUser) error
@@ -39,6 +44,7 @@ type OrganizationDatabaseInterface interface {
 	GetNoDepartmentUserIDList(ctx context.Context) ([]string, error)
 	GetOrganizationUserList(ctx context.Context, userIDList []string) ([]*table.OrganizationUser, error)
 	SearchOrganizationUser(ctx context.Context, positionList, userIDList []string, text string, sort []*rpc.GetSearchUserListSort) ([]*table.OrganizationUser, error)
+	GetPage(ctx context.Context, pageNumber, showNumber int) (int64, []*table.OrganizationUser, error)
 	//organizaiton
 	SetOrganization(ctx context.Context, Organization *table.Organization) error
 	GetOrganization(ctx context.Context) (*table.Organization, error)
@@ -60,6 +66,26 @@ type OrganizationDatabase struct {
 	DepartmentMember table.DepartmentMemberInterface
 	OrganizationUser table.OrganizationUserInterface
 	Organization     table.OrganizationInterface
+}
+
+func (o *OrganizationDatabase) GetPage(ctx context.Context, pageNumber, showNumber int) (int64, []*table.OrganizationUser, error) {
+	return o.OrganizationUser.GetPage(ctx, pageNumber, showNumber)
+}
+
+func (o *OrganizationDatabase) CreateDepartmentMemberList(ctx context.Context, members []*table.DepartmentMember) error {
+	return o.DepartmentMember.CreateList(ctx, members)
+}
+
+func (o *OrganizationDatabase) UpdateParentIDOrder(ctx context.Context, departmentID, parentID string, order int32) error {
+	return o.Department.UpdateParentIDOrder(ctx, departmentID, parentID, order)
+}
+
+func (o *OrganizationDatabase) UpdateOrderIncrement(ctx context.Context, parentID string, startOrder int32) error {
+	return o.Department.UpdateOrderIncrement(ctx, parentID, startOrder)
+}
+
+func (o *OrganizationDatabase) GetMaxOrder(ctx context.Context, parentID string) (int32, error) {
+	return o.Department.GetMaxOrder(ctx, parentID)
 }
 
 func (o *OrganizationDatabase) SearchOrganizationUser(ctx context.Context, positionList, userIDList []string, text string, sort []*rpc.GetSearchUserListSort) ([]*table.OrganizationUser, error) {
@@ -166,8 +192,10 @@ func (o *OrganizationDatabase) GetDepartmentByID(ctx context.Context, department
 	return o.Department.FindOne(ctx, departmentID)
 }
 
-func (o *OrganizationDatabase) CreateDepartment(ctx context.Context, department ...*table.Department) error {
-	return o.Department.Create(ctx, department...)
+func (o *OrganizationDatabase) CreateDepartment(ctx context.Context, department *table.Department) error {
+	department.CreateTime = time.Now()
+	department.ChangeTime = time.Now()
+	return o.Department.Create(ctx, department)
 }
 
 func (o *OrganizationDatabase) GetDepartment(ctx context.Context, departmentID string) (*table.Department, error) {

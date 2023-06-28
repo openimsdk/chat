@@ -13,6 +13,9 @@ import (
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/proto/group"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/proto/sdkws"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/proto/user"
+	configChat "github.com/OpenIMSDK/chat/pkg/common/config"
+	"github.com/OpenIMSDK/chat/pkg/proto/chat"
+	"github.com/OpenIMSDK/chat/pkg/proto/common"
 )
 
 func NewOpenIMClient(zk discoveryregistry.SvcDiscoveryRegistry) *OpenIMClient {
@@ -26,11 +29,19 @@ type OpenIMClient struct {
 }
 
 func (o *OpenIMClient) getUserClient(ctx context.Context) (user.UserClient, error) {
-	conn, err := o.zk.GetConn(ctx, config.Config.RpcRegisterName.OpenImUserName)
+	conn, err := o.zk.GetConn(ctx, configChat.Config.RpcRegisterName.OpenImChatName)
 	if err != nil {
 		return nil, err
 	}
 	return user.NewUserClient(conn), nil
+}
+
+func (o *OpenIMClient) getChatClient(ctx context.Context) (chat.ChatClient, error) {
+	conn, err := o.zk.GetConn(ctx, config.Config.RpcRegisterName.OpenImUserName)
+	if err != nil {
+		return nil, err
+	}
+	return chat.NewChatClient(conn), nil
 }
 
 func (o *OpenIMClient) getFriendClient(ctx context.Context) (friend.FriendClient, error) {
@@ -160,4 +171,22 @@ func (o *OpenIMClient) GetGroupMemberID(ctx context.Context, groupID string) ([]
 		return nil, err
 	}
 	return resp.UserIDs, nil
+}
+
+func (o *OpenIMClient) GetAccountUser(ctx context.Context, opUserID string, operationID string, account string) (*chat.GetAccountUserResp, error) {
+	client, err := o.getChatClient(ctx)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := client.GetAccountUser(ctx, &chat.GetAccountUserReq{
+		Operation: &common.Operation{
+			OpUserID:    opUserID,
+			OperationID: operationID,
+		},
+		AccountList: []string{account},
+	})
+	if err != nil {
+		return nil, err
+	}
+	return resp, nil
 }

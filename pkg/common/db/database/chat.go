@@ -33,6 +33,9 @@ type ChatDatabaseInterface interface {
 	LoginRecord(ctx context.Context, record *table.UserLoginRecord, verifyCodeID *uint) error
 	UpdatePassword(ctx context.Context, userID string, password string) error
 	UpdatePasswordAndDeleteVerifyCode(ctx context.Context, userID string, password string, code uint) error
+	GetAccountList(ctx context.Context, accountList []string) ([]*table.Attribute, error)
+	Restriction(ctx context.Context, ip string, isLogin bool) (bool, error)
+	ExistPhoneNumber(ctx context.Context, areaCode, phoneNumber string) (bool, error)
 }
 
 func NewChatDatabase(db *gorm.DB) ChatDatabaseInterface {
@@ -53,6 +56,19 @@ type ChatDatabase struct {
 	attribute       table.AttributeInterface
 	userLoginRecord table.UserLoginRecordInterface
 	verifyCode      table.VerifyCodeInterface
+	IPForbidden     table.IPForbiddenInterface
+}
+
+func (o *ChatDatabase) ExistPhoneNumber(ctx context.Context, areaCode, phoneNumber string) (bool, error) {
+	return o.attribute.ExistPhoneNumber(ctx, areaCode, phoneNumber)
+}
+
+func (o *ChatDatabase) Restriction(ctx context.Context, ip string, isLogin bool) (bool, error) {
+	return o.IPForbidden.Restriction(ctx, ip, isLogin)
+}
+
+func (o *ChatDatabase) GetAccountList(ctx context.Context, accountList []string) ([]*table.Attribute, error) {
+	return o.attribute.GetAccountList(ctx, accountList)
 }
 
 func (o *ChatDatabase) IsNotFound(err error) bool {

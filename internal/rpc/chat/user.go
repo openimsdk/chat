@@ -9,6 +9,7 @@ import (
 	"github.com/OpenIMSDK/chat/pkg/common/mctx"
 	"github.com/OpenIMSDK/chat/pkg/eerrs"
 	"github.com/OpenIMSDK/chat/pkg/proto/chat"
+	"github.com/OpenIMSDK/chat/pkg/proto/common"
 )
 
 func (o *chatSvr) UpdateUserInfo(ctx context.Context, req *chat.UpdateUserInfoReq) (*chat.UpdateUserInfoResp, error) {
@@ -187,4 +188,20 @@ func (o *chatSvr) FindAccountUser(ctx context.Context, req *chat.FindAccountUser
 		accountUserMap[attribute.Account] = attribute.UserID
 	}
 	return &chat.FindAccountUserResp{AccountUserMap: accountUserMap}, nil
+}
+
+func (s *chatSvr) GetAccountUser(ctx context.Context, req *chat.GetAccountUserReq) (*chat.GetAccountUserResp, error) {
+	resp := &chat.GetAccountUserResp{CommonResp: &common.CommonResp{}}
+	if req.Operation == nil {
+		return nil, errs.ErrArgs.Wrap(" operation is nil")
+	}
+	atts, err := s.Database.GetAccountList(ctx, req.AccountList)
+	if err != nil {
+		return nil, err
+	}
+	resp.Accounts = make(map[string]string)
+	for _, att := range atts {
+		resp.Accounts[att.Account] = att.UserID
+	}
+	return resp, nil
 }

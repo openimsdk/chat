@@ -225,6 +225,17 @@ message OpenIMCallbackResp {
 
 }
 
+
+message GetAccountUserReq {
+  common.Operation operation = 1;
+  repeated string accountList = 2;
+}
+
+message GetAccountUserResp {
+  common.CommonResp commonResp = 1;
+  map<string, string> accounts = 2; // account  userID
+}
+
 service chat {
   //编辑个人资料 自己或者管理员调用
   rpc UpdateUserInfo(UpdateUserInfoReq) returns(UpdateUserInfoResp);
@@ -249,4 +260,6 @@ service chat {
   rpc GetSignalRecords(GetSignalRecordsReq) returns(GetSignalRecordsResp);
 
   rpc OpenIMCallback(OpenIMCallbackReq) returns(OpenIMCallbackResp);
+
+  rpc GetAccountUser(GetAccountUserReq) returns(GetAccountUserResp);
 }

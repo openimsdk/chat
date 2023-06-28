@@ -17,6 +17,20 @@ func genDepartmentID() string {
 	return bi.String()
 }
 
+func GenUserID() string {
+	r := utils.Md5(strconv.FormatInt(time.Now().UnixNano(), 10) + strconv.FormatUint(rand.Uint64(), 10))
+	bi := big.NewInt(0)
+	bi.SetString(r[0:8], 16)
+	return bi.String()
+}
+
+func GenDepartmentID() string {
+	r := utils.Md5(strconv.FormatInt(time.Now().UnixNano(), 10) + strconv.FormatUint(rand.Uint64(), 10))
+	bi := big.NewInt(0)
+	bi.SetString(r[0:8], 16)
+	return bi.String()
+}
+
 func (o *organizationSvr) GetDepartmentMemberNum(ctx context.Context, parentID string) (map[string]int, error) {
 	type Department struct {
 		//DepartmentName         string        // 部门名

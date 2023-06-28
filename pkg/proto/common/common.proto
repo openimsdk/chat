@@ -37,6 +37,7 @@ message UserIdentity {
   string deviceID = 4;
   int32 platform = 5;
   string account = 6;
+  string password = 7;
 }
 
 

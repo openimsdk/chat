@@ -2,8 +2,10 @@ package chat
 
 import (
 	"context"
+	"errors"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/db/ormutil"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
+	"github.com/OpenIMSDK/Open-IM-Server/pkg/utils"
 	"github.com/OpenIMSDK/chat/pkg/common/db/table/chat"
 	"gorm.io/gorm"
 )
@@ -59,4 +61,25 @@ func (o *Attribute) TakeAccount(ctx context.Context, account string) (*chat.Attr
 func (o *Attribute) Take(ctx context.Context, userID string) (*chat.Attribute, error) {
 	var a chat.Attribute
 	return &a, errs.Wrap(o.db.WithContext(ctx).Where("user_id = ?", userID).Take(&a).Error)
+}
+
+func (tb *Attribute) GetAccountList(ctx context.Context, accountList []string) ([]*chat.Attribute, error) {
+	if len(accountList) == 0 {
+		return []*chat.Attribute{}, nil
+	}
+	var att []*chat.Attribute
+	err := tb.db.WithContext(ctx).Model(&att).Where("account in (?)", accountList).Find(&att).Error
+	return att, utils.Wrap(err, "")
+}
+
+func (tb *Attribute) ExistPhoneNumber(ctx context.Context, areaCode, phoneNumber string) (bool, error) {
+	var m chat.Attribute
+	err := tb.db.WithContext(ctx).Model(&chat.Attribute{}).Where("area_code = ? and phone_number = ?", areaCode, phoneNumber).First(&m).Error
+	if err == nil {
+		return true, nil
+	} else if errors.Is(err, gorm.ErrRecordNotFound) {
+		return false, nil
+	} else {
+		return false, utils.Wrap(err, "")
+	}
 }

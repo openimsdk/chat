@@ -74,3 +74,12 @@ func (o *DepartmentMember) GetByDepartmentID(ctx context.Context, departmentID s
 	var ms []*table.DepartmentMember
 	return ms, utils.Wrap(o.db.WithContext(ctx).Where("department_id = ?", departmentID).Find(ms).Error, "")
 }
+
+func (o *DepartmentMember) CreateList(ctx context.Context, ms []*table.DepartmentMember) error {
+	now := time.Now()
+	for i := 0; i < len(ms); i++ {
+		ms[i].CreateTime = now
+		ms[i].ChangeTime = now
+	}
+	return utils.Wrap(o.db.WithContext(ctx).Create(&ms).Error, "")
+}

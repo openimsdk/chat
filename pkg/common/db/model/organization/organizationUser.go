@@ -38,7 +38,7 @@ func (tb *OrganizationUser) Delete(ctx context.Context, userID string) error {
 
 func (tb *OrganizationUser) Get(ctx context.Context, userID string) (*table.OrganizationUser, error) {
 	var m table.OrganizationUser
-	return &m, utils.Wrap(tb.db.Where("user_id = ?", userID).First(&m).Error, "")
+	return &m, utils.Wrap(tb.db.WithContext(ctx).Where("user_id = ?", userID).First(&m).Error, "")
 }
 
 func (tb *OrganizationUser) SearchPage(ctx context.Context, positionList, userIDList []string, text string, sort []*organization.GetSearchUserListSort, pageNumber uint32, showNumber uint32) (uint32, []*table.OrganizationUser, error) {
@@ -62,7 +62,7 @@ func (tb *OrganizationUser) SearchPage(ctx context.Context, positionList, userID
 		db = db.Where("1=1")
 	}
 	var count int64
-	if err := db.Model(&OrganizationUser{}).Count(&count).Error; err != nil {
+	if err := db.Model(&table.OrganizationUser{}).Count(&count).Error; err != nil {
 		return 0, nil, utils.Wrap(err, "")
 	}
 	if showNumber > 0 {
@@ -144,4 +144,16 @@ func (tb *OrganizationUser) Search(ctx context.Context, positionList, userIDList
 	db = db.WithContext(ctx).Order("`order` ASC, `create_time` ASC")
 	var ms []*table.OrganizationUser
 	return ms, utils.Wrap(db.Find(ms).Error, "")
+}
+
+func (tb *OrganizationUser) GetPage(ctx context.Context, pageNumber, showNumber int) (int64, []*table.OrganizationUser, error) {
+	var total int64
+	err := tb.db.Model(&table.OrganizationUser{}).Count(&total).Error
+	if err != nil {
+		return 0, nil, utils.Wrap(err, "")
+	}
+
+	var users []*table.OrganizationUser
+	err = tb.db.WithContext(ctx).Model(&table.OrganizationUser{}).Order("create_time DESC").Offset(pageNumber * showNumber).Limit(showNumber).Find(users).Error
+	return total, users, utils.Wrap(err, "")
 }

@@ -26,4 +26,7 @@ type DepartmentInterface interface {
 	UpdateParentID(ctx context.Context, oldParentID, newParentID string) error
 	Delete(ctx context.Context, departmentIDList []string) error
 	GetDepartment(ctx context.Context, departmentID string) (*Department, error)
+	GetMaxOrder(ctx context.Context, parentID string) (int32, error)
+	UpdateOrderIncrement(ctx context.Context, parentID string, startOrder int32) error
+	UpdateParentIDOrder(ctx context.Context, departmentID, parentID string, order int32) error
 }

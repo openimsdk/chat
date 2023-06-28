@@ -61,3 +61,19 @@ func (o *Department) GetDepartment(ctx context.Context, departmentId string) (*t
 	var m table.Department
 	return &m, utils.Wrap(o.db.WithContext(ctx).Where("department_id = ?", departmentId).First(&m).Error, "")
 }
+
+func (o *Department) GetMaxOrder(ctx context.Context, parentID string) (int32, error) {
+	// SELECT IFNULL(MAX(`order`), 0) FROM department_members WHERE `user_id` = "22286361621"
+	var order int32
+	return order, utils.Wrap(o.db.WithContext(ctx).Model(&table.Department{}).Select("IFNULL(MAX(`order`), 0)").Where("parent_id = ?", parentID).Scan(&order).Error, "")
+}
+
+func (o *Department) UpdateOrderIncrement(ctx context.Context, parentID string, startOrder int32) error {
+	return utils.Wrap(o.db.WithContext(ctx).Model(&table.Department{}).Where("parent_id = ? AND `order` >= ?", parentID, startOrder).Update("`order`", gorm.Expr("`order` + ?", 1)).Error, "")
+}
+func (o *Department) UpdateParentIDOrder(ctx context.Context, departmentID, parentID string, order int32) error {
+	return utils.Wrap(o.db.WithContext(ctx).Model(&table.Department{}).Where("department_id = ?", departmentID).Updates(map[string]interface{}{
+		"parent_id": parentID,
+		"`order`":   order,
+	}).Error, "")
+}

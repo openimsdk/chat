@@ -107,7 +107,7 @@ func NewOrganizationRoute(router gin.IRouter, zk discoveryregistry.SvcDiscoveryR
 	{
 		//部门  增删改查
 		organizationGroup.POST("/create_department", mw.CheckAdmin, org.CreateDepartment) // 创建部门
-		organizationGroup.POST("/update_department", mw.CheckAdmin, org.UpdateDepartment) // 修改部门
+		organizationGroup.POST("/update_department", org.UpdateDepartment)                // 修改部门
 		organizationGroup.POST("/delete_department", mw.CheckAdmin, org.DeleteDepartment) // 删除部门
 		organizationGroup.POST("/get_department", mw.CheckToken, org.GetDepartment)       // 获取部门
 

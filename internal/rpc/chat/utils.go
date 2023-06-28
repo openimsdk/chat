@@ -4,6 +4,10 @@ import (
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/utils"
 	"github.com/OpenIMSDK/chat/pkg/common/db/table/chat"
 	"github.com/OpenIMSDK/chat/pkg/proto/common"
+	"math/big"
+	"math/rand"
+	"strconv"
+	"time"
 )
 
 func DbToPbAttribute(attribute *chat.Attribute) *common.UserPublicInfo {
@@ -47,4 +51,16 @@ func DbToPbUserFullInfo(attribute *chat.Attribute) *common.UserFullInfo {
 
 func DbToPbUserFullInfos(attributes []*chat.Attribute) []*common.UserFullInfo {
 	return utils.Slice(attributes, DbToPbUserFullInfo)
+}
+func FormatAccount(areaCode, phoneNumber, email string) string {
+	if phoneNumber == "" {
+		return email
+	}
+	return areaCode + phoneNumber
+}
+func GenUserID(len int) string {
+	r := utils.Md5(strconv.FormatInt(time.Now().UnixNano(), 10) + strconv.FormatUint(rand.Uint64(), 10))
+	bi := big.NewInt(0)
+	bi.SetString(r[0:len], 16)
+	return bi.String()
 }
