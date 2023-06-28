@@ -52,7 +52,7 @@ type organizationSvr struct {
 }
 
 func (o *organizationSvr) CreateDepartment(ctx context.Context, req *organization.CreateDepartmentReq) (*organization.CreateDepartmentResp, error) {
-	resp := &organization.CreateDepartmentResp{CommonResp: &common.CommonResp{}, DepartmentInfo: &common.Department{}}
+	resp := &organization.CreateDepartmentResp{DepartmentInfo: &common.Department{}}
 	if req.DepartmentInfo == nil {
 		return nil, errs.ErrArgs.Wrap(" req.DepartmentInfo is nil")
 	}
@@ -84,7 +84,7 @@ func (o *organizationSvr) CreateDepartment(ctx context.Context, req *organizatio
 }
 
 func (o *organizationSvr) UpdateDepartment(ctx context.Context, req *organization.UpdateDepartmentReq) (*organization.UpdateDepartmentResp, error) {
-	resp := &organization.UpdateDepartmentResp{CommonResp: &common.CommonResp{}}
+	resp := &organization.UpdateDepartmentResp{}
 
 	if req.DepartmentInfo == nil {
 		return nil, errs.ErrArgs.Wrap(" req.DepartmentInfo is nil")
@@ -114,7 +114,7 @@ func (o *organizationSvr) UpdateDepartment(ctx context.Context, req *organizatio
 }
 
 func (o *organizationSvr) GetOrganizationDepartment(ctx context.Context, req *organization.GetOrganizationDepartmentReq) (*organization.GetOrganizationDepartmentResp, error) {
-	resp := &organization.GetOrganizationDepartmentResp{CommonResp: &common.CommonResp{}, DepartmentList: []*organization.DepartmentInfo{}}
+	resp := &organization.GetOrganizationDepartmentResp{DepartmentList: []*organization.DepartmentInfo{}}
 
 	numMap, err := o.GetDepartmentMemberNum(ctx, "")
 	if err != nil {
@@ -157,7 +157,7 @@ func (o *organizationSvr) GetOrganizationDepartment(ctx context.Context, req *or
 }
 
 func (o *organizationSvr) DeleteDepartment(ctx context.Context, req *organization.DeleteDepartmentReq) (*organization.DeleteDepartmentResp, error) {
-	resp := &organization.DeleteDepartmentResp{CommonResp: &common.CommonResp{}}
+	resp := &organization.DeleteDepartmentResp{}
 	departmentList, err := o.Database.GetList(ctx, req.DepartmentIDList)
 	if err != nil {
 		return nil, err
@@ -184,7 +184,7 @@ func (o *organizationSvr) DeleteDepartment(ctx context.Context, req *organizatio
 }
 
 func (o *organizationSvr) GetDepartment(ctx context.Context, req *organization.GetDepartmentReq) (*organization.GetDepartmentResp, error) {
-	resp := &organization.GetDepartmentResp{CommonResp: &common.CommonResp{}}
+	resp := &organization.GetDepartmentResp{}
 
 	department, err := o.Database.GetDepartment(ctx, req.DepartmentID)
 	if err == nil {
@@ -208,7 +208,7 @@ func (o *organizationSvr) GetDepartment(ctx context.Context, req *organization.G
 }
 
 func (o *organizationSvr) CreateOrganizationUser(ctx context.Context, req *organization.CreateOrganizationUserReq) (*organization.CreateOrganizationUserResp, error) {
-	resp := &organization.CreateOrganizationUserResp{CommonResp: &common.CommonResp{}}
+	resp := &organization.CreateOrganizationUserResp{}
 	if req.OrganizationUser == nil {
 		return nil, errs.ErrArgs.Wrap(" req.OrganizationUser is nil")
 	}
@@ -233,7 +233,7 @@ func (o *organizationSvr) CreateOrganizationUser(ctx context.Context, req *organ
 }
 
 func (o *organizationSvr) UpdateOrganizationUser(ctx context.Context, req *organization.UpdateOrganizationUserReq) (*organization.UpdateOrganizationUserResp, error) {
-	resp := &organization.UpdateOrganizationUserResp{CommonResp: &common.CommonResp{}}
+	resp := &organization.UpdateOrganizationUserResp{}
 	if req.OrganizationUser == nil {
 		return nil, errs.ErrArgs.Wrap(" req.OrganizationUser is nil")
 	}
@@ -258,7 +258,7 @@ func (o *organizationSvr) UpdateOrganizationUser(ctx context.Context, req *organ
 }
 
 func (o *organizationSvr) DeleteOrganizationUser(ctx context.Context, req *organization.DeleteOrganizationUserReq) (*organization.DeleteOrganizationUserResp, error) {
-	resp := &organization.DeleteOrganizationUserResp{CommonResp: &common.CommonResp{}}
+	resp := &organization.DeleteOrganizationUserResp{}
 	err := o.Database.DeleteOrganizationUser(ctx, req.UserID)
 	if err != nil {
 		return nil, err
@@ -271,7 +271,7 @@ func (o *organizationSvr) DeleteOrganizationUser(ctx context.Context, req *organ
 }
 
 func (o *organizationSvr) CreateDepartmentMember(ctx context.Context, req *organization.CreateDepartmentMemberReq) (*organization.CreateDepartmentMemberResp, error) {
-	resp := &organization.CreateDepartmentMemberResp{CommonResp: &common.CommonResp{}}
+	resp := &organization.CreateDepartmentMemberResp{}
 	if req.DepartmentMember == nil {
 		return nil, errs.ErrArgs.Wrap("req.DepartmentInfo is nil")
 	}
@@ -297,7 +297,7 @@ func (o *organizationSvr) CreateDepartmentMember(ctx context.Context, req *organ
 }
 
 func (o *organizationSvr) GetUserInDepartment(ctx context.Context, req *organization.GetUserInDepartmentReq) (*organization.GetUserInDepartmentResp, error) {
-	resp := &organization.GetUserInDepartmentResp{CommonResp: &common.CommonResp{}}
+	resp := &organization.GetUserInDepartmentResp{}
 	user, err := o.Database.GetOrganizationUser(ctx, req.UserID)
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, errs.ErrArgs.Wrap("user not fount")
@@ -378,7 +378,7 @@ func (o *organizationSvr) GetUserInDepartment(ctx context.Context, req *organiza
 }
 
 func (o *organizationSvr) DeleteUserInDepartment(ctx context.Context, req *organization.DeleteUserInDepartmentReq) (*organization.DeleteUserInDepartmentResp, error) {
-	resp := &organization.DeleteUserInDepartmentResp{CommonResp: &common.CommonResp{}}
+	resp := &organization.DeleteUserInDepartmentResp{}
 	err := o.Database.DeleteDepartmentMemberByKey(ctx, req.UserID, req.DepartmentID)
 	if err != nil {
 		return nil, err
@@ -387,7 +387,7 @@ func (o *organizationSvr) DeleteUserInDepartment(ctx context.Context, req *organ
 }
 
 func (o *organizationSvr) UpdateUserInDepartment(ctx context.Context, req *organization.UpdateUserInDepartmentReq) (*organization.UpdateUserInDepartmentResp, error) {
-	resp := &organization.UpdateUserInDepartmentResp{CommonResp: &common.CommonResp{}}
+	resp := &organization.UpdateUserInDepartmentResp{}
 	if req.DepartmentMember == nil {
 		return nil, errs.ErrArgs.Wrap(" req.DepartmentInfo is nil")
 	}
@@ -419,7 +419,7 @@ func (o *organizationSvr) UpdateUserInDepartment(ctx context.Context, req *organ
 }
 
 func (o *organizationSvr) GetSearchUserList(ctx context.Context, req *organization.GetSearchUserListReq) (*organization.GetSearchUserListResp, error) {
-	resp := &organization.GetSearchUserListResp{CommonResp: &common.CommonResp{}, UserList: []*common.UserInDepartment{}}
+	resp := &organization.GetSearchUserListResp{UserList: []*common.UserInDepartment{}}
 	var userIDList []string
 	if len(req.DepartmentIDList) > 0 {
 		departments, err := o.Database.FindDepartmentMember(ctx, req.DepartmentIDList)
@@ -520,7 +520,7 @@ func (o *organizationSvr) GetSearchUserList(ctx context.Context, req *organizati
 }
 
 func (o *organizationSvr) SetOrganization(ctx context.Context, req *organization.SetOrganizationReq) (*organization.SetOrganizationResp, error) {
-	resp := &organization.SetOrganizationResp{CommonResp: &common.CommonResp{}}
+	resp := &organization.SetOrganizationResp{}
 	if req.Organization == nil {
 		return nil, errs.ErrArgs.Wrap(" req.Organization is nil")
 	}
@@ -538,7 +538,7 @@ func (o *organizationSvr) SetOrganization(ctx context.Context, req *organization
 }
 
 func (o *organizationSvr) GetOrganization(ctx context.Context, req *organization.GetOrganizationReq) (*organization.GetOrganizationResp, error) {
-	resp := &organization.GetOrganizationResp{CommonResp: &common.CommonResp{}}
+	resp := &organization.GetOrganizationResp{}
 	org, err := o.Database.GetOrganization(ctx)
 	if err != nil {
 		return nil, err
@@ -556,7 +556,6 @@ func (o *organizationSvr) GetOrganization(ctx context.Context, req *organization
 
 func (o *organizationSvr) GetSubDepartment(ctx context.Context, req *organization.GetSubDepartmentReq) (*organization.GetSubDepartmentResp, error) {
 	resp := &organization.GetSubDepartmentResp{
-		CommonResp:              &common.CommonResp{},
 		DepartmentMemberList:    []*common.DepartmentMember{},
 		DepartmentList:          []*common.Department{},
 		DepartmentDirectoryList: []*common.Department{},
@@ -733,7 +732,6 @@ func (o *organizationSvr) GetSubDepartment(ctx context.Context, req *organizatio
 
 func (o *organizationSvr) GetSearchDepartmentUser(ctx context.Context, req *organization.GetSearchDepartmentUserReq) (*organization.GetSearchDepartmentUserResp, error) {
 	resp := &organization.GetSearchDepartmentUserResp{
-		CommonResp:           &common.CommonResp{},
 		OrganizationUserList: []*organization.GetSearchDepartmentUserOrganizationUser{},
 		DepartmentList:       []*common.Department{},
 	}
@@ -839,7 +837,7 @@ func (o *organizationSvr) GetSearchDepartmentUser(ctx context.Context, req *orga
 }
 
 func (o *organizationSvr) SortDepartmentList(ctx context.Context, req *organization.SortDepartmentListReq) (*organization.SortDepartmentListResp, error) {
-	resp := &organization.SortDepartmentListResp{CommonResp: &common.CommonResp{}}
+	resp := &organization.SortDepartmentListResp{}
 	if req.DepartmentID == req.NextDepartmentID {
 		return nil, errs.ErrArgs.Wrap("department id equal")
 	}
@@ -900,13 +898,13 @@ func (o *organizationSvr) SortDepartmentList(ctx context.Context, req *organizat
 }
 
 func (o *organizationSvr) SortOrganizationUserList(ctx context.Context, req *organization.SortOrganizationUserListReq) (*organization.SortOrganizationUserListResp, error) {
-	resp := &organization.SortOrganizationUserListResp{CommonResp: &common.CommonResp{}}
+	resp := &organization.SortOrganizationUserListResp{}
 	// TODO 待实现
 	return resp, nil
 }
 
 func (o *organizationSvr) CreateNewOrganizationMember(ctx context.Context, req *organization.CreateNewOrganizationMemberReq) (*organization.CreateNewOrganizationMemberResp, error) {
-	resp := &organization.CreateNewOrganizationMemberResp{CommonResp: &common.CommonResp{}}
+	resp := &organization.CreateNewOrganizationMemberResp{}
 	if req.OrganizationUser == nil {
 		return nil, errs.ErrArgs.Wrap("req.OrganizationUser is nil")
 	}
@@ -1006,7 +1004,7 @@ func (o *organizationSvr) MoveUserDepartment(ctx context.Context, req *organizat
 }
 
 func (o *organizationSvr) GetUserFullList(ctx context.Context, req *organization.GetUserFullListReq) (*organization.GetUserFullListResp, error) {
-	resp := &organization.GetUserFullListResp{CommonResp: &common.CommonResp{}}
+	resp := &organization.GetUserFullListResp{}
 	var (
 		total int64
 		users []*table.OrganizationUser

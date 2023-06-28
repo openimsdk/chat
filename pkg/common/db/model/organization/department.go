@@ -43,7 +43,7 @@ func (o *Department) GetList(ctx context.Context, departmentIdList []string) ([]
 		return []*table.Department{}, nil
 	}
 	var ms []*table.Department
-	return ms, utils.Wrap(o.db.WithContext(ctx).Where("department_id in (?)", departmentIdList).Order("`order` ASC, `create_time` ASC").Find(ms).Error, "")
+	return ms, utils.Wrap(o.db.WithContext(ctx).Where("department_id in (?)", departmentIdList).Order("`order` ASC, `create_time` ASC").Find(&ms).Error, "")
 }
 
 func (o *Department) UpdateParentID(ctx context.Context, oldParentID, newParentID string) error {

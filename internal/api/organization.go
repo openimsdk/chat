@@ -27,39 +27,6 @@ type Org struct {
 	chatClient         chat.ChatClient
 }
 
-func (o *Org) UpdateUserPassword(c *gin.Context) {
-	a2r.Call(chat.ChatClient.UpdateUserInfo, o.chatClient, c)
-}
-
-func (o *Org) UserLogin(c *gin.Context) {
-	a2r.Call(chat.ChatClient.Login, o.chatClient, c)
-}
-
-func (o *Org) UpdateUserInfo(c *gin.Context) {
-	//todo:?
-	a2r.Call(chat.ChatClient.Login, o.chatClient, c)
-}
-
-func (o *Org) GetUserInfo(c *gin.Context) {
-	a2r.Call(organization.OrganizationClient.GetUserInfo, o.organizationClient, c)
-}
-
-func (o *Org) DeleteOrganizationUser(c *gin.Context) {
-	//todo:?
-}
-
-func (o *Org) GetUserFullList(c *gin.Context) {
-
-}
-
-func (o *Org) SearchUsersFullInfo(c *gin.Context) {
-
-}
-
-func (o *Org) Callback(c *gin.Context) {
-
-}
-
 func (o *Org) CreateDepartment(c *gin.Context) {
 	a2r.Call(organization.OrganizationClient.CreateDepartment, o.organizationClient, c)
 }
