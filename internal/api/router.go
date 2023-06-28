@@ -88,21 +88,6 @@ func NewAdminRoute(router gin.IRouter, zk discoveryregistry.SvcDiscoveryRegistry
 func NewOrganizationRoute(router gin.IRouter, zk discoveryregistry.SvcDiscoveryRegistry) {
 	mw := NewMW(zk)
 	org := NewOrg(zk)
-	userGroup := router.Group("/user")
-	{
-		userGroup.POST("/reset_password", mw.CheckToken, org.UpdateUserPassword) // 修改密码
-		userGroup.POST("/login", org.UserLogin)                                  // 登录
-		//userGroup.POST("/get_token", org.GetUserToken)            // 使用管理员token或者secret获取用户token
-		userGroup.POST("/update", mw.CheckUser, org.UpdateUserInfo)          // 修改用户信息
-		userGroup.POST("/info", mw.CheckToken, org.GetUserInfo)              // 获取用户信息
-		userGroup.POST("/delete", mw.CheckAdmin, org.DeleteOrganizationUser) // 删除用户
-
-		userGroup.POST("/get_users_full_info", org.GetUserFullList)        // 获取用户信息
-		userGroup.POST("/search_users_full_info", org.SearchUsersFullInfo) // 搜索用户信息
-
-		userGroup.POST("/callback", org.Callback)
-	}
-
 	organizationGroup := router.Group("/organization")
 	{
 		//部门  增删改查

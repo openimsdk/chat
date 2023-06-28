@@ -125,3 +125,7 @@ func (o *Org) BatchImportTemplate(c *gin.Context) {
 	//c.Data(http.StatusOK, "application/octet-stream", data)
 	c.File(config.Config.ImportTemplate)
 }
+
+func (o *Org) DeleteOrganizationUser(c *gin.Context) {
+
+}
