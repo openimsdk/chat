@@ -6,9 +6,11 @@ import (
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/discoveryregistry"
 	"github.com/OpenIMSDK/chat/pkg/common/constant"
 	"github.com/OpenIMSDK/chat/pkg/common/db/database"
+	"github.com/OpenIMSDK/chat/pkg/common/db/dbutil"
 	admin2 "github.com/OpenIMSDK/chat/pkg/common/db/table/admin"
 	"github.com/OpenIMSDK/chat/pkg/common/dbconn"
 	"github.com/OpenIMSDK/chat/pkg/common/mctx"
+	"github.com/OpenIMSDK/chat/pkg/eerrs"
 	"github.com/OpenIMSDK/chat/pkg/proto/admin"
 	"github.com/OpenIMSDK/chat/pkg/rpclient/chat"
 	"github.com/OpenIMSDK/chat/pkg/rpclient/openim"
@@ -88,39 +90,32 @@ func (o *adminServer) AdminUpdateInfo(ctx context.Context, req *admin.AdminUpdat
 }
 
 func (o *adminServer) Login(ctx context.Context, req *admin.LoginReq) (*admin.LoginResp, error) {
-	//a, err := o.Database.GetAdmin(ctx, req.Account)
-	//if err != nil {
-	//	if dbutil.IsGormNotFound(err) {
-	//		return nil, eerrs.ErrAccountNotFound.Wrap()
-	//	}
-	//	return nil, err
-	//}
-	//if a.Password != req.Password {
-	//	return nil, eerrs.ErrPassword.Wrap()
-	//}
-	//adminToken, err := o.CreateToken(ctx, &admin.CreateTokenReq{UserID: a.UserID, UserType: constant.AdminUser})
-	//if err != nil {
-	//	return nil, err
-	//}
-	//imToken, err := o.OpenIM.UserToken(ctx, a.UserID, 1)
-	//if err != nil {
-	//	return nil, err
-	//}
-	//return &admin.LoginResp{
-	//	AdminAccount: a.Account,
-	//	AdminToken:   adminToken.Token,
-	//	Nickname:     a.Nickname,
-	//	FaceURL:      a.FaceURL,
-	//	Level:        a.Level,
-	//	IMUserID:     a.UserID,
-	//	IMToken:      imToken.Token,
-	//}, nil
-	adminToken, err := o.CreateToken(ctx, &admin.CreateTokenReq{UserID: "asdf", UserType: constant.AdminUser})
+	a, err := o.Database.GetAdmin(ctx, req.Account)
+	if err != nil {
+		if dbutil.IsGormNotFound(err) {
+			return nil, eerrs.ErrAccountNotFound.Wrap()
+		}
+		return nil, err
+	}
+	if a.Password != req.Password {
+		return nil, eerrs.ErrPassword.Wrap()
+	}
+	adminToken, err := o.CreateToken(ctx, &admin.CreateTokenReq{UserID: a.UserID, UserType: constant.AdminUser})
+	if err != nil {
+		return nil, err
+	}
+	imToken, err := o.OpenIM.UserToken(ctx, a.UserID, 1)
 	if err != nil {
 		return nil, err
 	}
 	return &admin.LoginResp{
-		AdminToken: adminToken.Token,
+		AdminAccount: a.Account,
+		AdminToken:   adminToken.Token,
+		Nickname:     a.Nickname,
+		FaceURL:      a.FaceURL,
+		Level:        a.Level,
+		IMUserID:     a.UserID,
+		IMToken:      imToken.Token,
 	}, nil
 }
 
