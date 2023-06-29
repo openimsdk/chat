@@ -54,7 +54,7 @@ func (o *Org) CreateDepartmentMember(c *gin.Context) {
 	a2r.Call(organization.OrganizationClient.CreateDepartmentMember, o.organizationClient, c)
 }
 func (o *Org) GetUserInDepartment(c *gin.Context) {
-	//todo:
+	//todo:?
 	a2r.Call(organization.OrganizationClient.GetUserInDepartment, o.organizationClient, c)
 }
 
@@ -63,7 +63,7 @@ func (o *Org) UpdateUserInDepartment(c *gin.Context) {
 }
 
 func (o *Org) DeleteUserInDepartment(c *gin.Context) {
-	//todo:
+	//todo:?
 	a2r.Call(organization.OrganizationClient.DeleteUserInDepartment, o.organizationClient, c)
 }
 

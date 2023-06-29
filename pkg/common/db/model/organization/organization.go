@@ -19,8 +19,8 @@ type Organization struct {
 }
 
 func (o *Organization) Set(ctx context.Context, m *table.Organization) error {
-	var org Organization
-	if err := o.db.First(&org).Error; err == nil {
+	var org table.Organization
+	if err := o.db.WithContext(ctx).First(&org).Error; err == nil {
 		m.CreateTime = time.Time{}
 		m.ChangeTime = time.Now()
 		return utils.Wrap(o.db.WithContext(ctx).Where("1 = 1").Updates(m).Error, "")

@@ -271,6 +271,7 @@ func (o *organizationSvr) DeleteOrganizationUser(ctx context.Context, req *organ
 }
 
 func (o *organizationSvr) CreateDepartmentMember(ctx context.Context, req *organization.CreateDepartmentMemberReq) (*organization.CreateDepartmentMemberResp, error) {
+	//todo：departmentid或userId不存在报错
 	resp := &organization.CreateDepartmentMemberResp{}
 	if req.DepartmentMember == nil {
 		return nil, errs.ErrArgs.Wrap("req.DepartmentInfo is nil")
