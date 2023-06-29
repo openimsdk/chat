@@ -1,4 +1,4 @@
-package organization
+package main
 
 import (
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/log"

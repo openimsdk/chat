@@ -4,14 +4,15 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	openIMConfig "github.com/OpenIMSDK/Open-IM-Server/pkg/common/config"
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/constant"
-	openKeeper "github.com/OpenIMSDK/Open-IM-Server/pkg/discoveryregistry/zookeeper"
-	"gopkg.in/yaml.v3"
 	"os"
 	"path/filepath"
 	"runtime"
 	"time"
+
+	openIMConfig "github.com/OpenIMSDK/Open-IM-Server/pkg/common/config"
+	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/constant"
+	openKeeper "github.com/OpenIMSDK/Open-IM-Server/pkg/discoveryregistry/zookeeper"
+	"gopkg.in/yaml.v3"
 )
 
 var (
@@ -34,7 +35,7 @@ func readConfig() ([]byte, error) {
 		}
 		return data, nil
 	} else {
-		return os.ReadFile(fmt.Sprintf("../config/%s", "config.yaml"))
+		return os.ReadFile("/root/workspaces/openim/chat/config/config.yaml")
 	}
 }
 

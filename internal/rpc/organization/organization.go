@@ -1,9 +1,6 @@
 package organization
 
 import (
-	common2 "Open-IM-Organization/internal/rpc/common"
-	"Open-IM-Organization/pkg/common/config"
-	"Open-IM-Organization/pkg/proto/chat"
 	"context"
 	"errors"
 	"strconv"
@@ -1156,24 +1153,6 @@ func (o *organizationSvr) SearchUsersFullInfo(ctx context.Context, req *organiza
 		req.Pagination.ShowNumber = 10
 	}
 	var userIDList []string
-	if req.Content != "" {
-		// Search for users with matching accounts
-		etcdConn := common2.GetDefaultConn(config.Config.RpcRegisterName.OpenImChatName, req.Operation.OperationID, resp.CommonResp)
-		if etcdConn == nil {
-			return nil, errs.ErrArgs.Wrap("get base server etcd conn is empty")
-		}
-		rpcResp, err := chat.NewChatClient(etcdConn).GetAccountUser(ctx, &chat.GetAccountUserReq{
-			Operation:   req.Operation,
-			AccountList: []string{req.Content},
-		})
-		if err != nil {
-			return nil, errs.ErrArgs.Wrap("get base server GetAccountUser error")
-		}
-		if rpcResp.CommonResp.ErrCode != constant.NoError {
-			return nil, errs.ErrArgs.Wrap("get base server GetAccountUser errMsg")
-		}
-		userIDList = rpcResp.Accounts
-	}
 	if req.UserPublicInfo.UserID != "" {
 		userIDList = append(userIDList, req.UserPublicInfo.UserID)
 	}
