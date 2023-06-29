@@ -99,7 +99,7 @@ func NewOrganizationRoute(router gin.IRouter, zk discoveryregistry.SvcDiscoveryR
 		//用户 增删改查
 		organizationGroup.POST("/create_organization_user", mw.CheckAdmin, org.CreateOrganizationUser) // 创建用户 在某个部门或公司中新增
 		organizationGroup.POST("/update_organization_user", mw.CheckAdmin, org.UpdateOrganizationUser) // 修改用户信息
-		organizationGroup.POST("/delete_organization_user", org.DeleteOrganizationUser)                // 删除用户
+		organizationGroup.POST("/delete_organization_user", mw.CheckAdmin, org.DeleteOrganizationUser) // 删除用户
 
 		//查询用户所在的部门信息以及个人资料
 		organizationGroup.POST("/get_user_in_department", mw.CheckToken, org.GetUserInDepartment)       // 获取用户所在部门
@@ -127,7 +127,7 @@ func NewOrganizationRoute(router gin.IRouter, zk discoveryregistry.SvcDiscoveryR
 
 		organizationGroup.POST("/create_new_organization_member", mw.CheckAdmin, org.CreateNewOrganizationMember) // 创建用户的同时为其添加部门
 
-		organizationGroup.POST("/import", org.BatchImport)                 // 批量导入
+		organizationGroup.POST("/import", mw.CheckAdmin, org.BatchImport)  // 批量导入
 		organizationGroup.GET("/import_template", org.BatchImportTemplate) // 批量导入模板
 	}
 }
