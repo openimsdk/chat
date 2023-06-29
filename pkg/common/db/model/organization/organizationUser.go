@@ -157,3 +157,18 @@ func (tb *OrganizationUser) GetPage(ctx context.Context, pageNumber, showNumber 
 	err = tb.db.WithContext(ctx).Model(&table.OrganizationUser{}).Order("create_time DESC").Offset(pageNumber * showNumber).Limit(showNumber).Find(users).Error
 	return total, users, utils.Wrap(err, "")
 }
+
+func (tb *OrganizationUser) SearchV2(ctx context.Context, keyword string, orUserIDList []string, pageNumber, showNumber int) (int64, []*table.OrganizationUser, error) {
+	db := tb.db.Model(&table.OrganizationUser{})
+	if keyword != "" {
+		vague := "%" + keyword + "%"
+		db = db.WithContext(ctx).Where("user_id in (?) OR mobile = ? OR telephone = ? OR email = ? OR nickname like ? OR english_name like ?", append(orUserIDList, keyword), keyword, keyword, keyword, vague, vague)
+	}
+	var count int64
+	if err := db.WithContext(ctx).Count(&count).Error; err != nil {
+		return 0, nil, utils.Wrap(err, "")
+	}
+	db = db.WithContext(ctx).Order("`order` ASC, `create_time` ASC").Offset(int(pageNumber) * int(showNumber)).Limit(int(showNumber))
+	var ms []*table.OrganizationUser
+	return count, ms, utils.Wrap(db.WithContext(ctx).Find(&ms).Error, "")
+}

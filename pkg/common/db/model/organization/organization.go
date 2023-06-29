@@ -42,3 +42,7 @@ func (o *Organization) Get(ctx context.Context) (*table.Organization, error) {
 	}
 	return &m, nil
 }
+
+func (o *Organization) BeginTransaction(ctx context.Context) (*gorm.DB, error) {
+	return o.db.WithContext(ctx).Begin(), nil
+}

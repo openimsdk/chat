@@ -30,4 +30,5 @@ type DepartmentMemberInterface interface {
 	GetUserListInDepartment(ctx context.Context, departmentID string, userIDList []string) ([]*DepartmentMember, error)
 	GetByDepartmentID(ctx context.Context, departmentID string) ([]*DepartmentMember, error)
 	CreateList(ctx context.Context, members []*DepartmentMember) error
+	GetByKey(ctx context.Context, userID, departmentID string) (*DepartmentMember, error)
 }

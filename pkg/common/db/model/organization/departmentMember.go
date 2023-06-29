@@ -83,3 +83,8 @@ func (o *DepartmentMember) CreateList(ctx context.Context, ms []*table.Departmen
 	}
 	return utils.Wrap(o.db.WithContext(ctx).Create(&ms).Error, "")
 }
+
+func (o *DepartmentMember) GetByKey(ctx context.Context, userID, departmentID string) (*table.DepartmentMember, error) {
+	var ms *table.DepartmentMember
+	return ms, utils.Wrap(o.db.WithContext(ctx).Where("user_id = ? and department_id = ?", userID, departmentID).First(ms).Error, "")
+}

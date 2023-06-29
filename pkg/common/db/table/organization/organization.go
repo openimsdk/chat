@@ -2,6 +2,7 @@ package organization
 
 import (
 	"context"
+	"gorm.io/gorm"
 	"time"
 )
 
@@ -19,4 +20,5 @@ type Organization struct {
 type OrganizationInterface interface {
 	Set(ctx context.Context, m *Organization) error
 	Get(ctx context.Context) (*Organization, error)
+	BeginTransaction(ctx context.Context) (*gorm.DB, error)
 }

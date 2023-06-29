@@ -990,18 +990,268 @@ func (o *organizationSvr) CreateNewOrganizationMember(ctx context.Context, req *
 }
 
 func (o *organizationSvr) GetUserInfo(ctx context.Context, req *organization.GetUserInfoReq) (*organization.GetUserInfoResp, error) {
-	//TODO implement me
-	panic("implement me")
+	resp := &organization.GetUserInfoResp{}
+
+	user, err := o.Database.GetOrganizationUser(ctx, req.UserID)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errs.ErrArgs.Wrap("user id not found")
+		} else {
+			return nil, err
+		}
+	}
+
+	memberList, err := o.Database.GetDepartmentMemberByUserID(ctx, req.UserID)
+	if err != nil {
+		return nil, err
+	}
+
+	departmentMap := make(map[string]*common.Department)
+	if len(memberList) > 0 {
+		departmentIDList := make([]string, 0, len(memberList))
+		for _, member := range memberList {
+			departmentIDList = append(departmentIDList, member.DepartmentID)
+		}
+		departmentList, err := o.Database.GetList(ctx, departmentIDList)
+		if err != nil {
+			return nil, err
+		}
+		for _, department := range departmentList {
+			departmentMap[department.DepartmentID] = &common.Department{
+				DepartmentID:   department.DepartmentID,
+				FaceURL:        department.FaceURL,
+				Name:           department.Name,
+				ParentID:       department.ParentID,
+				Order:          department.Order,
+				DepartmentType: department.DepartmentType,
+				RelatedGroupID: department.RelatedGroupID,
+				CreateTime:     department.CreateTime.UnixMilli(),
+			}
+		}
+	}
+
+	resp.User = &common.OrganizationUser{
+		UserID:               user.UserID,
+		Nickname:             user.Nickname,
+		EnglishName:          user.EnglishName,
+		FaceURL:              user.FaceURL,
+		Gender:               user.Gender,
+		Mobile:               user.Mobile,
+		Telephone:            user.Telephone,
+		Birth:                user.Birth.UnixMilli(),
+		Email:                user.Email,
+		Order:                user.Order,
+		Status:               user.Status,
+		CreateTime:           user.CreateTime.UnixMilli(),
+		DepartmentMemberList: make([]*common.DepartmentMember, 0, len(memberList)),
+		Station:              user.Station,
+		AreaCode:             user.AreaCode,
+	}
+
+	for _, member := range memberList {
+		var terminationTime int64
+		if member.TerminationTime == nil {
+			terminationTime = constant.NilTimestamp
+		} else {
+			terminationTime = member.TerminationTime.UnixMilli()
+		}
+		resp.User.DepartmentMemberList = append(resp.User.DepartmentMemberList, &common.DepartmentMember{
+			UserID:          member.UserID,
+			DepartmentID:    member.DepartmentID,
+			Order:           member.Order,
+			Position:        member.Position,
+			Leader:          member.Leader,
+			Status:          member.Status,
+			EntryTime:       member.EntryTime.UnixMilli(),
+			TerminationTime: terminationTime,
+			CreateTime:      member.CreateTime.UnixMilli(),
+			Department:      departmentMap[member.DepartmentID],
+		})
+	}
+
+	return resp, nil
 }
 
 func (o *organizationSvr) BatchImport(ctx context.Context, req *organization.BatchImportReq) (*organization.BatchImportResp, error) {
-	//TODO implement me
-	panic("implement me")
+	resp := &organization.BatchImportResp{}
+
+	createDepartment := func(department *table.Department) error {
+		department.DepartmentID = genDepartmentID()
+		return o.Database.CreateDepartment(ctx, department)
+	}
+
+	if len(req.DepartmentList) > 0 {
+		for _, department := range req.DepartmentList {
+			var parentID string
+			for _, name := range department.ParentDepartmentName.HierarchyName {
+				if name == "" {
+					return nil, errs.ErrArgs.Wrap("department name is empty")
+				}
+				d, err := o.Database.GetDepartmentByName(ctx, name, parentID)
+				if errors.Is(err, gorm.ErrRecordNotFound) {
+					d = &table.Department{
+						Name:     name,
+						ParentID: parentID,
+					}
+					if err = createDepartment(d); err != nil {
+						return resp, nil
+					}
+					return nil, err
+				} else if err != nil {
+					return nil, err
+				}
+				parentID = d.DepartmentID
+			}
+		}
+	}
+
+	if len(req.UserList) > 0 {
+		var (
+			reqs   = make([]*organization.CreateNewOrganizationMemberReq, 0, len(req.UserList))
+			idList = make([]string, 0, len(req.UserList))
+		)
+
+		for _, user := range req.UserList {
+			departmentIDList := make([]string, 0, len(user.UserDepartmentNameList))
+			positions := make([]string, 0, len(user.UserDepartmentNameList))
+
+			for _, nameList := range user.UserDepartmentNameList {
+				var parentID string
+				for _, name := range nameList.HierarchyName {
+					if name == "" {
+						return nil, errs.ErrArgs.Wrap("department name is empty")
+					}
+					d, err := o.Database.GetDepartmentByName(ctx, name, parentID)
+					if errors.Is(err, gorm.ErrRecordNotFound) {
+						d = &table.Department{
+							Name:     name,
+							ParentID: parentID,
+						}
+						if err = createDepartment(d); err != nil {
+							return nil, errs.ErrArgs.Wrap("create not found department")
+						}
+						return nil, err
+					} else if err != nil {
+						return nil, err
+					}
+					parentID = d.DepartmentID
+				}
+				departmentIDList = append(departmentIDList, parentID)
+				positions = append(positions, nameList.Position)
+			}
+
+			departmentMemberList := make([]*common.DepartmentMember, 0, len(user.UserDepartmentNameList))
+
+			for i, departmentID := range departmentIDList {
+				departmentMemberList = append(departmentMemberList, &common.DepartmentMember{
+					UserID:       user.UserID,
+					DepartmentID: departmentID,
+					Position:     positions[i],
+				})
+			}
+
+			idList = append(idList, user.UserID)
+
+			reqs = append(reqs, &organization.CreateNewOrganizationMemberReq{
+				OrganizationUser: &common.OrganizationUser{
+					UserID:      user.UserID,
+					Nickname:    user.Nickname,
+					EnglishName: user.EnglishName,
+					FaceURL:     user.FaceURL,
+					Gender:      user.Gender,
+					Mobile:      user.Mobile,
+					Telephone:   user.Telephone,
+					Birth:       user.Birth,
+					Email:       user.Email,
+					Order:       user.Order,
+					Status:      user.Status,
+					Station:     user.Station,
+					AreaCode:    user.AreaCode,
+				},
+				DepartmentMemberList: departmentMemberList,
+				UserIdentity: &common.UserIdentity{
+					Account:  user.Account,
+					Password: user.Password,
+				},
+			})
+		}
+
+		users, err := o.Database.GetOrganizationUserList(ctx, idList)
+		if err != nil {
+			return nil, err
+		}
+
+		if len(users) != 0 {
+			return nil, err
+		}
+
+		for i := 0; i < len(reqs); i++ {
+			_, err := o.CreateNewOrganizationMember(context.Background(), reqs[i])
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+	return resp, nil
 }
 
 func (o *organizationSvr) MoveUserDepartment(ctx context.Context, req *organization.MoveUserDepartmentReq) (*organization.MoveUserDepartmentResp, error) {
-	//TODO implement me
-	panic("implement me")
+	resp := &organization.MoveUserDepartmentResp{}
+
+	if len(req.MoveUserDepartmentList) == 0 {
+		return nil, errs.ErrArgs.Wrap("move user department list is empty")
+	}
+
+	tx, err := o.Database.BeginTransaction(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, d := range req.MoveUserDepartmentList {
+		if _, err := o.Database.GetOrganizationUser(ctx, d.UserID); err != nil {
+			return nil, err
+		}
+		if _, err := o.Database.GetDepartment(ctx, d.DepartmentID); err != nil {
+			return nil, err
+		}
+		if d.CurrentDepartmentID != "" {
+			if err := o.Database.DeleteDepartmentMemberByKey(ctx, d.UserID, d.CurrentDepartmentID); err != nil {
+				return resp, err
+			}
+		}
+		var terminationTime *time.Time
+		if d.TerminationTime != constant.NilTimestamp {
+			t := time.UnixMilli(d.TerminationTime)
+			terminationTime = &t
+		}
+
+		_, err := o.Database.GetDepartmentMemberByKey(ctx, d.UserID, d.DepartmentID)
+		if err == nil {
+			continue
+		} else if !errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errs.ErrArgs.Wrap("record")
+		}
+
+		m := table.DepartmentMember{
+			UserID:          d.UserID,
+			DepartmentID:    d.DepartmentID,
+			Order:           d.Order,
+			Position:        d.Position,
+			Leader:          d.Leader,
+			Status:          d.Status,
+			EntryTime:       time.UnixMilli(d.EntryTime),
+			TerminationTime: terminationTime,
+		}
+		if err := o.Database.CreateDepartmentMember(ctx, &m); err != nil {
+			return nil, err
+		}
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		return nil, err
+	}
+
+	return resp, nil
 }
 
 func (o *organizationSvr) GetUserFullList(ctx context.Context, req *organization.GetUserFullListReq) (*organization.GetUserFullListResp, error) {
@@ -1097,6 +1347,91 @@ func (o *organizationSvr) GetUserFullList(ctx context.Context, req *organization
 }
 
 func (o *organizationSvr) SearchUsersFullInfo(ctx context.Context, req *organization.SearchUsersFullInfoReq) (*organization.SearchUsersFullInfoResp, error) {
-	//TODO implement me
-	panic("implement me")
+	resp := &organization.SearchUsersFullInfoResp{}
+	if req.Operation == nil || req.Pagination == nil || req.UserPublicInfo == nil {
+		return nil, errs.ErrArgs.Wrap("req.Operation or req.Pagination or req.UserPublicInfo is nil")
+	}
+	if req.Pagination.ShowNumber == 0 {
+		req.Pagination.ShowNumber = 10
+	}
+	var userIDList []string
+	if req.UserPublicInfo.UserID != "" {
+		userIDList = append(userIDList, req.UserPublicInfo.UserID)
+	}
+	total, users, err := o.Database.SearchV2(ctx, req.Content, userIDList, int(req.Pagination.PageNumber), int(req.Pagination.ShowNumber))
+	if err != nil {
+		return nil, err
+	}
+	resp.Total = int32(total)
+	for _, user := range users {
+		members, err := o.Database.GetDepartmentMemberByUserID(ctx, user.UserID)
+
+		if err != nil {
+			return resp, err
+		}
+		departmentIDList := make([]string, 0, len(members))
+		for _, member := range members {
+			departmentIDList = append(departmentIDList, member.DepartmentID)
+		}
+		departments, err := o.Database.GetList(ctx, departmentIDList)
+		if err != nil {
+			return resp, err
+		}
+		departmentMap := make(map[string]*common.Department)
+		for _, department := range departments {
+			departmentMap[department.DepartmentID] = &common.Department{
+				DepartmentID:   department.DepartmentID,
+				FaceURL:        department.FaceURL,
+				Name:           department.Name,
+				ParentID:       department.ParentID,
+				Order:          department.Order,
+				DepartmentType: department.DepartmentType,
+				RelatedGroupID: department.RelatedGroupID,
+				CreateTime:     department.CreateTime.UnixMilli(),
+			}
+		}
+		var departmentMemberList []*common.DepartmentMember
+		for _, member := range members {
+			department := departmentMap[member.DepartmentID]
+			if department == nil {
+				continue
+			}
+			var terminationTime int64
+			if member.TerminationTime == nil {
+				terminationTime = constant.NilTimestamp
+			} else {
+				terminationTime = member.TerminationTime.UnixMilli()
+			}
+			departmentMemberList = append(departmentMemberList, &common.DepartmentMember{
+				UserID:          member.UserID,
+				DepartmentID:    member.DepartmentID,
+				Order:           member.Order,
+				Position:        member.Position,
+				Leader:          member.Leader,
+				Status:          member.Status,
+				EntryTime:       member.EntryTime.UnixMilli(),
+				TerminationTime: terminationTime,
+				CreateTime:      member.CreateTime.UnixMilli(),
+				Department:      department,
+			})
+		}
+		resp.OrganizationUserList = append(resp.OrganizationUserList, &common.OrganizationUser{
+			UserID:               user.UserID,
+			Nickname:             user.Nickname,
+			EnglishName:          user.EnglishName,
+			FaceURL:              user.FaceURL,
+			Gender:               user.Gender,
+			Mobile:               user.Mobile,
+			Telephone:            user.Telephone,
+			Birth:                user.Birth.UnixMilli(),
+			Email:                user.Email,
+			Order:                user.Order,
+			Status:               user.Status,
+			CreateTime:           user.CreateTime.UnixMilli(),
+			DepartmentMemberList: departmentMemberList,
+			Station:              user.Station,
+			AreaCode:             user.AreaCode,
+		})
+	}
+	return resp, nil
 }

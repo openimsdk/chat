@@ -34,4 +34,5 @@ type OrganizationUserInterface interface {
 	GetList(ctx context.Context, userIDList []string) ([]*OrganizationUser, error)
 	Search(ctx context.Context, positionList, userIDList []string, text string, sort []*organization.GetSearchUserListSort) ([]*OrganizationUser, error)
 	GetPage(ctx context.Context, pageNumber, showNumber int) (int64, []*OrganizationUser, error)
+	SearchV2(ctx context.Context, text string, userIDList []string, pageNumber, showNumber int) (int64, []*OrganizationUser, error)
 }

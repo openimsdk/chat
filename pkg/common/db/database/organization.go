@@ -23,6 +23,7 @@ type OrganizationDatabaseInterface interface {
 	GetMaxOrder(ctx context.Context, parentID string) (int32, error)
 	UpdateOrderIncrement(ctx context.Context, parentID string, startOrder int32) error
 	UpdateParentIDOrder(ctx context.Context, departmentID, parentID string, order int32) error
+	GetDepartmentByName(ctx context.Context, name, parentID string) (*table.Department, error)
 	//departmentMember
 	FindDepartmentMember(ctx context.Context, departmentIDList []string) ([]*table.DepartmentMember, error)
 	GetDepartmentMemberByUserID(ctx context.Context, userID string) ([]*table.DepartmentMember, error)
@@ -35,6 +36,7 @@ type OrganizationDatabaseInterface interface {
 	GetUserListInDepartment(ctx context.Context, departmentID string, userIDList []string) ([]*table.DepartmentMember, error)
 	GetDepartmentMemberByDepartmentID(ctx context.Context, departmentID string) ([]*table.DepartmentMember, error)
 	CreateDepartmentMemberList(ctx context.Context, members []*table.DepartmentMember) error
+	GetDepartmentMemberByKey(ctx context.Context, userID, departmentID string) (*table.DepartmentMember, error)
 	//organizationUser
 	CreateOrganizationUser(ctx context.Context, OrganizationUser *table.OrganizationUser) error
 	UpdateOrganizationUser(ctx context.Context, OrganizationUser *table.OrganizationUser) error
@@ -45,9 +47,12 @@ type OrganizationDatabaseInterface interface {
 	GetOrganizationUserList(ctx context.Context, userIDList []string) ([]*table.OrganizationUser, error)
 	SearchOrganizationUser(ctx context.Context, positionList, userIDList []string, text string, sort []*rpc.GetSearchUserListSort) ([]*table.OrganizationUser, error)
 	GetPage(ctx context.Context, pageNumber, showNumber int) (int64, []*table.OrganizationUser, error)
+	SearchV2(ctx context.Context, keyword string, userIDList []string, pageNumber, showNumber int) (int64, []*table.OrganizationUser, error)
 	//organizaiton
 	SetOrganization(ctx context.Context, Organization *table.Organization) error
 	GetOrganization(ctx context.Context) (*table.Organization, error)
+	//transaction
+	BeginTransaction(ctx context.Context) (*gorm.DB, error)
 }
 
 func NewOrganizationDatabase(db *gorm.DB) OrganizationDatabaseInterface {
@@ -66,6 +71,18 @@ type OrganizationDatabase struct {
 	DepartmentMember table.DepartmentMemberInterface
 	OrganizationUser table.OrganizationUserInterface
 	Organization     table.OrganizationInterface
+}
+
+func (o *OrganizationDatabase) SearchV2(ctx context.Context, keyword string, userIDList []string, pageNumber, showNumber int) (int64, []*table.OrganizationUser, error) {
+	return o.OrganizationUser.SearchV2(ctx, keyword, userIDList, pageNumber, showNumber)
+}
+
+func (o *OrganizationDatabase) GetDepartmentMemberByKey(ctx context.Context, userID, departmentID string) (*table.DepartmentMember, error) {
+	return o.DepartmentMember.GetByKey(ctx, userID, departmentID)
+}
+
+func (o *OrganizationDatabase) GetDepartmentByName(ctx context.Context, name, parentID string) (*table.Department, error) {
+	return o.Department.GetByName(ctx, name, parentID)
 }
 
 func (o *OrganizationDatabase) GetPage(ctx context.Context, pageNumber, showNumber int) (int64, []*table.OrganizationUser, error) {
@@ -200,4 +217,8 @@ func (o *OrganizationDatabase) CreateDepartment(ctx context.Context, department 
 
 func (o *OrganizationDatabase) GetDepartment(ctx context.Context, departmentID string) (*table.Department, error) {
 	return o.Department.GetDepartment(ctx, departmentID)
+}
+
+func (o *OrganizationDatabase) BeginTransaction(ctx context.Context) (*gorm.DB, error) {
+	return o.Organization.BeginTransaction(ctx)
 }

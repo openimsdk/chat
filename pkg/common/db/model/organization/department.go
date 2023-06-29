@@ -77,3 +77,8 @@ func (o *Department) UpdateParentIDOrder(ctx context.Context, departmentID, pare
 		"`order`":   order,
 	}).Error, "")
 }
+
+func (o *Department) GetByName(ctx context.Context, name, parentID string) (*table.Department, error) {
+	var m table.Department
+	return &m, utils.Wrap(o.db.WithContext(ctx).Where("name = ? AND parent_id = ?", name, parentID).First(&m).Error, "")
+}
