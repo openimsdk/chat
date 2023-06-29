@@ -15,39 +15,39 @@ var Config struct {
 	ChatApi struct {
 		GinPort  []int  `yaml:"openImChatApiPort"`
 		ListenIP string `yaml:"listenIP"`
-	}
+	} `yaml:"chatApi"`
 	AdminApi struct {
 		GinPort  []int  `yaml:"openImAdminApiPort"`
 		ListenIP string `yaml:"listenIP"`
-	}
+	} `yaml:"adminApi"`
 	RpcPort struct {
 		OpenImAdminPort []int `yaml:"openImAdminPort"`
 		OpenImChatPort  []int `yaml:"openImChatPort"`
-	} `yaml:"rpcport"`
+	} `yaml:"rpcPort"`
 	RpcRegisterName struct {
 		OpenImAdminName string `yaml:"openImAdminName"`
 		OpenImChatName  string `yaml:"openImChatName"`
-	} `yaml:"rpcregistername"`
+	} `yaml:"rpcRegisterName"`
 	Mysql struct {
-		DBAddress      *[]string `yaml:"dbMysqlAddress"`
-		DBUserName     *string   `yaml:"dbMysqlUserName"`
-		DBPassword     *string   `yaml:"dbMysqlPassword"`
-		DBDatabaseName *string   `yaml:"dbMysqlDatabaseName"`
-		DBMaxOpenConns *int      `yaml:"dbMaxOpenConns"`
-		DBMaxIdleConns *int      `yaml:"dbMaxIdleConns"`
-		DBMaxLifeTime  *int      `yaml:"dbMaxLifeTime"`
-		LogLevel       *int      `yaml:"logLevel"`
-		SlowThreshold  *int      `yaml:"slowThreshold"`
-	}
+		Address       *[]string `yaml:"address"`
+		Username      *string   `yaml:"username"`
+		Password      *string   `yaml:"password"`
+		Database      *string   `yaml:"database"`
+		MaxOpenConn   *int      `yaml:"maxOpenConn"`
+		MaxIdleConn   *int      `yaml:"maxIdleConn"`
+		MaxLifeTime   *int      `yaml:"maxLifeTime"`
+		LogLevel      *int      `yaml:"logLevel"`
+		SlowThreshold *int      `yaml:"slowThreshold"`
+	} `yaml:"mysql"`
 	Log struct {
 		StorageLocation     *string `yaml:"storageLocation"`
 		RotationTime        *int    `yaml:"rotationTime"`
 		RemainRotationCount *uint   `yaml:"remainRotationCount"`
 		RemainLogLevel      *int    `yaml:"remainLogLevel"`
 		IsStdout            *bool   `yaml:"isStdout"`
-		WithStack           *bool   `yaml:"withStack"`
 		IsJson              *bool   `yaml:"isJson"`
-	}
+		WithStack           *bool   `yaml:"withStack"`
+	} `yaml:"log"`
 	TokenPolicy struct {
 		AccessSecret string `yaml:"accessSecret"`
 		AccessExpire int64  `yaml:"accessExpire"`
@@ -65,7 +65,7 @@ var Config struct {
 			AccessKeySecret              string `yaml:"accessKeySecret"`
 			SignName                     string `yaml:"signName"`
 			VerificationCodeTemplateCode string `yaml:"verificationCodeTemplateCode"`
-		}
-	}
-	ProxyHeader string `yaml:"proxyheader"`
+		} `yaml:"ali"`
+	} `yaml:"verifyCode"`
+	ProxyHeader string `yaml:"proxyHeader"`
 }

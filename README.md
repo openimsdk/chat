@@ -8,7 +8,7 @@
 
 ```
 cd script
-./batch_build_all_service.sh
+./build_all_service.sh
 ```
 
 ## 启动

@@ -60,13 +60,13 @@ func InitConfig() error {
 		return fmt.Errorf("parse zk openIMConfig: %w", err)
 	}
 
-	configFieldCopy(&Config.Mysql.DBAddress, openIMConfig.Config.Mysql.DBAddress)
-	configFieldCopy(&Config.Mysql.DBUserName, openIMConfig.Config.Mysql.DBUserName)
-	configFieldCopy(&Config.Mysql.DBPassword, openIMConfig.Config.Mysql.DBPassword)
-	configFieldCopy(&Config.Mysql.DBDatabaseName, openIMConfig.Config.Mysql.DBDatabaseName)
-	configFieldCopy(&Config.Mysql.DBMaxOpenConns, openIMConfig.Config.Mysql.DBMaxOpenConns)
-	configFieldCopy(&Config.Mysql.DBMaxIdleConns, openIMConfig.Config.Mysql.DBMaxIdleConns)
-	configFieldCopy(&Config.Mysql.DBMaxLifeTime, openIMConfig.Config.Mysql.DBMaxLifeTime)
+	configFieldCopy(&Config.Mysql.Address, openIMConfig.Config.Mysql.Address)
+	configFieldCopy(&Config.Mysql.Username, openIMConfig.Config.Mysql.Username)
+	configFieldCopy(&Config.Mysql.Password, openIMConfig.Config.Mysql.Password)
+	configFieldCopy(&Config.Mysql.Database, openIMConfig.Config.Mysql.Database)
+	configFieldCopy(&Config.Mysql.MaxOpenConn, openIMConfig.Config.Mysql.MaxOpenConn)
+	configFieldCopy(&Config.Mysql.MaxIdleConn, openIMConfig.Config.Mysql.MaxIdleConn)
+	configFieldCopy(&Config.Mysql.MaxLifeTime, openIMConfig.Config.Mysql.MaxLifeTime)
 	configFieldCopy(&Config.Mysql.LogLevel, openIMConfig.Config.Mysql.LogLevel)
 	configFieldCopy(&Config.Mysql.SlowThreshold, openIMConfig.Config.Mysql.SlowThreshold)
 
