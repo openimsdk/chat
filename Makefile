@@ -102,8 +102,8 @@ XARGS := xargs -r
 
 # ==============================================================================
 # TODO: License selection
-LICENSE_TEMPLATE ?= $(ROOT_DIR)/scripts/LICENSE/license_templates.txt	# MIT License
-# LICENSE_TEMPLATE ?= $(ROOT_DIR)/scripts/LICENSE/LICENSE_TEMPLATES  # Apache License
+# LICENSE_TEMPLATE ?= $(ROOT_DIR)/scripts/LICENSE/license_templates.txt	# MIT License
+LICENSE_TEMPLATE ?= $(ROOT_DIR)/scripts/LICENSE/LICENSE_TEMPLATES  # Apache License
 
 # COMMA: Concatenate multiple strings to form a list of strings
 COMMA := ,
