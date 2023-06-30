@@ -7,27 +7,27 @@
 ## 编译
 
 ```
-cd script
+cd scripts
 ./build_all_service.sh
 ```
 
 ## 启动
 
  ```
- cd script
+ cd scripts
  ./start_all.sh
  ```
 
 ## 检测
 
  ```
-cd script
+cd scripts
 ./check_all.sh
  ```
 
 ## 停止
 
  ```
-cd script
+cd scripts
 ./stop_all.sh
  ```
