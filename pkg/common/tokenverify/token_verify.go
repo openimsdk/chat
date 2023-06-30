@@ -34,24 +34,24 @@ type claims struct {
 	jwt.RegisteredClaims
 }
 
-func buildClaims(userID string, userType int32, ttlDay int64) claims {
+func buildClaims(userID string, userType int32, ttl int64) claims {
 	now := time.Now()
 	before := now.Add(-time.Minute * 5)
 	return claims{
 		UserID:   userID,
 		UserType: userType,
 		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(now.Add(time.Duration(ttlDay*24) * time.Hour)), //Expiration time
-			IssuedAt:  jwt.NewNumericDate(now),                                           //Issuing time
-			NotBefore: jwt.NewNumericDate(before),                                        //Begin Effective time
+			ExpiresAt: jwt.NewNumericDate(now.Add(time.Duration(ttl*24) * time.Hour)), //Expiration time
+			IssuedAt:  jwt.NewNumericDate(now),                                        //Issuing time
+			NotBefore: jwt.NewNumericDate(before),                                     //Begin Effective time
 		}}
 }
 
-func CreateToken(UserID string, userType int32, ttlDay int64) (string, error) {
+func CreateToken(UserID string, userType int32, ttl int64) (string, error) {
 	if !(userType == TokenUser || userType == TokenAdmin) {
 		return "", errs.ErrTokenUnknown.Wrap("token type unknown")
 	}
-	claims := buildClaims(UserID, userType, ttlDay)
+	claims := buildClaims(UserID, userType, ttl)
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := token.SignedString([]byte(*config.Config.Secret))
 	if err != nil {

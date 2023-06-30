@@ -74,34 +74,6 @@ func ToDBAdminUpdatePassword(password string) (map[string]any, error) {
 	return map[string]any{"password": password}, nil
 }
 
-/*
-	Name       *wrapperspb.StringValue
-	AppID      *wrapperspb.StringValue
-	Icon       *wrapperspb.StringValue
-	Url        *wrapperspb.StringValue
-	Md5        *wrapperspb.StringValue
-	Size       *wrapperspb.Int64Value
-	Version    *wrapperspb.StringValue
-	Priority   *wrapperspb.UInt32Value
-	Status     *wrapperspb.UInt32Value
-	CreateTime *wrapperspb.Int64Value
-*/
-/*
-type Applet struct {
-	ID         string    `gorm:"column:id;primary_key;size:64"`
-	Name       string    `gorm:"column:name;size:64"`
-	AppID      string    `gorm:"column:app_id;uniqueIndex;size:255"`
-	Icon       string    `gorm:"column:icon;size:255"`
-	URL        string    `gorm:"column:url;size:255"`
-	MD5        string    `gorm:"column:md5;size:255"`
-	Size       int64     `gorm:"column:size"`
-	Version    string    `gorm:"column:version;size:64"`
-	Priority   uint32    `gorm:"column:priority;size:64"`
-	Status     uint8     `gorm:"column:status"`
-	CreateTime time.Time `gorm:"column:create_time;autoCreateTime;size:64"`
-}
-*/
-
 func ToDBAppletUpdate(req *admin.UpdateAppletReq) (map[string]any, error) {
 	update := make(map[string]any)
 	if req.Name != nil {

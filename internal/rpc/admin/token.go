@@ -22,21 +22,22 @@ import (
 )
 
 func (*adminServer) CreateToken(ctx context.Context, req *admin.CreateTokenReq) (*admin.CreateTokenResp, error) {
-	resp := &admin.CreateTokenResp{}
-	var err error
-	resp.Token, err = tokenverify.CreateToken(req.UserID, req.UserType, *config.Config.TokenPolicy.Expire)
+	token, err := tokenverify.CreateToken(req.UserID, req.UserType, *config.Config.TokenPolicy.Expire)
 	if err != nil {
 		return nil, err
 	}
-	return resp, nil
+	return &admin.CreateTokenResp{
+		Token: token,
+	}, nil
 }
 
 func (*adminServer) ParseToken(ctx context.Context, req *admin.ParseTokenReq) (*admin.ParseTokenResp, error) {
-	resp := &admin.ParseTokenResp{}
-	var err error
-	resp.UserID, resp.UserType, err = tokenverify.GetToken(req.Token)
+	userID, userType, err := tokenverify.GetToken(req.Token)
 	if err != nil {
 		return nil, err
 	}
-	return resp, nil
+	return &admin.ParseTokenResp{
+		UserID:   userID,
+		UserType: userType,
+	}, nil
 }
