@@ -58,7 +58,7 @@ mysql:
 #  isJson: false
 #  withStack: false
 
-#secret: "openIM123"
+#secret: "tuoyun"
 #tokenPolicy:
 #  expire: 86400
 
