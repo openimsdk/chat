@@ -2,7 +2,7 @@
 
 ## 修改配置项
 
-参考config/config.yaml的配置说明，重点关注与DB相关的配置项，以保持和IM一致。
+参考config/config.yaml的配置说明
 
 ## 编译
 
