@@ -31,4 +31,3 @@ cd script
 cd script
 ./stop_all.sh
  ```
-
