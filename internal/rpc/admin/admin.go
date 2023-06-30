@@ -131,8 +131,8 @@ func (o *adminServer) Login(ctx context.Context, req *admin.LoginReq) (*admin.Lo
 		Nickname:     a.Nickname,
 		FaceURL:      a.FaceURL,
 		Level:        a.Level,
-		IMUserID:     a.UserID,
-		IMToken:      imToken.Token,
+		ImUserID:     a.UserID,
+		ImToken:      imToken.Token,
 	}, nil
 }
 
