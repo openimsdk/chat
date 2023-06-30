@@ -50,7 +50,7 @@ func ToDBAdminUpdate(req *admin.AdminUpdateInfoReq) (map[string]any, error) {
 		update["face_url"] = req.FaceURL.Value
 	}
 	if req.Nickname != nil {
-		if req.Nickname.Value != "" {
+		if req.Nickname.Value == "" {
 			return nil, errs.ErrArgs.Wrap("nickname is empty")
 		}
 		update["nickname"] = req.Nickname.Value
