@@ -39,7 +39,7 @@ func CreateToken(UserID string, userType int32, ttlDay int64) (string, error) {
 	}
 	claims := buildClaims(UserID, userType, ttlDay)
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString([]byte(config.Config.TokenPolicy.AccessSecret))
+	tokenString, err := token.SignedString([]byte(*config.Config.Secret))
 	if err != nil {
 		return "", utils.Wrap(err, "")
 	}
@@ -48,7 +48,7 @@ func CreateToken(UserID string, userType int32, ttlDay int64) (string, error) {
 
 func secret() jwt.Keyfunc {
 	return func(token *jwt.Token) (interface{}, error) {
-		return []byte(config.Config.TokenPolicy.AccessSecret), nil
+		return []byte(*config.Config.Secret), nil
 	}
 }
 

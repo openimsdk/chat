@@ -10,7 +10,7 @@ import (
 func (*adminServer) CreateToken(ctx context.Context, req *admin.CreateTokenReq) (*admin.CreateTokenResp, error) {
 	resp := &admin.CreateTokenResp{}
 	var err error
-	resp.Token, err = tokenverify.CreateToken(req.UserID, req.UserType, config.Config.TokenPolicy.AccessExpire)
+	resp.Token, err = tokenverify.CreateToken(req.UserID, req.UserType, *config.Config.TokenPolicy.Expire)
 	if err != nil {
 		return nil, err
 	}

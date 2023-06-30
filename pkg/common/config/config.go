@@ -48,9 +48,9 @@ var Config struct {
 		IsJson              *bool   `yaml:"isJson"`
 		WithStack           *bool   `yaml:"withStack"`
 	} `yaml:"log"`
+	Secret      *string `yaml:"secret"`
 	TokenPolicy struct {
-		AccessSecret string `yaml:"accessSecret"`
-		AccessExpire int64  `yaml:"accessExpire"`
+		Expire *int64 `yaml:"expire"`
 	} `yaml:"tokenPolicy"`
 	VerifyCode struct {
 		ValidTime int    `yaml:"validTime"`

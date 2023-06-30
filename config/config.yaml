@@ -44,9 +44,9 @@ mysql:
 #  isJson: false
 #  withStack: false
 
-tokenPolicy:
-  accessSecret: "openIM123"
-  accessExpire: 86400
+#secret: "openIM123"
+#tokenPolicy:
+#  expire: 86400
 
 verifyCode:
   validTime: 300 # 验证码有效时间

@@ -78,6 +78,9 @@ func InitConfig() error {
 	configFieldCopy(&Config.Log.WithStack, openIMConfig.Config.Log.WithStack)
 	configFieldCopy(&Config.Log.IsJson, openIMConfig.Config.Log.IsJson)
 
+	configFieldCopy(&Config.Secret, openIMConfig.Config.Secret)
+	configFieldCopy(&Config.TokenPolicy.Expire, openIMConfig.Config.TokenPolicy.Expire)
+
 	jsonData, err := json.Marshal(Config)
 	if err != nil {
 		return err
