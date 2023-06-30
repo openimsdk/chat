@@ -33,8 +33,6 @@ cloud.google.com/go/storage v1.10.0/go.mod h1:FLPqc6j+Ki4BU591ie1oL6qBQGu2Bl/tZ9
 dmitri.shuralyov.com/gpu/mtl v0.0.0-20190408044501-666a987793e9/go.mod h1:H6x//7gZCb22OMCxBHrMx7a5I7Hp++hsVxbQ4BYO7hU=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
-github.com/OpenIMSDK/Open-IM-Server v1.0.8-0.20230630073459-7d8589edcd77 h1:g3K205gXC7EnfeyOZNUpagNNvyJOYy5ddMbBJ49J1ww=
-github.com/OpenIMSDK/Open-IM-Server v1.0.8-0.20230630073459-7d8589edcd77/go.mod h1:sgp4idb/zDClK8RSct3EpRzYKIwKWi1d7mu6+En1RHI=
 github.com/OpenIMSDK/Open-IM-Server v1.0.8-0.20230630091751-3c10e2bb65ce h1:yqYqsUXIucBZ94GyUAUvAVZVJa2AfgPDwVtxp9vt1Nc=
 github.com/OpenIMSDK/Open-IM-Server v1.0.8-0.20230630091751-3c10e2bb65ce/go.mod h1:sgp4idb/zDClK8RSct3EpRzYKIwKWi1d7mu6+En1RHI=
 github.com/OpenIMSDK/open_utils v1.0.8 h1:IopxWgJwEF5ZAPsRuiZZOfcxNOQOCt/p8VDENcHN9r4=

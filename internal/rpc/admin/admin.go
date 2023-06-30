@@ -16,8 +16,11 @@ package admin
 
 import (
 	"context"
+
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/mcontext"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/discoveryregistry"
+	"google.golang.org/grpc"
+
 	"github.com/OpenIMSDK/chat/pkg/common/constant"
 	"github.com/OpenIMSDK/chat/pkg/common/db/database"
 	"github.com/OpenIMSDK/chat/pkg/common/db/dbutil"
@@ -28,7 +31,6 @@ import (
 	"github.com/OpenIMSDK/chat/pkg/proto/admin"
 	"github.com/OpenIMSDK/chat/pkg/rpclient/chat"
 	"github.com/OpenIMSDK/chat/pkg/rpclient/openim"
-	"google.golang.org/grpc"
 )
 
 func Start(discov discoveryregistry.SvcDiscoveryRegistry, server *grpc.Server) error {

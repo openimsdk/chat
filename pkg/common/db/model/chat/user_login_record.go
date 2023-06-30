@@ -16,8 +16,11 @@ package chat
 
 import (
 	"context"
-	"github.com/OpenIMSDK/chat/pkg/common/db/table/chat"
+
+
 	"gorm.io/gorm"
+
+	"github.com/OpenIMSDK/chat/pkg/common/db/table/chat"
 )
 
 func NewUserLoginRecord(db *gorm.DB) chat.UserLoginRecordInterface {

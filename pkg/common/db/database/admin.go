@@ -16,10 +16,12 @@ package database
 
 import (
 	"context"
+
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/db/tx"
+	"gorm.io/gorm"
+
 	"github.com/OpenIMSDK/chat/pkg/common/db/model/admin"
 	table "github.com/OpenIMSDK/chat/pkg/common/db/table/admin"
-	"gorm.io/gorm"
 )
 
 type AdminDatabaseInterface interface {
@@ -201,12 +203,15 @@ func (o *AdminDatabase) SearchDefaultFriend(ctx context.Context, keyword string,
 func (o *AdminDatabase) FindDefaultGroup(ctx context.Context, groupIDs []string) ([]string, error) {
 	return o.registerAddGroup.FindGroupID(ctx, groupIDs)
 }
+
 func (o *AdminDatabase) AddDefaultGroup(ctx context.Context, ms []*table.RegisterAddGroup) error {
 	return o.registerAddGroup.Add(ctx, ms)
 }
+
 func (o *AdminDatabase) DelDefaultGroup(ctx context.Context, groupIDs []string) error {
 	return o.registerAddGroup.Del(ctx, groupIDs)
 }
+
 func (o *AdminDatabase) SearchDefaultGroup(ctx context.Context, keyword string, page int32, size int32) (uint32, []*table.RegisterAddGroup, error) {
 	return o.registerAddGroup.Search(ctx, keyword, page, size)
 }
@@ -226,6 +231,7 @@ func (o *AdminDatabase) BlockUser(ctx context.Context, f []*table.ForbiddenAccou
 func (o *AdminDatabase) DelBlockUser(ctx context.Context, userID []string) error {
 	return o.forbiddenAccount.Delete(ctx, userID)
 }
+
 func (o *AdminDatabase) SearchBlockUser(ctx context.Context, keyword string, page int32, size int32) (uint32, []*table.ForbiddenAccount, error) {
 	return o.forbiddenAccount.Search(ctx, keyword, page, size)
 }

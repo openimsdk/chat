@@ -17,9 +17,11 @@ package admin
 import (
 	"crypto/md5"
 	"encoding/hex"
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
-	"github.com/OpenIMSDK/chat/pkg/proto/admin"
 	"time"
+
+	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
+
+	"github.com/OpenIMSDK/chat/pkg/proto/admin"
 )
 
 type Admin struct {
@@ -27,7 +29,7 @@ type Admin struct {
 	Password   string    `gorm:"column:password;type:char(64)"`
 	FaceURL    string    `gorm:"column:face_url;type:char(64)"`
 	Nickname   string    `gorm:"column:nickname;type:char(64)"`
-	UserID     string    `gorm:"column:user_id;type:char(64)"` //openIM userID
+	UserID     string    `gorm:"column:user_id;type:char(64)"` // openIM userID
 	Level      int32     `gorm:"column:level;default:1"  `
 	CreateTime time.Time `gorm:"column:create_time"`
 }

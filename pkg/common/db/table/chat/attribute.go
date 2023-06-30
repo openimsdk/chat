@@ -19,7 +19,7 @@ import (
 	"time"
 )
 
-// Attribute 用户属性表
+// Attribute 用户属性表.
 type Attribute struct {
 	UserID         string    `gorm:"column:user_id;primary_key;type:char(64)"`
 	Account        string    `gorm:"column:account;type:char(64)"`

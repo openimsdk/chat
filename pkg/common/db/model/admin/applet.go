@@ -16,11 +16,13 @@ package admin
 
 import (
 	"context"
+
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/db/ormutil"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
+	"gorm.io/gorm"
+
 	"github.com/OpenIMSDK/chat/pkg/common/constant"
 	"github.com/OpenIMSDK/chat/pkg/common/db/table/admin"
-	"gorm.io/gorm"
 )
 
 func NewApplet(db *gorm.DB) *Applet {

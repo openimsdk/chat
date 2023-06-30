@@ -16,7 +16,9 @@ package chat
 
 import (
 	"context"
+
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/discoveryregistry"
+
 	"github.com/OpenIMSDK/chat/pkg/common/config"
 	"github.com/OpenIMSDK/chat/pkg/common/mctx"
 	"github.com/OpenIMSDK/chat/pkg/eerrs"

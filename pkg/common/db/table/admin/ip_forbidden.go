@@ -19,7 +19,7 @@ import (
 	"time"
 )
 
-// 禁止ip登录 注册
+// 禁止ip登录 注册.
 type IPForbidden struct {
 	IP            string    `gorm:"column:ip;primary_key;type:char(32)"`
 	LimitRegister bool      `gorm:"column:limit_register"`

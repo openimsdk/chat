@@ -17,11 +17,13 @@ package sms
 import (
 	"context"
 	"encoding/json"
+
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
-	"github.com/OpenIMSDK/chat/pkg/common/config"
 	aliconf "github.com/alibabacloud-go/darabonba-openapi/client"
 	dysmsapi "github.com/alibabacloud-go/dysmsapi-20170525/v2/client"
 	"github.com/alibabacloud-go/tea/tea"
+
+	"github.com/OpenIMSDK/chat/pkg/common/config"
 )
 
 func newAli() (SMS, error) {

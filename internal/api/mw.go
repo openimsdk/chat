@@ -16,14 +16,16 @@ package api
 
 import (
 	"context"
+	"strconv"
+
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/apiresp"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/discoveryregistry"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
+	"github.com/gin-gonic/gin"
+
 	"github.com/OpenIMSDK/chat/pkg/common/config"
 	"github.com/OpenIMSDK/chat/pkg/common/constant"
 	"github.com/OpenIMSDK/chat/pkg/proto/admin"
-	"github.com/gin-gonic/gin"
-	"strconv"
 )
 
 func NewMW(zk discoveryregistry.SvcDiscoveryRegistry) *MW {

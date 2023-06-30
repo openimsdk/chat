@@ -16,7 +16,7 @@ package admin
 
 import "context"
 
-// ClientConfig 客户端相关配置项
+// ClientConfig 客户端相关配置项.
 type ClientConfig struct {
 	Key   string `gorm:"column:key;primary_key;type:varchar(255)"`
 	Value string `gorm:"column:value;not null;type:text"`

@@ -17,7 +17,7 @@ package constant
 import "github.com/OpenIMSDK/Open-IM-Server/pkg/common/constant"
 
 const (
-	//verificationCode used for
+	// verificationCode used for.
 	VerificationCodeForRegister      = 1 // 注册
 	VerificationCodeForResetPassword = 2 // 重置密码
 	VerificationCodeForLogin         = 3 // 登录
@@ -29,45 +29,45 @@ const (
 
 const LogFileName = "chat.log"
 
-// block unblock
+// block unblock.
 const (
 	BlockUser   = 1
 	UnblockUser = 2
 )
 
-// AccountType
+// AccountType.
 const (
 	Email   = "email"
 	Phone   = "phone"
 	Account = "account"
 )
 
-// Mode
+// Mode.
 const (
 	UserMode  = "user"
 	AdminMode = "admin"
 )
 
-// user level
+// user level.
 const (
 	OrdinaryUserLevel = 1
 	AdvancedUserLevel = 100
 )
 
-// AddFriendCtrl
+// AddFriendCtrl.
 const (
-	OrdinaryUserAddFriendEnable  = 1  //允许普通用户添加好友
-	OrdinaryUserAddFriendDisable = -1 //不允许普通用户添加好友
+	OrdinaryUserAddFriendEnable  = 1  // 允许普通用户添加好友
+	OrdinaryUserAddFriendDisable = -1 // 不允许普通用户添加好友
 )
 
-// minioUpload
+// minioUpload.
 const (
 	OtherType = 1
 	VideoType = 2
 	ImageType = 3
 )
 
-// callback Action
+// callback Action.
 const (
 	ActionAllow     = 0
 	ActionForbidden = 1
@@ -79,7 +79,7 @@ const (
 	ScreenInvitationRegisterNotUsed = 2 // 未使用
 )
 
-// 1 block; 2 unblock
+// 1 block; 2 unblock.
 const (
 	UserBlock   = 1 // 封号
 	UserUnblock = 2 // 解封
@@ -120,7 +120,7 @@ const (
 	NeedInvitationCodeRegister    = 1 // 需要邀请码
 )
 
-// 小程序
+// 小程序.
 const (
 	StatusOnShelf = 1 // 上架
 	StatusUnShelf = 2 // 下架
@@ -147,12 +147,11 @@ const (
 	InvitationCodeAll    = 2 // 未使用
 )
 
-// 默认发现页面
+// 默认发现页面.
 const DefaultDiscoverPageURL = "https://doc.rentsoft.cn/#/"
 
-//const OperationID = "operationID"
-//const OpUserID = "opUserID"
-
+// const OperationID = "operationID"
+// const OpUserID = "opUserID".
 const (
 	RpcOperationID = constant.OperationID
 	RpcOpUserID    = constant.OpUserID

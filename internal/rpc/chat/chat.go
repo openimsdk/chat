@@ -16,6 +16,8 @@ package chat
 
 import (
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/discoveryregistry"
+	"google.golang.org/grpc"
+
 	"github.com/OpenIMSDK/chat/pkg/common/db/database"
 	chat2 "github.com/OpenIMSDK/chat/pkg/common/db/table/chat"
 	"github.com/OpenIMSDK/chat/pkg/common/dbconn"
@@ -23,7 +25,6 @@ import (
 	chatClient "github.com/OpenIMSDK/chat/pkg/rpclient/chat"
 	"github.com/OpenIMSDK/chat/pkg/rpclient/openim"
 	"github.com/OpenIMSDK/chat/pkg/sms"
-	"google.golang.org/grpc"
 )
 
 func Start(discov discoveryregistry.SvcDiscoveryRegistry, server *grpc.Server) error {

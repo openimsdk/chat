@@ -17,6 +17,7 @@ package chat
 import (
 	"context"
 	"errors"
+
 	"github.com/OpenIMSDK/chat/pkg/proto/chat"
 )
 

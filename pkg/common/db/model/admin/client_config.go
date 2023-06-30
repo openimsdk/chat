@@ -16,9 +16,11 @@ package admin
 
 import (
 	"context"
+
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
-	"github.com/OpenIMSDK/chat/pkg/common/db/table/admin"
 	"gorm.io/gorm"
+
+	"github.com/OpenIMSDK/chat/pkg/common/db/table/admin"
 )
 
 func NewClientConfig(db *gorm.DB) admin.ClientConfigInterface {

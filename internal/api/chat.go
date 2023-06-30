@@ -17,17 +17,19 @@ package api
 import (
 	"context"
 	"fmt"
+	"io"
+	"net"
+
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/a2r"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/apiresp"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/constant"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/discoveryregistry"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
+	"github.com/gin-gonic/gin"
+
 	"github.com/OpenIMSDK/chat/pkg/common/config"
 	"github.com/OpenIMSDK/chat/pkg/proto/admin"
 	"github.com/OpenIMSDK/chat/pkg/proto/chat"
-	"github.com/gin-gonic/gin"
-	"io"
-	"net"
 )
 
 func NewChat(discov discoveryregistry.SvcDiscoveryRegistry) *Chat {
@@ -91,7 +93,7 @@ func (o *Chat) RegisterUser(c *gin.Context) {
 		return
 	}
 	apiresp.GinSuccess(c, resp)
-	//a2r.Call(chat.ChatClient.RegisterUser, o.chatClient, c)
+	// a2r.Call(chat.ChatClient.RegisterUser, o.chatClient, c)
 }
 
 func (o *Chat) Login(c *gin.Context) {

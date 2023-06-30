@@ -17,6 +17,7 @@ package main
 import (
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/log"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/startrpc"
+
 	"github.com/OpenIMSDK/chat/internal/rpc/admin"
 	"github.com/OpenIMSDK/chat/pkg/common/config"
 )

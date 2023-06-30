@@ -15,9 +15,11 @@
 package chat
 
 import (
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
-	"github.com/OpenIMSDK/chat/pkg/proto/chat"
 	"time"
+
+	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
+
+	"github.com/OpenIMSDK/chat/pkg/proto/chat"
 )
 
 func ToDBAttributeUpdate(req *chat.UpdateUserInfoReq) (map[string]any, error) {

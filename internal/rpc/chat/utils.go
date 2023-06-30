@@ -16,6 +16,7 @@ package chat
 
 import (
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/utils"
+
 	"github.com/OpenIMSDK/chat/pkg/common/db/table/chat"
 	"github.com/OpenIMSDK/chat/pkg/proto/common"
 )
@@ -51,7 +52,7 @@ func DbToPbUserFullInfo(attribute *chat.Attribute) *common.UserFullInfo {
 		FaceURL:     attribute.FaceURL,
 		Gender:      attribute.Gender,
 		Level:       attribute.Level,
-		//Forbidden:      attribute.Forbidden,
+		// Forbidden:      attribute.Forbidden,
 		Birth:          attribute.BirthTime.UnixMilli(),
 		AllowAddFriend: attribute.AllowAddFriend,
 		AllowBeep:      attribute.AllowBeep,

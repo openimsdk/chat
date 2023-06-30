@@ -16,11 +16,13 @@ package mctx
 
 import (
 	"context"
+	"strconv"
+
 	constant2 "github.com/OpenIMSDK/Open-IM-Server/pkg/common/constant"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
+
 	"github.com/OpenIMSDK/chat/pkg/common/constant"
 	"github.com/OpenIMSDK/chat/pkg/common/tokenverify"
-	"strconv"
 )
 
 func HaveOpUser(ctx context.Context) bool {
