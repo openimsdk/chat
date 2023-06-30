@@ -9,8 +9,6 @@ import (
 
 func New() (SMS, error) {
 	switch strings.ToLower(config.Config.VerifyCode.Use) {
-	case "":
-		return nil, nil
 	case "ali":
 		return newAli()
 	default:

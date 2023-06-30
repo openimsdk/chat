@@ -29,7 +29,7 @@ func NewMysqlGormDB() (*gorm.DB, error) {
 		return nil, err
 	}
 	defer sqlDB.Close()
-	sql := fmt.Sprintf("CREATE DATABASE IF NOT EXISTS %s default charset utf8 COLLATE utf8_general_ci;", *config.Config.Mysql.Database)
+	sql := fmt.Sprintf("CREATE DATABASE IF NOT EXISTS %s default charset utf8mb4 COLLATE utf8mb4_unicode_ci;", *config.Config.Mysql.Database)
 	err = db.Exec(sql).Error
 	if err != nil {
 		return nil, fmt.Errorf("init db %w", err)
