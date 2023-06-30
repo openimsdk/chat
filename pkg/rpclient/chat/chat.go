@@ -29,21 +29,20 @@ func NewChatClient(discov discoveryregistry.SvcDiscoveryRegistry) *ChatClient {
 	if err != nil {
 		panic(err)
 	}
-	client := chat.NewChatClient(conn)
-	return &ChatClient{Client: client}
+	return &ChatClient{
+		client: chat.NewChatClient(conn),
+	}
 }
 
 type ChatClient struct {
-	Client chat.ChatClient
+	client chat.ChatClient
 }
-
-//type ChatClient Chat
 
 func (o *ChatClient) FindUserPublicInfo(ctx context.Context, userIDs []string) ([]*common.UserPublicInfo, error) {
 	if len(userIDs) == 0 {
 		return []*common.UserPublicInfo{}, nil
 	}
-	resp, err := o.Client.FindUserPublicInfo(ctx, &chat.FindUserPublicInfoReq{UserIDs: userIDs})
+	resp, err := o.client.FindUserPublicInfo(ctx, &chat.FindUserPublicInfoReq{UserIDs: userIDs})
 	if err != nil {
 		return nil, err
 	}
@@ -64,7 +63,7 @@ func (o *ChatClient) FindUserFullInfo(ctx context.Context, userIDs []string) ([]
 	if len(userIDs) == 0 {
 		return []*common.UserFullInfo{}, nil
 	}
-	resp, err := o.Client.FindUserFullInfo(ctx, &chat.FindUserFullInfoReq{UserIDs: userIDs})
+	resp, err := o.client.FindUserFullInfo(ctx, &chat.FindUserFullInfoReq{UserIDs: userIDs})
 	if err != nil {
 		return nil, err
 	}
@@ -106,6 +105,6 @@ func (o *ChatClient) GetUserPublicInfo(ctx context.Context, userID string) (*com
 }
 
 func (o *ChatClient) UpdateUser(ctx context.Context, req *chat.UpdateUserInfoReq) error {
-	_, err := o.Client.UpdateUserInfo(ctx, req)
+	_, err := o.client.UpdateUserInfo(ctx, req)
 	return err
 }
