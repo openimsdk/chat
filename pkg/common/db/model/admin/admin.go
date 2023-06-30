@@ -16,9 +16,13 @@ package admin
 
 import (
 	"context"
+	"crypto/md5"
+	"encoding/hex"
+	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/config"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
 	"github.com/OpenIMSDK/chat/pkg/common/db/table/admin"
 	"gorm.io/gorm"
+	"time"
 )
 
 func NewAdmin(db *gorm.DB) *Admin {
@@ -43,4 +47,36 @@ func (o *Admin) TakeUserID(ctx context.Context, userID string) (*admin.Admin, er
 
 func (o *Admin) Update(ctx context.Context, account string, update map[string]any) error {
 	return errs.Wrap(o.db.WithContext(ctx).Model(&admin.Admin{}).Where("user_id = ?", account).Updates(update).Error)
+}
+
+func (o *Admin) InitAdmin(ctx context.Context) error {
+	var count int64
+	if err := o.db.WithContext(ctx).Model(&admin.Admin{}).Count(&count).Error; err != nil {
+		return errs.Wrap(err)
+	}
+	if count > 0 || len(config.Config.Manager.UserID) == 0 {
+		return nil
+	}
+	now := time.Now()
+	admins := make([]*admin.Admin, 0, len(config.Config.Manager.UserID))
+	for i, userID := range config.Config.Manager.UserID {
+		password := md5.Sum([]byte(userID))
+		table := admin.Admin{
+			Account:    userID,
+			UserID:     userID,
+			Password:   hex.EncodeToString(password[:]),
+			Level:      100,
+			CreateTime: now,
+		}
+		if len(config.Config.Manager.Nickname) > i {
+			table.Nickname = config.Config.Manager.Nickname[i]
+		} else {
+			table.Nickname = userID
+		}
+		admins = append(admins, &table)
+	}
+	if err := o.db.WithContext(ctx).Create(&admins).Error; err != nil {
+		return errs.Wrap(err)
+	}
+	return nil
 }

@@ -50,6 +50,9 @@ func Start(discov discoveryregistry.SvcDiscoveryRegistry, server *grpc.Server) e
 	if err := db.AutoMigrate(tables...); err != nil {
 		return err
 	}
+	if err := database.NewAdminDatabase(db).InitAdmin(context.Background()); err != nil {
+		return err
+	}
 	admin.RegisterAdminServer(server, &adminServer{
 		Database: database.NewAdminDatabase(db),
 		Chat:     chat.NewChatClient(discov),

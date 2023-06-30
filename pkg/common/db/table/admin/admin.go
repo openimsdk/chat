@@ -38,4 +38,5 @@ type AdminInterface interface {
 	Take(ctx context.Context, account string) (*Admin, error)
 	TakeUserID(ctx context.Context, userID string) (*Admin, error)
 	Update(ctx context.Context, account string, update map[string]any) error
+	InitAdmin(ctx context.Context) error
 }
