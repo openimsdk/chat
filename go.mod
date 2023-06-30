@@ -2,7 +2,7 @@ module github.com/OpenIMSDK/chat
 
 go 1.18
 
-// go get -u github.com/OpenIMSDK/Open-IM-Server@ver3
+// go get -u github.com/OpenIMSDK/Open-IM-Server@main
 require (
 	github.com/OpenIMSDK/open_utils v1.0.8
 	github.com/gin-gonic/gin v1.9.1
@@ -22,7 +22,7 @@ require (
 )
 
 require (
-	github.com/OpenIMSDK/Open-IM-Server v1.0.8-0.20230629102753-434ca599c55b
+	github.com/OpenIMSDK/Open-IM-Server v0.0.0-20230630025837-c19952d48394
 	github.com/alibabacloud-go/darabonba-openapi v0.2.1
 	github.com/alibabacloud-go/dysmsapi-20170525/v2 v2.0.18
 	github.com/alibabacloud-go/tea v1.1.20
@@ -113,7 +113,7 @@ require (
 	golang.org/x/sync v0.1.0 // indirect
 	golang.org/x/sys v0.9.0 // indirect
 	golang.org/x/text v0.10.0 // indirect
-	google.golang.org/genproto v0.0.0-20230525234025-438c736192d0 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20230626202813-9b080da550b3 // indirect
 	gopkg.in/ini.v1 v1.66.2 // indirect
 )
 
