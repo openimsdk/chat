@@ -72,7 +72,7 @@ func (o *OpenIMClient) UserRegister(ctx context.Context, req *sdkws.UserInfo) er
 	if err != nil {
 		return err
 	}
-	_, err = client.UserRegister(ctx, &user.UserRegisterReq{Users: []*sdkws.UserInfo{req}})
+	_, err = client.UserRegister(ctx, &user.UserRegisterReq{Secret: config.Config.TokenPolicy.AccessSecret, Users: []*sdkws.UserInfo{req}})
 	return err
 }
 
@@ -106,7 +106,7 @@ func (o *OpenIMClient) UserToken(ctx context.Context, userID string, platformID 
 	if err != nil {
 		return nil, err
 	}
-	return client.UserToken(ctx, &auth.UserTokenReq{PlatformID: platformID, UserID: userID})
+	return client.UserToken(ctx, &auth.UserTokenReq{Secret: config.Config.TokenPolicy.AccessSecret, PlatformID: platformID, UserID: userID})
 }
 
 func (o *OpenIMClient) FindGroup(ctx context.Context, groupIDs []string) ([]*sdkws.GroupInfo, error) {
