@@ -1,7 +1,7 @@
 FROM ubuntu
 
 # 设置固定的项目路径
-ENV WORKDIR /chat
+ENV WORKDIR /openim-chat
 ENV CMDDIR $WORKDIR/scripts
 ENV CONFIG_NAME $WORKDIR/config/config.yaml
 
@@ -19,7 +19,7 @@ RUN mkdir $WORKDIR/logs && \
 RUN apt-get -qq update \
     && apt-get -qq install -y --no-install-recommends ca-certificates curl
 
-VOLUME ["/chat/logs","/chat/config","/chat/scripts"]
+VOLUME ["openim-server/logs/openim-chat","/openim-chat/config","/openim-chat/scripts"]
 
 WORKDIR $CMDDIR
 CMD ["./docker_start_all.sh"]
