@@ -64,7 +64,6 @@ jobs:
       #     password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       # skip for now
-      # - name: Build docker images for host arch and push images to registry
-      #   run: |
-      #     set -e
-      #     make docker-push
+      - name: Build docker images for host arch and push images to registry
+        run: |
+          make docker-push

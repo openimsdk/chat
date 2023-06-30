@@ -57,7 +57,7 @@ ifeq (, $(shell git status --porcelain 2>/dev/null))
 endif
 GIT_COMMIT:=$(shell git rev-parse HEAD)
 
-IMG ?= ghcr.io/OpenIM/chat:latest
+IMG ?= openim_chat:latest
 
 BUILDFILE = "./main.go"
 BUILDAPP = "$(OUTPUT_DIR)/"
@@ -258,7 +258,7 @@ cover: test
 
 ## docker-build: Build docker image with the manager.
 .PHONY: docker-build
-docker-build: test
+docker-build:
 	docker build -t ${IMG} .
 
 ## docker-push: Push docker image with the manager.
