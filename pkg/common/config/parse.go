@@ -16,7 +16,6 @@ package config
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
 	openIMConfig "github.com/OpenIMSDK/Open-IM-Server/pkg/common/config"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/constant"
@@ -94,12 +93,6 @@ func InitConfig() error {
 
 	configFieldCopy(&Config.Secret, openIMConfig.Config.Secret)
 	configFieldCopy(&Config.TokenPolicy.Expire, openIMConfig.Config.TokenPolicy.Expire)
-
-	jsonData, err := json.Marshal(Config)
-	if err != nil {
-		return err
-	}
-	fmt.Println(string(jsonData))
 
 	return nil
 }
