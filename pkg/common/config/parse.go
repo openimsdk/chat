@@ -94,6 +94,12 @@ func InitConfig() error {
 	configFieldCopy(&Config.Secret, openIMConfig.Config.Secret)
 	configFieldCopy(&Config.TokenPolicy.Expire, openIMConfig.Config.TokenPolicy.Expire)
 
+	configData, err := yaml.Marshal(&Config)
+	if err != nil {
+		return err
+	}
+	fmt.Printf("%s\nconfig:\n%s\n", time.Now(), string(configData))
+
 	return nil
 }
 
