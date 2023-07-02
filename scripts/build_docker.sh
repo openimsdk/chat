@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-image=openim/open_im_enterprise:v1.0.2
+image=openim/openim_chat:v1.0.2
 chmod +x ./*.sh
 ./build_all_service.sh
 cd ../
