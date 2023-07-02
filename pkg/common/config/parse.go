@@ -16,6 +16,7 @@ package config
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	openIMConfig "github.com/OpenIMSDK/Open-IM-Server/pkg/common/config"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/constant"
@@ -65,14 +66,28 @@ func InitConfig() error {
 	if err != nil {
 		return fmt.Errorf("conn zk error: %w", err)
 	}
-	openIMConfigData, err := zk.GetConfFromRegistry(constant.OpenIMCommonConfigKey)
-	if err != nil {
-		return fmt.Errorf("get zk config: %w", err)
+	var openIMConfigData []byte
+	for i := 0; i < 100; i++ {
+		var err error
+		configData, err := zk.GetConfFromRegistry(constant.OpenIMCommonConfigKey)
+		if err != nil {
+			fmt.Printf("get zk config [%d] error: %v\n", i, err)
+			time.Sleep(time.Second)
+			continue
+		}
+		if len(configData) == 0 {
+			fmt.Printf("get zk config [%d] data is empty\n", i)
+			time.Sleep(time.Second)
+			continue
+		}
+		openIMConfigData = configData
+	}
+	if len(openIMConfigData) == 0 {
+		return errors.New("get zk config data failed")
 	}
 	if err := yaml.NewDecoder(bytes.NewReader(openIMConfigData)).Decode(&openIMConfig.Config); err != nil {
 		return fmt.Errorf("parse zk openIMConfig: %w", err)
 	}
-
 	configFieldCopy(&Config.Mysql.Address, openIMConfig.Config.Mysql.Address)
 	configFieldCopy(&Config.Mysql.Username, openIMConfig.Config.Mysql.Username)
 	configFieldCopy(&Config.Mysql.Password, openIMConfig.Config.Mysql.Password)
