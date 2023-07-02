@@ -1,8 +1,9 @@
 FROM ubuntu
 
 # 设置固定的项目路径
-ENV WORKDIR /openim-chat
+ENV WORKDIR /chat
 ENV CMDDIR $WORKDIR/scripts
+
 ENV CONFIG_NAME $WORKDIR/config/config.yaml
 
 # 将可执行文件复制到目标目录
@@ -19,7 +20,7 @@ RUN mkdir $WORKDIR/logs && \
 RUN apt-get -qq update \
     && apt-get -qq install -y --no-install-recommends ca-certificates curl
 
-VOLUME ["/openim-chat/logs","/openim-chat/config","./openim-chat/scripts"]
+VOLUME ["/chat/logs","/chat/config","/chat/scripts"]
 
 WORKDIR $CMDDIR
 CMD ["./docker_start_all.sh"]
