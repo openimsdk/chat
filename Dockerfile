@@ -19,7 +19,7 @@ RUN mkdir $WORKDIR/logs && \
 RUN apt-get -qq update \
     && apt-get -qq install -y --no-install-recommends ca-certificates curl
 
-VOLUME ["openim-chat/logs","/openim-chat/config","./openim-chat/scripts"]
+VOLUME ["/openim-chat/logs","/openim-chat/config","./openim-chat/scripts"]
 
 WORKDIR $CMDDIR
 CMD ["./docker_start_all.sh"]
