@@ -18,6 +18,7 @@ import (
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/discoveryregistry"
 	"google.golang.org/grpc"
 
+	"github.com/OpenIMSDK/chat/pkg/common/config"
 	"github.com/OpenIMSDK/chat/pkg/common/db/database"
 	chat2 "github.com/OpenIMSDK/chat/pkg/common/db/table/chat"
 	"github.com/OpenIMSDK/chat/pkg/common/dbconn"
@@ -45,6 +46,9 @@ func Start(discov discoveryregistry.SvcDiscoveryRegistry, server *grpc.Server) e
 	s, err := sms.New()
 	if err != nil {
 		return err
+	}
+	if err := discov.CreateRpcRootNodes([]string{config.Config.RpcRegisterName.OpenImAdminName, config.Config.RpcRegisterName.OpenImChatName}); err != nil {
+		panic(err)
 	}
 	chat.RegisterChatServer(server, &chatSvr{
 		Database: database.NewChatDatabase(db),

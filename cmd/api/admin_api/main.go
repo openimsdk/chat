@@ -16,6 +16,11 @@ package main
 
 import (
 	"flag"
+	"math/rand"
+	"net"
+	"strconv"
+	"time"
+
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/log"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/mw"
 	openKeeper "github.com/OpenIMSDK/Open-IM-Server/pkg/discoveryregistry/zookeeper"
@@ -23,10 +28,6 @@ import (
 	"github.com/OpenIMSDK/chat/pkg/common/config"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
-	"math/rand"
-	"net"
-	"strconv"
-	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -43,6 +44,10 @@ func main() {
 		openKeeper.WithFreq(time.Hour), openKeeper.WithUserNameAndPassword(config.Config.Zookeeper.UserName,
 			config.Config.Zookeeper.Password), openKeeper.WithRoundRobin(), openKeeper.WithTimeout(10), openKeeper.WithLogger(log.NewZkLogger()))
 	if err != nil {
+		panic(err)
+	}
+
+	if err := zk.CreateRpcRootNodes([]string{config.Config.RpcRegisterName.OpenImAdminName, config.Config.RpcRegisterName.OpenImChatName}); err != nil {
 		panic(err)
 	}
 	zk.AddOption(mw.GrpcClient(), grpc.WithTransportCredentials(insecure.NewCredentials())) // 默认RPC中间件

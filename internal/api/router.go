@@ -15,13 +15,24 @@
 package api
 
 import (
+	"context"
+
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/discoveryregistry"
+	"github.com/OpenIMSDK/chat/pkg/common/config"
 	"github.com/gin-gonic/gin"
 )
 
-func NewChatRoute(router gin.IRouter, zk discoveryregistry.SvcDiscoveryRegistry) {
-	mw := NewMW(zk)
-	chat := NewChat(zk)
+func NewChatRoute(router gin.IRouter, discov discoveryregistry.SvcDiscoveryRegistry) {
+	chatConn, err := discov.GetConn(context.Background(), config.Config.RpcRegisterName.OpenImChatName)
+	if err != nil {
+		panic(err)
+	}
+	adminConn, err := discov.GetConn(context.Background(), config.Config.RpcRegisterName.OpenImAdminName)
+	if err != nil {
+		panic(err)
+	}
+	mw := NewMW(adminConn)
+	chat := NewChat(chatConn, adminConn)
 	account := router.Group("/account")
 	account.POST("/code/send", chat.SendVerifyCode)                      // 发送验证码
 	account.POST("/code/verify", chat.VerifyCode)                        // 校验验证码
@@ -44,10 +55,17 @@ func NewChatRoute(router gin.IRouter, zk discoveryregistry.SvcDiscoveryRegistry)
 	router.Group("/callback").POST("/open_im", chat.OpenIMCallback) // 回调
 }
 
-func NewAdminRoute(router gin.IRouter, zk discoveryregistry.SvcDiscoveryRegistry) {
-	mw := NewMW(zk)
-	admin := NewAdmin(zk)
-
+func NewAdminRoute(router gin.IRouter, discov discoveryregistry.SvcDiscoveryRegistry) {
+	adminConn, err := discov.GetConn(context.Background(), config.Config.RpcRegisterName.OpenImAdminName)
+	if err != nil {
+		panic(err)
+	}
+	chatConn, err := discov.GetConn(context.Background(), config.Config.RpcRegisterName.OpenImChatName)
+	if err != nil {
+		panic(err)
+	}
+	mw := NewMW(adminConn)
+	admin := NewAdmin(chatConn, adminConn)
 	adminRouterGroup := router.Group("/account")
 	adminRouterGroup.POST("/login", admin.AdminLogin)                      // 登录
 	adminRouterGroup.POST("/update", mw.CheckAdmin, admin.AdminUpdateInfo) // 修改信息

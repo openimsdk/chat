@@ -15,26 +15,15 @@
 package api
 
 import (
-	"context"
-
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/a2r"
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/discoveryregistry"
 	"github.com/gin-gonic/gin"
+	"google.golang.org/grpc"
 
-	"github.com/OpenIMSDK/chat/pkg/common/config"
 	"github.com/OpenIMSDK/chat/pkg/proto/admin"
 	"github.com/OpenIMSDK/chat/pkg/proto/chat"
 )
 
-func NewAdmin(discov discoveryregistry.SvcDiscoveryRegistry) *Admin {
-	chatConn, err := discov.GetConn(context.Background(), config.Config.RpcRegisterName.OpenImChatName)
-	if err != nil {
-		panic(err)
-	}
-	adminConn, err := discov.GetConn(context.Background(), config.Config.RpcRegisterName.OpenImAdminName)
-	if err != nil {
-		panic(err)
-	}
+func NewAdmin(chatConn, adminConn grpc.ClientConnInterface) *Admin {
 	return &Admin{chatClient: chat.NewChatClient(chatConn), adminClient: admin.NewAdminClient(adminConn)}
 }
 
