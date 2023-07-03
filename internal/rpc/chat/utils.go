@@ -42,21 +42,21 @@ func DbToPbAttributes(attributes []*chat.Attribute) []*common.UserPublicInfo {
 
 func DbToPbUserFullInfo(attribute *chat.Attribute) *common.UserFullInfo {
 	return &common.UserFullInfo{
-		UserID:      attribute.UserID,
-		Password:    "",
-		Account:     attribute.Account,
-		PhoneNumber: attribute.PhoneNumber,
-		AreaCode:    attribute.AreaCode,
-		Email:       attribute.Email,
-		Nickname:    attribute.Nickname,
-		FaceURL:     attribute.FaceURL,
-		Gender:      attribute.Gender,
-		Level:       attribute.Level,
-		// Forbidden:      attribute.Forbidden,
-		Birth:          attribute.BirthTime.UnixMilli(),
-		AllowAddFriend: attribute.AllowAddFriend,
-		AllowBeep:      attribute.AllowBeep,
-		AllowVibration: attribute.AllowVibration,
+		UserID:           attribute.UserID,
+		Password:         "",
+		Account:          attribute.Account,
+		PhoneNumber:      attribute.PhoneNumber,
+		AreaCode:         attribute.AreaCode,
+		Email:            attribute.Email,
+		Nickname:         attribute.Nickname,
+		FaceURL:          attribute.FaceURL,
+		Gender:           attribute.Gender,
+		Level:            attribute.Level,
+		Birth:            attribute.BirthTime.UnixMilli(),
+		AllowAddFriend:   attribute.AllowAddFriend,
+		AllowBeep:        attribute.AllowBeep,
+		AllowVibration:   attribute.AllowVibration,
+		GlobalRecvMsgOpt: attribute.GlobalRecvMsgOpt,
 	}
 }
 

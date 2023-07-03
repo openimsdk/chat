@@ -60,6 +60,9 @@ func ToDBAttributeUpdate(req *chat.UpdateUserInfoReq) (map[string]any, error) {
 	if req.AllowVibration != nil {
 		update["allow_vibration"] = req.AllowVibration.Value
 	}
+	if req.GlobalRecvMsgOpt != nil {
+		update["global_recv_msg_opt"] = req.GlobalRecvMsgOpt.Value
+	}
 	if len(update) == 0 {
 		return nil, errs.ErrArgs.Wrap("no update info")
 	}

@@ -32,6 +32,7 @@ message UserFullInfo{
   int32  allowAddFriend = 12;
   int32  allowBeep = 13;
   int32  allowVibration = 14;
+  int32 globalRecvMsgOpt = 15;
 }
 
 message UserPublicInfo{

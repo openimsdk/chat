@@ -43,6 +43,7 @@ message UpdateUserInfoReq{
   OpenIMServer.protobuf.Int32Value  allowAddFriend = 11;
   OpenIMServer.protobuf.Int32Value  allowBeep = 12;
   OpenIMServer.protobuf.Int32Value  allowVibration = 13;
+  OpenIMServer.protobuf.Int32Value  globalRecvMsgOpt = 14;
 }
 
 message UpdateUserInfoResp{
