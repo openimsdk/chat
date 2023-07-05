@@ -110,3 +110,17 @@ func (o *ChatClient) UpdateUser(ctx context.Context, req *chat.UpdateUserInfoReq
 	_, err := o.client.UpdateUserInfo(ctx, req)
 	return err
 }
+
+func (o *ChatClient) GetAccountUser(ctx context.Context, opUserID string, operationID string, account string) (*chat.GetAccountUserResp, error) {
+	resp, err := o.client.GetAccountUser(ctx, &chat.GetAccountUserReq{
+		Operation: &common.Operation{
+			OpUserID:    opUserID,
+			OperationID: operationID,
+		},
+		AccountList: []string{account},
+	})
+	if err != nil {
+		return nil, err
+	}
+	return resp, nil
+}

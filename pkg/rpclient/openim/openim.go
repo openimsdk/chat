@@ -137,21 +137,3 @@ func (o *OpenIMClient) GetFriendID(ctx context.Context, userID string) ([]string
 func (o *OpenIMClient) SendMsg(ctx context.Context, req *msg.SendMsgReq) (*msg.SendMsgResp, error) {
 	return o.msg.SendMsg(ctx, req)
 }
-
-func (o *OpenIMClient) GetAccountUser(ctx context.Context, opUserID string, operationID string, account string) (*chat.GetAccountUserResp, error) {
-	client, err := o.getChatClient(ctx)
-	if err != nil {
-		return nil, err
-	}
-	resp, err := client.GetAccountUser(ctx, &chat.GetAccountUserReq{
-		Operation: &common.Operation{
-			OpUserID:    opUserID,
-			OperationID: operationID,
-		},
-		AccountList: []string{account},
-	})
-	if err != nil {
-		return nil, err
-	}
-	return resp, nil
-}

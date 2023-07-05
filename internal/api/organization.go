@@ -1,25 +1,19 @@
 package api
 
 import (
-	"context"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/a2r"
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/discoveryregistry"
 	"github.com/OpenIMSDK/chat/pkg/common/config"
 	"github.com/OpenIMSDK/chat/pkg/proto/chat"
 	"github.com/OpenIMSDK/chat/pkg/proto/organization"
 	"github.com/gin-gonic/gin"
+	"google.golang.org/grpc"
 )
 
-func NewOrg(discov discoveryregistry.SvcDiscoveryRegistry) *Org {
-	orgConn, err := discov.GetConn(context.Background(), config.Config.RpcRegisterName.OpenImOrganizationName)
-	if err != nil {
-		panic(err)
+func NewOrg(chatConn, orgConn grpc.ClientConnInterface) *Org {
+	return &Org{
+		organizationClient: organization.NewOrganizationClient(orgConn),
+		chatClient:         chat.NewChatClient(chatConn),
 	}
-	chatConn, err := discov.GetConn(context.Background(), config.Config.RpcRegisterName.OpenImChatName)
-	if err != nil {
-		panic(err)
-	}
-	return &Org{organizationClient: organization.NewOrganizationClient(orgConn), chatClient: chat.NewChatClient(chatConn)}
 }
 
 type Org struct {

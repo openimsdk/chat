@@ -26,9 +26,9 @@ var Config struct {
 		OpenImOrganizationPort []int `yaml:"openImOrganizationPort"`
 	} `yaml:"rpcPort"`
 	RpcRegisterName struct {
-		OpenImAdminName string `yaml:"openImAdminName"`
-		OpenImChatName  string `yaml:"openImChatName"`
-		OpenImOrganizationName string `yaml:"openImOrganizationName"
+		OpenImAdminName        string `yaml:"openImAdminName"`
+		OpenImChatName         string `yaml:"openImChatName"`
+		OpenImOrganizationName string `yaml:"openImOrganizationName"`
 	} `yaml:"rpcRegisterName"`
 	Mysql struct {
 		Address       *[]string `yaml:"address"`
@@ -69,5 +69,6 @@ var Config struct {
 			VerificationCodeTemplateCode string `yaml:"verificationCodeTemplateCode"`
 		} `yaml:"ali"`
 	} `yaml:"verifyCode"`
-	ProxyHeader string `yaml:"proxyHeader"`
+	ProxyHeader    string `yaml:"proxyHeader"`
+	ImportTemplate string `yaml:"importTemplate"`
 }
