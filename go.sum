@@ -35,6 +35,8 @@ github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
 github.com/OpenIMSDK/Open-IM-Server v0.0.0-20230702094900-7930a8bf851b h1:1LTQ1l+ACFf6j9655SDz/ls/olJz6yYdVlbJL0uWsus=
 github.com/OpenIMSDK/Open-IM-Server v0.0.0-20230702094900-7930a8bf851b/go.mod h1:sgp4idb/zDClK8RSct3EpRzYKIwKWi1d7mu6+En1RHI=
+github.com/OpenIMSDK/Open-IM-Server v0.0.0-20230705123117-b494c73328c7 h1:SrydfYQulXD+2mJkkExIzu2u1r0eumE/mgWE4K1hfxE=
+github.com/OpenIMSDK/Open-IM-Server v0.0.0-20230705123117-b494c73328c7/go.mod h1:TKF0pcxM9+CLGS9y7YAyqtiJ1qlWziuloJyCMlVeRGg=
 github.com/OpenIMSDK/Open-IM-Server v1.0.8-0.20230630091751-3c10e2bb65ce h1:yqYqsUXIucBZ94GyUAUvAVZVJa2AfgPDwVtxp9vt1Nc=
 github.com/OpenIMSDK/Open-IM-Server v1.0.8-0.20230630091751-3c10e2bb65ce/go.mod h1:sgp4idb/zDClK8RSct3EpRzYKIwKWi1d7mu6+En1RHI=
 github.com/OpenIMSDK/open_utils v1.0.8 h1:IopxWgJwEF5ZAPsRuiZZOfcxNOQOCt/p8VDENcHN9r4=
