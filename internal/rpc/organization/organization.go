@@ -899,9 +899,7 @@ func (o *organizationSvr) SortDepartmentList(ctx context.Context, req *organizat
 }
 
 func (o *organizationSvr) SortOrganizationUserList(ctx context.Context, req *organization.SortOrganizationUserListReq) (*organization.SortOrganizationUserListResp, error) {
-	resp := &organization.SortOrganizationUserListResp{}
-	// TODO 待实现
-	return resp, nil
+	return nil, errs.ErrInternalServer.Wrap("not implement")
 }
 
 func (o *organizationSvr) CreateNewOrganizationMember(ctx context.Context, req *organization.CreateNewOrganizationMemberReq) (*organization.CreateNewOrganizationMemberResp, error) {
@@ -919,11 +917,6 @@ func (o *organizationSvr) CreateNewOrganizationMember(ctx context.Context, req *
 	if len(req.DepartmentMemberList) > 0 {
 		departmentIDList := make([]string, 0, len(req.DepartmentMemberList))
 		for _, member := range req.DepartmentMemberList {
-			//if member.Position == "" {
-			//	resp.CommonResp.ErrCode = constant.FormattingError
-			//	resp.CommonResp.ErrMsg = "position is empty"
-			//	return resp, nil
-			//}
 			departmentIDList = append(departmentIDList, member.DepartmentID)
 		}
 		departments, err := o.Database.GetList(ctx, departmentIDList)
