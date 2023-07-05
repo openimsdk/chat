@@ -48,7 +48,7 @@ func readConfig() ([]byte, error) {
 		}
 		return data, nil
 	} else {
-		return os.ReadFile(fmt.Sprintf("./config/%s", "config.yaml"))
+		return os.ReadFile(fmt.Sprintf("../config/%s", "config.yaml"))
 	}
 }
 
