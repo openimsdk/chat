@@ -59,7 +59,7 @@ func NewChatRoute(router gin.IRouter, discov discoveryregistry.SvcDiscoveryRegis
 	router.Group("/callback").POST("/open_im", chat.OpenIMCallback) // 回调
 
 	org := NewOrg(chatConn, orgConn)
-	organizationGroup := router.Group("/organization", mw.CheckToken)
+	organizationGroup := router.Group("/organization")
 	{
 		//部门  增删改查
 		organizationGroup.POST("/create_department", mw.CheckAdmin, org.CreateDepartment) // 创建部门
