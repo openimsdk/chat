@@ -89,7 +89,6 @@ func NewChatRoute(router gin.IRouter, discov discoveryregistry.SvcDiscoveryRegis
 		organizationGroup.POST("/get_sub_department", mw.CheckToken, org.GetSubDepartment) // 获取部门的人和同级部门
 
 		organizationGroup.POST("/get_search_department_user", mw.CheckToken, org.GetSearchDepartmentUser) // 搜索部门和用户
-		organizationGroup.POST("/get_search_department_user_without_token", org.GetSearchDepartmentUserWithoutToken)
 
 		organizationGroup.POST("/get_organization_department", mw.CheckToken, org.GetOrganizationDepartment) // 获取组织部门
 

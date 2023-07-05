@@ -2,8 +2,12 @@ package config
 
 import _ "embed"
 
-//go:embed version
-var Version string
+var (
+	//go:embed version
+	Version string
+	//go:embed template.xlsx
+	ImportTemplate []byte
+)
 
 var Config struct {
 	Zookeeper struct {
