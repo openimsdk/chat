@@ -25,6 +25,7 @@ service_filename=(
   #rpc
   open_im_admin
   open_im_chat
+  open_im_organization
 )
 
 #service config port name
@@ -34,6 +35,7 @@ openImAdminApiPort
   #api port name
   openImAdminPort
   openImChatPort
+  openImOrganizationPort
 )
 
 service_prometheus_port_name=(
