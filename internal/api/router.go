@@ -142,7 +142,7 @@ func NewAdminRoute(router gin.IRouter, discov discoveryregistry.SvcDiscoveryRegi
 		organizationGroup.POST("/create_department", mw.CheckAdmin, org.CreateDepartment) // 创建部门
 		organizationGroup.POST("/update_department", mw.CheckAdmin, org.UpdateDepartment) // 修改部门
 		organizationGroup.POST("/delete_department", mw.CheckAdmin, org.DeleteDepartment) // 删除部门
-		organizationGroup.POST("/get_department", mw.CheckToken, org.GetDepartment)       // 获取部门
+		organizationGroup.POST("/get_department", mw.CheckAdmin, org.GetDepartment)       // 获取部门
 
 		//用户 增删改查
 		organizationGroup.POST("/create_organization_user", mw.CheckAdmin, org.CreateOrganizationUser) // 创建用户 在某个部门或公司中新增
