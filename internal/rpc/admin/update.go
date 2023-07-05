@@ -1,11 +1,27 @@
+// Copyright © 2023 OpenIM open source community. All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package admin
 
 import (
 	"crypto/md5"
 	"encoding/hex"
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
-	"github.com/OpenIMSDK/chat/pkg/proto/admin"
 	"time"
+
+	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
+
+	"github.com/OpenIMSDK/chat/pkg/proto/admin"
 )
 
 type Admin struct {
@@ -13,7 +29,7 @@ type Admin struct {
 	Password   string    `gorm:"column:password;type:char(64)"`
 	FaceURL    string    `gorm:"column:face_url;type:char(64)"`
 	Nickname   string    `gorm:"column:nickname;type:char(64)"`
-	UserID     string    `gorm:"column:user_id;type:char(64)"` //openIM userID
+	UserID     string    `gorm:"column:user_id;type:char(64)"` // openIM userID
 	Level      int32     `gorm:"column:level;default:1"  `
 	CreateTime time.Time `gorm:"column:create_time"`
 }
@@ -36,7 +52,7 @@ func ToDBAdminUpdate(req *admin.AdminUpdateInfoReq) (map[string]any, error) {
 		update["face_url"] = req.FaceURL.Value
 	}
 	if req.Nickname != nil {
-		if req.Nickname.Value != "" {
+		if req.Nickname.Value == "" {
 			return nil, errs.ErrArgs.Wrap("nickname is empty")
 		}
 		update["nickname"] = req.Nickname.Value
@@ -59,34 +75,6 @@ func ToDBAdminUpdatePassword(password string) (map[string]any, error) {
 	}
 	return map[string]any{"password": password}, nil
 }
-
-/*
-	Name       *wrapperspb.StringValue
-	AppID      *wrapperspb.StringValue
-	Icon       *wrapperspb.StringValue
-	Url        *wrapperspb.StringValue
-	Md5        *wrapperspb.StringValue
-	Size       *wrapperspb.Int64Value
-	Version    *wrapperspb.StringValue
-	Priority   *wrapperspb.UInt32Value
-	Status     *wrapperspb.UInt32Value
-	CreateTime *wrapperspb.Int64Value
-*/
-/*
-type Applet struct {
-	ID         string    `gorm:"column:id;primary_key;size:64"`
-	Name       string    `gorm:"column:name;size:64"`
-	AppID      string    `gorm:"column:app_id;uniqueIndex;size:255"`
-	Icon       string    `gorm:"column:icon;size:255"`
-	URL        string    `gorm:"column:url;size:255"`
-	MD5        string    `gorm:"column:md5;size:255"`
-	Size       int64     `gorm:"column:size"`
-	Version    string    `gorm:"column:version;size:64"`
-	Priority   uint32    `gorm:"column:priority;size:64"`
-	Status     uint8     `gorm:"column:status"`
-	CreateTime time.Time `gorm:"column:create_time;autoCreateTime;size:64"`
-}
-*/
 
 func ToDBAppletUpdate(req *admin.UpdateAppletReq) (map[string]any, error) {
 	update := make(map[string]any)

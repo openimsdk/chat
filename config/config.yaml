@@ -4,58 +4,67 @@ zookeeper:
     - 127.0.0.1:2181
   userName: ""
   password: ""
-chatapi:
+
+chatApi:
   openImChatApiPort: [ 10008 ]
-  listenIP: 0.0.0.0
-adminapi:
+  listenIP:
+
+adminApi:
   openImAdminApiPort: [ 10009 ]
-  listenIP: 0.0.0.0
-organizationapi:
-  openImOrganizationApiPort: [ 10010 ]
-  listenIP: 0.0.0.0
-rpcport:
+  listenIP:
+
+rpcPort:
   openImAdminPort: [ 30200 ]
   openImChatPort: [ 30300 ]
   openImOrganizationPort: [ 30400 ]
-rpcregistername:
+rpcRegisterName:
   openImAdminName: admin
   openImChatName: chat
   openImOrganizationName: organization
+
+# 没有配置表示和OpenIM一致
 mysql:
-  # 没有配置代表和openIM保持一致
-  # dbMysqlAddress: [ 127.0.0.1:13306 ] #mysql地址 目前仅支持单机，默认即可
-  # dbMysqlUserName: root #mysql用户名，建议修改
-  # dbMysqlPassword: openIM123 # mysql密码，建议修改
-  # dbTableName: eMsg #默认即可
-  # dbMsgTableNum: 1
-  # dbMaxOpenConns: 100
-  # dbMaxIdleConns: 10
-  # dbMaxLifeTime: 5
-  # logLevel: 4 #1=slient 2=error 3=warn 4=info
-  # slowThreshold: 500
-  dbMysqlDatabaseName: openim_enterprise
+  #  address: [ 127.0.0.1:13306 ]            #目前仅支持单机
+  #  username: root                          #用户名
+  #  password: openIM123                     #密码
+  #  database: openIM_v2                     #不建议修改
+  #  maxOpenConn: 1000                       #最大连接数
+  #  maxIdleConn: 100                        #最大空闲连接数
+  #  maxLifeTime: 60                         #连接可以重复使用的最长时间（秒）
+  #  logLevel: 4                             #日志级别 1=slient 2=error 3=warn 4=info
+  #  slowThreshold: 500                      #慢语句阈值 （毫秒）
+  database: openim_enterprise
 
-tokenPolicy:
-  accessSecret: "openIM123"
-  accessExpire: 86400
+# 没有配置表示和OpenIM一致
+#log:
+#  storageLocation: ../logs/           #存放目录
+#  rotationTime: 24                    #日志旋转时间
+#  remainRotationCount: 2              #日志数量
+#  remainLogLevel: 6                   #日志级别 6表示全都打印，
+#  isStdout: false
+#  isJson: false
+#  withStack: false
 
-verifycode:
+#secret: "tuoyun"
+#tokenPolicy:
+#  expire: 86400
+
+verifyCode:
   validTime: 300 # 验证码有效时间
   validCount: 5 # 验证码有效次数
   uintTime: 86400 # 单位时间间隔
   maxCount: 10 # 单位时间内最大获取次数
   superCode: "666666" # 超级验证码(只有use为空时使用)
   len: 6 # 验证码长度
-  use: "" # 使用的验证码服务(use: "Ali")
-  Ali:
+  use: "" # 使用的验证码服务(use: "ali")
+  ali:
     endpoint: "dysmsapi.aliyuncs.com"
     accessKeyId: ""
     accessKeySecret: ""
     signName: ""
     verificationCodeTemplateCode: ""
 
-proxyheader: "" # 获取ip的header 空字符串没有代理
-#proxyheader: "X-Forwarded-For"
-businessServerAddress: "http://127.0.0.1:10008"
+# 获取ip的header,没有配置直接获取远程地址
+#proxyHeader: "X-Forwarded-For"
 
 importTemplate: "template.xlsx" # 批量导入模板

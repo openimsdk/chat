@@ -2,7 +2,7 @@ module github.com/OpenIMSDK/chat
 
 go 1.18
 
-// go get -u github.com/OpenIMSDK/Open-IM-Server@ver3
+// go get -u github.com/OpenIMSDK/Open-IM-Server@main
 require (
 	github.com/OpenIMSDK/open_utils v1.0.8
 	github.com/gin-gonic/gin v1.9.1
@@ -15,7 +15,7 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/sirupsen/logrus v1.9.0 // indirect
 	google.golang.org/grpc v1.55.0
-	google.golang.org/protobuf v1.30.0
+	google.golang.org/protobuf v1.31.0
 	gopkg.in/yaml.v3 v3.0.1
 	gorm.io/driver/mysql v1.3.5
 	gorm.io/gorm v1.23.8
@@ -24,6 +24,7 @@ require (
 require (
 	github.com/OpenIMSDK/Open-IM-Server v1.0.8-0.20230621033912-41023a440474
 	github.com/OpenIMSDK/open_log v1.0.0
+	github.com/OpenIMSDK/Open-IM-Server v0.0.0-20230702094900-7930a8bf851b
 	github.com/alibabacloud-go/darabonba-openapi v0.2.1
 	github.com/alibabacloud-go/dysmsapi-20170525/v2 v2.0.18
 	github.com/alibabacloud-go/tea v1.1.20
@@ -39,7 +40,6 @@ require (
 	github.com/alibabacloud-go/tea-utils v1.4.5 // indirect
 	github.com/alibabacloud-go/tea-xml v1.1.2 // indirect
 	github.com/aliyun/credentials-go v1.1.2 // indirect
-	github.com/antonfisher/nested-logrus-formatter v1.3.1 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bwmarrin/snowflake v0.3.0 // indirect
 	github.com/bytedance/sonic v1.9.1 // indirect
@@ -95,7 +95,6 @@ require (
 	github.com/prometheus/procfs v0.8.0 // indirect
 	github.com/rcrowley/go-metrics v0.0.0-20201227073835-cf1acfcdf475 // indirect
 	github.com/redis/go-redis/v9 v9.0.5 // indirect
-	github.com/rifflock/lfshook v0.0.0-20180920164130-b9218ef580f5 // indirect
 	github.com/rs/xid v1.2.1 // indirect
 	github.com/tencentyun/qcloud-cos-sts-sdk v0.0.0-20210325043845-84a0811633ca // indirect
 	github.com/tjfoc/gmsm v1.3.2 // indirect

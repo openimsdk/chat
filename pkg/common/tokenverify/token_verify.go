@@ -1,3 +1,17 @@
+// Copyright © 2023 OpenIM open source community. All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package tokenverify
 
 import (
@@ -20,26 +34,26 @@ type claims struct {
 	jwt.RegisteredClaims
 }
 
-func buildClaims(userID string, userType int32, ttlDay int64) claims {
+func buildClaims(userID string, userType int32, ttl int64) claims {
 	now := time.Now()
 	before := now.Add(-time.Minute * 5)
 	return claims{
 		UserID:   userID,
 		UserType: userType,
 		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(now.Add(time.Duration(ttlDay*24) * time.Hour)), //Expiration time
-			IssuedAt:  jwt.NewNumericDate(now),                                           //Issuing time
-			NotBefore: jwt.NewNumericDate(before),                                        //Begin Effective time
+			ExpiresAt: jwt.NewNumericDate(now.Add(time.Duration(ttl*24) * time.Hour)), //Expiration time
+			IssuedAt:  jwt.NewNumericDate(now),                                        //Issuing time
+			NotBefore: jwt.NewNumericDate(before),                                     //Begin Effective time
 		}}
 }
 
-func CreateToken(UserID string, userType int32, ttlDay int64) (string, error) {
+func CreateToken(UserID string, userType int32, ttl int64) (string, error) {
 	if !(userType == TokenUser || userType == TokenAdmin) {
 		return "", errs.ErrTokenUnknown.Wrap("token type unknown")
 	}
-	claims := buildClaims(UserID, userType, ttlDay)
+	claims := buildClaims(UserID, userType, ttl)
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString([]byte(config.Config.TokenPolicy.AccessSecret))
+	tokenString, err := token.SignedString([]byte(*config.Config.Secret))
 	if err != nil {
 		return "", utils.Wrap(err, "")
 	}
@@ -48,7 +62,7 @@ func CreateToken(UserID string, userType int32, ttlDay int64) (string, error) {
 
 func secret() jwt.Keyfunc {
 	return func(token *jwt.Token) (interface{}, error) {
-		return []byte(config.Config.TokenPolicy.AccessSecret), nil
+		return []byte(*config.Config.Secret), nil
 	}
 }
 

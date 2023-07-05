@@ -1,8 +1,22 @@
+// Copyright © 2023 OpenIM open source community. All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package config
 
 import (
 	"bytes"
-	"encoding/json"
+	"errors"
 	"fmt"
 	openIMConfig "github.com/OpenIMSDK/Open-IM-Server/pkg/common/config"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/constant"
@@ -52,21 +66,35 @@ func InitConfig() error {
 	if err != nil {
 		return fmt.Errorf("conn zk error: %w", err)
 	}
-	openIMConfigData, err := zk.GetConfFromRegistry(constant.OpenIMCommonConfigKey)
-	if err != nil {
-		return fmt.Errorf("get zk config: %w", err)
+	var openIMConfigData []byte
+	for i := 0; i < 100; i++ {
+		var err error
+		configData, err := zk.GetConfFromRegistry(constant.OpenIMCommonConfigKey)
+		if err != nil {
+			fmt.Printf("get zk config [%d] error: %v\n", i, err)
+			time.Sleep(time.Second)
+			continue
+		}
+		if len(configData) == 0 {
+			fmt.Printf("get zk config [%d] data is empty\n", i)
+			time.Sleep(time.Second)
+			continue
+		}
+		openIMConfigData = configData
+	}
+	if len(openIMConfigData) == 0 {
+		return errors.New("get zk config data failed")
 	}
 	if err := yaml.NewDecoder(bytes.NewReader(openIMConfigData)).Decode(&openIMConfig.Config); err != nil {
 		return fmt.Errorf("parse zk openIMConfig: %w", err)
 	}
-
-	configFieldCopy(&Config.Mysql.DBAddress, openIMConfig.Config.Mysql.DBAddress)
-	configFieldCopy(&Config.Mysql.DBUserName, openIMConfig.Config.Mysql.DBUserName)
-	configFieldCopy(&Config.Mysql.DBPassword, openIMConfig.Config.Mysql.DBPassword)
-	configFieldCopy(&Config.Mysql.DBDatabaseName, openIMConfig.Config.Mysql.DBDatabaseName)
-	configFieldCopy(&Config.Mysql.DBMaxOpenConns, openIMConfig.Config.Mysql.DBMaxOpenConns)
-	configFieldCopy(&Config.Mysql.DBMaxIdleConns, openIMConfig.Config.Mysql.DBMaxIdleConns)
-	configFieldCopy(&Config.Mysql.DBMaxLifeTime, openIMConfig.Config.Mysql.DBMaxLifeTime)
+	configFieldCopy(&Config.Mysql.Address, openIMConfig.Config.Mysql.Address)
+	configFieldCopy(&Config.Mysql.Username, openIMConfig.Config.Mysql.Username)
+	configFieldCopy(&Config.Mysql.Password, openIMConfig.Config.Mysql.Password)
+	configFieldCopy(&Config.Mysql.Database, openIMConfig.Config.Mysql.Database)
+	configFieldCopy(&Config.Mysql.MaxOpenConn, openIMConfig.Config.Mysql.MaxOpenConn)
+	configFieldCopy(&Config.Mysql.MaxIdleConn, openIMConfig.Config.Mysql.MaxIdleConn)
+	configFieldCopy(&Config.Mysql.MaxLifeTime, openIMConfig.Config.Mysql.MaxLifeTime)
 	configFieldCopy(&Config.Mysql.LogLevel, openIMConfig.Config.Mysql.LogLevel)
 	configFieldCopy(&Config.Mysql.SlowThreshold, openIMConfig.Config.Mysql.SlowThreshold)
 
@@ -78,11 +106,14 @@ func InitConfig() error {
 	configFieldCopy(&Config.Log.WithStack, openIMConfig.Config.Log.WithStack)
 	configFieldCopy(&Config.Log.IsJson, openIMConfig.Config.Log.IsJson)
 
-	jsonData, err := json.Marshal(Config)
+	configFieldCopy(&Config.Secret, openIMConfig.Config.Secret)
+	configFieldCopy(&Config.TokenPolicy.Expire, openIMConfig.Config.TokenPolicy.Expire)
+
+	configData, err := yaml.Marshal(&Config)
 	if err != nil {
 		return err
 	}
-	fmt.Println(string(jsonData))
+	fmt.Printf("%s\nconfig:\n%s\n", time.Now(), string(configData))
 
 	return nil
 }

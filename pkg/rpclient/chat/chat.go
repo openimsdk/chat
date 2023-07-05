@@ -1,10 +1,26 @@
+// Copyright © 2023 OpenIM open source community. All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package chat
 
 import (
 	"context"
+
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/discoveryregistry"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/utils"
+
 	"github.com/OpenIMSDK/chat/pkg/common/config"
 	"github.com/OpenIMSDK/chat/pkg/proto/chat"
 	"github.com/OpenIMSDK/chat/pkg/proto/common"
@@ -15,21 +31,20 @@ func NewChatClient(discov discoveryregistry.SvcDiscoveryRegistry) *ChatClient {
 	if err != nil {
 		panic(err)
 	}
-	client := chat.NewChatClient(conn)
-	return &ChatClient{Client: client}
+	return &ChatClient{
+		client: chat.NewChatClient(conn),
+	}
 }
 
 type ChatClient struct {
-	Client chat.ChatClient
+	client chat.ChatClient
 }
-
-//type ChatClient Chat
 
 func (o *ChatClient) FindUserPublicInfo(ctx context.Context, userIDs []string) ([]*common.UserPublicInfo, error) {
 	if len(userIDs) == 0 {
 		return []*common.UserPublicInfo{}, nil
 	}
-	resp, err := o.Client.FindUserPublicInfo(ctx, &chat.FindUserPublicInfoReq{UserIDs: userIDs})
+	resp, err := o.client.FindUserPublicInfo(ctx, &chat.FindUserPublicInfoReq{UserIDs: userIDs})
 	if err != nil {
 		return nil, err
 	}
@@ -50,7 +65,7 @@ func (o *ChatClient) FindUserFullInfo(ctx context.Context, userIDs []string) ([]
 	if len(userIDs) == 0 {
 		return []*common.UserFullInfo{}, nil
 	}
-	resp, err := o.Client.FindUserFullInfo(ctx, &chat.FindUserFullInfoReq{UserIDs: userIDs})
+	resp, err := o.client.FindUserFullInfo(ctx, &chat.FindUserFullInfoReq{UserIDs: userIDs})
 	if err != nil {
 		return nil, err
 	}
@@ -92,6 +107,6 @@ func (o *ChatClient) GetUserPublicInfo(ctx context.Context, userID string) (*com
 }
 
 func (o *ChatClient) UpdateUser(ctx context.Context, req *chat.UpdateUserInfoReq) error {
-	_, err := o.Client.UpdateUserInfo(ctx, req)
+	_, err := o.client.UpdateUserInfo(ctx, req)
 	return err
 }

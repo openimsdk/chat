@@ -2,33 +2,32 @@
 
 ## 修改配置项
 
-参考config/config.yaml的配置说明，重点关注与DB相关的配置项，以保持和IM一致。
+参考config/config.yaml的配置说明
 
 ## 编译
 
 ```
-cd script
-./batch_build_all_service.sh
+cd scripts
+./build_all_service.sh
 ```
 
 ## 启动
 
  ```
- cd script
+ cd scripts
  ./start_all.sh
  ```
 
 ## 检测
 
  ```
-cd script
+cd scripts
 ./check_all.sh
  ```
 
 ## 停止
 
  ```
-cd script
+cd scripts
 ./stop_all.sh
  ```
-

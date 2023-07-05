@@ -1,14 +1,31 @@
+// Copyright © 2023 OpenIM open source community. All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package database
 
 import (
 	"context"
+
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/db/tx"
+	"gorm.io/gorm"
+
 	"github.com/OpenIMSDK/chat/pkg/common/db/model/admin"
 	table "github.com/OpenIMSDK/chat/pkg/common/db/table/admin"
-	"gorm.io/gorm"
 )
 
 type AdminDatabaseInterface interface {
+	InitAdmin(ctx context.Context) error
 	GetAdmin(ctx context.Context, account string) (*table.Admin, error)
 	GetAdminUserID(ctx context.Context, userID string) (*table.Admin, error)
 	UpdateAdmin(ctx context.Context, userID string, update map[string]any) error
@@ -77,6 +94,10 @@ type AdminDatabase struct {
 	registerAddGroup   table.RegisterAddGroupInterface
 	applet             table.AppletInterface
 	clientConfig       table.ClientConfigInterface
+}
+
+func (o *AdminDatabase) InitAdmin(ctx context.Context) error {
+	return o.admin.InitAdmin(ctx)
 }
 
 func (o *AdminDatabase) GetAdmin(ctx context.Context, account string) (*table.Admin, error) {
@@ -182,12 +203,15 @@ func (o *AdminDatabase) SearchDefaultFriend(ctx context.Context, keyword string,
 func (o *AdminDatabase) FindDefaultGroup(ctx context.Context, groupIDs []string) ([]string, error) {
 	return o.registerAddGroup.FindGroupID(ctx, groupIDs)
 }
+
 func (o *AdminDatabase) AddDefaultGroup(ctx context.Context, ms []*table.RegisterAddGroup) error {
 	return o.registerAddGroup.Add(ctx, ms)
 }
+
 func (o *AdminDatabase) DelDefaultGroup(ctx context.Context, groupIDs []string) error {
 	return o.registerAddGroup.Del(ctx, groupIDs)
 }
+
 func (o *AdminDatabase) SearchDefaultGroup(ctx context.Context, keyword string, page int32, size int32) (uint32, []*table.RegisterAddGroup, error) {
 	return o.registerAddGroup.Search(ctx, keyword, page, size)
 }
@@ -207,6 +231,7 @@ func (o *AdminDatabase) BlockUser(ctx context.Context, f []*table.ForbiddenAccou
 func (o *AdminDatabase) DelBlockUser(ctx context.Context, userID []string) error {
 	return o.forbiddenAccount.Delete(ctx, userID)
 }
+
 func (o *AdminDatabase) SearchBlockUser(ctx context.Context, keyword string, page int32, size int32) (uint32, []*table.ForbiddenAccount, error) {
 	return o.forbiddenAccount.Search(ctx, keyword, page, size)
 }
