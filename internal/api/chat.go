@@ -31,18 +31,19 @@ import (
 	"github.com/OpenIMSDK/chat/pkg/proto/chat"
 )
 
-func NewChat(chatConn, adminConn grpc.ClientConnInterface) *Chat {
-	return &Chat{chatClient: chat.NewChatClient(chatConn), adminClient: admin.NewAdminClient(adminConn)}
+func NewChat(chatConn, adminConn grpc.ClientConnInterface) *ChatApi {
+
+	return &ChatApi{chatClient: chat.NewChatClient(chatConn), adminClient: admin.NewAdminClient(adminConn)}
 }
 
-type Chat struct {
+type ChatApi struct {
 	chatClient  chat.ChatClient
 	adminClient admin.AdminClient
 }
 
 // ################## ACCOUNT ##################
 
-func (o *Chat) SendVerifyCode(c *gin.Context) {
+func (o *ChatApi) SendVerifyCode(c *gin.Context) {
 	var req chat.SendVerifyCodeReq
 	if err := c.BindJSON(&req); err != nil {
 		apiresp.GinError(c, err)
@@ -62,11 +63,11 @@ func (o *Chat) SendVerifyCode(c *gin.Context) {
 	apiresp.GinSuccess(c, resp)
 }
 
-func (o *Chat) VerifyCode(c *gin.Context) {
+func (o *ChatApi) VerifyCode(c *gin.Context) {
 	a2r.Call(chat.ChatClient.VerifyCode, o.chatClient, c)
 }
 
-func (o *Chat) RegisterUser(c *gin.Context) {
+func (o *ChatApi) RegisterUser(c *gin.Context) {
 	var req chat.RegisterUserReq
 	if err := c.BindJSON(&req); err != nil {
 		apiresp.GinError(c, err)
@@ -87,7 +88,7 @@ func (o *Chat) RegisterUser(c *gin.Context) {
 	// a2r.Call(chat.ChatClient.RegisterUser, o.chatClient, c)
 }
 
-func (o *Chat) Login(c *gin.Context) {
+func (o *ChatApi) Login(c *gin.Context) {
 	var req chat.LoginReq
 	if err := c.BindJSON(&req); err != nil {
 		apiresp.GinError(c, err)
@@ -107,55 +108,55 @@ func (o *Chat) Login(c *gin.Context) {
 	apiresp.GinSuccess(c, resp)
 }
 
-func (o *Chat) ResetPassword(c *gin.Context) {
+func (o *ChatApi) ResetPassword(c *gin.Context) {
 	a2r.Call(chat.ChatClient.ResetPassword, o.chatClient, c)
 }
 
-func (o *Chat) ChangePassword(c *gin.Context) {
+func (o *ChatApi) ChangePassword(c *gin.Context) {
 	a2r.Call(chat.ChatClient.ChangePassword, o.chatClient, c)
 }
 
 // ################## USER ##################
 
-func (o *Chat) UpdateUserInfo(c *gin.Context) {
+func (o *ChatApi) UpdateUserInfo(c *gin.Context) {
 	a2r.Call(chat.ChatClient.UpdateUserInfo, o.chatClient, c)
 }
 
-func (o *Chat) FindUserPublicInfo(c *gin.Context) {
+func (o *ChatApi) FindUserPublicInfo(c *gin.Context) {
 	a2r.Call(chat.ChatClient.FindUserPublicInfo, o.chatClient, c)
 }
 
-func (o *Chat) FindUserFullInfo(c *gin.Context) {
+func (o *ChatApi) FindUserFullInfo(c *gin.Context) {
 	a2r.Call(chat.ChatClient.FindUserFullInfo, o.chatClient, c)
 }
 
-//func (o *Chat) GetUsersFullInfo(c *gin.Context) {
+//func (o *ChatApi) GetUsersFullInfo(c *gin.Context) {
 //	a2r.Call(chat.ChatClient.GetUsersFullInfo, o.chatClient, c)
 //}
 
-func (o *Chat) SearchUserFullInfo(c *gin.Context) {
+func (o *ChatApi) SearchUserFullInfo(c *gin.Context) {
 	a2r.Call(chat.ChatClient.SearchUserFullInfo, o.chatClient, c)
 }
 
-func (o *Chat) SearchUserPublicInfo(c *gin.Context) {
+func (o *ChatApi) SearchUserPublicInfo(c *gin.Context) {
 	a2r.Call(chat.ChatClient.SearchUserPublicInfo, o.chatClient, c)
 }
 
 // ################## APPLET ##################
 
-func (o *Chat) FindApplet(c *gin.Context) {
+func (o *ChatApi) FindApplet(c *gin.Context) {
 	a2r.Call(admin.AdminClient.FindApplet, o.adminClient, c)
 }
 
 // ################## CONFIG ##################
 
-func (o *Chat) GetClientConfig(c *gin.Context) {
+func (o *ChatApi) GetClientConfig(c *gin.Context) {
 	a2r.Call(admin.AdminClient.GetClientConfig, o.adminClient, c)
 }
 
 // ################## CALLBACK ##################
 
-func (o *Chat) OpenIMCallback(c *gin.Context) {
+func (o *ChatApi) OpenIMCallback(c *gin.Context) {
 	body, err := io.ReadAll(c.Request.Body)
 	if err != nil {
 		apiresp.GinError(c, err)
@@ -172,7 +173,7 @@ func (o *Chat) OpenIMCallback(c *gin.Context) {
 	apiresp.GinSuccess(c, nil)
 }
 
-func (o *Chat) getClientIP(c *gin.Context) (string, error) {
+func (o *ChatApi) getClientIP(c *gin.Context) (string, error) {
 	if config.Config.ProxyHeader == "" {
 		ip, _, err := net.SplitHostPort(c.Request.RemoteAddr)
 		return ip, err
