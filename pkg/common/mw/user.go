@@ -10,7 +10,7 @@ import (
 )
 
 func AddUserType() grpc.DialOption {
-	return grpc.WithUnaryInterceptor(func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
+	return grpc.WithChainUnaryInterceptor(func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
 		log.ZInfo(ctx, "add user type", "method", method)
 		if arr, _ := ctx.Value(constant.RpcOpUserType).([]string); len(arr) > 0 {
 			userType, err := strconv.Atoi(arr[0])

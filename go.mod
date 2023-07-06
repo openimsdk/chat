@@ -22,7 +22,7 @@ require (
 )
 
 require (
-	github.com/OpenIMSDK/Open-IM-Server v0.0.0-20230705123117-b494c73328c7
+	github.com/OpenIMSDK/Open-IM-Server v0.0.0-20230706032357-ff22ea71086a
 	github.com/alibabacloud-go/darabonba-openapi v0.2.1
 	github.com/alibabacloud-go/dysmsapi-20170525/v2 v2.0.18
 	github.com/alibabacloud-go/tea v1.1.20
