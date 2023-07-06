@@ -29,10 +29,10 @@ func Start(rpcPort int, rpcRegisterName string, prometheusPort int, rpcFn func(c
 		openKeeper.WithFreq(time.Hour), openKeeper.WithUserNameAndPassword(config.Config.Zookeeper.Username,
 			config.Config.Zookeeper.Password), openKeeper.WithRoundRobin(), openKeeper.WithTimeout(10), openKeeper.WithLogger(log.NewZkLogger()))
 	if err != nil {
-		return utils.Wrap1(err)
+		return errs.Wrap(err)
 	}
 	defer zkClient.CloseZK()
-	zkClient.AddOption(chatMw.AddUserType(), mw.GrpcClient(), grpc.WithTransportCredentials(insecure.NewCredentials()))
+	zkClient.AddOption(mw.GrpcClient(), chatMw.AddUserType(), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	registerIP, err := network.GetRpcRegisterIP(config.Config.Rpc.RegisterIP)
 	if err != nil {
 		return err
