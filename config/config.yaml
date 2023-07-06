@@ -17,7 +17,7 @@ zookeeper:
   schema: openim
   zkAddr:
     - 127.0.0.1:2181
-  userName: ""
+  username: ""
   password: ""
 
 chatApi:
@@ -27,6 +27,10 @@ chatApi:
 adminApi:
   openImAdminApiPort: [ 10009 ]
   listenIP:
+
+rpc:
+  registerIP:                             #作为rpc启动时，注册到zookeeper的IP，api/gateway能访问到此ip和对应的rpcPort中的端口
+  listenIP:                               #默认为0.0.0.0
 
 rpcPort:
   openImAdminPort: [ 30200 ]

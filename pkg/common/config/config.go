@@ -23,7 +23,7 @@ var Config struct {
 	Zookeeper struct {
 		Schema   string   `yaml:"schema"`
 		ZkAddr   []string `yaml:"zkAddr"`
-		UserName string   `yaml:"userName"`
+		Username string   `yaml:"username"`
 		Password string   `yaml:"password"`
 	} `yaml:"zookeeper"`
 	ChatApi struct {
@@ -34,6 +34,10 @@ var Config struct {
 		GinPort  []int  `yaml:"openImAdminApiPort"`
 		ListenIP string `yaml:"listenIP"`
 	} `yaml:"adminApi"`
+	Rpc struct {
+		RegisterIP string `yaml:"registerIP"`
+		ListenIP   string `yaml:"listenIP"`
+	} `yaml:"rpc"`
 	RpcPort struct {
 		OpenImAdminPort []int `yaml:"openImAdminPort"`
 		OpenImChatPort  []int `yaml:"openImChatPort"`
