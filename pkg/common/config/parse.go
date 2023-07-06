@@ -61,7 +61,7 @@ func InitConfig() error {
 		return fmt.Errorf("parse loacl openIMConfig file error: %w", err)
 	}
 	zk, err := openKeeper.NewClient(Config.Zookeeper.ZkAddr, Config.Zookeeper.Schema,
-		openKeeper.WithFreq(time.Hour), openKeeper.WithUserNameAndPassword(Config.Zookeeper.UserName,
+		openKeeper.WithFreq(time.Hour), openKeeper.WithUserNameAndPassword(Config.Zookeeper.Username,
 			Config.Zookeeper.Password), openKeeper.WithRoundRobin(), openKeeper.WithTimeout(10), openKeeper.WithLogger(&zkLogger{}))
 	if err != nil {
 		return fmt.Errorf("conn zk error: %w", err)
