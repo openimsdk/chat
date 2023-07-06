@@ -2,6 +2,7 @@ package mw
 
 import (
 	"context"
+	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/log"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
 	"github.com/OpenIMSDK/chat/pkg/common/constant"
 	"google.golang.org/grpc"
@@ -15,6 +16,7 @@ func AddUserType() grpc.DialOption {
 			if err != nil {
 				return errs.ErrInternalServer.Wrap("user type is not int")
 			}
+			log.ZInfo(ctx, "add user type", "method", method, "userType", userType)
 			headers, _ := ctx.Value(constant.RpcCustomHeader).([]string)
 			ctx = context.WithValue(ctx, constant.RpcCustomHeader, append(headers, constant.RpcOpUserType))
 			ctx = context.WithValue(ctx, constant.RpcOpUserType, userType)
