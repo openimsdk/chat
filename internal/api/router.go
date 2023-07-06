@@ -71,8 +71,8 @@ func NewAdminRoute(router gin.IRouter, discov discoveryregistry.SvcDiscoveryRegi
 	adminRouterGroup.POST("/update", mw.CheckAdmin, admin.AdminUpdateInfo) // 修改信息
 	adminRouterGroup.POST("/info", mw.CheckAdmin, admin.AdminInfo)         // 获取信息
 
-	defaultRouter := router.Group("/default")
-	defaultUserRouter := defaultRouter.Group("/user", mw.CheckAdmin)
+	defaultRouter := router.Group("/default", mw.CheckAdmin)
+	defaultUserRouter := defaultRouter.Group("/user")
 	defaultUserRouter.POST("/add", admin.AddDefaultFriend)       // 添加注册时默认好友
 	defaultUserRouter.POST("/del", admin.DelDefaultFriend)       // 删除注册时默认好友
 	defaultUserRouter.POST("/find", admin.FindDefaultFriend)     // 默认好友列表
