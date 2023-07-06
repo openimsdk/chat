@@ -16,6 +16,8 @@ package admin
 
 import (
 	"context"
+	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/log"
+	"github.com/OpenIMSDK/chat/pkg/common/constant"
 	"strings"
 	"time"
 
@@ -99,6 +101,7 @@ func (o *adminServer) SearchBlockUser(ctx context.Context, req *admin.SearchBloc
 	if _, err := mctx.CheckAdmin(ctx); err != nil {
 		return nil, err
 	}
+	log.ZInfo(ctx, "SearchBlockUser", "RpcOpUserID", ctx.Value(constant.RpcOpUserID), "RpcOpUserType", ctx.Value(constant.RpcOpUserType))
 	total, infos, err := o.Database.SearchBlockUser(ctx, req.Keyword, req.Pagination.PageNumber, req.Pagination.ShowNumber)
 	if err != nil {
 		return nil, err
