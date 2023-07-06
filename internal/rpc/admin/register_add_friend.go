@@ -50,7 +50,7 @@ func (o *adminServer) AddDefaultFriend(ctx context.Context, req *admin.AddDefaul
 		return nil, err
 	}
 	if len(exists) > 0 {
-		return nil, errs.ErrUserIDExisted.Wrap(strings.Join(exists, ", "))
+		return nil, errs.ErrDuplicateKey.Wrap(strings.Join(exists, ", "))
 	}
 	now := time.Now()
 	ms := make([]*admin2.RegisterAddFriend, 0, len(req.UserIDs))
