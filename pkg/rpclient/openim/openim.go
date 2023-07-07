@@ -100,6 +100,9 @@ func (o *OpenIMClient) UserToken(ctx context.Context, userID string, platformID 
 }
 
 func (o *OpenIMClient) FindGroup(ctx context.Context, groupIDs []string) ([]*sdkws.GroupInfo, error) {
+	if len(groupIDs) == 0 {
+		return []*sdkws.GroupInfo{}, nil
+	}
 	resp, err := o.group.GetGroupsInfo(ctx, &group.GetGroupsInfoReq{GroupIDs: groupIDs})
 	if err != nil {
 		return nil, err
