@@ -16,6 +16,7 @@ package admin
 
 import (
 	"context"
+	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/log"
 	"time"
 
 	admin2 "github.com/OpenIMSDK/chat/pkg/common/db/table/admin"
@@ -24,6 +25,7 @@ import (
 )
 
 func (o *adminServer) SearchIPForbidden(ctx context.Context, req *admin.SearchIPForbiddenReq) (*admin.SearchIPForbiddenResp, error) {
+	defer log.ZDebug(ctx, "return")
 	if _, err := mctx.CheckAdmin(ctx); err != nil {
 		return nil, err
 	}
@@ -47,6 +49,7 @@ func (o *adminServer) SearchIPForbidden(ctx context.Context, req *admin.SearchIP
 }
 
 func (o *adminServer) AddIPForbidden(ctx context.Context, req *admin.AddIPForbiddenReq) (*admin.AddIPForbiddenResp, error) {
+	defer log.ZDebug(ctx, "return")
 	if _, err := mctx.CheckAdmin(ctx); err != nil {
 		return nil, err
 	}
@@ -67,6 +70,7 @@ func (o *adminServer) AddIPForbidden(ctx context.Context, req *admin.AddIPForbid
 }
 
 func (o *adminServer) DelIPForbidden(ctx context.Context, req *admin.DelIPForbiddenReq) (*admin.DelIPForbiddenResp, error) {
+	defer log.ZDebug(ctx, "return")
 	if _, err := mctx.CheckAdmin(ctx); err != nil {
 		return nil, err
 	}

@@ -30,6 +30,7 @@ import (
 )
 
 func (o *chatSvr) OpenIMCallback(ctx context.Context, req *chat.OpenIMCallbackReq) (*chat.OpenIMCallbackResp, error) {
+	defer log.ZDebug(ctx, "return")
 	switch req.Command {
 	case constant.CallbackBeforeAddFriendCommand:
 		var data callbackstruct.CallbackBeforeAddFriendReq

@@ -16,6 +16,7 @@ package admin
 
 import (
 	"context"
+	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/log"
 
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
 
@@ -24,6 +25,7 @@ import (
 )
 
 func (o *adminServer) GetClientConfig(ctx context.Context, req *admin.GetClientConfigReq) (*admin.GetClientConfigResp, error) {
+	defer log.ZDebug(ctx, "return")
 	conf, err := o.Database.GetConfig(ctx)
 	if err != nil {
 		return nil, err
@@ -32,6 +34,7 @@ func (o *adminServer) GetClientConfig(ctx context.Context, req *admin.GetClientC
 }
 
 func (o *adminServer) SetClientConfig(ctx context.Context, req *admin.SetClientConfigReq) (*admin.SetClientConfigResp, error) {
+	defer log.ZDebug(ctx, "return")
 	if _, err := mctx.CheckAdmin(ctx); err != nil {
 		return nil, err
 	}

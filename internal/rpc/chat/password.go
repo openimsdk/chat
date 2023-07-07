@@ -16,6 +16,7 @@ package chat
 
 import (
 	"context"
+	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/log"
 
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
 
@@ -25,6 +26,7 @@ import (
 )
 
 func (o *chatSvr) ResetPassword(ctx context.Context, req *chat.ResetPasswordReq) (*chat.ResetPasswordResp, error) {
+	defer log.ZDebug(ctx, "return")
 	if req.Password == "" {
 		return nil, errs.ErrArgs.Wrap("password must be set")
 	}
@@ -44,6 +46,7 @@ func (o *chatSvr) ResetPassword(ctx context.Context, req *chat.ResetPasswordReq)
 }
 
 func (o *chatSvr) ChangePassword(ctx context.Context, req *chat.ChangePasswordReq) (*chat.ChangePasswordResp, error) {
+	defer log.ZDebug(ctx, "return")
 	if req.NewPassword == "" {
 		return nil, errs.ErrArgs.Wrap("new password must be set")
 	}

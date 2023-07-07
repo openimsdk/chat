@@ -41,6 +41,7 @@ func (o *chatSvr) verifyCodeJoin(areaCode, phoneNumber string) string {
 }
 
 func (o *chatSvr) SendVerifyCode(ctx context.Context, req *chat.SendVerifyCodeReq) (*chat.SendVerifyCodeResp, error) {
+	defer log.ZDebug(ctx, "return")
 	switch req.UsedFor {
 	case constant.VerificationCodeForRegister:
 		if err := o.Admin.CheckRegister(ctx, req.Ip); err != nil {
@@ -120,6 +121,7 @@ func (o *chatSvr) SendVerifyCode(ctx context.Context, req *chat.SendVerifyCodeRe
 }
 
 func (o *chatSvr) verifyCode(ctx context.Context, account string, verifyCode string) (uint, error) {
+	defer log.ZDebug(ctx, "return")
 	if verifyCode == "" {
 		return 0, errs.ErrArgs.Wrap("verify code is empty")
 	}
@@ -159,6 +161,7 @@ func (o *chatSvr) verifyCode(ctx context.Context, account string, verifyCode str
 }
 
 func (o *chatSvr) VerifyCode(ctx context.Context, req *chat.VerifyCodeReq) (*chat.VerifyCodeResp, error) {
+	defer log.ZDebug(ctx, "return")
 	if _, err := o.verifyCode(ctx, o.verifyCodeJoin(req.AreaCode, req.PhoneNumber), req.VerifyCode); err != nil {
 		return nil, err
 	}
@@ -191,6 +194,7 @@ func (o *chatSvr) genVerifyCode() string {
 }
 
 func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (*chat.RegisterUserResp, error) {
+	defer log.ZDebug(ctx, "return")
 	isAdmin, err := o.Admin.CheckNilOrAdmin(ctx)
 	if err != nil {
 		return nil, err
@@ -363,6 +367,7 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 }
 
 func (o *chatSvr) Login(ctx context.Context, req *chat.LoginReq) (*chat.LoginResp, error) {
+	defer log.ZDebug(ctx, "return")
 	resp := &chat.LoginResp{}
 	if req.Password == "" && req.VerifyCode == "" {
 		return nil, errs.ErrArgs.Wrap("password or code must be set")
