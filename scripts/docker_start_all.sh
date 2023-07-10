@@ -13,11 +13,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
+echo "start running docker_start_all.sh..."
 chmod +x ./*.sh
+echo "start running internal bash ====> ./start_all.sh"
 ./start_all.sh
+echo "running ./start_all.sh succeed "
 i=1
 while ((i == 1))
 do
     sleep 5
 done
+echo "docker  docker is started successfully"

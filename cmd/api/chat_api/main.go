@@ -24,10 +24,11 @@ import (
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/log"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/mw"
 	openKeeper "github.com/OpenIMSDK/Open-IM-Server/pkg/discoveryregistry/zookeeper"
-	"github.com/OpenIMSDK/chat/internal/api"
-	"github.com/OpenIMSDK/chat/pkg/common/config"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+
+	"github.com/OpenIMSDK/chat/internal/api"
+	"github.com/OpenIMSDK/chat/pkg/common/config"
 
 	"github.com/gin-gonic/gin"
 )

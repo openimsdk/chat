@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
+echo "start running build_all_service.sh..."
 source ./style_info.cfg
 source ./path_info.cfg
 source ./function.sh

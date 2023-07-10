@@ -18,8 +18,9 @@ import (
 	"context"
 
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/discoveryregistry"
-	"github.com/OpenIMSDK/chat/pkg/common/config"
 	"github.com/gin-gonic/gin"
+
+	"github.com/OpenIMSDK/chat/pkg/common/config"
 )
 
 func NewChatRoute(router gin.IRouter, discov discoveryregistry.SvcDiscoveryRegistry) {

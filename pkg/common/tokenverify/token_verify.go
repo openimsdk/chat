@@ -15,12 +15,11 @@
 package tokenverify
 
 import (
+	"time"
+
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
-	"github.com/OpenIMSDK/chat/pkg/common/config"
-	"github.com/OpenIMSDK/chat/pkg/common/constant"
 	utils "github.com/OpenIMSDK/open_utils"
 	"github.com/golang-jwt/jwt/v4"
-	"time"
 )
 
 const (
@@ -41,10 +40,11 @@ func buildClaims(userID string, userType int32, ttl int64) claims {
 		UserID:   userID,
 		UserType: userType,
 		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(now.Add(time.Duration(ttl*24) * time.Hour)), //Expiration time
-			IssuedAt:  jwt.NewNumericDate(now),                                        //Issuing time
-			NotBefore: jwt.NewNumericDate(before),                                     //Begin Effective time
-		}}
+			ExpiresAt: jwt.NewNumericDate(now.Add(time.Duration(ttl*24) * time.Hour)), // Expiration time
+			IssuedAt:  jwt.NewNumericDate(now),                                        // Issuing time
+			NotBefore: jwt.NewNumericDate(before),                                     // Begin Effective time
+		},
+	}
 }
 
 func CreateToken(UserID string, userType int32, ttl int64) (string, error) {

@@ -14,7 +14,7 @@
 # limitations under the License.
 
 #fixme This scripts is to stop the service
-
+echo "stop all services beginning ..."
 source ./style_info.cfg
 source ./path_info.cfg
 

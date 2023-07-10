@@ -16,12 +16,14 @@ package database
 
 import (
 	"context"
+	"time"
+
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/db/tx"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
+	"gorm.io/gorm"
+
 	"github.com/OpenIMSDK/chat/pkg/common/db/model/chat"
 	table "github.com/OpenIMSDK/chat/pkg/common/db/table/chat"
-	"gorm.io/gorm"
-	"time"
 )
 
 type ChatDatabaseInterface interface {

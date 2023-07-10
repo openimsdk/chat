@@ -11,9 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+echo "start building..."
+image=openim/openim_chat:v1.1.0
+echo "current image version ====> ${image}"
 
-image=openim/openim_chat:v1.0.2
 chmod +x ./*.sh
+echo "starting running bash shell ./build_all_service.sh"
 ./build_all_service.sh
 cd ../
 docker build -t $image . -f ./deploy.Dockerfile

@@ -35,7 +35,7 @@ openImAdminApiPort
   openImAdminPort
   openImChatPort
 )
-
+# prometheus will be used latex
 service_prometheus_port_name=(
 
 )

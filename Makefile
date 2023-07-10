@@ -11,7 +11,7 @@ OUT_DIR=$(REPO_ROOT)/_output
 
 # define the default goal
 #
-
+# define shell
 SHELL := /bin/bash
 DIRS=$(shell ls)
 GO=go

@@ -17,6 +17,7 @@
 source ./style_info.cfg
 source ./path_info.cfg
 source ./function.sh
+
 service_port_name=(
  openImChatApiPort
  openImAdminApiPort
@@ -24,6 +25,7 @@ service_port_name=(
    openImAdminPort
    openImChatPort
 )
+
 switch=$(cat $config_path | grep demoswitch |awk -F '[:]' '{print $NF}')
 for i in ${service_port_name[*]}; do
   list=$(cat $config_path | grep -w ${i} | awk -F '[:]' '{print $NF}')
