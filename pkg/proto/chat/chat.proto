@@ -76,18 +76,6 @@ message FindUserFullInfoResp{
   repeated OpenIMChat.common.UserFullInfo users = 1;
 }
 
-
-message SearchUserFullInfoReq{
-  string keyword = 1;
-  OpenIMServer.sdkws.RequestPagination pagination = 2;
-  repeated int32 genders = 3;
-}
-
-message SearchUserFullInfoResp{
-  uint32 total = 1;
-  repeated OpenIMChat.common.UserFullInfo users = 2;
-}
-
 message SendVerifyCodeReq {
   int32 usedFor = 1;
   string ip = 2;
@@ -239,6 +227,19 @@ message OpenIMCallbackReq {
 message OpenIMCallbackResp {
 
 }
+
+message SearchUserFullInfoReq{
+  string keyword = 1;
+  OpenIMServer.sdkws.RequestPagination pagination = 2;
+  repeated int32 genders = 3;
+  int32 normal = 4;
+}
+
+message SearchUserFullInfoResp{
+  uint32 total = 1;
+  repeated OpenIMChat.common.UserFullInfo users = 2;
+}
+
 
 service chat {
   //编辑个人资料 自己或者管理员调用
