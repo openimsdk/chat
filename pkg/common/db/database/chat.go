@@ -18,7 +18,9 @@ import (
 	"context"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/db/tx"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
+	admin2 "github.com/OpenIMSDK/chat/pkg/common/db/model/admin"
 	"github.com/OpenIMSDK/chat/pkg/common/db/model/chat"
+	"github.com/OpenIMSDK/chat/pkg/common/db/table/admin"
 	table "github.com/OpenIMSDK/chat/pkg/common/db/table/chat"
 	"gorm.io/gorm"
 	"time"
@@ -33,7 +35,7 @@ type ChatDatabaseInterface interface {
 	TakeAttributeByPhone(ctx context.Context, areaCode string, phoneNumber string) (*table.Attribute, error)
 	TakeAttributeByAccount(ctx context.Context, account string) (*table.Attribute, error)
 	TakeAttributeByUserID(ctx context.Context, userID string) (*table.Attribute, error)
-	Search(ctx context.Context, keyword string, genders []int32, pageNumber int32, showNumber int32) (uint32, []*table.Attribute, error)
+	Search(ctx context.Context, normalUser int32, keyword string, genders []int32, pageNumber int32, showNumber int32) (uint32, []*table.Attribute, error)
 	CountVerifyCodeRange(ctx context.Context, account string, start time.Time, end time.Time) (uint32, error)
 	AddVerifyCode(ctx context.Context, verifyCode *table.VerifyCode, fn func() error) error
 	UpdateVerifyCodeIncrCount(ctx context.Context, id uint) error
@@ -51,22 +53,24 @@ type ChatDatabaseInterface interface {
 
 func NewChatDatabase(db *gorm.DB) ChatDatabaseInterface {
 	return &ChatDatabase{
-		tx:              tx.NewGorm(db),
-		register:        chat.NewRegister(db),
-		account:         chat.NewAccount(db),
-		attribute:       chat.NewAttribute(db),
-		userLoginRecord: chat.NewUserLoginRecord(db),
-		verifyCode:      chat.NewVerifyCode(db),
+		tx:               tx.NewGorm(db),
+		register:         chat.NewRegister(db),
+		account:          chat.NewAccount(db),
+		attribute:        chat.NewAttribute(db),
+		userLoginRecord:  chat.NewUserLoginRecord(db),
+		verifyCode:       chat.NewVerifyCode(db),
+		forbiddenAccount: admin2.NewForbiddenAccount(db),
 	}
 }
 
 type ChatDatabase struct {
-	tx              tx.Tx
-	register        table.RegisterInterface
-	account         table.AccountInterface
-	attribute       table.AttributeInterface
-	userLoginRecord table.UserLoginRecordInterface
-	verifyCode      table.VerifyCodeInterface
+	tx               tx.Tx
+	register         table.RegisterInterface
+	account          table.AccountInterface
+	attribute        table.AttributeInterface
+	userLoginRecord  table.UserLoginRecordInterface
+	verifyCode       table.VerifyCodeInterface
+	forbiddenAccount admin.ForbiddenAccountInterface
 }
 
 func (o *ChatDatabase) IsNotFound(err error) bool {
@@ -111,8 +115,22 @@ func (o *ChatDatabase) TakeAttributeByUserID(ctx context.Context, userID string)
 	return o.attribute.Take(ctx, userID)
 }
 
-func (o *ChatDatabase) Search(ctx context.Context, keyword string, genders []int32, pageNumber int32, showNumber int32) (uint32, []*table.Attribute, error) {
-	return o.attribute.Search(ctx, keyword, genders, pageNumber, showNumber)
+func (o *ChatDatabase) Search(ctx context.Context, normalUser int32, keyword string, genders []int32, pageNumber int32, showNumber int32) (uint32, []*table.Attribute, error) {
+	var forbiddenIDs = []string{}
+	if normalUser == 1 {
+		_, forbiddenUsers, err := o.forbiddenAccount.Search(ctx, keyword, pageNumber, showNumber)
+		if err != nil {
+			return 0, nil, err
+		}
+		for _, forbiddenUser := range forbiddenUsers {
+			forbiddenIDs = append(forbiddenIDs, forbiddenUser.UserID)
+		}
+	}
+	total, totalUser, err := o.attribute.SearchNormalUser(ctx, keyword, forbiddenIDs, genders, pageNumber, showNumber)
+	if err != nil {
+		return 0, nil, err
+	}
+	return total, totalUser, nil
 }
 
 func (o *ChatDatabase) CountVerifyCodeRange(ctx context.Context, account string, start time.Time, end time.Time) (uint32, error) {

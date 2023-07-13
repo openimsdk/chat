@@ -135,7 +135,7 @@ func (o *chatSvr) SearchUserPublicInfo(ctx context.Context, req *chat.SearchUser
 	if _, _, err := mctx.Check(ctx); err != nil {
 		return nil, err
 	}
-	total, list, err := o.Database.Search(ctx, req.Keyword, req.Genders, req.Pagination.PageNumber, req.Pagination.ShowNumber)
+	total, list, err := o.Database.Search(ctx, constant.FinDAllUser, req.Keyword, req.Genders, req.Pagination.PageNumber, req.Pagination.ShowNumber)
 	if err != nil {
 		return nil, err
 	}
@@ -161,11 +161,10 @@ func (o *chatSvr) FindUserFullInfo(ctx context.Context, req *chat.FindUserFullIn
 }
 
 func (o *chatSvr) SearchUserFullInfo(ctx context.Context, req *chat.SearchUserFullInfoReq) (*chat.SearchUserFullInfoResp, error) {
-	defer log.ZDebug(ctx, "return")
 	if _, _, err := mctx.Check(ctx); err != nil {
 		return nil, err
 	}
-	total, list, err := o.Database.Search(ctx, req.Keyword, req.Genders, req.Pagination.PageNumber, req.Pagination.ShowNumber)
+	total, list, err := o.Database.Search(ctx, req.Normal, req.Keyword, req.Genders, req.Pagination.PageNumber, req.Pagination.ShowNumber)
 	if err != nil {
 		return nil, err
 	}

@@ -167,3 +167,8 @@ const (
 	DefaultAllowBeep      = 1
 	DefaultAllowAddFriend = 1
 )
+
+const (
+	FindNormalUser = 1
+	FinDAllUser    = 2
+)
