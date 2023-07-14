@@ -16,6 +16,7 @@ package chat
 
 import (
 	"context"
+	"github.com/OpenIMSDK/chat/pkg/common/mctx"
 	"math/rand"
 	"strconv"
 	"strings"
@@ -195,6 +196,7 @@ func (o *chatSvr) genVerifyCode() string {
 
 func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (*chat.RegisterUserResp, error) {
 	defer log.ZDebug(ctx, "return")
+	ctx = mctx.WithAdminUser(ctx)
 	isAdmin, err := o.Admin.CheckNilOrAdmin(ctx)
 	if err != nil {
 		return nil, err
@@ -325,29 +327,27 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 	if err := o.Database.RegisterUser(ctx, register, account, attribute, openIMRegister); err != nil {
 		return nil, err
 	}
-	go func() {
-		if usedInvitationCode {
-			if err := o.Admin.UseInvitationCode(ctx, req.User.UserID, req.InvitationCode); err != nil {
-				log.ZError(ctx, "UseInvitationCode", err, "userID", req.User.UserID, "invitationCode", req.InvitationCode)
+	if usedInvitationCode {
+		if err := o.Admin.UseInvitationCode(ctx, req.User.UserID, req.InvitationCode); err != nil {
+			log.ZError(ctx, "UseInvitationCode", err, "userID", req.User.UserID, "invitationCode", req.InvitationCode)
+		}
+	}
+	if userIDs, err := o.Admin.GetDefaultFriendUserID(ctx); err != nil {
+		log.ZError(ctx, "GetDefaultFriendUserID Failed", err, "userID", req.User.UserID)
+	} else if len(userIDs) > 0 {
+		if err := o.OpenIM.AddDefaultFriend(ctx, req.User.UserID, userIDs); err != nil {
+			log.ZError(ctx, "AddDefaultFriend Failed", err, "userID", req.User.UserID, "userIDs", userIDs)
+		}
+	}
+	if groupIDs, err := o.Admin.GetDefaultGroupID(ctx); err != nil {
+		log.ZError(ctx, "GetDefaultGroupID Failed", err, "userID", req.User.UserID)
+	} else if len(groupIDs) > 0 {
+		for _, groupID := range groupIDs {
+			if err := o.OpenIM.AddDefaultGroup(ctx, req.User.UserID, groupID); err != nil {
+				log.ZError(ctx, "GetDefaultGroupID Failed", err, "userID", req.User.UserID, "groupID", groupID)
 			}
 		}
-		if userIDs, err := o.Admin.GetDefaultFriendUserID(ctx); err != nil {
-			log.ZError(ctx, "GetDefaultFriendUserID Failed", err, "userID", req.User.UserID)
-		} else if len(userIDs) > 0 {
-			if err := o.OpenIM.AddDefaultFriend(ctx, req.User.UserID, userIDs); err != nil {
-				log.ZError(ctx, "AddDefaultFriend Failed", err, "userID", req.User.UserID, "userIDs", userIDs)
-			}
-		}
-		if groupIDs, err := o.Admin.GetDefaultGroupID(ctx); err != nil {
-			log.ZError(ctx, "GetDefaultGroupID Failed", err, "userID", req.User.UserID)
-		} else if len(groupIDs) > 0 {
-			for _, groupID := range groupIDs {
-				if err := o.OpenIM.AddDefaultGroup(ctx, req.User.UserID, groupID); err != nil {
-					log.ZError(ctx, "GetDefaultGroupID Failed", err, "userID", req.User.UserID, "groupID", groupID)
-				}
-			}
-		}
-	}()
+	}
 	resp := &chat.RegisterUserResp{UserID: req.User.UserID}
 	if req.AutoLogin {
 		openimToken, openIMErr := o.OpenIM.UserToken(ctx, req.User.UserID, req.Platform)
