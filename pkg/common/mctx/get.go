@@ -16,6 +16,7 @@ package mctx
 
 import (
 	"context"
+	imConfig "github.com/OpenIMSDK/Open-IM-Server/pkg/common/config"
 	"strconv"
 
 	constant2 "github.com/OpenIMSDK/Open-IM-Server/pkg/common/constant"
@@ -104,4 +105,17 @@ func CheckAdminOr(ctx context.Context, userIDs ...string) error {
 func GetOpUserID(ctx context.Context) string {
 	userID, _ := ctx.Value(constant2.OpUserID).(string)
 	return userID
+}
+
+func WithOpUserID(ctx context.Context, opUserID string, userType int32) context.Context {
+	ctx = context.WithValue(ctx, constant.RpcOpUserID, opUserID)
+	ctx = context.WithValue(ctx, constant.RpcOpUserType, userType)
+	return ctx
+}
+
+func WithAdminUser(ctx context.Context) context.Context {
+	if len(imConfig.Config.Manager.UserID) > 0 {
+		ctx = WithOpUserID(ctx, imConfig.Config.Manager.UserID[0], constant.AdminUser)
+	}
+	return ctx
 }
