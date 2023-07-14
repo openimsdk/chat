@@ -109,13 +109,13 @@ func GetOpUserID(ctx context.Context) string {
 
 func WithOpUserID(ctx context.Context, opUserID string, userType int32) context.Context {
 	ctx = context.WithValue(ctx, constant.RpcOpUserID, opUserID)
-	ctx = context.WithValue(ctx, constant.RpcOpUserType, userType)
+	ctx = context.WithValue(ctx, constant.RpcOpUserType, []string{strconv.Itoa(int(userType))})
 	return ctx
 }
 
 func WithAdminUser(ctx context.Context) context.Context {
 	if len(imConfig.Config.Manager.UserID) > 0 {
-		ctx = WithOpUserID(ctx, imConfig.Config.Manager.UserID[0], constant.AdminUser)
+		ctx = WithOpUserID(ctx, imConfig.Config.Manager.UserID[0], int32(constant.AdminUser))
 	}
 	return ctx
 }
