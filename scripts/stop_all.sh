@@ -14,10 +14,13 @@
 # limitations under the License.
 
 #fixme This scripts is to stop the service
+SCRIPTS_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+OPENIM_ROOT=$(dirname "${BASH_SOURCE[0]}")/..
 
-source ./style_info.cfg
-source ./path_info.cfg
+source $OPENIM_ROOT/scripts/style_info.cfg
+source $OPENIM_ROOT/scripts/path_info.cfg
 
+cd "$SCRIPTS_ROOT"
 
 for i in ${service_names[*]}; do
   #Check whether the service exists

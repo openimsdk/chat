@@ -16,14 +16,16 @@ package database
 
 import (
 	"context"
+	"time"
+
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/db/tx"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
+	"gorm.io/gorm"
+
 	admin2 "github.com/OpenIMSDK/chat/pkg/common/db/model/admin"
 	"github.com/OpenIMSDK/chat/pkg/common/db/model/chat"
 	"github.com/OpenIMSDK/chat/pkg/common/db/table/admin"
 	table "github.com/OpenIMSDK/chat/pkg/common/db/table/chat"
-	"gorm.io/gorm"
-	"time"
 )
 
 type ChatDatabaseInterface interface {
@@ -116,7 +118,7 @@ func (o *ChatDatabase) TakeAttributeByUserID(ctx context.Context, userID string)
 }
 
 func (o *ChatDatabase) Search(ctx context.Context, normalUser int32, keyword string, genders []int32, pageNumber int32, showNumber int32) (uint32, []*table.Attribute, error) {
-	var forbiddenIDs = []string{}
+	forbiddenIDs := []string{}
 	if normalUser == 1 {
 		_, forbiddenUsers, err := o.forbiddenAccount.Search(ctx, keyword, pageNumber, showNumber)
 		if err != nil {

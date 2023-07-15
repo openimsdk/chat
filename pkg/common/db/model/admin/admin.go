@@ -18,11 +18,11 @@ import (
 	"context"
 	"crypto/md5"
 	"encoding/hex"
+	"time"
+
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/config"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
-	"github.com/OpenIMSDK/chat/pkg/common/db/table/admin"
 	"gorm.io/gorm"
-	"time"
 )
 
 func NewAdmin(db *gorm.DB) *Admin {

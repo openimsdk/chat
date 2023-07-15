@@ -16,11 +16,14 @@ package chat
 
 import (
 	"context"
-	"github.com/OpenIMSDK/chat/pkg/common/mctx"
 	"math/rand"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/OpenIMSDK/chat/pkg/common/mctx"
+
+	"github.com/OpenIMSDK/chat/pkg/common/mctx"
 
 	constant2 "github.com/OpenIMSDK/Open-IM-Server/pkg/common/constant"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/log"

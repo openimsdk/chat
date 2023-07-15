@@ -32,7 +32,6 @@ import (
 )
 
 func NewChat(chatConn, adminConn grpc.ClientConnInterface) *ChatApi {
-
 	return &ChatApi{chatClient: chat.NewChatClient(chatConn), adminClient: admin.NewAdminClient(adminConn)}
 }
 
