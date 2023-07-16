@@ -33,7 +33,7 @@ builds:
       - 7
   - binary: chat_rpc
     id: chat_rpc
-    main: ./cmd/chat_rpc/main.go
+    main: ./cmd/rpc/chat_rpc/main.go
     goos:
       - darwin
       - linux
@@ -45,7 +45,7 @@ builds:
       - 7
   - binary: admin_rpc
     id: admin_rpc
-    main: ./cmd/admin_rpc/main.go
+    main: ./cmd/rpc/admin_rpc/main.go
     goos:
       - darwin
       - linux
