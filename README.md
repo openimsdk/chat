@@ -74,20 +74,20 @@ Targets:
 make all
 ```
 
-## Chat Start
+### Chat Start
 
  ```
  ./scripts/start_all.sh
  ```
 
-## Chat Detection
+### Chat Detection
 
  ```
 cd scripts
 ./check_all.sh
  ```
 
-## Chat Stop
+### Chat Stop
 
  ```
 cd scripts
