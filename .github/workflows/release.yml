@@ -1,4 +1,4 @@
-name: github labels syncer release
+name: OpenIM chat release
 
 on:
   push:

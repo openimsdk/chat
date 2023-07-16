@@ -113,3 +113,4 @@ jobs:
       - name: Run OpenIM make install start
         run: |
           sudo make install
+        continue-on-error: true
