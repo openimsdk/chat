@@ -7,9 +7,9 @@ before:
     # you may remove this if you don't need go generate
     - go generate ./...
 builds:
-  - binary: syncer
-    id: syncer
-    main: ./cmd/syncer/main.go
+  - binary: admin_api
+    id: admin_api
+    main: ./cmd/api/admin_api/main.go
     goos:
       - windows
       - darwin
@@ -23,9 +23,41 @@ builds:
     goarm:
       - 6
       - 7
-  - binary: exporter
-    id: exporter
-    main: ./cmd/exporter/main.go
+  - binary: chat_api
+    id: chat_api
+    main: ./cmd/api/chat_api/main.go
+    goos:
+      - windows
+      - darwin
+      - linux
+      - freebsd
+    goarch:
+      - amd64
+      - 386
+      - arm
+      - arm64
+    goarm:
+      - 6
+      - 7
+  - binary: chat_rpc
+    id: chat_rpc
+    main: ./cmd/chat_rpc/main.go
+    goos:
+      - windows
+      - darwin
+      - linux
+      - freebsd
+    goarch:
+      - amd64
+      - 386
+      - arm
+      - arm64
+    goarm:
+      - 6
+      - 7
+  - binary: admin_rpc
+    id: admin_rpc
+    main: ./cmd/admin_rpc/main.go
     goos:
       - windows
       - darwin
