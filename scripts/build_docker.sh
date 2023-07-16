@@ -16,6 +16,6 @@ image=openim/openim_chat:v1.0.2
 chmod +x ./*.sh
 ./build_all_service.sh
 cd ../
-docker build -t $image . -f ./deploy.Dockerfile
+docker build -t $image . -f ./Dockerfile
 docker push $image
 echo "build ok"
