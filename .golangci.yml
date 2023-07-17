@@ -1,3 +1,19 @@
+# Copyright © 2023 OpenIMSDK open source community. All rights reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# This file contains all available configuration options
+# with their default values.
 
 # options for analysis running
 run:
@@ -160,7 +176,7 @@ linters-settings:
     # put imports beginning with prefix after 3rd-party packages;
     # only support one prefix
     # if not set, use goimports.local-prefixes
-    prefix: github.com/OpenIMSDK/chat
+    prefix: github.com/OpenIMSDK/OpenKF
   gocognit:
     # minimal code complexity to report, 30 by default (but we recommend 10-20)
     min-complexity: 30
@@ -317,7 +333,7 @@ linters-settings:
   goimports:
     # put imports beginning with prefix after 3rd-party packages;
     # it's a comma-separated list of prefixes
-    local-prefixes: github.com/OpenIMSDK/chat
+    local-prefixes: github.com/OpenIMSDK/OpenKF
   golint:
     # minimal confidence for issues, default is 0.8
     min-confidence: 0.9
@@ -342,7 +358,8 @@ linters-settings:
     exclude-forbidden: false
   gomodguard:
     allowed:
-      modules:                                                        # List of allowed modules
+      modules:    
+        - gorm.io/gen                                                    # List of allowed modules
         - gorm.io/gorm
         - gorm.io/driver/mysql
         - k8s.io/klog
