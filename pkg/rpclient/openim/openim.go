@@ -78,23 +78,6 @@ func (o *OpenIMClient) UserRegister(ctx context.Context, req *sdkws.UserInfo) er
 	return err
 }
 
-func (o *OpenIMClient) AddDefaultFriend(ctx context.Context, userID string, friendUserIDs []string) error {
-	_, err := o.friend.ImportFriends(ctx, &friend.ImportFriendReq{
-		OwnerUserID:   userID,
-		FriendUserIDs: friendUserIDs,
-	})
-	return err
-}
-
-func (o *OpenIMClient) AddDefaultGroup(ctx context.Context, userID string, groupID string) error {
-	_, err := o.group.InviteUserToGroup(ctx, &group.InviteUserToGroupReq{
-		GroupID:        groupID,
-		Reason:         "",
-		InvitedUserIDs: []string{userID},
-	})
-	return err
-}
-
 func (o *OpenIMClient) UserToken(ctx context.Context, userID string, platformID int32) (*auth.UserTokenResp, error) {
 	return o.auth.UserToken(ctx, &auth.UserTokenReq{Secret: config.Config.Secret, PlatformID: platformID, UserID: userID})
 }

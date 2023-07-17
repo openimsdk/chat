@@ -83,3 +83,10 @@ verifyCode:
 
 # 获取ip的header,没有配置直接获取远程地址
 #proxyHeader: "X-Forwarded-For"
+
+adminMap:
+  admin1: openIM123456
+  admin2: openIM654321
+  admin3: openIMAdmin
+
+openIM_url: "http://127.0.0.1:10002"

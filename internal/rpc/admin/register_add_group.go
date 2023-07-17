@@ -17,11 +17,11 @@ package admin
 import (
 	"context"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/log"
+	"github.com/OpenIMSDK/chat/pkg/common/config"
 	"strings"
 	"time"
 
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/proto/sdkws"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/utils"
 
 	admin2 "github.com/OpenIMSDK/chat/pkg/common/db/table/admin"
@@ -31,23 +31,28 @@ import (
 
 func (o *adminServer) AddDefaultGroup(ctx context.Context, req *admin.AddDefaultGroupReq) (*admin.AddDefaultGroupResp, error) {
 	defer log.ZDebug(ctx, "return")
-	if _, err := mctx.CheckAdmin(ctx); err != nil {
-		return nil, err
-	}
-	if len(req.GroupIDs) == 0 {
-		return nil, errs.ErrArgs.Wrap("group ids is empty")
-	}
-	if utils.Duplicate(req.GroupIDs) {
-		return nil, errs.ErrArgs.Wrap("group ids is duplicate")
-	}
-	groups, err := o.OpenIM.FindGroup(ctx, req.GroupIDs)
+	opUserID, err := mctx.CheckAdmin(ctx)
 	if err != nil {
 		return nil, err
 	}
-	if ids := utils.Single(req.GroupIDs, utils.Slice(groups, func(group *sdkws.GroupInfo) string { return group.GroupID })); len(ids) > 0 {
-		return nil, errs.ErrGroupIDNotFound.Wrap(strings.Join(ids, ", "))
+	groupIDs := []string{}
+	for _, group := range req.Groups {
+		groupIDs = append(groupIDs, group.GroupID)
 	}
-	exists, err := o.Database.FindDefaultGroup(ctx, req.GroupIDs)
+	if len(groupIDs) == 0 {
+		return nil, errs.ErrArgs.Wrap("group ids is empty")
+	}
+	if utils.Duplicate(groupIDs) {
+		return nil, errs.ErrArgs.Wrap("group ids is duplicate")
+	}
+	//groups, err := o.OpenIM.FindGroup(ctx, req.GroupIDs)
+	//if err != nil {
+	//	return nil, err
+	//}
+	//if ids := utils.Single(groupIDs, utils.Slice(req.Groups, func(group *sdkws.GroupInfo) string { return group.GroupID })); len(ids) > 0 {
+	//	return nil, errs.ErrGroupIDNotFound.Wrap(strings.Join(ids, ", "))
+	//}
+	exists, err := o.Database.FindDefaultGroup(ctx, groupIDs)
 	if err != nil {
 		return nil, err
 	}
@@ -55,8 +60,8 @@ func (o *adminServer) AddDefaultGroup(ctx context.Context, req *admin.AddDefault
 		return nil, errs.ErrGroupIDExisted.Wrap(strings.Join(exists, ", "))
 	}
 	now := time.Now()
-	ms := make([]*admin2.RegisterAddGroup, 0, len(req.GroupIDs))
-	for _, groupID := range req.GroupIDs {
+	ms := make([]*admin2.RegisterAddGroup, 0, len(groupIDs))
+	for _, groupID := range groupIDs {
 		ms = append(ms, &admin2.RegisterAddGroup{
 			GroupID:    groupID,
 			CreateTime: now,
@@ -65,7 +70,7 @@ func (o *adminServer) AddDefaultGroup(ctx context.Context, req *admin.AddDefault
 	if err := o.Database.AddDefaultGroup(ctx, ms); err != nil {
 		return nil, err
 	}
-	return &admin.AddDefaultGroupResp{}, nil
+	return &admin.AddDefaultGroupResp{AdminID: config.Config.AdminMap[opUserID]}, nil
 }
 
 func (o *adminServer) DelDefaultGroup(ctx context.Context, req *admin.DelDefaultGroupReq) (*admin.DelDefaultGroupResp, error) {

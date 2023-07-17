@@ -66,7 +66,8 @@ var Config struct {
 		IsJson              *bool   `yaml:"isJson"`
 		WithStack           *bool   `yaml:"withStack"`
 	} `yaml:"log"`
-	Secret      *string `yaml:"secret"`
+	Secret      *string           `yaml:"secret"`
+	AdminMap    map[string]string `yaml:"adminMap"`
 	TokenPolicy struct {
 		Expire *int64 `yaml:"expire"`
 	} `yaml:"tokenPolicy"`

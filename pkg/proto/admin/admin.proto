@@ -32,7 +32,6 @@ message LoginResp {
   string faceURL = 4;
   int32 level = 5;
   string imUserID = 6;
-  string imToken = 7;
 }
 
 message AdminUpdateInfoReq {
@@ -106,10 +105,12 @@ message SearchDefaultFriendResp {
 
 
 message AddDefaultGroupReq {
-  repeated string groupIDs = 1;
+  repeated OpenIMServer.sdkws.GroupInfo groups=1;
 }
 
-message AddDefaultGroupResp {}
+message AddDefaultGroupResp {
+  string adminID=1;
+}
 
 message DelDefaultGroupReq {
   repeated string groupIDs = 1;
@@ -297,7 +298,9 @@ message CancellationUserReq{
   string reason = 2;
 }
 
-message CancellationUserResp {}
+message CancellationUserResp {
+  string adminID=1;
+}
 
 // ################### 封号、解封 ###################
 message BlockUserReq{
@@ -305,7 +308,9 @@ message BlockUserReq{
   string reason = 2;
 }
 
-message BlockUserResp {}
+message BlockUserResp {
+  string adminID=1;
+}
 
 message UnblockUserReq{
   repeated string userIDs = 1;
