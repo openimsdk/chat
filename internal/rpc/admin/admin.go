@@ -128,10 +128,10 @@ func (o *adminServer) Login(ctx context.Context, req *admin.LoginReq) (*admin.Lo
 	if err != nil {
 		return nil, err
 	}
-	imToken, err := o.OpenIM.UserToken(ctx, a.UserID, 1)
-	if err != nil {
-		return nil, err
-	}
+	//imToken, err := o.OpenIM.UserToken(ctx, a.UserID, 1)
+	//if err != nil {
+	//	return nil, err
+	//}
 	return &admin.LoginResp{
 		AdminAccount: a.Account,
 		AdminToken:   adminToken.Token,
@@ -139,7 +139,6 @@ func (o *adminServer) Login(ctx context.Context, req *admin.LoginReq) (*admin.Lo
 		FaceURL:      a.FaceURL,
 		Level:        a.Level,
 		ImUserID:     a.UserID,
-		ImToken:      imToken.Token,
 	}, nil
 }
 

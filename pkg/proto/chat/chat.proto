@@ -47,6 +47,7 @@ message UpdateUserInfoReq{
 }
 
 message UpdateUserInfoResp{
+  OpenIMServer.sdkws.UserInfo userInfo = 1;
 }
 
 message FindUserPublicInfoReq{
@@ -123,8 +124,10 @@ message RegisterUserReq {
 
 message RegisterUserResp {
   string userID = 1;
-  string imToken = 2;
-  string chatToken = 3;
+  OpenIMServer.sdkws.UserInfo userInfo = 3;
+  repeated string defaultFriend = 2;
+  repeated string defaultGroup = 4;
+  string chatToken = 5;
 }
 
 message LoginReq {
@@ -139,7 +142,6 @@ message LoginReq {
 }
 
 message LoginResp {
-  string imToken = 1;
   string chatToken = 2;
   string userID = 3;
 }

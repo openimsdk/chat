@@ -17,11 +17,9 @@ package chat
 import (
 	"context"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/log"
+	"github.com/OpenIMSDK/Open-IM-Server/pkg/proto/sdkws"
 
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/proto/sdkws"
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/proto/user"
-
 	"github.com/OpenIMSDK/chat/pkg/common/constant"
 	"github.com/OpenIMSDK/chat/pkg/common/mctx"
 	"github.com/OpenIMSDK/chat/pkg/eerrs"
@@ -30,6 +28,7 @@ import (
 
 func (o *chatSvr) UpdateUserInfo(ctx context.Context, req *chat.UpdateUserInfoReq) (*chat.UpdateUserInfoResp, error) {
 	defer log.ZDebug(ctx, "return")
+	resp := &chat.UpdateUserInfoResp{UserInfo: &sdkws.UserInfo{UserID: req.UserID}}
 	opUserID, userType, err := mctx.Check(ctx)
 	if err != nil {
 		return nil, err
@@ -96,24 +95,35 @@ func (o *chatSvr) UpdateUserInfo(ctx context.Context, req *chat.UpdateUserInfoRe
 			}
 		}
 	}
-	updateOpenIM := func() error {
-		userReq := &user.UpdateUserInfoReq{UserInfo: &sdkws.UserInfo{UserID: req.UserID}}
-		if req.Nickname != nil {
-			userReq.UserInfo.Nickname = req.Nickname.Value
-		} else {
-			userReq.UserInfo.Nickname = attribute.Nickname
-		}
-		if req.FaceURL != nil {
-			userReq.UserInfo.FaceURL = req.FaceURL.Value
-		} else {
-			userReq.UserInfo.FaceURL = attribute.FaceURL
-		}
-		return o.OpenIM.UpdateUser(ctx, userReq)
+	//updateOpenIM := func() error {
+	//	userReq := &user.UpdateUserInfoReq{UserInfo: &sdkws.UserInfo{UserID: req.UserID}}
+	//	if req.Nickname != nil {
+	//		userReq.UserInfo.Nickname = req.Nickname.Value
+	//	} else {
+	//		userReq.UserInfo.Nickname = attribute.Nickname
+	//	}
+	//	if req.FaceURL != nil {
+	//		userReq.UserInfo.FaceURL = req.FaceURL.Value
+	//	} else {
+	//		userReq.UserInfo.FaceURL = attribute.FaceURL
+	//	}
+	//	return o.OpenIM.UpdateUser(ctx, userReq)
+	//}
+	if req.Nickname != nil {
+		resp.UserInfo.Nickname = req.Nickname.Value
+	} else {
+		resp.UserInfo.Nickname = attribute.Nickname
 	}
-	if err := o.Database.UpdateUseInfo(ctx, req.UserID, update, updateOpenIM); err != nil {
+	if req.FaceURL != nil {
+		resp.UserInfo.FaceURL = req.FaceURL.Value
+	} else {
+		resp.UserInfo.FaceURL = attribute.FaceURL
+	}
+
+	if err := o.Database.UpdateUseInfo(ctx, req.UserID, update); err != nil {
 		return nil, err
 	}
-	return &chat.UpdateUserInfoResp{}, nil
+	return resp, nil
 }
 
 func (o *chatSvr) FindUserPublicInfo(ctx context.Context, req *chat.FindUserPublicInfoReq) (*chat.FindUserPublicInfoResp, error) {
