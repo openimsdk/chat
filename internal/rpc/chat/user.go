@@ -17,9 +17,9 @@ package chat
 import (
 	"context"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/log"
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/proto/sdkws"
-
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
+	"github.com/OpenIMSDK/Open-IM-Server/pkg/proto/sdkws"
+	"github.com/OpenIMSDK/chat/pkg/common/config"
 	"github.com/OpenIMSDK/chat/pkg/common/constant"
 	"github.com/OpenIMSDK/chat/pkg/common/mctx"
 	"github.com/OpenIMSDK/chat/pkg/eerrs"
@@ -60,6 +60,7 @@ func (o *chatSvr) UpdateUserInfo(ctx context.Context, req *chat.UpdateUserInfoRe
 		if req.UserID == "" {
 			return nil, errs.ErrArgs.Wrap("user id is empty")
 		}
+		resp.AdminID = config.Config.AdminMap[req.UserID]
 	}
 	update, err := ToDBAttributeUpdate(req)
 	if err != nil {
@@ -119,7 +120,6 @@ func (o *chatSvr) UpdateUserInfo(ctx context.Context, req *chat.UpdateUserInfoRe
 	} else {
 		resp.UserInfo.FaceURL = attribute.FaceURL
 	}
-
 	if err := o.Database.UpdateUseInfo(ctx, req.UserID, update); err != nil {
 		return nil, err
 	}

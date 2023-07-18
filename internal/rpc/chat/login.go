@@ -194,9 +194,9 @@ func (o *chatSvr) genVerifyCode() string {
 	return string(data)
 }
 
-// registerUser rpc return defaultFriends,defaultGroups->ImportFriends,InviteUserToGroup,usertoken,userRegister api
+// registerUser rpc return defaultFriends,defaultGroups->usertoken api->userRegister api->ImportFriends,InviteUserToGroup api
 func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (*chat.RegisterUserResp, error) {
-	resp := &chat.RegisterUserResp{UserID: req.User.UserID}
+	resp := &chat.RegisterUserResp{}
 	defer log.ZDebug(ctx, "return")
 	ctx = mctx.WithAdminUser(ctx)
 	isAdmin, err := o.Admin.CheckNilOrAdmin(ctx)

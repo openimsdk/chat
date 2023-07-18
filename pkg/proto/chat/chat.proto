@@ -48,6 +48,7 @@ message UpdateUserInfoReq{
 
 message UpdateUserInfoResp{
   OpenIMServer.sdkws.UserInfo userInfo = 1;
+  string adminID=2;
 }
 
 message FindUserPublicInfoReq{
@@ -123,7 +124,6 @@ message RegisterUserReq {
 }
 
 message RegisterUserResp {
-  string userID = 1;
   OpenIMServer.sdkws.UserInfo userInfo = 3;
   repeated string defaultFriend = 2;
   repeated string defaultGroup = 4;
