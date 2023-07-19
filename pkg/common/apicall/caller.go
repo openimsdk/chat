@@ -2,6 +2,7 @@ package apicall
 
 import (
 	"context"
+
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/constant"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/log"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/proto/auth"
@@ -19,6 +20,8 @@ type CallerInterface interface {
 	UpdateUserInfo(ctx context.Context, userID string, nickName string, faceURL string) error
 	ForceOffLine(ctx context.Context, userID string) error
 	RegisterUser(ctx context.Context, users []*sdkws.UserInfo) error
+	FindGroup(ctx context.Context, groupIDs []string) ([]*sdkws.GroupInfo, error)
+	MapGroup(ctx context.Context, groupIDss []string) (map[string]*sdkws.GroupInfo, error)
 }
 
 type Caller struct {
@@ -63,11 +66,39 @@ func (c *Caller) UserToken(ctx context.Context, userID string, platformID int32)
 		PlatformID: platformID,
 		UserID:     userID,
 	})
+	log.ZDebug(ctx, "userToken", "userID", userID, "platform", platformID, "resp", resp, "err", err)
 	if err != nil {
 		log.ZError(ctx, "userToken", err, "userID", userID, "platform", platformID)
 		return "", err
 	}
 	return resp.Token, nil
+}
+
+func (c *Caller) FindGroup(ctx context.Context, groupIDs []string) ([]*sdkws.GroupInfo, error) {
+	findGroup := NewApiCaller[group.GetGroupsInfoReq, group.GetGroupsInfoResp]("/group/find_group")
+	resp, err := findGroup.Call(ctx, &group.GetGroupsInfoReq{
+		GroupIDs: groupIDs,
+	})
+	if err != nil {
+		log.ZError(ctx, "FindGroup", err, "groupIDs", groupIDs)
+		return nil, err
+	}
+	return resp.GroupInfos, nil
+}
+
+func (c *Caller) MapGroup(ctx context.Context, groupIDs []string) (map[string]*sdkws.GroupInfo, error) {
+	mapGroup := NewApiCaller[group.GetGroupsInfoReq, group.GetGroupsInfoResp]("/group/map_group")
+	resp, err := mapGroup.Call(ctx, &group.GetGroupsInfoReq{
+		GroupIDs: groupIDs,
+	})
+	if err != nil {
+		log.ZError(ctx, "MapGroup", err, "groupID", groupIDs)
+		return nil, err
+	}
+	if len(resp.GroupInfos) == 0 {
+		return nil, nil
+	}
+	return make(map[string]*sdkws.GroupInfo), nil
 }
 
 func (c *Caller) InviteToGroup(ctx context.Context, userID string, groupID string) error {
