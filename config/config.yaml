@@ -86,6 +86,7 @@ verifyCode:
 manager:
   nickName: ["chat1","chat2", "chat3" ]
 
+# admin1 ~ 3 is chat admin account
 adminMap:
   admin1: openIM123456
   admin2: openIM654321
