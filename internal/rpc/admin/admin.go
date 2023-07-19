@@ -62,9 +62,9 @@ func Start(discov discoveryregistry.SvcDiscoveryRegistry, server *grpc.Server) e
 	}
 
 	admin.RegisterAdminServer(server, &adminServer{
-		Database:        database.NewAdminDatabase(db),
-		Chat:            chat.NewChatClient(discov),
-		OpenIM:          openim.NewOpenIMClient(discov),
+		Database: database.NewAdminDatabase(db),
+		Chat:     chat.NewChatClient(discov),
+		//	OpenIM:          openim.NewOpenIMClient(discov),
 		CallerInterface: apicall.NewCallerInterface(),
 	})
 	return nil

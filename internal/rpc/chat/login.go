@@ -377,6 +377,7 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 			resp.ChatToken = chatToken.Token
 		}
 	}
+	resp.UserID = req.User.UserID
 	return resp, nil
 }
 
