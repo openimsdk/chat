@@ -13,10 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+#Include shell font styles and some basic information
+SCRIPTS_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 
-source ./style_info.cfg
-source ./path_info.cfg
-source ./function.sh
+source $SCRIPTS_ROOT/style_info.cfg
+source $SCRIPTS_ROOT/path_info.cfg
+source $SCRIPTS_ROOT/function.sh
+
 service_port_name=(
  openImChatApiPort
  openImAdminApiPort
@@ -24,6 +27,7 @@ service_port_name=(
    openImAdminPort
    openImChatPort
 )
+
 switch=$(cat $config_path | grep demoswitch |awk -F '[:]' '{print $NF}')
 for i in ${service_port_name[*]}; do
   list=$(cat $config_path | grep -w ${i} | awk -F '[:]' '{print $NF}')

@@ -13,9 +13,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
+OPENIM_ROOT=$(dirname "${BASH_SOURCE[0]}")/..
 chmod +x ./*.sh
-./start_all.sh
+
+$OPENIM_ROOT/scripts/start_all.sh
 i=1
 while ((i == 1))
 do

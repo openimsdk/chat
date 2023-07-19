@@ -12,15 +12,17 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+OPENIM_ROOT=$(dirname "${BASH_SOURCE[0]}")/..
+BIN_DIR=$OPENIM_ROOT/output/bin
+# Include necessary files
 
+source $OPENIM_ROOT/scripts/style_info.cfg
+source $OPENIM_ROOT/scripts/path_info.cfg
+source $OPENIM_ROOT/scripts/function.sh
 
-source ./style_info.cfg
-source ./path_info.cfg
-source ./function.sh
-
-bin_dir="../bin"
-logs_dir="../logs"
-sdk_db_dir="../db/sdk/"
+bin_dir="$BIN_DIR"
+logs_dir="$OPENIM_ROOT/logs"
+sdk_db_dir="$OPENIM_ROOT/sdk/db/"
 #Automatically created when there is no bin, logs folder
 if [ ! -d $bin_dir ]; then
   mkdir -p $bin_dir

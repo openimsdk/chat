@@ -14,11 +14,12 @@
 # limitations under the License.
 
 #Include shell font styles and some basic information
-source ./style_info.cfg
-source ./path_info.cfg
-source ./function.sh
+SCRIPTS_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+OPENIM_ROOT=$(dirname "${BASH_SOURCE[0]}")/..
 
-
+source $OPENIM_ROOT/scripts/style_info.cfg
+source $OPENIM_ROOT/scripts/path_info.cfg
+source $OPENIM_ROOT/scripts/function.sh
 
 list1=$(cat $config_path | grep openImPushPort | awk -F '[:]' '{print $NF}')
 list2=$(cat $config_path | grep pushPrometheusPort | awk -F '[:]' '{print $NF}')
