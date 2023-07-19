@@ -6,6 +6,9 @@ before:
     - go mod tidy
     # you may remove this if you don't need go generate
     - go generate ./...
+
+report_sizes: true
+
 builds:
   - binary: admin_api
     id: admin_api
@@ -101,6 +104,41 @@ archives:
     - goos: windows
       format: zip
 
+changelog:
+  sort: asc
+  use: github
+  filters:
+    exclude:
+      - "^test:"
+      - "^chore"
+      - "merge conflict"
+      - Merge pull request
+      - Merge remote-tracking branch
+      - Merge branch
+      - go mod tidy
+  groups:
+    - title: Dependency updates
+      regexp: '^.*?(feat|fix)\(deps\)!?:.+$'
+      order: 300
+    - title: "New Features"
+      regexp: '^.*?feat(\([[:word:]]+\))??!?:.+$'
+      order: 100
+    - title: "Security updates"
+      regexp: '^.*?sec(\([[:word:]]+\))??!?:.+$'
+      order: 150
+    - title: "Bug fixes"
+      regexp: '^.*?fix(\([[:word:]]+\))??!?:.+$'
+      order: 200
+    - title: "Documentation updates"
+      regexp: ^.*?doc(\([[:word:]]+\))??!?:.+$
+      order: 400
+    - title: "Build process updates"
+      regexp: ^.*?build(\([[:word:]]+\))??!?:.+$
+      order: 400
+    - title: Other work
+      order: 9999
+
+
 nfpms:
   - id: packages
     builds:
@@ -135,6 +173,44 @@ nfpms:
 
 # Default: './dist'
 dist: ./_output/dist
+
+# .goreleaser.yaml
+milestones:
+  # You can have multiple milestone configs
+  -
+    # Repository for the milestone
+    # Default is extracted from the origin remote URL
+    repo:
+      owner: user
+      name: repo
+
+    # Whether to close the milestone
+    close: true
+
+    # Fail release on errors, such as missing milestone.
+    fail_on_error: false
+
+    # Name of the milestone
+    #
+    # Default: '{{ .Tag }}'
+    name_template: "Current Release"
+
+publishers:
+  - name: "fury.io"
+    ids:
+      - packages
+    dir: "{{ dir .ArtifactPath }}"
+    cmd: |
+      bash -c '
+      if [[ "{{ .Tag }}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+        curl -F package=@{{ .ArtifactName }} https://{{ .Env.FURY_TOKEN }}@push.fury.io/{{ .Env.USERNAME }}/
+      else
+        echo "Skipping deployment: Non-production release detected"
+      fi'
+
+checksum:
+  name_template: "{{ .ProjectName }}_checksums.txt"
+  algorithm: sha256
 
 release:
   footer: |
