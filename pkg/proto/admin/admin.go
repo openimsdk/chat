@@ -50,8 +50,8 @@ func (x *SearchDefaultFriendReq) Check() error {
 }
 
 func (x *AddDefaultGroupReq) Check() error {
-	if x.Groups == nil {
-		return errs.ErrArgs.Wrap("Groups is empty")
+	if x.GroupIDs == nil {
+		return errs.ErrArgs.Wrap("GroupIDs is empty")
 	}
 	return nil
 }

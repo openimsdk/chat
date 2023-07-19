@@ -131,11 +131,8 @@ func (o *adminServer) Login(ctx context.Context, req *admin.LoginReq) (*admin.Lo
 	if err != nil {
 		return nil, err
 	}
-	//imToken, err := o.OpenIM.UserToken(ctx, a.UserID, 1)
-	//if err != nil {
-	//	return nil, err
-	//}
-	imToken, err := o.CallerInterface.UserToken(ctx, a.UserID, constant.AdminDefaultPlatform)
+	imUserID := config.Config.AdminMap[a.UserID]
+	imToken, err := o.CallerInterface.UserToken(ctx, imUserID, constant.AdminDefaultPlatform)
 	if err != nil {
 		return nil, err
 	}
@@ -145,7 +142,7 @@ func (o *adminServer) Login(ctx context.Context, req *admin.LoginReq) (*admin.Lo
 		Nickname:     a.Nickname,
 		FaceURL:      a.FaceURL,
 		Level:        a.Level,
-		ImUserID:     a.UserID,
+		ImUserID:     imUserID,
 		ImToken:      imToken,
 	}, nil
 }
