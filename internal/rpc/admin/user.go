@@ -16,7 +16,7 @@ package admin
 
 import (
 	"context"
-	"fmt"
+	constant2 "github.com/OpenIMSDK/Open-IM-Server/pkg/common/constant"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/log"
 	"github.com/OpenIMSDK/chat/pkg/common/config"
 	"github.com/OpenIMSDK/chat/pkg/common/constant"
@@ -37,7 +37,6 @@ import (
 
 func (o *adminServer) CancellationUser(ctx context.Context, req *admin.CancellationUserReq) (*admin.CancellationUserResp, error) {
 	defer log.ZDebug(ctx, "return")
-	fmt.Println(ctx.Value(constant.Token))
 	opUserID, err := mctx.CheckAdmin(ctx)
 	if err != nil {
 		return nil, err
@@ -46,8 +45,7 @@ func (o *adminServer) CancellationUser(ctx context.Context, req *admin.Cancellat
 	if err != nil {
 		return nil, err
 	}
-	ctx = context.WithValue(ctx, constant.Token, IMtoken)
-	fmt.Println(ctx.Value(constant.Token))
+	ctx = context.WithValue(ctx, constant2.Token, IMtoken)
 
 	err = o.CallerInterface.ForceOffLine(ctx, req.UserID)
 	if err != nil {
@@ -78,8 +76,7 @@ func (o *adminServer) BlockUser(ctx context.Context, req *admin.BlockUserReq) (*
 	if err != nil {
 		return nil, err
 	}
-	ctx = context.WithValue(ctx, constant.Token, IMtoken)
-	fmt.Println(ctx.Value(constant.Token))
+	ctx = context.WithValue(ctx, constant2.Token, IMtoken)
 
 	err = o.CallerInterface.ForceOffLine(ctx, req.UserID)
 	if err != nil {

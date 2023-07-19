@@ -16,6 +16,7 @@ package chat
 
 import (
 	"context"
+	constant2 "github.com/OpenIMSDK/Open-IM-Server/pkg/common/constant"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/log"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
 	"github.com/OpenIMSDK/chat/pkg/common/config"
@@ -63,7 +64,7 @@ func (o *chatSvr) UpdateUserInfo(ctx context.Context, req *chat.UpdateUserInfoRe
 		if err != nil {
 			return nil, err
 		}
-		ctx = context.WithValue(ctx, constant.Token, token)
+		ctx = context.WithValue(ctx, constant2.Token, token)
 	}
 	update, err := ToDBAttributeUpdate(req)
 	if err != nil {

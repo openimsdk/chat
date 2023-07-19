@@ -173,6 +173,4 @@ const (
 	FinDAllUser    = 2
 )
 
-const Token = "token"
-
 const AdminDefaultPlatform = 1

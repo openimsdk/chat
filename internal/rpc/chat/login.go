@@ -194,7 +194,6 @@ func (o *chatSvr) genVerifyCode() string {
 	return string(data)
 }
 
-// registerUser rpc return defaultFriends,defaultGroups->usertoken api->userRegister api->ImportFriends,InviteUserToGroup api
 func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (*chat.RegisterUserResp, error) {
 	resp := &chat.RegisterUserResp{}
 	defer log.ZDebug(ctx, "return")
@@ -342,7 +341,7 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 	}
 	imAdminID := config.GetDefaultIMAdmin()
 	token, err := o.CallerInterface.UserToken(ctx, imAdminID, constant.AdminDefaultPlatform)
-	ctx = context.WithValue(ctx, constant.Token, token)
+	ctx = context.WithValue(ctx, constant2.Token, token)
 	if err != nil {
 		log.ZError(ctx, "GetIMAdminUserToken Failed", err, "userID", imAdminID)
 	}
