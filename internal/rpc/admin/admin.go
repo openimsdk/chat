@@ -16,6 +16,7 @@ package admin
 
 import (
 	"context"
+	"github.com/OpenIMSDK/chat/pkg/common/apicall"
 
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/mcontext"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/discoveryregistry"
@@ -61,17 +62,19 @@ func Start(discov discoveryregistry.SvcDiscoveryRegistry, server *grpc.Server) e
 	}
 
 	admin.RegisterAdminServer(server, &adminServer{
-		Database: database.NewAdminDatabase(db),
-		Chat:     chat.NewChatClient(discov),
-		OpenIM:   openim.NewOpenIMClient(discov),
+		Database:        database.NewAdminDatabase(db),
+		Chat:            chat.NewChatClient(discov),
+		OpenIM:          openim.NewOpenIMClient(discov),
+		CallerInterface: apicall.NewCallerInterface(),
 	})
 	return nil
 }
 
 type adminServer struct {
-	Database database.AdminDatabaseInterface
-	Chat     *chat.ChatClient
-	OpenIM   *openim.OpenIMClient
+	Database        database.AdminDatabaseInterface
+	Chat            *chat.ChatClient
+	OpenIM          *openim.OpenIMClient
+	CallerInterface apicall.CallerInterface
 }
 
 func (o *adminServer) GetAdminInfo(ctx context.Context, req *admin.GetAdminInfoReq) (*admin.GetAdminInfoResp, error) {
@@ -132,6 +135,10 @@ func (o *adminServer) Login(ctx context.Context, req *admin.LoginReq) (*admin.Lo
 	//if err != nil {
 	//	return nil, err
 	//}
+	imToken, err := o.CallerInterface.UserToken(ctx, a.UserID, constant.AdminDefaultPlatform)
+	if err != nil {
+		return nil, err
+	}
 	return &admin.LoginResp{
 		AdminAccount: a.Account,
 		AdminToken:   adminToken.Token,
@@ -139,6 +146,7 @@ func (o *adminServer) Login(ctx context.Context, req *admin.LoginReq) (*admin.Lo
 		FaceURL:      a.FaceURL,
 		Level:        a.Level,
 		ImUserID:     a.UserID,
+		ImToken:      imToken,
 	}, nil
 }
 

@@ -66,9 +66,11 @@ var Config struct {
 		IsJson              *bool   `yaml:"isJson"`
 		WithStack           *bool   `yaml:"withStack"`
 	} `yaml:"log"`
-	Secret      *string           `yaml:"secret"`
-	AdminMap    map[string]string `yaml:"adminMap"`
-	TokenPolicy struct {
+	Secret          *string           `yaml:"secret"`
+	ManagerNickName []string          `yaml:"managerNickName"`
+	AdminMap        map[string]string `yaml:"adminMap"`
+	OpenIM_url      string            `yaml:"openIM_Url"`
+	TokenPolicy     struct {
 		Expire *int64 `yaml:"expire"`
 	} `yaml:"tokenPolicy"`
 	VerifyCode struct {

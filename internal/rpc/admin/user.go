@@ -16,6 +16,7 @@ package admin
 
 import (
 	"context"
+	"fmt"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/log"
 	"github.com/OpenIMSDK/chat/pkg/common/config"
 	"github.com/OpenIMSDK/chat/pkg/common/constant"
@@ -36,19 +37,28 @@ import (
 
 func (o *adminServer) CancellationUser(ctx context.Context, req *admin.CancellationUserReq) (*admin.CancellationUserResp, error) {
 	defer log.ZDebug(ctx, "return")
+	fmt.Println(ctx.Value(constant.Token))
 	opUserID, err := mctx.CheckAdmin(ctx)
 	if err != nil {
 		return nil, err
 	}
-	//if err := o.OpenIM.ForceOffline(ctx, req.UserID); err != nil {
-	//	return nil, err
-	//}
+	IMtoken, err := o.CallerInterface.UserToken(ctx, config.Config.AdminMap[opUserID], constant.AdminDefaultPlatform)
+	if err != nil {
+		return nil, err
+	}
+	ctx = context.WithValue(ctx, constant.Token, IMtoken)
+	fmt.Println(ctx.Value(constant.Token))
+
+	err = o.CallerInterface.ForceOffLine(ctx, req.UserID)
+	if err != nil {
+		return nil, err
+	}
 	empty := wrapperspb.String("")
 	update := &chat.UpdateUserInfoReq{UserID: req.UserID, Account: empty, AreaCode: empty, PhoneNumber: empty, Email: empty}
 	if err := o.Chat.UpdateUser(ctx, update); err != nil {
 		return nil, err
 	}
-	return &admin.CancellationUserResp{AdminID: config.Config.AdminMap[opUserID]}, nil
+	return &admin.CancellationUserResp{}, nil
 }
 
 func (o *adminServer) BlockUser(ctx context.Context, req *admin.BlockUserReq) (*admin.BlockUserResp, error) {
@@ -63,9 +73,18 @@ func (o *adminServer) BlockUser(ctx context.Context, req *admin.BlockUserReq) (*
 	} else if !dbutil.IsGormNotFound(err) {
 		return nil, err
 	}
-	//if err := o.OpenIM.ForceOffline(ctx, req.UserID); err != nil {
-	//	return nil, err
-	//}
+
+	IMtoken, err := o.CallerInterface.UserToken(ctx, config.Config.AdminMap[opUserID], constant.AdminDefaultPlatform)
+	if err != nil {
+		return nil, err
+	}
+	ctx = context.WithValue(ctx, constant.Token, IMtoken)
+	fmt.Println(ctx.Value(constant.Token))
+
+	err = o.CallerInterface.ForceOffLine(ctx, req.UserID)
+	if err != nil {
+		return nil, err
+	}
 	t := &admin2.ForbiddenAccount{
 		UserID:         req.UserID,
 		Reason:         req.Reason,
@@ -75,7 +94,7 @@ func (o *adminServer) BlockUser(ctx context.Context, req *admin.BlockUserReq) (*
 	if err := o.Database.BlockUser(ctx, []*admin2.ForbiddenAccount{t}); err != nil {
 		return nil, err
 	}
-	return &admin.BlockUserResp{AdminID: opUserID}, nil
+	return &admin.BlockUserResp{}, nil
 }
 
 func (o *adminServer) UnblockUser(ctx context.Context, req *admin.UnblockUserReq) (*admin.UnblockUserResp, error) {

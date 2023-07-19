@@ -17,6 +17,8 @@ package chat
 import (
 	"context"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/proto/sdkws"
+	"github.com/OpenIMSDK/Open-IM-Server/pkg/proto/user"
+	"github.com/OpenIMSDK/chat/pkg/common/apicall"
 	"github.com/OpenIMSDK/chat/pkg/common/mctx"
 	"math/rand"
 	"strconv"
@@ -318,22 +320,25 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 		AllowBeep:      constant.DefaultAllowBeep,
 		AllowAddFriend: constant.DefaultAllowAddFriend,
 	}
-	//openIMRegister := func() error {
-	//	return o.OpenIM.UserRegister(ctx, &sdkws.UserInfo{
-	//		UserID:     req.User.UserID,
-	//		Nickname:   req.User.Nickname,
-	//		FaceURL:    req.User.FaceURL,
-	//		CreateTime: register.CreateTime.UnixMilli(),
-	//	})
-	//}
-	resp.UserInfo = &sdkws.UserInfo{
-		UserID:     req.User.UserID,
-		Nickname:   req.User.Nickname,
-		FaceURL:    req.User.FaceURL,
-		CreateTime: register.CreateTime.UnixMilli(),
+	openIMRegister := func() error {
+		userInfo := &sdkws.UserInfo{
+			UserID:     req.User.UserID,
+			Nickname:   req.User.Nickname,
+			FaceURL:    req.User.FaceURL,
+			CreateTime: register.CreateTime.UnixMilli(),
+		}
+		registerUser := apicall.NewApiCaller[user.UserRegisterReq, user.UserRegisterResp](config.Config.OpenIM_url + "/user/user_register")
+		_, err := registerUser.Call(ctx, &user.UserRegisterReq{
+			Secret: *config.Config.Secret,
+			Users:  []*sdkws.UserInfo{userInfo},
+		})
+		if err != nil {
+			return err
+		}
+		return nil
 	}
 
-	if err := o.Database.RegisterUser(ctx, register, account, attribute); err != nil {
+	if err := o.Database.RegisterUser(ctx, register, account, attribute, openIMRegister); err != nil {
 		return nil, err
 	}
 	if usedInvitationCode {
@@ -341,17 +346,35 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 			log.ZError(ctx, "UseInvitationCode", err, "userID", req.User.UserID, "invitationCode", req.InvitationCode)
 		}
 	}
+	imAdminID := config.GetDefaultIMAdmin()
+	token, err := o.CallerInterface.UserToken(ctx, imAdminID, constant.AdminDefaultPlatform)
+	ctx = context.WithValue(ctx, constant.Token, token)
+	if err != nil {
+		log.ZError(ctx, "GetIMAdminUserToken Failed", err, "userID", imAdminID)
+	}
 	if userIDs, err := o.Admin.GetDefaultFriendUserID(ctx); err != nil {
 		log.ZError(ctx, "GetDefaultFriendUserID Failed", err, "userID", req.User.UserID)
 	} else if len(userIDs) > 0 {
-		resp.DefaultFriend = userIDs
+		if err := o.CallerInterface.ImportFriend(ctx, req.User.UserID, userIDs); err != nil {
+			return nil, err
+		}
 	}
 	if groupIDs, err := o.Admin.GetDefaultGroupID(ctx); err != nil {
 		log.ZError(ctx, "GetDefaultGroupID Failed", err, "userID", req.User.UserID)
 	} else if len(groupIDs) > 0 {
-		resp.DefaultGroup = groupIDs
+		for _, groupID := range groupIDs {
+			if err := o.CallerInterface.InviteToGroup(ctx, req.User.UserID, groupID); err != nil {
+				log.ZError(ctx, "inviteUserToGroup Failed", err, "userID", req.User.UserID, "groupID", groupID)
+			}
+		}
 	}
 	if req.AutoLogin {
+		token, err := o.CallerInterface.UserToken(ctx, req.User.UserID, req.Platform)
+		if err != nil {
+			log.ZError(ctx, "GetIMAdminUserToken Failed", err, "userID", req.User.UserID)
+		}
+		resp.ImToken = token
+
 		chatToken, adminErr := o.Admin.CreateToken(ctx, req.User.UserID, constant.NormalUser)
 		if err != nil {
 			log.ZError(ctx, "Admin CreateToken Failed", err, "userID", req.User.UserID, "platform", req.Platform)
@@ -363,7 +386,6 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 	return resp, nil
 }
 
-// login rpc-> call usertoken api to set imtoken
 func (o *chatSvr) Login(ctx context.Context, req *chat.LoginReq) (*chat.LoginResp, error) {
 	defer log.ZDebug(ctx, "return")
 	resp := &chat.LoginResp{}
@@ -411,6 +433,10 @@ func (o *chatSvr) Login(ctx context.Context, req *chat.LoginReq) (*chat.LoginRes
 	if err != nil {
 		return nil, err
 	}
+	imToken, err := o.CallerInterface.UserToken(ctx, attribute.UserID, req.Platform)
+	if err != nil {
+		return nil, err
+	}
 	record := &chat2.UserLoginRecord{
 		UserID:    attribute.UserID,
 		LoginTime: time.Now(),
@@ -427,6 +453,7 @@ func (o *chatSvr) Login(ctx context.Context, req *chat.LoginReq) (*chat.LoginRes
 		}
 	}
 	resp.UserID = attribute.UserID
+	resp.ImToken = imToken
 	resp.ChatToken = chatToken.Token
 	return resp, nil
 }

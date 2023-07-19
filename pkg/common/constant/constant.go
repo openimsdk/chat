@@ -172,3 +172,7 @@ const (
 	FindNormalUser = 1
 	FinDAllUser    = 2
 )
+
+const Token = "token"
+
+const AdminDefaultPlatform = 1

@@ -124,6 +124,15 @@ func configFieldCopy[T any](local **T, remote T) {
 	}
 }
 
+func GetDefaultIMAdmin() string {
+	var adminID string
+	for _, imAdminID := range Config.AdminMap {
+		adminID = imAdminID
+		break
+	}
+	return adminID
+}
+
 type zkLogger struct{}
 
 func (l *zkLogger) Printf(format string, a ...interface{}) {

@@ -18,7 +18,6 @@ import (
 	"context"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/log"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/proto/sdkws"
 	"github.com/OpenIMSDK/chat/pkg/common/config"
 	"github.com/OpenIMSDK/chat/pkg/common/constant"
 	"github.com/OpenIMSDK/chat/pkg/common/mctx"
@@ -28,7 +27,7 @@ import (
 
 func (o *chatSvr) UpdateUserInfo(ctx context.Context, req *chat.UpdateUserInfoReq) (*chat.UpdateUserInfoResp, error) {
 	defer log.ZDebug(ctx, "return")
-	resp := &chat.UpdateUserInfoResp{UserInfo: &sdkws.UserInfo{UserID: req.UserID}}
+	resp := &chat.UpdateUserInfoResp{}
 	opUserID, userType, err := mctx.Check(ctx)
 	if err != nil {
 		return nil, err
@@ -60,7 +59,11 @@ func (o *chatSvr) UpdateUserInfo(ctx context.Context, req *chat.UpdateUserInfoRe
 		if req.UserID == "" {
 			return nil, errs.ErrArgs.Wrap("user id is empty")
 		}
-		resp.AdminID = config.Config.AdminMap[req.UserID]
+		token, err := o.CallerInterface.UserToken(ctx, config.Config.AdminMap[opUserID], constant.AdminDefaultPlatform)
+		if err != nil {
+			return nil, err
+		}
+		ctx = context.WithValue(ctx, constant.Token, token)
 	}
 	update, err := ToDBAttributeUpdate(req)
 	if err != nil {
@@ -96,31 +99,28 @@ func (o *chatSvr) UpdateUserInfo(ctx context.Context, req *chat.UpdateUserInfoRe
 			}
 		}
 	}
-	//updateOpenIM := func() error {
-	//	userReq := &user.UpdateUserInfoReq{UserInfo: &sdkws.UserInfo{UserID: req.UserID}}
-	//	if req.Nickname != nil {
-	//		userReq.UserInfo.Nickname = req.Nickname.Value
-	//	} else {
-	//		userReq.UserInfo.Nickname = attribute.Nickname
-	//	}
-	//	if req.FaceURL != nil {
-	//		userReq.UserInfo.FaceURL = req.FaceURL.Value
-	//	} else {
-	//		userReq.UserInfo.FaceURL = attribute.FaceURL
-	//	}
-	//	return o.OpenIM.UpdateUser(ctx, userReq)
-	//}
-	if req.Nickname != nil {
-		resp.UserInfo.Nickname = req.Nickname.Value
-	} else {
-		resp.UserInfo.Nickname = attribute.Nickname
+	updateOpenIM := func() error {
+		var (
+			nickName string
+			faceURL  string
+		)
+		if req.Nickname != nil {
+			nickName = req.Nickname.Value
+		} else {
+			nickName = attribute.Nickname
+		}
+		if req.FaceURL != nil {
+			faceURL = req.FaceURL.Value
+		} else {
+			faceURL = attribute.FaceURL
+		}
+		err := o.CallerInterface.UpdateUserInfo(ctx, req.UserID, nickName, faceURL)
+		if err != nil {
+			return err
+		}
+		return nil
 	}
-	if req.FaceURL != nil {
-		resp.UserInfo.FaceURL = req.FaceURL.Value
-	} else {
-		resp.UserInfo.FaceURL = attribute.FaceURL
-	}
-	if err := o.Database.UpdateUseInfo(ctx, req.UserID, update); err != nil {
+	if err := o.Database.UpdateUseInfo(ctx, req.UserID, update, updateOpenIM); err != nil {
 		return nil, err
 	}
 	return resp, nil

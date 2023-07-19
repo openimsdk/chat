@@ -28,6 +28,10 @@ adminApi:
   openImAdminApiPort: [ 10009 ]
   listenIP:
 
+callerApi:
+  openImAdminApiPort: [ 10007 ]
+  listenIP:
+
 rpc:
   registerIP:                             #作为rpc启动时，注册到zookeeper的IP，api/gateway能访问到此ip和对应的rpcPort中的端口
   listenIP:                               #默认为0.0.0.0
@@ -83,6 +87,8 @@ verifyCode:
 
 # 获取ip的header,没有配置直接获取远程地址
 #proxyHeader: "X-Forwarded-For"
+manager:
+  nickName: ["chat1","chat2", "chat3" ]
 
 adminMap:
   admin1: openIM123456

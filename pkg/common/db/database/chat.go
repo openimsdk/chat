@@ -29,7 +29,7 @@ import (
 type ChatDatabaseInterface interface {
 	IsNotFound(err error) bool
 	GetUser(ctx context.Context, userID string) (account *table.Account, err error)
-	UpdateUseInfo(ctx context.Context, userID string, attribute map[string]any) (err error)
+	UpdateUseInfo(ctx context.Context, userID string, attribute map[string]any, fn func() error) (err error)
 	FindAttribute(ctx context.Context, userIDs []string) ([]*table.Attribute, error)
 	FindAttributeByAccount(ctx context.Context, accounts []string) ([]*table.Attribute, error)
 	TakeAttributeByPhone(ctx context.Context, areaCode string, phoneNumber string) (*table.Attribute, error)
@@ -41,7 +41,7 @@ type ChatDatabaseInterface interface {
 	UpdateVerifyCodeIncrCount(ctx context.Context, id uint) error
 	TakeLastVerifyCode(ctx context.Context, account string) (*table.VerifyCode, error)
 	DelVerifyCode(ctx context.Context, id uint) error
-	RegisterUser(ctx context.Context, register *table.Register, account *table.Account, attribute *table.Attribute) error
+	RegisterUser(ctx context.Context, register *table.Register, account *table.Account, attribute *table.Attribute, fn func() error) error
 	GetAccount(ctx context.Context, userID string) (*table.Account, error)
 	GetAttribute(ctx context.Context, userID string) (*table.Attribute, error)
 	GetAttributeByAccount(ctx context.Context, account string) (*table.Attribute, error)
@@ -81,12 +81,15 @@ func (o *ChatDatabase) GetUser(ctx context.Context, userID string) (account *tab
 	return o.account.Take(ctx, userID)
 }
 
-func (o *ChatDatabase) UpdateUseInfo(ctx context.Context, userID string, attribute map[string]any) (err error) {
+func (o *ChatDatabase) UpdateUseInfo(ctx context.Context, userID string, attribute map[string]any, fn func() error) (err error) {
 	return o.tx.Transaction(func(tx any) error {
 		if len(attribute) > 0 {
 			if err := o.attribute.NewTx(tx).Update(ctx, userID, attribute); err != nil {
 				return err
 			}
+		}
+		if fn != nil {
+			return fn()
 		}
 		return nil
 	})
@@ -158,7 +161,7 @@ func (o *ChatDatabase) DelVerifyCode(ctx context.Context, id uint) error {
 	return o.verifyCode.Delete(ctx, id)
 }
 
-func (o *ChatDatabase) RegisterUser(ctx context.Context, register *table.Register, account *table.Account, attribute *table.Attribute) error {
+func (o *ChatDatabase) RegisterUser(ctx context.Context, register *table.Register, account *table.Account, attribute *table.Attribute, fn func() error) error {
 	return o.tx.Transaction(func(tx any) error {
 		if err := o.register.NewTx(tx).Create(ctx, register); err != nil {
 			return err
@@ -168,6 +171,9 @@ func (o *ChatDatabase) RegisterUser(ctx context.Context, register *table.Registe
 		}
 		if err := o.attribute.NewTx(tx).Create(ctx, attribute); err != nil {
 			return err
+		}
+		if fn != nil {
+			return fn()
 		}
 		return nil
 	})
