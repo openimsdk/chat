@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/log"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/proto/auth"
 	"github.com/OpenIMSDK/chat/pkg/common/config"
@@ -34,7 +35,7 @@ func (a Api[Req, Resp]) Call(ctx context.Context, req *Req) (*Resp, error) {
 	if err != nil {
 		return nil, err
 	}
-	request, err := http.NewRequestWithContext(ctx, http.MethodPost, apiURL+string(a), bytes.NewReader(reqBody))
+	request, err := http.NewRequestWithContext(ctx, http.MethodPost, config.Config.OpenIM_url+string(a), bytes.NewReader(reqBody))
 	if err != nil {
 		return nil, err
 	}
@@ -42,6 +43,7 @@ func (a Api[Req, Resp]) Call(ctx context.Context, req *Req) (*Resp, error) {
 	if err != nil {
 		return nil, err
 	}
+	log.ZDebug(ctx, "call api successfully")
 	defer response.Body.Close()
 	if response.StatusCode != http.StatusOK {
 		return nil, errors.New(response.Status)

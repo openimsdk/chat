@@ -18,6 +18,7 @@ type CallerInterface interface {
 	InviteToGroup(ctx context.Context, userID string, groupID string) error
 	UpdateUserInfo(ctx context.Context, userID string, nickName string, faceURL string) error
 	ForceOffLine(ctx context.Context, userID string) error
+	RegisterUser(ctx context.Context, users []*sdkws.UserInfo) error
 }
 
 type Caller struct {
@@ -25,7 +26,7 @@ type Caller struct {
 
 func (c *Caller) ForceOffLine(ctx context.Context, userID string) error {
 	for id := range constant.PlatformID2Name {
-		forceOffLine := NewApiCaller[auth.ForceLogoutReq, auth.ForceLogoutResp](config.Config.OpenIM_url + "/auth/force_logout")
+		forceOffLine := NewApiCaller[auth.ForceLogoutReq, auth.ForceLogoutResp]("/auth/force_logout")
 		_, err := forceOffLine.Call(ctx, &auth.ForceLogoutReq{
 			PlatformID: int32(id),
 			UserID:     userID,
@@ -43,7 +44,7 @@ func NewCallerInterface() CallerInterface {
 }
 
 func (c *Caller) ImportFriend(ctx context.Context, ownerUserID string, friendUserID []string) error {
-	importFriend := NewApiCaller[friend.ImportFriendReq, friend.ImportFriendResp](config.Config.OpenIM_url + "/friend/import_friend")
+	importFriend := NewApiCaller[friend.ImportFriendReq, friend.ImportFriendResp]("/friend/import_friend")
 	_, err := importFriend.Call(ctx, &friend.ImportFriendReq{
 		OwnerUserID:   ownerUserID,
 		FriendUserIDs: friendUserID,
@@ -56,7 +57,7 @@ func (c *Caller) ImportFriend(ctx context.Context, ownerUserID string, friendUse
 }
 
 func (c *Caller) UserToken(ctx context.Context, userID string, platformID int32) (string, error) {
-	userToken := NewApiCaller[auth.UserTokenReq, auth.UserTokenResp](config.Config.OpenIM_url + "/auth/user_token")
+	userToken := NewApiCaller[auth.UserTokenReq, auth.UserTokenResp]("/auth/user_token")
 	resp, err := userToken.Call(ctx, &auth.UserTokenReq{
 		Secret:     *config.Config.Secret,
 		PlatformID: platformID,
@@ -70,7 +71,7 @@ func (c *Caller) UserToken(ctx context.Context, userID string, platformID int32)
 }
 
 func (c *Caller) InviteToGroup(ctx context.Context, userID string, groupID string) error {
-	inviteToGroup := NewApiCaller[group.InviteUserToGroupReq, group.InviteUserToGroupResp](config.Config.OpenIM_url + "/group/invite_user_to_group")
+	inviteToGroup := NewApiCaller[group.InviteUserToGroupReq, group.InviteUserToGroupResp]("/group/invite_user_to_group")
 	_, err := inviteToGroup.Call(ctx, &group.InviteUserToGroupReq{
 		GroupID:        groupID,
 		Reason:         "",
@@ -84,7 +85,7 @@ func (c *Caller) InviteToGroup(ctx context.Context, userID string, groupID strin
 }
 
 func (c *Caller) UpdateUserInfo(ctx context.Context, userID string, nickName string, faceURL string) error {
-	updateUserInfo := NewApiCaller[user.UpdateUserInfoReq, user.UpdateUserInfoResp](config.Config.OpenIM_url + "/user/update_user_info")
+	updateUserInfo := NewApiCaller[user.UpdateUserInfoReq, user.UpdateUserInfoResp]("/user/update_user_info")
 	_, err := updateUserInfo.Call(ctx, &user.UpdateUserInfoReq{UserInfo: &sdkws.UserInfo{
 		UserID:   userID,
 		Nickname: nickName,
@@ -92,6 +93,19 @@ func (c *Caller) UpdateUserInfo(ctx context.Context, userID string, nickName str
 	}})
 	if err != nil {
 		log.ZError(ctx, "updateUserInfo", err, "userID", userID)
+		return err
+	}
+	return nil
+}
+
+func (c *Caller) RegisterUser(ctx context.Context, users []*sdkws.UserInfo) error {
+	registerUser := NewApiCaller[user.UserRegisterReq, user.UserRegisterResp]("/user/user_register")
+	_, err := registerUser.Call(ctx, &user.UserRegisterReq{
+		Secret: *config.Config.Secret,
+		Users:  users,
+	})
+	if err != nil {
+		log.ZError(ctx, "RegisterUser", err)
 		return err
 	}
 	return nil

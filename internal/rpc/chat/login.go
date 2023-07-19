@@ -17,8 +17,6 @@ package chat
 import (
 	"context"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/proto/sdkws"
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/proto/user"
-	"github.com/OpenIMSDK/chat/pkg/common/apicall"
 	"github.com/OpenIMSDK/chat/pkg/common/mctx"
 	"math/rand"
 	"strconv"
@@ -327,11 +325,7 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 			FaceURL:    req.User.FaceURL,
 			CreateTime: register.CreateTime.UnixMilli(),
 		}
-		registerUser := apicall.NewApiCaller[user.UserRegisterReq, user.UserRegisterResp](config.Config.OpenIM_url + "/user/user_register")
-		_, err := registerUser.Call(ctx, &user.UserRegisterReq{
-			Secret: *config.Config.Secret,
-			Users:  []*sdkws.UserInfo{userInfo},
-		})
+		err := o.CallerInterface.RegisterUser(ctx, []*sdkws.UserInfo{userInfo})
 		if err != nil {
 			return err
 		}

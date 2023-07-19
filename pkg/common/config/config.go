@@ -69,7 +69,7 @@ var Config struct {
 	Secret          *string           `yaml:"secret"`
 	ManagerNickName []string          `yaml:"managerNickName"`
 	AdminMap        map[string]string `yaml:"adminMap"`
-	OpenIM_url      string            `yaml:"openIM_Url"`
+	OpenIM_url      string            `yaml:"openIMUrl"`
 	TokenPolicy     struct {
 		Expire *int64 `yaml:"expire"`
 	} `yaml:"tokenPolicy"`

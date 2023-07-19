@@ -28,10 +28,6 @@ adminApi:
   openImAdminApiPort: [ 10009 ]
   listenIP:
 
-callerApi:
-  openImAdminApiPort: [ 10007 ]
-  listenIP:
-
 rpc:
   registerIP:                             #作为rpc启动时，注册到zookeeper的IP，api/gateway能访问到此ip和对应的rpcPort中的端口
   listenIP:                               #默认为0.0.0.0
@@ -66,7 +62,7 @@ log:
 #  isJson: false
 #  withStack: false
 
-#secret: "tuoyun"
+secret: "tuoyun"
 #tokenPolicy:
 #  expire: 86400
 
@@ -95,4 +91,4 @@ adminMap:
   admin2: openIM654321
   admin3: openIMAdmin
 
-openIM_url: "http://127.0.0.1:10002"
+openIMUrl: "http://127.0.0.1:10002"
