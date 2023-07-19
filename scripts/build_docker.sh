@@ -14,12 +14,14 @@
 IMAGE_VERSION=v1.1.0
 image=openim/openim_chat:$IMAGE_VERSION
 
+
 OPENIM_ROOT=$(dirname "${BASH_SOURCE[0]}")/..
 chmod +x $OPENIM_ROOT/scripts/*.sh
 
 $OPENIM_ROOT/scripts/build_all_service.sh
 
 docker build -t $image . -f $OPENIM_ROOT/deploy.Dockerfile
+
 docker push $image
 
 echo -e ${YELLOW_PREFIX}"docker build success"${COLOR_SUFFIX}
