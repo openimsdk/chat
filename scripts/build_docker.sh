@@ -11,11 +11,17 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+IMAGE_VERSION=v1.1.0
+image=openim/openim_chat:$IMAGE_VERSION
 
-image=openim/openim_chat:v1.0.2
-chmod +x ./*.sh
-./build_all_service.sh
-cd ../
-docker build -t $image . -f ./Dockerfile
+
+OPENIM_ROOT=$(dirname "${BASH_SOURCE[0]}")/..
+chmod +x $OPENIM_ROOT/scripts/*.sh
+
+$OPENIM_ROOT/scripts/build_all_service.sh
+
+docker build -t $image . -f $OPENIM_ROOT/deploy.Dockerfile
+
 docker push $image
-echo "build ok"
+
+echo -e ${YELLOW_PREFIX}"docker build success"${COLOR_SUFFIX}

@@ -13,10 +13,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+OPENIM_ROOT=$(dirname "${BASH_SOURCE[0]}")/..
+SCRIPTS_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 
-source ./style_info.cfg
-source ./path_info.cfg
-source ./function.sh
+source $OPENIM_ROOT/scripts/style_info.cfg
+source $OPENIM_ROOT/scripts/path_info.cfg
+source $OPENIM_ROOT/scripts/function.sh
 
 #service filename
 service_filename=(
@@ -40,6 +42,8 @@ service_prometheus_port_name=(
 
 )
 
+cd $SCRIPTS_ROOT
+
 for ((i = 0; i < ${#service_filename[*]}; i++)); do
   #Check whether the service exists
   service_name="ps -aux |grep -w ${service_filename[$i]} |grep -v grep"
@@ -53,7 +57,7 @@ for ((i = 0; i < ${#service_filename[*]}; i++)); do
     kill -9 $(eval $pid)
     sleep 0.5
   fi
-  cd ../bin
+  cd $OPENIM_ROOT/output/bin
   #Get the rpc port in the configuration file
   portList=$(cat $config_path | grep ${service_port_name[$i]} | awk -F '[:]' '{print $NF}')
   list_to_string ${portList}
