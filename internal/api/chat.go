@@ -85,6 +85,7 @@ func (o *ChatApi) RegisterUser(c *gin.Context) {
 		apiresp.GinError(c, err)
 		return
 	}
+	log.ZInfo(c, "registerUser", "req", &req)
 	if err := checker.Validate(&req); err != nil {
 		apiresp.GinError(c, errs.ErrArgs.Wrap(err.Error())) // 参数校验失败
 		return
@@ -160,6 +161,7 @@ func (o *ChatApi) RegisterUser(c *gin.Context) {
 	}
 	resp.ChatToken = resp1.ChatToken
 	resp.UserID = resp1.UserID
+	log.ZInfo(c, "registerUser api", "resp", &resp)
 	apiresp.GinSuccess(c, &resp)
 	// a2r.Call(chat.ChatClient.RegisterUser, o.chatClient, c)
 }
@@ -177,6 +179,7 @@ func (o *ChatApi) Login(c *gin.Context) {
 		apiresp.GinError(c, errs.ErrArgs.Wrap(err.Error())) // 参数校验失败
 		return
 	}
+	log.ZInfo(c, "Login", "req", &req)
 	ip, err := o.getClientIP(c)
 	if err != nil {
 		apiresp.GinError(c, err)
@@ -195,6 +198,7 @@ func (o *ChatApi) Login(c *gin.Context) {
 	resp.ImToken = imToken
 	resp.UserID = resp1.UserID
 	resp.ChatToken = resp1.ChatToken
+	log.ZInfo(c, "Login api", "resp", &resp)
 	apiresp.GinSuccess(c, resp)
 }
 
@@ -221,6 +225,7 @@ func (o *ChatApi) UpdateUserInfo(c *gin.Context) {
 		apiresp.GinError(c, err)
 		return
 	}
+	log.ZInfo(c, "updateUserInfo", "req", &req)
 	if err := checker.Validate(&req); err != nil {
 		apiresp.GinError(c, errs.ErrArgs.Wrap(err.Error())) // 参数校验失败
 		return
@@ -265,6 +270,7 @@ func (o *ChatApi) UpdateUserInfo(c *gin.Context) {
 		apiresp.GinError(c, err)
 		return
 	}
+	log.ZInfo(c, "updateUserInfo", "resp", &resp)
 	apiresp.GinSuccess(c, resp)
 }
 

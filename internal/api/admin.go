@@ -19,6 +19,7 @@ import (
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/apiresp"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/checker"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/constant"
+	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/log"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/utils"
 	"github.com/OpenIMSDK/chat/pkg/common/apicall"
@@ -51,6 +52,7 @@ func (o *AdminApi) AdminLogin(c *gin.Context) {
 		apiresp.GinError(c, err)
 		return
 	}
+	log.ZInfo(c, "AdminLogin api", "req", &req)
 	if err := checker.Validate(&req); err != nil {
 		apiresp.GinError(c, errs.ErrArgs.Wrap(err.Error())) // 参数校验失败
 		return
@@ -73,6 +75,7 @@ func (o *AdminApi) AdminLogin(c *gin.Context) {
 	}
 	resp.ImToken = imToken
 	resp.ImUserID = imAdminID
+	log.ZInfo(c, "AdminLogin api", "resp", resp)
 	apiresp.GinSuccess(c, resp)
 }
 
@@ -172,6 +175,7 @@ func (o *AdminApi) BlockUser(c *gin.Context) {
 		apiresp.GinError(c, err)
 		return
 	}
+	log.ZInfo(c, "BlockUser Api", "req", &req)
 	resp, err := o.adminClient.BlockUser(c, &req)
 	if err != nil {
 		apiresp.GinError(c, err)
@@ -199,6 +203,7 @@ func (o *AdminApi) BlockUser(c *gin.Context) {
 		apiresp.GinError(c, err)
 		return
 	}
+	log.ZInfo(c, "BlockUser Api", "resp", &resp)
 	apiresp.GinSuccess(c, resp)
 }
 

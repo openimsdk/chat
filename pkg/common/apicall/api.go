@@ -64,6 +64,7 @@ func (a Api[Req, Resp]) Call(ctx context.Context, req *Req) (*Resp, error) {
 	if err := json.Unmarshal(data, &resp); err != nil {
 		return nil, err
 	}
+
 	if resp.ErrCode != 0 {
 		return nil, errs.NewCodeError(resp.ErrCode, resp.ErrMsg).WithDetail(resp.ErrDlt)
 	}
