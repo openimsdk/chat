@@ -54,44 +54,26 @@ func (o *Admin) InitAdmin(ctx context.Context) error {
 	if err := o.db.WithContext(ctx).Model(&admin.Admin{}).Count(&count).Error; err != nil {
 		return errs.Wrap(err)
 	}
-	if count > 0 || len(config.Config.AdminMap) == 0 {
+	if count > 0 || len(config.Config.AdminList) == 0 {
 		return nil
 	}
 	now := time.Now()
-	admins := make([]*admin.Admin, 0, len(config.Config.AdminMap))
-	//for i, userID := range config.Config.Manager.UserID {
-	//	password := md5.Sum([]byte(userID))
-	//	table := admin.Admin{
-	//		Account:    userID,
-	//		UserID:     userID,
-	//		Password:   hex.EncodeToString(password[:]),
-	//		Level:      100,
-	//		CreateTime: now,
-	//	}
-	//	if len(config.Config.Manager.Nickname) > i {
-	//		table.Nickname = config.Config.Manager.Nickname[i]
-	//	} else {
-	//		table.Nickname = userID
-	//	}
-	//	admins = append(admins, &table)
-	//}
-	i := 0
-	for chatAdminID, _ := range config.Config.AdminMap {
-		password := md5.Sum([]byte(chatAdminID))
+	admins := make([]*admin.Admin, 0, len(config.Config.AdminList))
+	for _, adminChat := range config.Config.AdminList {
+		password := md5.Sum([]byte(adminChat.AdminID))
 		table := admin.Admin{
-			Account:    chatAdminID,
-			UserID:     chatAdminID,
+			Account:    adminChat.AdminID,
+			UserID:     adminChat.AdminID,
 			Password:   hex.EncodeToString(password[:]),
 			Level:      100,
 			CreateTime: now,
 		}
-		if len(config.Config.ManagerNickName) > i {
-			table.Nickname = config.Config.ManagerNickName[i]
+		if adminChat.NickName != "" {
+			table.Nickname = adminChat.NickName
 		} else {
-			table.Nickname = chatAdminID
+			table.Nickname = adminChat.AdminID
 		}
 		admins = append(admins, &table)
-		i += 1
 	}
 	if err := o.db.WithContext(ctx).Create(&admins).Error; err != nil {
 		return errs.Wrap(err)

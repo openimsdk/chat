@@ -16,6 +16,7 @@ package chat
 
 import (
 	"context"
+	"fmt"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/proto/sdkws"
 	"github.com/OpenIMSDK/chat/pkg/common/mctx"
 	"math/rand"
@@ -195,6 +196,7 @@ func (o *chatSvr) genVerifyCode() string {
 }
 
 func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (*chat.RegisterUserResp, error) {
+	fmt.Printf(config.Config.AdminList[0].ImAdminID)
 	resp := &chat.RegisterUserResp{}
 	defer log.ZDebug(ctx, "return")
 	ctx = mctx.WithAdminUser(ctx)

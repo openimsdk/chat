@@ -66,10 +66,9 @@ var Config struct {
 		IsJson              *bool   `yaml:"isJson"`
 		WithStack           *bool   `yaml:"withStack"`
 	} `yaml:"log"`
-	Secret          *string  `yaml:"secret"`
-	ManagerNickName []string `yaml:"managerNickName"`
-	OpenIM_url      string   `yaml:"openIMUrl"`
-	TokenPolicy     struct {
+	Secret      *string `yaml:"secret"`
+	OpenIM_url  string  `yaml:"openIMUrl"`
+	TokenPolicy struct {
 		Expire *int64 `yaml:"expire"`
 	} `yaml:"tokenPolicy"`
 	VerifyCode struct {
@@ -87,10 +86,12 @@ var Config struct {
 			VerificationCodeTemplateCode string `yaml:"verificationCodeTemplateCode"`
 		} `yaml:"ali"`
 	} `yaml:"verifyCode"`
-	ProxyHeader string `yaml:"proxyHeader"`
-	AdminList   []struct {
-		AdminID   string `yaml:"adminID"`
-		NickName  string `yaml:"nickName"`
-		ImAdminID string `yaml:"imAdmin"`
-	} `yaml:"adminList"`
+	ProxyHeader string  `yaml:"proxyHeader"`
+	AdminList   []Admin `yaml:"adminList"`
+}
+
+type Admin struct {
+	AdminID   string `yaml:"adminID"`
+	NickName  string `yaml:"nickname"`
+	ImAdminID string `yaml:"imAdmin"`
 }
