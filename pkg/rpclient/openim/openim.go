@@ -28,38 +28,6 @@ import (
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/proto/user"
 )
 
-//
-//func NewOpenIMClient(discov discoveryregistry.SvcDiscoveryRegistry) *OpenIMClient {
-//	ctx := context.Background()
-//	userConn, err := discov.GetConn(ctx, config.Config.RpcRegisterName.OpenImUserName)
-//	if err != nil {
-//		panic(err)
-//	}
-//	friendConn, err := discov.GetConn(ctx, config.Config.RpcRegisterName.OpenImFriendName)
-//	if err != nil {
-//		panic(err)
-//	}
-//	groupConn, err := discov.GetConn(ctx, config.Config.RpcRegisterName.OpenImGroupName)
-//	if err != nil {
-//		panic(err)
-//	}
-//	authConn, err := discov.GetConn(ctx, config.Config.RpcRegisterName.OpenImAuthName)
-//	if err != nil {
-//		panic(err)
-//	}
-//	msgConn, err := discov.GetConn(ctx, config.Config.RpcRegisterName.OpenImMsgName)
-//	if err != nil {
-//		panic(err)
-//	}
-//	return &OpenIMClient{
-//		msg:    msg.NewMsgClient(msgConn),
-//		auth:   auth.NewAuthClient(authConn),
-//		user:   user.NewUserClient(userConn),
-//		group:  group.NewGroupClient(groupConn),
-//		friend: friend.NewFriendClient(friendConn),
-//	}
-//}
-
 type OpenIMClient struct {
 	msg    msg.MsgClient
 	auth   auth.AuthClient

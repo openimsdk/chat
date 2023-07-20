@@ -83,12 +83,19 @@ verifyCode:
 
 # 获取ip的header,没有配置直接获取远程地址
 #proxyHeader: "X-Forwarded-For"
-manager:
-  nickName: ["chat1","chat2", "chat3" ]
 
-adminMap:
-  admin1: openIM123456
-  admin2: openIM654321
-  admin3: openIMAdmin
-
+adminList: [
+  admin:
+    adminID: admin1
+    nickname: chat1
+    imAdmin: openIM123456,
+  admin:
+    adminID: admin2
+    nickname: chat2
+    imAdmin: openIM654321,
+  admin:
+    adminID: admin3
+    nickname: chat3
+    imAdmin: openIMAdmin
+]
 openIMUrl: "http://127.0.0.1:10002"

@@ -125,12 +125,16 @@ func configFieldCopy[T any](local **T, remote T) {
 }
 
 func GetDefaultIMAdmin() string {
-	var adminID string
-	for _, imAdminID := range Config.AdminMap {
-		adminID = imAdminID
-		break
+	return Config.AdminList[0].ImAdminID
+}
+
+func GetIMAdmin(chatAdminID string) string {
+	for _, admin := range Config.AdminList {
+		if admin.AdminID == chatAdminID {
+			return admin.ImAdminID
+		}
 	}
-	return adminID
+	return ""
 }
 
 type zkLogger struct{}

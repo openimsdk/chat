@@ -60,7 +60,8 @@ func (o *chatSvr) UpdateUserInfo(ctx context.Context, req *chat.UpdateUserInfoRe
 		if req.UserID == "" {
 			return nil, errs.ErrArgs.Wrap("user id is empty")
 		}
-		token, err := o.CallerInterface.UserToken(ctx, config.Config.AdminMap[opUserID], constant.AdminDefaultPlatform)
+		imAdminID := config.GetIMAdmin(opUserID)
+		token, err := o.CallerInterface.UserToken(ctx, imAdminID, constant.AdminDefaultPlatform)
 		if err != nil {
 			return nil, err
 		}

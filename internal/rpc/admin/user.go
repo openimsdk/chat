@@ -41,7 +41,8 @@ func (o *adminServer) CancellationUser(ctx context.Context, req *admin.Cancellat
 	if err != nil {
 		return nil, err
 	}
-	IMtoken, err := o.CallerInterface.UserToken(ctx, config.Config.AdminMap[opUserID], constant.AdminDefaultPlatform)
+	imAdminID := config.GetIMAdmin(opUserID)
+	IMtoken, err := o.CallerInterface.UserToken(ctx, imAdminID, constant.AdminDefaultPlatform)
 	if err != nil {
 		return nil, err
 	}
@@ -71,8 +72,8 @@ func (o *adminServer) BlockUser(ctx context.Context, req *admin.BlockUserReq) (*
 	} else if !dbutil.IsGormNotFound(err) {
 		return nil, err
 	}
-
-	IMtoken, err := o.CallerInterface.UserToken(ctx, config.Config.AdminMap[opUserID], constant.AdminDefaultPlatform)
+	imAdminID := config.GetIMAdmin(opUserID)
+	IMtoken, err := o.CallerInterface.UserToken(ctx, imAdminID, constant.AdminDefaultPlatform)
 	if err != nil {
 		return nil, err
 	}
