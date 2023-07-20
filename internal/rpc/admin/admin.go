@@ -131,20 +131,13 @@ func (o *adminServer) Login(ctx context.Context, req *admin.LoginReq) (*admin.Lo
 	if err != nil {
 		return nil, err
 	}
-
-	imAdminID := config.GetIMAdmin(a.UserID)
-	imToken, err := o.CallerInterface.UserToken(ctx, imAdminID, constant.AdminDefaultPlatform)
-	if err != nil {
-		return nil, err
-	}
 	return &admin.LoginResp{
+		AdminUserID:  a.UserID,
 		AdminAccount: a.Account,
 		AdminToken:   adminToken.Token,
 		Nickname:     a.Nickname,
 		FaceURL:      a.FaceURL,
 		Level:        a.Level,
-		ImUserID:     imAdminID,
-		ImToken:      imToken,
 	}, nil
 }
 

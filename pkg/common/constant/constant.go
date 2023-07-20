@@ -173,4 +173,4 @@ const (
 	FinDAllUser    = 2
 )
 
-const AdminDefaultPlatform = 1
+const DefaultPlatform = 1

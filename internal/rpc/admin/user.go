@@ -42,7 +42,7 @@ func (o *adminServer) CancellationUser(ctx context.Context, req *admin.Cancellat
 		return nil, err
 	}
 	imAdminID := config.GetIMAdmin(opUserID)
-	IMtoken, err := o.CallerInterface.UserToken(ctx, imAdminID, constant.AdminDefaultPlatform)
+	IMtoken, err := o.CallerInterface.UserToken(ctx, imAdminID, constant2.AdminPlatformID)
 	if err != nil {
 		return nil, err
 	}
@@ -62,7 +62,7 @@ func (o *adminServer) CancellationUser(ctx context.Context, req *admin.Cancellat
 
 func (o *adminServer) BlockUser(ctx context.Context, req *admin.BlockUserReq) (*admin.BlockUserResp, error) {
 	defer log.ZDebug(ctx, "return")
-	opUserID, err := mctx.CheckAdmin(ctx)
+	_, err := mctx.CheckAdmin(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -72,17 +72,7 @@ func (o *adminServer) BlockUser(ctx context.Context, req *admin.BlockUserReq) (*
 	} else if !dbutil.IsGormNotFound(err) {
 		return nil, err
 	}
-	imAdminID := config.GetIMAdmin(opUserID)
-	IMtoken, err := o.CallerInterface.UserToken(ctx, imAdminID, constant.AdminDefaultPlatform)
-	if err != nil {
-		return nil, err
-	}
-	ctx = context.WithValue(ctx, constant2.Token, IMtoken)
 
-	err = o.CallerInterface.ForceOffLine(ctx, req.UserID)
-	if err != nil {
-		return nil, err
-	}
 	t := &admin2.ForbiddenAccount{
 		UserID:         req.UserID,
 		Reason:         req.Reason,

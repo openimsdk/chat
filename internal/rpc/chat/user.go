@@ -16,10 +16,8 @@ package chat
 
 import (
 	"context"
-	constant2 "github.com/OpenIMSDK/Open-IM-Server/pkg/common/constant"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/log"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
-	"github.com/OpenIMSDK/chat/pkg/common/config"
 	"github.com/OpenIMSDK/chat/pkg/common/constant"
 	"github.com/OpenIMSDK/chat/pkg/common/mctx"
 	"github.com/OpenIMSDK/chat/pkg/eerrs"
@@ -60,12 +58,6 @@ func (o *chatSvr) UpdateUserInfo(ctx context.Context, req *chat.UpdateUserInfoRe
 		if req.UserID == "" {
 			return nil, errs.ErrArgs.Wrap("user id is empty")
 		}
-		imAdminID := config.GetIMAdmin(opUserID)
-		token, err := o.CallerInterface.UserToken(ctx, imAdminID, constant.AdminDefaultPlatform)
-		if err != nil {
-			return nil, err
-		}
-		ctx = context.WithValue(ctx, constant2.Token, token)
 	}
 	update, err := ToDBAttributeUpdate(req)
 	if err != nil {
@@ -101,28 +93,7 @@ func (o *chatSvr) UpdateUserInfo(ctx context.Context, req *chat.UpdateUserInfoRe
 			}
 		}
 	}
-	updateOpenIM := func() error {
-		var (
-			nickName string
-			faceURL  string
-		)
-		if req.Nickname != nil {
-			nickName = req.Nickname.Value
-		} else {
-			nickName = attribute.Nickname
-		}
-		if req.FaceURL != nil {
-			faceURL = req.FaceURL.Value
-		} else {
-			faceURL = attribute.FaceURL
-		}
-		err := o.CallerInterface.UpdateUserInfo(ctx, req.UserID, nickName, faceURL)
-		if err != nil {
-			return err
-		}
-		return nil
-	}
-	if err := o.Database.UpdateUseInfo(ctx, req.UserID, update, updateOpenIM); err != nil {
+	if err := o.Database.UpdateUseInfo(ctx, req.UserID, update); err != nil {
 		return nil, err
 	}
 	return resp, nil

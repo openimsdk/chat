@@ -16,7 +16,9 @@ package mctx
 
 import (
 	"context"
+	"fmt"
 	imConfig "github.com/OpenIMSDK/Open-IM-Server/pkg/common/config"
+	"github.com/OpenIMSDK/Open-IM-Server/pkg/utils"
 	"strconv"
 
 	constant2 "github.com/OpenIMSDK/Open-IM-Server/pkg/common/constant"
@@ -39,6 +41,7 @@ func Check(ctx context.Context) (string, int32, error) {
 	if opUserID == "" {
 		return "", 0, errs.ErrNoPermission.Wrap("opUserID empty")
 	}
+	fmt.Println(ctx.Value(constant.RpcOpUserType))
 	opUserTypeArr, ok := ctx.Value(constant.RpcOpUserType).([]string)
 	if !ok {
 		return "", 0, errs.ErrNoPermission.Wrap("missing user type")
@@ -107,9 +110,18 @@ func GetOpUserID(ctx context.Context) string {
 	return userID
 }
 
+func GetUserType(ctx context.Context) int32 {
+	userType, _ := ctx.Value(constant.RpcOpUserType).(int32)
+	return userType
+}
+
 func WithOpUserID(ctx context.Context, opUserID string, userType int32) context.Context {
+	headers, _ := ctx.Value(constant.RpcCustomHeader).([]string)
 	ctx = context.WithValue(ctx, constant.RpcOpUserID, opUserID)
 	ctx = context.WithValue(ctx, constant.RpcOpUserType, []string{strconv.Itoa(int(userType))})
+	if utils.IndexOf(constant.RpcOpUserType, headers...) < 0 {
+		ctx = context.WithValue(ctx, constant.RpcCustomHeader, append(headers, constant.RpcOpUserType))
+	}
 	return ctx
 }
 

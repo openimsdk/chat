@@ -16,14 +16,13 @@ package chat
 
 import (
 	"context"
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/proto/sdkws"
+	constant2 "github.com/OpenIMSDK/Open-IM-Server/pkg/common/constant"
 	"github.com/OpenIMSDK/chat/pkg/common/mctx"
 	"math/rand"
 	"strconv"
 	"strings"
 	"time"
 
-	constant2 "github.com/OpenIMSDK/Open-IM-Server/pkg/common/constant"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/log"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/mcontext"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
@@ -317,21 +316,7 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 		AllowBeep:      constant.DefaultAllowBeep,
 		AllowAddFriend: constant.DefaultAllowAddFriend,
 	}
-	openIMRegister := func() error {
-		userInfo := &sdkws.UserInfo{
-			UserID:     req.User.UserID,
-			Nickname:   req.User.Nickname,
-			FaceURL:    req.User.FaceURL,
-			CreateTime: register.CreateTime.UnixMilli(),
-		}
-		err := o.CallerInterface.RegisterUser(ctx, []*sdkws.UserInfo{userInfo})
-		if err != nil {
-			return err
-		}
-		return nil
-	}
-
-	if err := o.Database.RegisterUser(ctx, register, account, attribute, openIMRegister); err != nil {
+	if err := o.Database.RegisterUser(ctx, register, account, attribute); err != nil {
 		return nil, err
 	}
 	if usedInvitationCode {
@@ -339,35 +324,7 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 			log.ZError(ctx, "UseInvitationCode", err, "userID", req.User.UserID, "invitationCode", req.InvitationCode)
 		}
 	}
-	imAdminID := config.GetDefaultIMAdmin()
-	token, err := o.CallerInterface.UserToken(ctx, imAdminID, constant.AdminDefaultPlatform)
-	ctx = context.WithValue(ctx, constant2.Token, token)
-	if err != nil {
-		log.ZError(ctx, "GetIMAdminUserToken Failed", err, "userID", imAdminID)
-	}
-	if userIDs, err := o.Admin.GetDefaultFriendUserID(ctx); err != nil {
-		log.ZError(ctx, "GetDefaultFriendUserID Failed", err, "userID", req.User.UserID)
-	} else if len(userIDs) > 0 {
-		if err := o.CallerInterface.ImportFriend(ctx, req.User.UserID, userIDs); err != nil {
-			return nil, err
-		}
-	}
-	if groupIDs, err := o.Admin.GetDefaultGroupID(ctx); err != nil {
-		log.ZError(ctx, "GetDefaultGroupID Failed", err, "userID", req.User.UserID)
-	} else if len(groupIDs) > 0 {
-		for _, groupID := range groupIDs {
-			if err := o.CallerInterface.InviteToGroup(ctx, req.User.UserID, groupID); err != nil {
-				log.ZError(ctx, "inviteUserToGroup Failed", err, "userID", req.User.UserID, "groupID", groupID)
-			}
-		}
-	}
 	if req.AutoLogin {
-		token, err := o.CallerInterface.UserToken(ctx, req.User.UserID, req.Platform)
-		if err != nil {
-			log.ZError(ctx, "GetIMAdminUserToken Failed", err, "userID", req.User.UserID)
-		}
-		resp.ImToken = token
-
 		chatToken, adminErr := o.Admin.CreateToken(ctx, req.User.UserID, constant.NormalUser)
 		if err != nil {
 			log.ZError(ctx, "Admin CreateToken Failed", err, "userID", req.User.UserID, "platform", req.Platform)
@@ -427,10 +384,6 @@ func (o *chatSvr) Login(ctx context.Context, req *chat.LoginReq) (*chat.LoginRes
 	if err != nil {
 		return nil, err
 	}
-	imToken, err := o.CallerInterface.UserToken(ctx, attribute.UserID, req.Platform)
-	if err != nil {
-		return nil, err
-	}
 	record := &chat2.UserLoginRecord{
 		UserID:    attribute.UserID,
 		LoginTime: time.Now(),
@@ -447,7 +400,6 @@ func (o *chatSvr) Login(ctx context.Context, req *chat.LoginReq) (*chat.LoginRes
 		}
 	}
 	resp.UserID = attribute.UserID
-	resp.ImToken = imToken
 	resp.ChatToken = chatToken.Token
 	return resp, nil
 }

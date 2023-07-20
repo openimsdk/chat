@@ -5,7 +5,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
 	constant2 "github.com/OpenIMSDK/Open-IM-Server/pkg/common/constant"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/log"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
@@ -52,7 +51,6 @@ func (a Api[Req, Resp]) Call(ctx context.Context, req *Req) (*Resp, error) {
 		return nil, err
 	}
 	log.ZDebug(ctx, "call api successfully", "api", string(a))
-	fmt.Println(ctx.Value("operationID"))
 	defer response.Body.Close()
 	if response.StatusCode != http.StatusOK {
 		return nil, errors.New(response.Status)
@@ -66,7 +64,6 @@ func (a Api[Req, Resp]) Call(ctx context.Context, req *Req) (*Resp, error) {
 	if err := json.Unmarshal(data, &resp); err != nil {
 		return nil, err
 	}
-	fmt.Println(resp)
 	if resp.ErrCode != 0 {
 		return nil, errs.NewCodeError(resp.ErrCode, resp.ErrMsg).WithDetail(resp.ErrDlt)
 	}
