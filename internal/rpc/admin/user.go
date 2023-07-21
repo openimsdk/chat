@@ -16,9 +16,7 @@ package admin
 
 import (
 	"context"
-	constant2 "github.com/OpenIMSDK/Open-IM-Server/pkg/common/constant"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/log"
-	"github.com/OpenIMSDK/chat/pkg/common/config"
 	"github.com/OpenIMSDK/chat/pkg/common/constant"
 	"strings"
 	"time"
@@ -37,18 +35,18 @@ import (
 
 func (o *adminServer) CancellationUser(ctx context.Context, req *admin.CancellationUserReq) (*admin.CancellationUserResp, error) {
 	defer log.ZDebug(ctx, "return")
-	opUserID, err := mctx.CheckAdmin(ctx)
+	_, err := mctx.CheckAdmin(ctx)
 	if err != nil {
 		return nil, err
 	}
-	imAdminID := config.GetIMAdmin(opUserID)
-	IMtoken, err := o.CallerInterface.UserToken(ctx, imAdminID, constant2.AdminPlatformID)
-	if err != nil {
-		return nil, err
-	}
-	//ctx = context.WithValue(ctx, constant2.Token, IMtoken)
-
-	err = o.CallerInterface.ForceOffLine(ctx, req.UserID, IMtoken)
+	//imAdminID := config.GetIMAdmin(opUserID)
+	//IMtoken, err := o.CallerInterface.UserToken(ctx, imAdminID, constant2.AdminPlatformID)
+	//if err != nil {
+	//	return nil, err
+	//}
+	////ctx = context.WithValue(ctx, constant2.Token, IMtoken)
+	//
+	//err = o.CallerInterface.ForceOffLine(ctx, req.UserID, IMtoken)
 	if err != nil {
 		return nil, err
 	}

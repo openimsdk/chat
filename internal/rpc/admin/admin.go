@@ -16,8 +16,6 @@ package admin
 
 import (
 	"context"
-	"github.com/OpenIMSDK/chat/pkg/common/apicall"
-
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/mcontext"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/discoveryregistry"
 	"google.golang.org/grpc"
@@ -64,17 +62,14 @@ func Start(discov discoveryregistry.SvcDiscoveryRegistry, server *grpc.Server) e
 	admin.RegisterAdminServer(server, &adminServer{
 		Database: database.NewAdminDatabase(db),
 		Chat:     chat.NewChatClient(discov),
-		//	OpenIM:          openim.NewOpenIMClient(discov),
-		CallerInterface: apicall.NewCallerInterface(),
 	})
 	return nil
 }
 
 type adminServer struct {
-	Database        database.AdminDatabaseInterface
-	Chat            *chat.ChatClient
-	OpenIM          *openim.OpenIMClient
-	CallerInterface apicall.CallerInterface
+	Database database.AdminDatabaseInterface
+	Chat     *chat.ChatClient
+	OpenIM   *openim.OpenIMClient
 }
 
 func (o *adminServer) GetAdminInfo(ctx context.Context, req *admin.GetAdminInfoReq) (*admin.GetAdminInfoResp, error) {

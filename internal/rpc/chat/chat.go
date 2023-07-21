@@ -16,7 +16,6 @@ package chat
 
 import (
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/discoveryregistry"
-	"github.com/OpenIMSDK/chat/pkg/common/apicall"
 	"google.golang.org/grpc"
 
 	"github.com/OpenIMSDK/chat/pkg/common/config"
@@ -54,17 +53,14 @@ func Start(discov discoveryregistry.SvcDiscoveryRegistry, server *grpc.Server) e
 	chat.RegisterChatServer(server, &chatSvr{
 		Database: database.NewChatDatabase(db),
 		Admin:    chatClient.NewAdminClient(discov),
-		//OpenIM:          openim.NewOpenIMClient(discov),
-		SMS:             s,
-		CallerInterface: apicall.NewCallerInterface(),
+		SMS:      s,
 	})
 	return nil
 }
 
 type chatSvr struct {
-	Database        database.ChatDatabaseInterface
-	Admin           *chatClient.AdminClient
-	OpenIM          *openim.OpenIMClient
-	SMS             sms.SMS
-	CallerInterface apicall.CallerInterface
+	Database database.ChatDatabaseInterface
+	Admin    *chatClient.AdminClient
+	OpenIM   *openim.OpenIMClient
+	SMS      sms.SMS
 }
