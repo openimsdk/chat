@@ -2,6 +2,7 @@ package apicall
 
 import (
 	"context"
+
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/constant"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/log"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/proto/auth"
@@ -10,6 +11,7 @@ import (
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/proto/sdkws"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/proto/user"
 	"github.com/OpenIMSDK/chat/pkg/common/config"
+	"github.com/OpenIMSDK/chat/pkg/proto/admin"
 )
 
 type CallerInterface interface {
@@ -19,6 +21,7 @@ type CallerInterface interface {
 	UpdateUserInfo(ctx context.Context, userID string, nickName string, faceURL string, token string) error
 	ForceOffLine(ctx context.Context, userID string, token string) error
 	RegisterUser(ctx context.Context, users []*sdkws.UserInfo) error
+	AddDefaultGroup(ctx context.Context, groupIDs []string) error
 }
 
 type Caller struct {
@@ -107,6 +110,16 @@ func (c *Caller) ForceOffLine(ctx context.Context, userID string, token string) 
 			log.ZError(ctx, "ForceOffline", err, "userID", userID, "platformID", id)
 			return err
 		}
+	}
+	return nil
+}
+
+func (c *Caller) AddDefaultGroup(ctx context.Context, groupIDs []string) error {
+	addDefaultGroup := NewApiCaller[admin.AddDefaultGroupReq, admin.AddDefaultGroupResp]("/admin/add_default_group")
+	_, err := addDefaultGroup.Call(ctx, &admin.AddDefaultGroupReq{GroupIDs: groupIDs})
+	if err != nil {
+		log.ZError(ctx, "addDefaultGroup", err, "groupIDs", groupIDs)
+		return err
 	}
 	return nil
 }

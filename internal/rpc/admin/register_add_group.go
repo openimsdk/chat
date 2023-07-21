@@ -16,10 +16,11 @@ package admin
 
 import (
 	"context"
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/log"
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/proto/sdkws"
 	"strings"
 	"time"
+
+	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/log"
+	"github.com/OpenIMSDK/Open-IM-Server/pkg/proto/sdkws"
 
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/utils"
@@ -114,26 +115,39 @@ func (o *adminServer) FindDefaultGroup(ctx context.Context, req *admin.FindDefau
 
 func (o *adminServer) SearchDefaultGroup(ctx context.Context, req *admin.SearchDefaultGroupReq) (*admin.SearchDefaultGroupResp, error) {
 	defer log.ZDebug(ctx, "return")
-	if _, err := mctx.CheckAdmin(ctx); err != nil {
+	_, err := mctx.CheckAdmin(ctx)
+	if err != nil {
 		return nil, err
 	}
+
 	total, infos, err := o.Database.SearchDefaultGroup(ctx, req.Keyword, req.Pagination.PageNumber, req.Pagination.ShowNumber)
 	if err != nil {
 		return nil, err
 	}
-	groupIDs := utils.Slice(infos, func(info *admin2.RegisterAddGroup) string { return info.GroupID })
+
+	groupIDs := make([]string, len(infos))
+	for i, info := range infos {
+		groupIDs[i] = info.GroupID
+	}
+
 	groupMap, err := o.OpenIM.MapGroup(ctx, groupIDs)
 	if err != nil {
 		return nil, err
 	}
+
 	attributes := make([]*admin.GroupAttribute, 0, len(infos))
 	for _, info := range infos {
+		group := groupMap[info.GroupID]
+		if group == nil {
+			return nil, err
+		}
 		attribute := &admin.GroupAttribute{
 			GroupID:    info.GroupID,
 			CreateTime: info.CreateTime.UnixMilli(),
-			Group:      groupMap[info.GroupID],
+			Group:      group,
 		}
 		attributes = append(attributes, attribute)
 	}
+
 	return &admin.SearchDefaultGroupResp{Total: total, Groups: attributes}, nil
 }

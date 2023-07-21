@@ -108,7 +108,26 @@ func (o *AdminApi) FindDefaultFriend(c *gin.Context) {
 }
 
 func (o *AdminApi) AddDefaultGroup(c *gin.Context) {
-	a2r.Call(admin.AdminClient.AddDefaultGroup, o.adminClient, c)
+	var (
+		req  admin.AddDefaultGroupReq
+		resp admin.AddDefaultGroupResp
+	)
+	if err := c.BindJSON(&req); err != nil {
+		apiresp.GinError(c, err)
+		return
+	}
+	log.ZInfo(c, "addDefaultGroup", "req", &req)
+	if err := checker.Validate(&req); err != nil {
+		apiresp.GinError(c, errs.ErrArgs.Wrap(err.Error())) // 参数校验失败
+		return
+	}
+	_, err := o.adminClient.AddDefaultGroup(c, &req)
+	if err != nil {
+		apiresp.GinError(c, err)
+		return
+	}
+	log.ZInfo(c, "addDefaultGroup", "resp", &resp)
+	apiresp.GinSuccess(c, resp)
 }
 
 func (o *AdminApi) DelDefaultGroup(c *gin.Context) {
@@ -119,8 +138,23 @@ func (o *AdminApi) FindDefaultGroup(c *gin.Context) {
 	a2r.Call(admin.AdminClient.FindDefaultGroup, o.adminClient, c)
 }
 
+// rpc internal/api/admin.go
 func (o *AdminApi) SearchDefaultGroup(c *gin.Context) {
-	a2r.Call(admin.AdminClient.SearchDefaultGroup, o.adminClient, c)
+	var (
+		req admin.SearchDefaultGroupReq
+	)
+	if err := c.BindJSON(&req); err != nil {
+		apiresp.GinError(c, err)
+		return
+	}
+	log.ZInfo(c, "SearchDefaultGroup Api", "req", &req)
+	resp, err := o.adminClient.SearchDefaultGroup(c, &req)
+	if err != nil {
+		apiresp.GinError(c, err)
+		return
+	}
+	log.ZInfo(c, "SearchDefaultGroup Api", "resp", &resp)
+	apiresp.GinSuccess(c, resp)
 }
 
 func (o *AdminApi) AddInvitationCode(c *gin.Context) {
