@@ -196,9 +196,9 @@ func (o *AdminApi) BlockUser(c *gin.Context) {
 		apiresp.GinError(c, err)
 		return
 	}
-	c.Set(constant.Token, IMtoken)
+	//c.Set(constant.Token, IMtoken)
 
-	err = o.imApiCaller.ForceOffLine(c, req.UserID)
+	err = o.imApiCaller.ForceOffLine(c, req.UserID, IMtoken)
 	if err != nil {
 		apiresp.GinError(c, err)
 		return

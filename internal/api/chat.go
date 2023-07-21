@@ -120,17 +120,16 @@ func (o *ChatApi) RegisterUser(c *gin.Context) {
 		apiresp.GinError(c, err)
 		return
 	}
-	c.Set(constant.Token, token)
+	//c.Set(constant.Token, token)
 
 	t := mctx.WithOpUserID(c, config.Config.AdminList[0].AdminID, constant2.AdminUser)
-	fmt.Println(c.Value(constant2.RpcOpUserType))
 	resp2, err := o.adminClient.FindDefaultFriend(t, &admin.FindDefaultFriendReq{})
 	if err != nil {
 		log.ZError(t, "FindDefaultFriend Failed", err, "userID", req.User.UserID)
 		apiresp.GinError(c, err)
 		return
 	} else if len(resp2.UserIDs) > 0 {
-		if err := o.imApiCaller.ImportFriend(c, resp1.UserID, resp2.UserIDs); err != nil {
+		if err := o.imApiCaller.ImportFriend(c, resp1.UserID, resp2.UserIDs, token); err != nil {
 			apiresp.GinError(c, err)
 			return
 		}
@@ -143,7 +142,7 @@ func (o *ChatApi) RegisterUser(c *gin.Context) {
 		return
 	} else if len(resp3.GroupIDs) > 0 {
 		for _, groupID := range resp3.GroupIDs {
-			if err := o.imApiCaller.InviteToGroup(c, resp1.UserID, groupID); err != nil {
+			if err := o.imApiCaller.InviteToGroup(c, resp1.UserID, groupID, token); err != nil {
 				log.ZError(c, "inviteUserToGroup Failed", err, "userID", req.User.UserID, "groupID", groupID)
 				apiresp.GinError(c, err)
 				return
@@ -253,7 +252,7 @@ func (o *ChatApi) UpdateUserInfo(c *gin.Context) {
 		apiresp.GinError(c, err)
 		return
 	}
-	c.Set(constant.Token, token)
+	//c.Set(constant.Token, token)
 
 	if req.Nickname != nil {
 		nickName = req.Nickname.Value
@@ -265,7 +264,7 @@ func (o *ChatApi) UpdateUserInfo(c *gin.Context) {
 	} else {
 		faceURL = resp1.FaceUrl
 	}
-	err = o.imApiCaller.UpdateUserInfo(c, req.UserID, nickName, faceURL)
+	err = o.imApiCaller.UpdateUserInfo(c, req.UserID, nickName, faceURL, token)
 	if err != nil {
 		apiresp.GinError(c, err)
 		return

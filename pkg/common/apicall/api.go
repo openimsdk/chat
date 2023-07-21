@@ -23,7 +23,7 @@ type baseApiResponse[T any] struct {
 }
 
 type ApiCaller[Req, Resp any] interface {
-	Call(ctx context.Context, req *Req) (*Resp, error)
+	Call(ctx context.Context, req *Req, token ...string) (*Resp, error)
 }
 
 func NewApiCaller[Req, Resp any](url string) ApiCaller[Req, Resp] {
@@ -32,7 +32,7 @@ func NewApiCaller[Req, Resp any](url string) ApiCaller[Req, Resp] {
 
 type Api[Req, Resp any] string
 
-func (a Api[Req, Resp]) Call(ctx context.Context, req *Req) (*Resp, error) {
+func (a Api[Req, Resp]) Call(ctx context.Context, req *Req, token ...string) (*Resp, error) {
 	reqBody, err := json.Marshal(req)
 	if err != nil {
 		return nil, err
@@ -43,8 +43,8 @@ func (a Api[Req, Resp]) Call(ctx context.Context, req *Req) (*Resp, error) {
 	}
 	operationID := utils.ToString(ctx.Value(constant2.OperationID))
 	request.Header.Set(constant2.OperationID, operationID)
-	if token := ctx.Value(constant2.Token); token != nil {
-		request.Header.Set(constant2.Token, utils.ToString(ctx.Value(constant2.Token)))
+	if token != nil {
+		request.Header.Set(constant2.Token, utils.ToString(token[0]))
 	}
 	response, err := http.DefaultClient.Do(request)
 	if err != nil {

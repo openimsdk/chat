@@ -46,9 +46,9 @@ func (o *adminServer) CancellationUser(ctx context.Context, req *admin.Cancellat
 	if err != nil {
 		return nil, err
 	}
-	ctx = context.WithValue(ctx, constant2.Token, IMtoken)
+	//ctx = context.WithValue(ctx, constant2.Token, IMtoken)
 
-	err = o.CallerInterface.ForceOffLine(ctx, req.UserID)
+	err = o.CallerInterface.ForceOffLine(ctx, req.UserID, IMtoken)
 	if err != nil {
 		return nil, err
 	}
