@@ -16,7 +16,6 @@ package admin
 
 import (
 	"context"
-
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/mcontext"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/discoveryregistry"
 	"google.golang.org/grpc"
@@ -63,7 +62,6 @@ func Start(discov discoveryregistry.SvcDiscoveryRegistry, server *grpc.Server) e
 	admin.RegisterAdminServer(server, &adminServer{
 		Database: database.NewAdminDatabase(db),
 		Chat:     chat.NewChatClient(discov),
-		OpenIM:   openim.NewOpenIMClient(discov),
 	})
 	return nil
 }
@@ -128,18 +126,13 @@ func (o *adminServer) Login(ctx context.Context, req *admin.LoginReq) (*admin.Lo
 	if err != nil {
 		return nil, err
 	}
-	imToken, err := o.OpenIM.UserToken(ctx, a.UserID, 1)
-	if err != nil {
-		return nil, err
-	}
 	return &admin.LoginResp{
+		AdminUserID:  a.UserID,
 		AdminAccount: a.Account,
 		AdminToken:   adminToken.Token,
 		Nickname:     a.Nickname,
 		FaceURL:      a.FaceURL,
 		Level:        a.Level,
-		ImUserID:     a.UserID,
-		ImToken:      imToken.Token,
 	}, nil
 }
 

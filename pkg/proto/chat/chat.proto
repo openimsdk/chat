@@ -47,6 +47,8 @@ message UpdateUserInfoReq{
 }
 
 message UpdateUserInfoResp{
+  string faceUrl=1;
+  string nickName=2;
 }
 
 message FindUserPublicInfoReq{
@@ -123,7 +125,6 @@ message RegisterUserReq {
 
 message RegisterUserResp {
   string userID = 1;
-  string imToken = 2;
   string chatToken = 3;
 }
 
@@ -139,7 +140,6 @@ message LoginReq {
 }
 
 message LoginResp {
-  string imToken = 1;
   string chatToken = 2;
   string userID = 3;
 }

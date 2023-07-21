@@ -18,14 +18,15 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	openIMConfig "github.com/OpenIMSDK/Open-IM-Server/pkg/common/config"
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/constant"
-	openKeeper "github.com/OpenIMSDK/Open-IM-Server/pkg/discoveryregistry/zookeeper"
-	"gopkg.in/yaml.v3"
 	"os"
 	"path/filepath"
 	"runtime"
 	"time"
+
+	openIMConfig "github.com/OpenIMSDK/Open-IM-Server/pkg/common/config"
+	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/constant"
+	openKeeper "github.com/OpenIMSDK/Open-IM-Server/pkg/discoveryregistry/zookeeper"
+	"gopkg.in/yaml.v3"
 )
 
 var (
@@ -122,6 +123,19 @@ func configFieldCopy[T any](local **T, remote T) {
 	if *local == nil {
 		*local = &remote
 	}
+}
+
+func GetDefaultIMAdmin() string {
+	return Config.AdminList[0].ImAdminID
+}
+
+func GetIMAdmin(chatAdminID string) string {
+	for _, admin := range Config.AdminList {
+		if admin.AdminID == chatAdminID {
+			return admin.ImAdminID
+		}
+	}
+	return ""
 }
 
 type zkLogger struct{}

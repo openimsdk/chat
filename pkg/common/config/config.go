@@ -67,6 +67,7 @@ var Config struct {
 		WithStack           *bool   `yaml:"withStack"`
 	} `yaml:"log"`
 	Secret      *string `yaml:"secret"`
+	OpenIM_url  string  `yaml:"openIMUrl"`
 	TokenPolicy struct {
 		Expire *int64 `yaml:"expire"`
 	} `yaml:"tokenPolicy"`
@@ -85,5 +86,12 @@ var Config struct {
 			VerificationCodeTemplateCode string `yaml:"verificationCodeTemplateCode"`
 		} `yaml:"ali"`
 	} `yaml:"verifyCode"`
-	ProxyHeader string `yaml:"proxyHeader"`
+	ProxyHeader string  `yaml:"proxyHeader"`
+	AdminList   []Admin `yaml:"adminList"`
+}
+
+type Admin struct {
+	AdminID   string `yaml:"adminID"`
+	NickName  string `yaml:"nickname"`
+	ImAdminID string `yaml:"imAdmin"`
 }

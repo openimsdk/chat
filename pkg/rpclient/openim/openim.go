@@ -20,7 +20,6 @@ import (
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/config"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/constant"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/log"
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/discoveryregistry"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/proto/auth"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/proto/friend"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/proto/group"
@@ -28,37 +27,6 @@ import (
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/proto/sdkws"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/proto/user"
 )
-
-func NewOpenIMClient(discov discoveryregistry.SvcDiscoveryRegistry) *OpenIMClient {
-	ctx := context.Background()
-	userConn, err := discov.GetConn(ctx, config.Config.RpcRegisterName.OpenImUserName)
-	if err != nil {
-		panic(err)
-	}
-	friendConn, err := discov.GetConn(ctx, config.Config.RpcRegisterName.OpenImFriendName)
-	if err != nil {
-		panic(err)
-	}
-	groupConn, err := discov.GetConn(ctx, config.Config.RpcRegisterName.OpenImGroupName)
-	if err != nil {
-		panic(err)
-	}
-	authConn, err := discov.GetConn(ctx, config.Config.RpcRegisterName.OpenImAuthName)
-	if err != nil {
-		panic(err)
-	}
-	msgConn, err := discov.GetConn(ctx, config.Config.RpcRegisterName.OpenImMsgName)
-	if err != nil {
-		panic(err)
-	}
-	return &OpenIMClient{
-		msg:    msg.NewMsgClient(msgConn),
-		auth:   auth.NewAuthClient(authConn),
-		user:   user.NewUserClient(userConn),
-		group:  group.NewGroupClient(groupConn),
-		friend: friend.NewFriendClient(friendConn),
-	}
-}
 
 type OpenIMClient struct {
 	msg    msg.MsgClient
@@ -75,23 +43,6 @@ func (o *OpenIMClient) UpdateUser(ctx context.Context, req *user.UpdateUserInfoR
 
 func (o *OpenIMClient) UserRegister(ctx context.Context, req *sdkws.UserInfo) error {
 	_, err := o.user.UserRegister(ctx, &user.UserRegisterReq{Secret: config.Config.Secret, Users: []*sdkws.UserInfo{req}})
-	return err
-}
-
-func (o *OpenIMClient) AddDefaultFriend(ctx context.Context, userID string, friendUserIDs []string) error {
-	_, err := o.friend.ImportFriends(ctx, &friend.ImportFriendReq{
-		OwnerUserID:   userID,
-		FriendUserIDs: friendUserIDs,
-	})
-	return err
-}
-
-func (o *OpenIMClient) AddDefaultGroup(ctx context.Context, userID string, groupID string) error {
-	_, err := o.group.InviteUserToGroup(ctx, &group.InviteUserToGroupReq{
-		GroupID:        groupID,
-		Reason:         "",
-		InvitedUserIDs: []string{userID},
-	})
 	return err
 }
 

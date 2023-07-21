@@ -35,10 +35,19 @@ import (
 
 func (o *adminServer) CancellationUser(ctx context.Context, req *admin.CancellationUserReq) (*admin.CancellationUserResp, error) {
 	defer log.ZDebug(ctx, "return")
-	if _, err := mctx.CheckAdmin(ctx); err != nil {
+	_, err := mctx.CheckAdmin(ctx)
+	if err != nil {
 		return nil, err
 	}
-	if err := o.OpenIM.ForceOffline(ctx, req.UserID); err != nil {
+	//imAdminID := config.GetIMAdmin(opUserID)
+	//IMtoken, err := o.CallerInterface.UserToken(ctx, imAdminID, constant2.AdminPlatformID)
+	//if err != nil {
+	//	return nil, err
+	//}
+	////ctx = context.WithValue(ctx, constant2.Token, IMtoken)
+	//
+	//err = o.CallerInterface.ForceOffLine(ctx, req.UserID, IMtoken)
+	if err != nil {
 		return nil, err
 	}
 	empty := wrapperspb.String("")
@@ -51,18 +60,17 @@ func (o *adminServer) CancellationUser(ctx context.Context, req *admin.Cancellat
 
 func (o *adminServer) BlockUser(ctx context.Context, req *admin.BlockUserReq) (*admin.BlockUserResp, error) {
 	defer log.ZDebug(ctx, "return")
-	if _, err := mctx.CheckAdmin(ctx); err != nil {
+	_, err := mctx.CheckAdmin(ctx)
+	if err != nil {
 		return nil, err
 	}
-	_, err := o.Database.GetBlockInfo(ctx, req.UserID)
+	_, err = o.Database.GetBlockInfo(ctx, req.UserID)
 	if err == nil {
 		return nil, errs.ErrArgs.Wrap("user already blocked")
 	} else if !dbutil.IsGormNotFound(err) {
 		return nil, err
 	}
-	if err := o.OpenIM.ForceOffline(ctx, req.UserID); err != nil {
-		return nil, err
-	}
+
 	t := &admin2.ForbiddenAccount{
 		UserID:         req.UserID,
 		Reason:         req.Reason,

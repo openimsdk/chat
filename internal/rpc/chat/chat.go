@@ -53,7 +53,6 @@ func Start(discov discoveryregistry.SvcDiscoveryRegistry, server *grpc.Server) e
 	chat.RegisterChatServer(server, &chatSvr{
 		Database: database.NewChatDatabase(db),
 		Admin:    chatClient.NewAdminClient(discov),
-		OpenIM:   openim.NewOpenIMClient(discov),
 		SMS:      s,
 	})
 	return nil

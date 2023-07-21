@@ -172,3 +172,5 @@ const (
 	FindNormalUser = 1
 	FinDAllUser    = 2
 )
+
+const DefaultPlatform = 1
