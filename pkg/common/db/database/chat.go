@@ -112,15 +112,12 @@ func (o *ChatDatabase) TakeAttributeByUserID(ctx context.Context, userID string)
 	return o.attribute.Take(ctx, userID)
 }
 
-func (o *ChatDatabase) Search(ctx context.Context, normalUser int32, keyword string, genders []int32, pageNumber int32, showNumber int32) (uint32, []*table.Attribute, error) {
-	var forbiddenIDs = []string{}
+func (o *ChatDatabase) Search(ctx context.Context, normalUser int32, keyword string, genders []int32, pageNumber int32, showNumber int32) (total uint32, attributes []*table.Attribute, err error) {
+	var forbiddenIDs []string
 	if normalUser == 1 {
-		_, forbiddenUsers, err := o.forbiddenAccount.Search(ctx, keyword, pageNumber, showNumber)
+		forbiddenIDs, err = o.forbiddenAccount.FindAllIDs(ctx)
 		if err != nil {
 			return 0, nil, err
-		}
-		for _, forbiddenUser := range forbiddenUsers {
-			forbiddenIDs = append(forbiddenIDs, forbiddenUser.UserID)
 		}
 	}
 	total, totalUser, err := o.attribute.SearchNormalUser(ctx, keyword, forbiddenIDs, genders, pageNumber, showNumber)

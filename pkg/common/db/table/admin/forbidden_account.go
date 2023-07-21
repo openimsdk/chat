@@ -37,4 +37,5 @@ type ForbiddenAccountInterface interface {
 	Delete(ctx context.Context, userIDs []string) error
 	Find(ctx context.Context, userIDs []string) ([]*ForbiddenAccount, error)
 	Search(ctx context.Context, keyword string, page int32, size int32) (uint32, []*ForbiddenAccount, error)
+	FindAllIDs(ctx context.Context) ([]string, error)
 }
