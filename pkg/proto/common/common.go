@@ -6,7 +6,7 @@ import (
 )
 
 func EmailCheck(email string) error {
-	pattern := `^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z0-9]{2,6}$`
+	pattern := `^[0-9a-z][_.0-9a-z-]{0,31}@([0-9a-z][0-9a-z-]{0,30}[0-9a-z]\.){1,4}[a-z]{2,4}$`
 	if err := regexMatch(pattern, email); err != nil {
 		return errs.Wrap(err, "Email is invalid")
 	}
@@ -14,7 +14,7 @@ func EmailCheck(email string) error {
 }
 
 func AreaCodeCheck(areaCode string) error {
-	pattern := ``
+	pattern := `\+[1-9][0-9]{1,2}`
 	if err := regexMatch(pattern, areaCode); err != nil {
 		return errs.Wrap(err, "AreaCode is invalid")
 	}
@@ -22,7 +22,7 @@ func AreaCodeCheck(areaCode string) error {
 }
 
 func PhoneNumberCheck(phoneNumber string) error {
-	pattern := ``
+	pattern := `^1[1-9]{10}`
 	if err := regexMatch(pattern, phoneNumber); err != nil {
 		return errs.Wrap(err, "phoneNumber is invalid")
 	}
