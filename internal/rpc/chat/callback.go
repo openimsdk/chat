@@ -23,12 +23,12 @@ import (
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/constant"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/log"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
-
 	constant2 "github.com/OpenIMSDK/chat/pkg/common/constant"
 	"github.com/OpenIMSDK/chat/pkg/eerrs"
 	"github.com/OpenIMSDK/chat/pkg/proto/chat"
 )
 
+// openimcb
 func (o *chatSvr) OpenIMCallback(ctx context.Context, req *chat.OpenIMCallbackReq) (*chat.OpenIMCallbackResp, error) {
 	defer log.ZDebug(ctx, "return")
 	switch req.Command {

@@ -16,14 +16,13 @@ package admin
 
 import (
 	"context"
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/log"
 	"math/rand"
 	"strings"
 	"time"
 
+	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/log"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/utils"
-
 	"github.com/OpenIMSDK/chat/pkg/common/constant"
 	admin2 "github.com/OpenIMSDK/chat/pkg/common/db/table/admin"
 	"github.com/OpenIMSDK/chat/pkg/common/mctx"
@@ -31,6 +30,7 @@ import (
 	"github.com/OpenIMSDK/chat/pkg/proto/admin"
 )
 
+// add invitate code
 func (o *adminServer) AddInvitationCode(ctx context.Context, req *admin.AddInvitationCodeReq) (*admin.AddInvitationCodeResp, error) {
 	defer log.ZDebug(ctx, "return")
 	if _, err := mctx.CheckAdmin(ctx); err != nil {
@@ -65,6 +65,7 @@ func (o *adminServer) AddInvitationCode(ctx context.Context, req *admin.AddInvit
 	return &admin.AddInvitationCodeResp{}, nil
 }
 
+// get invitate code
 func (o *adminServer) GenInvitationCode(ctx context.Context, req *admin.GenInvitationCodeReq) (*admin.GenInvitationCodeResp, error) {
 	defer log.ZDebug(ctx, "return")
 	if _, err := mctx.CheckAdmin(ctx); err != nil {
@@ -109,6 +110,7 @@ func (o *adminServer) GenInvitationCode(ctx context.Context, req *admin.GenInvit
 	return &admin.GenInvitationCodeResp{}, nil
 }
 
+// find invitate code
 func (o *adminServer) FindInvitationCode(ctx context.Context, req *admin.FindInvitationCodeReq) (*admin.FindInvitationCodeResp, error) {
 	defer log.ZDebug(ctx, "return")
 	if _, _, err := mctx.Check(ctx); err != nil {
@@ -143,6 +145,7 @@ func (o *adminServer) FindInvitationCode(ctx context.Context, req *admin.FindInv
 	return resp, nil
 }
 
+// verify code
 func (o *adminServer) UseInvitationCode(ctx context.Context, req *admin.UseInvitationCodeReq) (*admin.UseInvitationCodeResp, error) {
 	defer log.ZDebug(ctx, "return")
 	if _, _, err := mctx.Check(ctx); err != nil {
@@ -164,6 +167,7 @@ func (o *adminServer) UseInvitationCode(ctx context.Context, req *admin.UseInvit
 	return &admin.UseInvitationCodeResp{}, nil
 }
 
+// delete invitate code
 func (o *adminServer) DelInvitationCode(ctx context.Context, req *admin.DelInvitationCodeReq) (*admin.DelInvitationCodeResp, error) {
 	defer log.ZDebug(ctx, "return")
 	if _, err := mctx.CheckAdmin(ctx); err != nil {
@@ -189,6 +193,7 @@ func (o *adminServer) DelInvitationCode(ctx context.Context, req *admin.DelInvit
 	return &admin.DelInvitationCodeResp{}, nil
 }
 
+// search invitate code
 func (o *adminServer) SearchInvitationCode(ctx context.Context, req *admin.SearchInvitationCodeReq) (*admin.SearchInvitationCodeResp, error) {
 	defer log.ZDebug(ctx, "return")
 	if _, err := mctx.CheckAdmin(ctx); err != nil {

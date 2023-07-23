@@ -16,10 +16,11 @@ package chat
 
 import (
 	"context"
+	"time"
+
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
 	"github.com/OpenIMSDK/chat/pkg/common/db/table/chat"
 	"gorm.io/gorm"
-	"time"
 )
 
 func NewVerifyCode(db *gorm.DB) *VerifyCode {
@@ -40,6 +41,7 @@ func (o *VerifyCode) Add(ctx context.Context, ms []*chat.VerifyCode) error {
 	return errs.Wrap(o.db.WithContext(ctx).Create(&ms).Error)
 }
 
+// range a num for code
 func (o *VerifyCode) RangeNum(ctx context.Context, account string, start time.Time, end time.Time) (uint32, error) {
 	var count int64
 	if err := o.db.WithContext(ctx).Model(&chat.VerifyCode{}).Where("account = ?", account).Where("create_time BETWEEN ? AND ?", start, end).Count(&count).Error; err != nil {
@@ -53,10 +55,12 @@ func (o *VerifyCode) TakeLast(ctx context.Context, account string) (*chat.Verify
 	return &m, errs.Wrap(o.db.WithContext(ctx).Where("account = ?", account).Order("id DESC").Take(&m).Error)
 }
 
+// increse
 func (o *VerifyCode) Incr(ctx context.Context, id uint) error {
 	return errs.Wrap(o.db.WithContext(ctx).Model(&chat.VerifyCode{}).Where("id = ?", id).Updates(map[string]any{"count": gorm.Expr("count + 1")}).Error)
 }
 
+// delete code
 func (o *VerifyCode) Delete(ctx context.Context, id uint) error {
 	return errs.Wrap(o.db.WithContext(ctx).Where("id = ?", id).Delete(&chat.VerifyCode{}).Error)
 }

@@ -19,9 +19,8 @@ import (
 
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/db/ormutil"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
-	"gorm.io/gorm"
-
 	"github.com/OpenIMSDK/chat/pkg/common/db/table/chat"
+	"gorm.io/gorm"
 )
 
 func NewAttribute(db *gorm.DB) chat.AttributeInterface {
@@ -77,6 +76,7 @@ func (o *Attribute) Take(ctx context.Context, userID string) (*chat.Attribute, e
 	return &a, errs.Wrap(o.db.WithContext(ctx).Where("user_id = ?", userID).Take(&a).Error)
 }
 
+// search normal user
 func (o *Attribute) SearchNormalUser(ctx context.Context, keyword string, forbiddenIDs []string, genders []int32, page int32, size int32) (uint32, []*chat.Attribute, error) {
 	db := o.db.WithContext(ctx)
 	if len(genders) > 0 {

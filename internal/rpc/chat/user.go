@@ -16,6 +16,7 @@ package chat
 
 import (
 	"context"
+
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/log"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
 	"github.com/OpenIMSDK/chat/pkg/common/constant"
@@ -24,6 +25,7 @@ import (
 	"github.com/OpenIMSDK/chat/pkg/proto/chat"
 )
 
+// update user info
 func (o *chatSvr) UpdateUserInfo(ctx context.Context, req *chat.UpdateUserInfoReq) (*chat.UpdateUserInfoResp, error) {
 	defer log.ZDebug(ctx, "return")
 	resp := &chat.UpdateUserInfoResp{}
@@ -99,6 +101,7 @@ func (o *chatSvr) UpdateUserInfo(ctx context.Context, req *chat.UpdateUserInfoRe
 	return resp, nil
 }
 
+// find user public info
 func (o *chatSvr) FindUserPublicInfo(ctx context.Context, req *chat.FindUserPublicInfoReq) (*chat.FindUserPublicInfoResp, error) {
 	defer log.ZDebug(ctx, "return")
 	if len(req.UserIDs) == 0 {
@@ -113,6 +116,7 @@ func (o *chatSvr) FindUserPublicInfo(ctx context.Context, req *chat.FindUserPubl
 	}, nil
 }
 
+// search user public info
 func (o *chatSvr) SearchUserPublicInfo(ctx context.Context, req *chat.SearchUserPublicInfoReq) (*chat.SearchUserPublicInfoResp, error) {
 	defer log.ZDebug(ctx, "return")
 	if _, _, err := mctx.Check(ctx); err != nil {
@@ -128,6 +132,7 @@ func (o *chatSvr) SearchUserPublicInfo(ctx context.Context, req *chat.SearchUser
 	}, nil
 }
 
+// find user info fully
 func (o *chatSvr) FindUserFullInfo(ctx context.Context, req *chat.FindUserFullInfoReq) (*chat.FindUserFullInfoResp, error) {
 	defer log.ZDebug(ctx, "return")
 	if _, _, err := mctx.Check(ctx); err != nil {
@@ -143,6 +148,7 @@ func (o *chatSvr) FindUserFullInfo(ctx context.Context, req *chat.FindUserFullIn
 	return &chat.FindUserFullInfoResp{Users: DbToPbUserFullInfos(attributes)}, nil
 }
 
+// search user info fullly
 func (o *chatSvr) SearchUserFullInfo(ctx context.Context, req *chat.SearchUserFullInfoReq) (*chat.SearchUserFullInfoResp, error) {
 	if _, _, err := mctx.Check(ctx); err != nil {
 		return nil, err
@@ -157,6 +163,7 @@ func (o *chatSvr) SearchUserFullInfo(ctx context.Context, req *chat.SearchUserFu
 	}, nil
 }
 
+// find user accout
 func (o *chatSvr) FindUserAccount(ctx context.Context, req *chat.FindUserAccountReq) (*chat.FindUserAccountResp, error) {
 	defer log.ZDebug(ctx, "return")
 	if len(req.UserIDs) == 0 {
@@ -176,6 +183,7 @@ func (o *chatSvr) FindUserAccount(ctx context.Context, req *chat.FindUserAccount
 	return &chat.FindUserAccountResp{UserAccountMap: userAccountMap}, nil
 }
 
+// find account user
 func (o *chatSvr) FindAccountUser(ctx context.Context, req *chat.FindAccountUserReq) (*chat.FindAccountUserResp, error) {
 	defer log.ZDebug(ctx, "return")
 	if len(req.Accounts) == 0 {

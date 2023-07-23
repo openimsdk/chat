@@ -16,11 +16,13 @@ package api
 
 import (
 	"context"
+
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/discoveryregistry"
 	"github.com/OpenIMSDK/chat/pkg/common/config"
 	"github.com/gin-gonic/gin"
 )
 
+// create a new chat route
 func NewChatRoute(router gin.IRouter, discov discoveryregistry.SvcDiscoveryRegistry) {
 	chatConn, err := discov.GetConn(context.Background(), config.Config.RpcRegisterName.OpenImChatName)
 	if err != nil {
@@ -54,6 +56,7 @@ func NewChatRoute(router gin.IRouter, discov discoveryregistry.SvcDiscoveryRegis
 	router.Group("/callback").POST("/open_im", chat.OpenIMCallback) // 回调
 }
 
+// create a new admin route
 func NewAdminRoute(router gin.IRouter, discov discoveryregistry.SvcDiscoveryRegistry) {
 	adminConn, err := discov.GetConn(context.Background(), config.Config.RpcRegisterName.OpenImAdminName)
 	if err != nil {

@@ -2,6 +2,7 @@ package apicall
 
 import (
 	"context"
+
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/constant"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/log"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/proto/auth"
@@ -21,13 +22,13 @@ type CallerInterface interface {
 	RegisterUser(ctx context.Context, users []*sdkws.UserInfo) error
 }
 
-type Caller struct {
-}
+type Caller struct{}
 
 func NewCallerInterface() CallerInterface {
 	return &Caller{}
 }
 
+// imporrt friend
 func (c *Caller) ImportFriend(ctx context.Context, ownerUserID string, friendUserID []string, token string) error {
 	importFriend := NewApiCaller[friend.ImportFriendReq, friend.ImportFriendResp]("/friend/import_friend")
 	_, err := importFriend.Call(ctx, &friend.ImportFriendReq{
@@ -41,6 +42,7 @@ func (c *Caller) ImportFriend(ctx context.Context, ownerUserID string, friendUse
 	return nil
 }
 
+// get user token
 func (c *Caller) UserToken(ctx context.Context, userID string, platformID int32) (string, error) {
 	userToken := NewApiCaller[auth.UserTokenReq, auth.UserTokenResp]("/auth/user_token")
 	resp, err := userToken.Call(ctx, &auth.UserTokenReq{
@@ -55,6 +57,7 @@ func (c *Caller) UserToken(ctx context.Context, userID string, platformID int32)
 	return resp.Token, nil
 }
 
+// invitate user to group
 func (c *Caller) InviteToGroup(ctx context.Context, userID string, groupID string, token string) error {
 	inviteToGroup := NewApiCaller[group.InviteUserToGroupReq, group.InviteUserToGroupResp]("/group/invite_user_to_group")
 	_, err := inviteToGroup.Call(ctx, &group.InviteUserToGroupReq{
@@ -69,6 +72,7 @@ func (c *Caller) InviteToGroup(ctx context.Context, userID string, groupID strin
 	return nil
 }
 
+// update user info
 func (c *Caller) UpdateUserInfo(ctx context.Context, userID string, nickName string, faceURL string, token string) error {
 	updateUserInfo := NewApiCaller[user.UpdateUserInfoReq, user.UpdateUserInfoResp]("/user/update_user_info")
 	_, err := updateUserInfo.Call(ctx, &user.UpdateUserInfoReq{UserInfo: &sdkws.UserInfo{
@@ -83,6 +87,7 @@ func (c *Caller) UpdateUserInfo(ctx context.Context, userID string, nickName str
 	return nil
 }
 
+// register user
 func (c *Caller) RegisterUser(ctx context.Context, users []*sdkws.UserInfo) error {
 	registerUser := NewApiCaller[user.UserRegisterReq, user.UserRegisterResp]("/user/user_register")
 	_, err := registerUser.Call(ctx, &user.UserRegisterReq{
@@ -96,6 +101,7 @@ func (c *Caller) RegisterUser(ctx context.Context, users []*sdkws.UserInfo) erro
 	return nil
 }
 
+// force user offline
 func (c *Caller) ForceOffLine(ctx context.Context, userID string, token string) error {
 	for id := range constant.PlatformID2Name {
 		forceOffLine := NewApiCaller[auth.ForceLogoutReq, auth.ForceLogoutResp]("/auth/force_logout")

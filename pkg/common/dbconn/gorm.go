@@ -16,6 +16,8 @@ package dbconn
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/log"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/mw/specialerror"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
@@ -24,7 +26,6 @@ import (
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
-	"time"
 )
 
 func NewMysqlGormDB() (*gorm.DB, error) {
@@ -73,6 +74,7 @@ func NewGormDB() (*gorm.DB, error) {
 	return NewMysqlGormDB()
 }
 
+// replace duplicate key
 func replaceDuplicateKey(err error) errs.CodeError {
 	if IsMysqlDuplicateKey(err) {
 		return errs.ErrDuplicateKey
@@ -80,6 +82,7 @@ func replaceDuplicateKey(err error) errs.CodeError {
 	return nil
 }
 
+// consider is or not mysql duplicate key
 func IsMysqlDuplicateKey(err error) bool {
 	if mysqlErr, ok := err.(*mysqlDriver.MySQLError); ok {
 		return mysqlErr.Number == 1062

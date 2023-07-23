@@ -16,19 +16,19 @@ package admin
 
 import (
 	"context"
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/log"
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/proto/sdkws"
 	"strings"
 	"time"
 
+	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/log"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
+	"github.com/OpenIMSDK/Open-IM-Server/pkg/proto/sdkws"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/utils"
-
 	admin2 "github.com/OpenIMSDK/chat/pkg/common/db/table/admin"
 	"github.com/OpenIMSDK/chat/pkg/common/mctx"
 	"github.com/OpenIMSDK/chat/pkg/proto/admin"
 )
 
+// add default group
 func (o *adminServer) AddDefaultGroup(ctx context.Context, req *admin.AddDefaultGroupReq) (*admin.AddDefaultGroupResp, error) {
 	defer log.ZDebug(ctx, "return")
 	if _, err := mctx.CheckAdmin(ctx); err != nil {
@@ -68,6 +68,7 @@ func (o *adminServer) AddDefaultGroup(ctx context.Context, req *admin.AddDefault
 	return &admin.AddDefaultGroupResp{}, nil
 }
 
+// delete dafault group
 func (o *adminServer) DelDefaultGroup(ctx context.Context, req *admin.DelDefaultGroupReq) (*admin.DelDefaultGroupResp, error) {
 	defer log.ZDebug(ctx, "return")
 	if _, err := mctx.CheckAdmin(ctx); err != nil {
@@ -100,6 +101,7 @@ func (o *adminServer) DelDefaultGroup(ctx context.Context, req *admin.DelDefault
 	return &admin.DelDefaultGroupResp{}, nil
 }
 
+// find default group
 func (o *adminServer) FindDefaultGroup(ctx context.Context, req *admin.FindDefaultGroupReq) (*admin.FindDefaultGroupResp, error) {
 	defer log.ZDebug(ctx, "return")
 	if _, _, err := mctx.Check(ctx); err != nil {
@@ -112,6 +114,7 @@ func (o *adminServer) FindDefaultGroup(ctx context.Context, req *admin.FindDefau
 	return &admin.FindDefaultGroupResp{GroupIDs: groupIDs}, nil
 }
 
+// search default group
 func (o *adminServer) SearchDefaultGroup(ctx context.Context, req *admin.SearchDefaultGroupReq) (*admin.SearchDefaultGroupResp, error) {
 	defer log.ZDebug(ctx, "return")
 	if _, err := mctx.CheckAdmin(ctx); err != nil {

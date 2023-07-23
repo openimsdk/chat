@@ -16,10 +16,11 @@ package chat
 
 import (
 	"context"
+	"time"
+
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
 	"github.com/OpenIMSDK/chat/pkg/common/db/table/chat"
 	"gorm.io/gorm"
-	"time"
 )
 
 func NewAccount(db *gorm.DB) chat.AccountInterface {

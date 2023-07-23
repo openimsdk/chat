@@ -20,7 +20,6 @@ import (
 	"time"
 
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
-
 	"github.com/OpenIMSDK/chat/pkg/proto/admin"
 )
 
@@ -34,6 +33,7 @@ type Admin struct {
 	CreateTime time.Time `gorm:"column:create_time"`
 }
 
+// update admin userinfo
 func ToDBAdminUpdate(req *admin.AdminUpdateInfoReq) (map[string]any, error) {
 	update := make(map[string]any)
 	if req.Account != nil {
@@ -69,6 +69,7 @@ func ToDBAdminUpdate(req *admin.AdminUpdateInfoReq) (map[string]any, error) {
 	return update, nil
 }
 
+// update admin password
 func ToDBAdminUpdatePassword(password string) (map[string]any, error) {
 	if password == "" {
 		return nil, errs.ErrArgs.Wrap("password is empty")
@@ -76,6 +77,7 @@ func ToDBAdminUpdatePassword(password string) (map[string]any, error) {
 	return map[string]any{"password": password}, nil
 }
 
+// update admin applet
 func ToDBAppletUpdate(req *admin.UpdateAppletReq) (map[string]any, error) {
 	update := make(map[string]any)
 	if req.Name != nil {
@@ -129,6 +131,7 @@ func ToDBAppletUpdate(req *admin.UpdateAppletReq) (map[string]any, error) {
 	return update, nil
 }
 
+// Invitation Register Update
 func ToDBInvitationRegisterUpdate(userID string) map[string]any {
 	return map[string]any{"user_id": userID}
 }

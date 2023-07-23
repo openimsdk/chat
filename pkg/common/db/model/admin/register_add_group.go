@@ -19,9 +19,8 @@ import (
 
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/db/ormutil"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
-	"gorm.io/gorm"
-
 	"github.com/OpenIMSDK/chat/pkg/common/db/table/admin"
+	"gorm.io/gorm"
 )
 
 func NewRegisterAddGroup(db *gorm.DB) admin.RegisterAddGroupInterface {
@@ -32,14 +31,17 @@ type RegisterAddGroup struct {
 	db *gorm.DB
 }
 
+// add register group
 func (o *RegisterAddGroup) Add(ctx context.Context, registerAddGroups []*admin.RegisterAddGroup) error {
 	return errs.Wrap(o.db.WithContext(ctx).Create(registerAddGroups).Error)
 }
 
+// delete register_add_group
 func (o *RegisterAddGroup) Del(ctx context.Context, userIDs []string) error {
 	return errs.Wrap(o.db.WithContext(ctx).Where("group_id in ?", userIDs).Delete(&admin.RegisterAddGroup{}).Error)
 }
 
+// find group id
 func (o *RegisterAddGroup) FindGroupID(ctx context.Context, userIDs []string) ([]string, error) {
 	db := o.db.WithContext(ctx).Model(&admin.RegisterAddGroup{})
 	if len(userIDs) > 0 {
@@ -52,6 +54,7 @@ func (o *RegisterAddGroup) FindGroupID(ctx context.Context, userIDs []string) ([
 	return ms, nil
 }
 
+// search register groups
 func (o *RegisterAddGroup) Search(ctx context.Context, keyword string, page int32, size int32) (uint32, []*admin.RegisterAddGroup, error) {
 	return ormutil.GormSearch[admin.RegisterAddGroup](o.db.WithContext(ctx), []string{"group_id"}, keyword, page, size)
 }

@@ -16,16 +16,15 @@ package admin
 
 import (
 	"context"
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/log"
-	"github.com/OpenIMSDK/chat/pkg/common/constant"
 	"strings"
 	"time"
 
+	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/log"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/mcontext"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/proto/wrapperspb"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/utils"
-
+	"github.com/OpenIMSDK/chat/pkg/common/constant"
 	"github.com/OpenIMSDK/chat/pkg/common/db/dbutil"
 	admin2 "github.com/OpenIMSDK/chat/pkg/common/db/table/admin"
 	"github.com/OpenIMSDK/chat/pkg/common/mctx"
@@ -33,6 +32,7 @@ import (
 	"github.com/OpenIMSDK/chat/pkg/proto/chat"
 )
 
+// cancel
 func (o *adminServer) CancellationUser(ctx context.Context, req *admin.CancellationUserReq) (*admin.CancellationUserResp, error) {
 	defer log.ZDebug(ctx, "return")
 	_, err := mctx.CheckAdmin(ctx)
@@ -58,6 +58,7 @@ func (o *adminServer) CancellationUser(ctx context.Context, req *admin.Cancellat
 	return &admin.CancellationUserResp{}, nil
 }
 
+// block user
 func (o *adminServer) BlockUser(ctx context.Context, req *admin.BlockUserReq) (*admin.BlockUserResp, error) {
 	defer log.ZDebug(ctx, "return")
 	_, err := mctx.CheckAdmin(ctx)
@@ -83,6 +84,7 @@ func (o *adminServer) BlockUser(ctx context.Context, req *admin.BlockUserReq) (*
 	return &admin.BlockUserResp{}, nil
 }
 
+// unblock user
 func (o *adminServer) UnblockUser(ctx context.Context, req *admin.UnblockUserReq) (*admin.UnblockUserResp, error) {
 	defer log.ZDebug(ctx, "return")
 	if _, err := mctx.CheckAdmin(ctx); err != nil {
@@ -108,6 +110,7 @@ func (o *adminServer) UnblockUser(ctx context.Context, req *admin.UnblockUserReq
 	return &admin.UnblockUserResp{}, nil
 }
 
+// search user blocked
 func (o *adminServer) SearchBlockUser(ctx context.Context, req *admin.SearchBlockUserReq) (*admin.SearchBlockUserResp, error) {
 	defer log.ZDebug(ctx, "return")
 	if _, err := mctx.CheckAdmin(ctx); err != nil {
@@ -145,6 +148,7 @@ func (o *adminServer) SearchBlockUser(ctx context.Context, req *admin.SearchBloc
 	return &admin.SearchBlockUserResp{Total: total, Users: users}, nil
 }
 
+// find user block info
 func (o *adminServer) FindUserBlockInfo(ctx context.Context, req *admin.FindUserBlockInfoReq) (*admin.FindUserBlockInfoResp, error) {
 	defer log.ZDebug(ctx, "return")
 	if _, err := mctx.CheckAdmin(ctx); err != nil {

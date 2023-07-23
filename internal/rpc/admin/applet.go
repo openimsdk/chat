@@ -16,21 +16,21 @@ package admin
 
 import (
 	"context"
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/log"
 	"strings"
 	"time"
 
+	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/log"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/utils"
-	"github.com/google/uuid"
-
 	"github.com/OpenIMSDK/chat/pkg/common/constant"
 	admin2 "github.com/OpenIMSDK/chat/pkg/common/db/table/admin"
 	"github.com/OpenIMSDK/chat/pkg/common/mctx"
 	"github.com/OpenIMSDK/chat/pkg/proto/admin"
 	"github.com/OpenIMSDK/chat/pkg/proto/common"
+	"github.com/google/uuid"
 )
 
+// add applet
 func (o *adminServer) AddApplet(ctx context.Context, req *admin.AddAppletReq) (*admin.AddAppletResp, error) {
 	defer log.ZDebug(ctx, "return")
 	if _, err := mctx.CheckAdmin(ctx); err != nil {
@@ -67,6 +67,7 @@ func (o *adminServer) AddApplet(ctx context.Context, req *admin.AddAppletReq) (*
 	return &admin.AddAppletResp{}, nil
 }
 
+// delete applet
 func (o *adminServer) DelApplet(ctx context.Context, req *admin.DelAppletReq) (*admin.DelAppletResp, error) {
 	defer log.ZDebug(ctx, "return")
 	if _, err := mctx.CheckAdmin(ctx); err != nil {
@@ -88,6 +89,7 @@ func (o *adminServer) DelApplet(ctx context.Context, req *admin.DelAppletReq) (*
 	return &admin.DelAppletResp{}, nil
 }
 
+// update applet
 func (o *adminServer) UpdateApplet(ctx context.Context, req *admin.UpdateAppletReq) (*admin.UpdateAppletResp, error) {
 	defer log.ZDebug(ctx, "return")
 	if _, err := mctx.CheckAdmin(ctx); err != nil {
@@ -107,6 +109,7 @@ func (o *adminServer) UpdateApplet(ctx context.Context, req *admin.UpdateAppletR
 	return &admin.UpdateAppletResp{}, nil
 }
 
+// find applet
 func (o *adminServer) FindApplet(ctx context.Context, req *admin.FindAppletReq) (*admin.FindAppletResp, error) {
 	defer log.ZDebug(ctx, "return")
 	if _, _, err := mctx.Check(ctx); err != nil {
@@ -135,6 +138,7 @@ func (o *adminServer) FindApplet(ctx context.Context, req *admin.FindAppletReq) 
 	return resp, nil
 }
 
+// search applet
 func (o *adminServer) SearchApplet(ctx context.Context, req *admin.SearchAppletReq) (*admin.SearchAppletResp, error) {
 	defer log.ZDebug(ctx, "return")
 	if _, err := mctx.CheckAdmin(ctx); err != nil {

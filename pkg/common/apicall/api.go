@@ -5,14 +5,15 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"io"
+	"net/http"
+
 	constant2 "github.com/OpenIMSDK/Open-IM-Server/pkg/common/constant"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/log"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/proto/auth"
 	"github.com/OpenIMSDK/chat/pkg/common/config"
 	"gorm.io/gorm/utils"
-	"io"
-	"net/http"
 )
 
 type baseApiResponse[T any] struct {
@@ -32,6 +33,7 @@ func NewApiCaller[Req, Resp any](url string) ApiCaller[Req, Resp] {
 
 type Api[Req, Resp any] string
 
+// call
 func (a Api[Req, Resp]) Call(ctx context.Context, req *Req, token ...string) (*Resp, error) {
 	reqBody, err := json.Marshal(req)
 	if err != nil {
@@ -74,10 +76,9 @@ func (a Api[Req, Resp]) Call(ctx context.Context, req *Req, token ...string) (*R
 
 var apiURL = config.Config.OpenIM_url
 
-var (
-	UserToken = NewApiCaller[auth.UserTokenReq, auth.UserTokenResp](apiURL + "/auth/user_token")
-)
+var UserToken = NewApiCaller[auth.UserTokenReq, auth.UserTokenResp](apiURL + "/auth/user_token")
 
+// test method
 func test() error {
 	ctx := context.Background()
 	resp, err := UserToken.Call(ctx, &auth.UserTokenReq{

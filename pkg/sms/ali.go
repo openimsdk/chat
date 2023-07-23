@@ -19,13 +19,13 @@ import (
 	"encoding/json"
 
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
+	"github.com/OpenIMSDK/chat/pkg/common/config"
 	aliconf "github.com/alibabacloud-go/darabonba-openapi/client"
 	dysmsapi "github.com/alibabacloud-go/dysmsapi-20170525/v2/client"
 	"github.com/alibabacloud-go/tea/tea"
-
-	"github.com/OpenIMSDK/chat/pkg/common/config"
 )
 
+// new ali
 func newAli() (SMS, error) {
 	conf := &aliconf.Config{
 		Endpoint:        tea.String(config.Config.VerifyCode.Ali.Endpoint),
@@ -43,10 +43,12 @@ type ali struct {
 	client *dysmsapi.Client
 }
 
+// sms by name
 func (a *ali) Name() string {
 	return "ali-sms"
 }
 
+// send sms code
 func (a *ali) SendCode(ctx context.Context, areaCode string, phoneNumber string, verifyCode string) error {
 	data, err := json.Marshal(&struct {
 		Code string `json:"code"`

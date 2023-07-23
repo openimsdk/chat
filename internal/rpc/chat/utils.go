@@ -16,11 +16,11 @@ package chat
 
 import (
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/utils"
-
 	"github.com/OpenIMSDK/chat/pkg/common/db/table/chat"
 	"github.com/OpenIMSDK/chat/pkg/proto/common"
 )
 
+// PB attribute
 func DbToPbAttribute(attribute *chat.Attribute) *common.UserPublicInfo {
 	if attribute == nil {
 		return nil
@@ -36,10 +36,12 @@ func DbToPbAttribute(attribute *chat.Attribute) *common.UserPublicInfo {
 	}
 }
 
+// PB attribute
 func DbToPbAttributes(attributes []*chat.Attribute) []*common.UserPublicInfo {
 	return utils.Slice(attributes, DbToPbAttribute)
 }
 
+// user full info
 func DbToPbUserFullInfo(attribute *chat.Attribute) *common.UserFullInfo {
 	return &common.UserFullInfo{
 		UserID:           attribute.UserID,
@@ -60,6 +62,7 @@ func DbToPbUserFullInfo(attribute *chat.Attribute) *common.UserFullInfo {
 	}
 }
 
+// user full infomation
 func DbToPbUserFullInfos(attributes []*chat.Attribute) []*common.UserFullInfo {
 	return utils.Slice(attributes, DbToPbUserFullInfo)
 }

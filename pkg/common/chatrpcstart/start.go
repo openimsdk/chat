@@ -2,6 +2,10 @@ package chatrpcstart
 
 import (
 	"fmt"
+	"net"
+	"strconv"
+	"time"
+
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/log"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/mw"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/network"
@@ -13,11 +17,9 @@ import (
 	chatMw "github.com/OpenIMSDK/chat/pkg/common/mw"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
-	"net"
-	"strconv"
-	"time"
 )
 
+// rpc start
 func Start(rpcPort int, rpcRegisterName string, prometheusPort int, rpcFn func(client discoveryregistry.SvcDiscoveryRegistry, server *grpc.Server) error, options ...grpc.ServerOption) error {
 	fmt.Println("start", rpcRegisterName, "server, port: ", rpcPort, "prometheusPort:", prometheusPort, ", OpenIM version: ", config.Version)
 	listener, err := net.Listen("tcp", net.JoinHostPort(network.GetListenIP(config.Config.Rpc.ListenIP), strconv.Itoa(rpcPort)))

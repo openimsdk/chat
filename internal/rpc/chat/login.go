@@ -16,30 +16,31 @@ package chat
 
 import (
 	"context"
-	constant2 "github.com/OpenIMSDK/Open-IM-Server/pkg/common/constant"
-	"github.com/OpenIMSDK/chat/pkg/common/mctx"
 	"math/rand"
 	"strconv"
 	"strings"
 	"time"
 
+	constant2 "github.com/OpenIMSDK/Open-IM-Server/pkg/common/constant"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/log"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/mcontext"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/utils"
-
 	"github.com/OpenIMSDK/chat/pkg/common/config"
 	"github.com/OpenIMSDK/chat/pkg/common/constant"
 	"github.com/OpenIMSDK/chat/pkg/common/db/dbutil"
 	chat2 "github.com/OpenIMSDK/chat/pkg/common/db/table/chat"
+	"github.com/OpenIMSDK/chat/pkg/common/mctx"
 	"github.com/OpenIMSDK/chat/pkg/eerrs"
 	"github.com/OpenIMSDK/chat/pkg/proto/chat"
 )
 
+// verify code by join
 func (o *chatSvr) verifyCodeJoin(areaCode, phoneNumber string) string {
 	return areaCode + " " + phoneNumber
 }
 
+// send verify code
 func (o *chatSvr) SendVerifyCode(ctx context.Context, req *chat.SendVerifyCodeReq) (*chat.SendVerifyCodeResp, error) {
 	defer log.ZDebug(ctx, "return")
 	switch req.UsedFor {
@@ -120,6 +121,7 @@ func (o *chatSvr) SendVerifyCode(ctx context.Context, req *chat.SendVerifyCodeRe
 	return &chat.SendVerifyCodeResp{}, nil
 }
 
+// verify code limit account
 func (o *chatSvr) verifyCode(ctx context.Context, account string, verifyCode string) (uint, error) {
 	defer log.ZDebug(ctx, "return")
 	if verifyCode == "" {
@@ -160,6 +162,7 @@ func (o *chatSvr) verifyCode(ctx context.Context, account string, verifyCode str
 	return last.ID, nil
 }
 
+// verify code
 func (o *chatSvr) VerifyCode(ctx context.Context, req *chat.VerifyCodeReq) (*chat.VerifyCodeResp, error) {
 	defer log.ZDebug(ctx, "return")
 	if _, err := o.verifyCode(ctx, o.verifyCodeJoin(req.AreaCode, req.PhoneNumber), req.VerifyCode); err != nil {
@@ -168,6 +171,7 @@ func (o *chatSvr) VerifyCode(ctx context.Context, req *chat.VerifyCodeReq) (*cha
 	return &chat.VerifyCodeResp{}, nil
 }
 
+// generate user id
 func (o *chatSvr) genUserID() string {
 	const l = 10
 	data := make([]byte, l)
@@ -183,6 +187,7 @@ func (o *chatSvr) genUserID() string {
 	return string(data)
 }
 
+// generate code
 func (o *chatSvr) genVerifyCode() string {
 	data := make([]byte, config.Config.VerifyCode.Len)
 	rand.Read(data)
@@ -193,6 +198,7 @@ func (o *chatSvr) genVerifyCode() string {
 	return string(data)
 }
 
+// registe user
 func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (*chat.RegisterUserResp, error) {
 	resp := &chat.RegisterUserResp{}
 	defer log.ZDebug(ctx, "return")
@@ -337,6 +343,7 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 	return resp, nil
 }
 
+// user login
 func (o *chatSvr) Login(ctx context.Context, req *chat.LoginReq) (*chat.LoginResp, error) {
 	defer log.ZDebug(ctx, "return")
 	resp := &chat.LoginResp{}

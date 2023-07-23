@@ -19,21 +19,22 @@ import (
 
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/apiresp"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
-	"github.com/gin-gonic/gin"
-	"google.golang.org/grpc"
-
 	"github.com/OpenIMSDK/chat/pkg/common/constant"
 	"github.com/OpenIMSDK/chat/pkg/proto/admin"
+	"github.com/gin-gonic/gin"
+	"google.golang.org/grpc"
 )
 
 func NewMW(adminConn grpc.ClientConnInterface) *MW {
 	return &MW{client: admin.NewAdminClient(adminConn)}
 }
 
+// define a mv struct
 type MW struct {
 	client admin.AdminClient
 }
 
+// parse token
 func (o *MW) parseToken(c *gin.Context) (string, int32, error) {
 	token := c.GetHeader("token")
 	if token == "" {
@@ -46,6 +47,7 @@ func (o *MW) parseToken(c *gin.Context) (string, int32, error) {
 	return resp.UserID, resp.UserType, nil
 }
 
+// parse token by type
 func (o *MW) parseTokenType(c *gin.Context, userType int32) (string, error) {
 	userID, t, err := o.parseToken(c)
 	if err != nil {
@@ -57,12 +59,14 @@ func (o *MW) parseTokenType(c *gin.Context, userType int32) (string, error) {
 	return userID, nil
 }
 
+// set token
 func (o *MW) setToken(c *gin.Context, userID string, userType int32) {
 	c.Set(constant.RpcOpUserID, userID)
 	c.Set(constant.RpcOpUserType, []string{strconv.Itoa(int(userType))})
 	c.Set(constant.RpcCustomHeader, []string{constant.RpcOpUserType})
 }
 
+// check token
 func (o *MW) CheckToken(c *gin.Context) {
 	userID, userType, err := o.parseToken(c)
 	if err != nil {
@@ -73,6 +77,7 @@ func (o *MW) CheckToken(c *gin.Context) {
 	o.setToken(c, userID, userType)
 }
 
+// check admin info
 func (o *MW) CheckAdmin(c *gin.Context) {
 	userID, err := o.parseTokenType(c, constant.AdminUser)
 	if err != nil {
@@ -83,6 +88,7 @@ func (o *MW) CheckAdmin(c *gin.Context) {
 	o.setToken(c, userID, constant.AdminUser)
 }
 
+// checck user
 func (o *MW) CheckUser(c *gin.Context) {
 	userID, err := o.parseTokenType(c, constant.NormalUser)
 	if err != nil {

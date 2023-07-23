@@ -31,10 +31,11 @@ import (
 
 var (
 	_, b, _, _ = runtime.Caller(0)
-	// Root folder of this project
+	// Root folder of this project.
 	Root = filepath.Join(filepath.Dir(b), "../../..")
 )
 
+// read rpc config
 func readConfig() ([]byte, error) {
 	cfgName := os.Getenv("CONFIG_NAME")
 	if len(cfgName) != 0 {
@@ -53,6 +54,7 @@ func readConfig() ([]byte, error) {
 	}
 }
 
+// initialize config
 func InitConfig() error {
 	data, err := readConfig()
 	if err != nil {
@@ -119,16 +121,19 @@ func InitConfig() error {
 	return nil
 }
 
+// copy config field
 func configFieldCopy[T any](local **T, remote T) {
 	if *local == nil {
 		*local = &remote
 	}
 }
 
+// get default admin by im
 func GetDefaultIMAdmin() string {
 	return Config.AdminList[0].ImAdminID
 }
 
+// gey admin by im
 func GetIMAdmin(chatAdminID string) string {
 	for _, admin := range Config.AdminList {
 		if admin.AdminID == chatAdminID {

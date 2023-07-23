@@ -19,10 +19,9 @@ import (
 
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/db/ormutil"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
-	"gorm.io/gorm"
-
 	"github.com/OpenIMSDK/chat/pkg/common/constant"
 	"github.com/OpenIMSDK/chat/pkg/common/db/table/admin"
+	"gorm.io/gorm"
 )
 
 func NewInvitationRegister(db *gorm.DB) admin.InvitationRegisterInterface {
@@ -37,15 +36,18 @@ func (o *InvitationRegister) NewTx(tx any) admin.InvitationRegisterInterface {
 	return &InvitationRegister{db: tx.(*gorm.DB)}
 }
 
+// find invitation_register
 func (o *InvitationRegister) Find(ctx context.Context, codes []string) ([]*admin.InvitationRegister, error) {
 	var ms []*admin.InvitationRegister
 	return ms, errs.Wrap(o.db.WithContext(ctx).Where("invitation_code in ?", codes).Find(&ms).Error)
 }
 
+// delete invitation register
 func (o *InvitationRegister) Del(ctx context.Context, codes []string) error {
 	return errs.Wrap(o.db.WithContext(ctx).Where("invitation_code in ?", codes).Delete(&admin.InvitationRegister{}).Error)
 }
 
+// create a invitation register
 func (o *InvitationRegister) Create(ctx context.Context, v ...*admin.InvitationRegister) error {
 	return errs.Wrap(o.db.WithContext(ctx).Create(v).Error)
 }
@@ -59,6 +61,7 @@ func (o *InvitationRegister) Update(ctx context.Context, code string, data map[s
 	return errs.Wrap(o.db.WithContext(ctx).Model(&admin.InvitationRegister{}).Where("code = ?", code).Updates(data).Error)
 }
 
+// search invitation_registration
 func (o *InvitationRegister) Search(ctx context.Context, keyword string, state int32, userIDs []string, codes []string, page int32, size int32) (uint32, []*admin.InvitationRegister, error) {
 	db := o.db.WithContext(ctx)
 	switch state {

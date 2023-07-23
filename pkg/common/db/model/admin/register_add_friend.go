@@ -19,9 +19,8 @@ import (
 
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/db/ormutil"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
-	"gorm.io/gorm"
-
 	"github.com/OpenIMSDK/chat/pkg/common/db/table/admin"
+	"gorm.io/gorm"
 )
 
 func NewRegisterAddFriend(db *gorm.DB) admin.RegisterAddFriendInterface {
@@ -32,14 +31,17 @@ type RegisterAddFriend struct {
 	db *gorm.DB
 }
 
+// add register friend
 func (o *RegisterAddFriend) Add(ctx context.Context, registerAddFriends []*admin.RegisterAddFriend) error {
 	return errs.Wrap(o.db.WithContext(ctx).Create(registerAddFriends).Error)
 }
 
+// delete register friend
 func (o *RegisterAddFriend) Del(ctx context.Context, userIDs []string) error {
 	return errs.Wrap(o.db.WithContext(ctx).Where("user_id in ?", userIDs).Delete(&admin.RegisterAddFriend{}).Error)
 }
 
+// find user ID
 func (o *RegisterAddFriend) FindUserID(ctx context.Context, userIDs []string) ([]string, error) {
 	db := o.db.WithContext(ctx).Model(&admin.RegisterAddFriend{})
 	if len(userIDs) > 0 {
@@ -52,6 +54,7 @@ func (o *RegisterAddFriend) FindUserID(ctx context.Context, userIDs []string) ([
 	return ms, nil
 }
 
+// search register_add_friend
 func (o *RegisterAddFriend) Search(ctx context.Context, keyword string, page int32, size int32) (uint32, []*admin.RegisterAddFriend, error) {
 	return ormutil.GormSearch[admin.RegisterAddFriend](o.db.WithContext(ctx), []string{"user_id"}, keyword, page, size)
 }

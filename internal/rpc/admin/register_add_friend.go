@@ -16,19 +16,19 @@ package admin
 
 import (
 	"context"
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/log"
 	"strings"
 	"time"
 
+	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/log"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/utils"
-
 	admin2 "github.com/OpenIMSDK/chat/pkg/common/db/table/admin"
 	"github.com/OpenIMSDK/chat/pkg/common/mctx"
 	"github.com/OpenIMSDK/chat/pkg/proto/admin"
 	"github.com/OpenIMSDK/chat/pkg/proto/common"
 )
 
+// add default friend
 func (o *adminServer) AddDefaultFriend(ctx context.Context, req *admin.AddDefaultFriendReq) (*admin.AddDefaultFriendResp, error) {
 	defer log.ZDebug(ctx, "return")
 	if _, err := mctx.CheckAdmin(ctx); err != nil {
@@ -68,6 +68,7 @@ func (o *adminServer) AddDefaultFriend(ctx context.Context, req *admin.AddDefaul
 	return &admin.AddDefaultFriendResp{}, nil
 }
 
+// delete default friend
 func (o *adminServer) DelDefaultFriend(ctx context.Context, req *admin.DelDefaultFriendReq) (*admin.DelDefaultFriendResp, error) {
 	defer log.ZDebug(ctx, "return")
 	if _, err := mctx.CheckAdmin(ctx); err != nil {
@@ -100,6 +101,7 @@ func (o *adminServer) DelDefaultFriend(ctx context.Context, req *admin.DelDefaul
 	return &admin.DelDefaultFriendResp{}, nil
 }
 
+// find default friend
 func (o *adminServer) FindDefaultFriend(ctx context.Context, req *admin.FindDefaultFriendReq) (*admin.FindDefaultFriendResp, error) {
 	defer log.ZDebug(ctx, "return")
 	if _, _, err := mctx.Check(ctx); err != nil {
@@ -112,6 +114,7 @@ func (o *adminServer) FindDefaultFriend(ctx context.Context, req *admin.FindDefa
 	return &admin.FindDefaultFriendResp{UserIDs: userIDs}, nil
 }
 
+// search default friend
 func (o *adminServer) SearchDefaultFriend(ctx context.Context, req *admin.SearchDefaultFriendReq) (*admin.SearchDefaultFriendResp, error) {
 	defer log.ZDebug(ctx, "return")
 	if _, err := mctx.CheckAdmin(ctx); err != nil {

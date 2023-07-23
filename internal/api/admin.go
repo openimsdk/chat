@@ -26,23 +26,25 @@ import (
 	"github.com/OpenIMSDK/chat/pkg/common/apistruct"
 	"github.com/OpenIMSDK/chat/pkg/common/config"
 	"github.com/OpenIMSDK/chat/pkg/common/mctx"
-	"github.com/gin-gonic/gin"
-	"google.golang.org/grpc"
-
 	"github.com/OpenIMSDK/chat/pkg/proto/admin"
 	"github.com/OpenIMSDK/chat/pkg/proto/chat"
+	"github.com/gin-gonic/gin"
+	"google.golang.org/grpc"
 )
 
+// create a new admin channel
 func NewAdmin(chatConn, adminConn grpc.ClientConnInterface) *AdminApi {
 	return &AdminApi{chatClient: chat.NewChatClient(chatConn), adminClient: admin.NewAdminClient(adminConn), imApiCaller: apicall.NewCallerInterface()}
 }
 
+// define a struct named adminapi
 type AdminApi struct {
 	chatClient  chat.ChatClient
 	adminClient admin.AdminClient
 	imApiCaller apicall.CallerInterface
 }
 
+// admin login
 func (o *AdminApi) AdminLogin(c *gin.Context) {
 	var (
 		req  admin.LoginReq
@@ -79,98 +81,119 @@ func (o *AdminApi) AdminLogin(c *gin.Context) {
 	apiresp.GinSuccess(c, resp)
 }
 
+// reset user password
 func (o *AdminApi) ResetUserPassword(c *gin.Context) {
 	a2r.Call(chat.ChatClient.ChangePassword, o.chatClient, c)
 }
 
+// update admin-infomation
 func (o *AdminApi) AdminUpdateInfo(c *gin.Context) {
 	a2r.Call(admin.AdminClient.AdminUpdateInfo, o.adminClient, c)
 }
 
+// admin user info
 func (o *AdminApi) AdminInfo(c *gin.Context) {
 	a2r.Call(admin.AdminClient.GetAdminInfo, o.adminClient, c)
 }
 
+// add default friend
 func (o *AdminApi) AddDefaultFriend(c *gin.Context) {
 	a2r.Call(admin.AdminClient.AddDefaultFriend, o.adminClient, c)
 }
 
+// delete default friend
 func (o *AdminApi) DelDefaultFriend(c *gin.Context) {
 	a2r.Call(admin.AdminClient.DelDefaultFriend, o.adminClient, c)
 }
 
+// search default friend
 func (o *AdminApi) SearchDefaultFriend(c *gin.Context) {
 	a2r.Call(admin.AdminClient.SearchDefaultFriend, o.adminClient, c)
 }
 
+// search default friend
 func (o *AdminApi) FindDefaultFriend(c *gin.Context) {
 	a2r.Call(admin.AdminClient.FindDefaultFriend, o.adminClient, c)
 }
 
+// add fefault group
 func (o *AdminApi) AddDefaultGroup(c *gin.Context) {
 	a2r.Call(admin.AdminClient.AddDefaultGroup, o.adminClient, c)
 }
 
+// delete default group
 func (o *AdminApi) DelDefaultGroup(c *gin.Context) {
 	a2r.Call(admin.AdminClient.DelDefaultGroup, o.adminClient, c)
 }
 
+// find fefault group
 func (o *AdminApi) FindDefaultGroup(c *gin.Context) {
 	a2r.Call(admin.AdminClient.FindDefaultGroup, o.adminClient, c)
 }
 
+// search default group
 func (o *AdminApi) SearchDefaultGroup(c *gin.Context) {
 	a2r.Call(admin.AdminClient.SearchDefaultGroup, o.adminClient, c)
 }
 
+// add inviate code
 func (o *AdminApi) AddInvitationCode(c *gin.Context) {
 	a2r.Call(admin.AdminClient.AddInvitationCode, o.adminClient, c)
 }
 
+// generate invivate code
 func (o *AdminApi) GenInvitationCode(c *gin.Context) {
 	a2r.Call(admin.AdminClient.GenInvitationCode, o.adminClient, c)
 }
 
+// delete inviate code
 func (o *AdminApi) DelInvitationCode(c *gin.Context) {
 	a2r.Call(admin.AdminClient.DelInvitationCode, o.adminClient, c)
 }
 
+// search invitate code
 func (o *AdminApi) SearchInvitationCode(c *gin.Context) {
 	a2r.Call(admin.AdminClient.SearchInvitationCode, o.adminClient, c)
 }
 
+// add user login limit by ip
 func (o *AdminApi) AddUserIPLimitLogin(c *gin.Context) {
 	a2r.Call(admin.AdminClient.AddUserIPLimitLogin, o.adminClient, c)
 }
 
+// search userlogin by ip limit
 func (o *AdminApi) SearchUserIPLimitLogin(c *gin.Context) {
 	a2r.Call(admin.AdminClient.SearchUserIPLimitLogin, o.adminClient, c)
 }
 
+// delete user limit login by ip limit
 func (o *AdminApi) DelUserIPLimitLogin(c *gin.Context) {
 	a2r.Call(admin.AdminClient.DelUserIPLimitLogin, o.adminClient, c)
 }
 
+// search ip in 403
 func (o *AdminApi) SearchIPForbidden(c *gin.Context) {
 	a2r.Call(admin.AdminClient.SearchIPForbidden, o.adminClient, c)
 }
 
+// add ip into 403
 func (o *AdminApi) AddIPForbidden(c *gin.Context) {
 	a2r.Call(admin.AdminClient.AddIPForbidden, o.adminClient, c)
 }
 
+// delete ip from 403
 func (o *AdminApi) DelIPForbidden(c *gin.Context) {
 	a2r.Call(admin.AdminClient.DelIPForbidden, o.adminClient, c)
 }
 
+// parse token
 func (o *AdminApi) ParseToken(c *gin.Context) {
 	a2r.Call(admin.AdminClient.ParseToken, o.adminClient, c)
 }
 
+// block user
 func (o *AdminApi) BlockUser(c *gin.Context) {
-	var (
-		req admin.BlockUserReq
-	)
+	var req admin.BlockUserReq
 	if err := c.BindJSON(&req); err != nil {
 		apiresp.GinError(c, err)
 		return
@@ -196,7 +219,7 @@ func (o *AdminApi) BlockUser(c *gin.Context) {
 		apiresp.GinError(c, err)
 		return
 	}
-	//c.Set(constant.Token, IMtoken)
+	// c.Set(constant.Token, IMtoken)
 
 	err = o.imApiCaller.ForceOffLine(c, req.UserID, IMtoken)
 	if err != nil {
@@ -207,34 +230,42 @@ func (o *AdminApi) BlockUser(c *gin.Context) {
 	apiresp.GinSuccess(c, resp)
 }
 
+// unblock user
 func (o *AdminApi) UnblockUser(c *gin.Context) {
 	a2r.Call(admin.AdminClient.UnblockUser, o.adminClient, c)
 }
 
+// search user blocked
 func (o *AdminApi) SearchBlockUser(c *gin.Context) {
 	a2r.Call(admin.AdminClient.SearchBlockUser, o.adminClient, c)
 }
 
+// set client config
 func (o *AdminApi) SetClientConfig(c *gin.Context) {
 	a2r.Call(admin.AdminClient.SetClientConfig, o.adminClient, c)
 }
 
+// get client config
 func (o *AdminApi) GetClientConfig(c *gin.Context) {
 	a2r.Call(admin.AdminClient.GetClientConfig, o.adminClient, c)
 }
 
+// add applet
 func (o *AdminApi) AddApplet(c *gin.Context) {
 	a2r.Call(admin.AdminClient.AddApplet, o.adminClient, c)
 }
 
+// delete applet
 func (o *AdminApi) DelApplet(c *gin.Context) {
 	a2r.Call(admin.AdminClient.DelApplet, o.adminClient, c)
 }
 
+// update applet
 func (o *AdminApi) UpdateApplet(c *gin.Context) {
 	a2r.Call(admin.AdminClient.UpdateApplet, o.adminClient, c)
 }
 
+// search applet
 func (o *AdminApi) SearchApplet(c *gin.Context) {
 	a2r.Call(admin.AdminClient.SearchApplet, o.adminClient, c)
 }

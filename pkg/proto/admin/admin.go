@@ -14,7 +14,6 @@ func (x *LoginReq) Check() error {
 	}
 	return nil
 }
-
 func (x *ChangePasswordReq) Check() error {
 	if x.Password == "" {
 		return errs.ErrArgs.Wrap("password is empty")

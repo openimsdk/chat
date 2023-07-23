@@ -12,5 +12,4 @@ type LoginResp struct {
 	UserID    string
 }
 
-type UpdateUserInfoResp struct {
-}
+type UpdateUserInfoResp struct{}

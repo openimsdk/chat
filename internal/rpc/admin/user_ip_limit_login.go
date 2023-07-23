@@ -16,17 +16,17 @@ package admin
 
 import (
 	"context"
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/log"
 	"time"
 
+	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/log"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/utils"
-
 	admin2 "github.com/OpenIMSDK/chat/pkg/common/db/table/admin"
 	"github.com/OpenIMSDK/chat/pkg/common/mctx"
 	"github.com/OpenIMSDK/chat/pkg/proto/admin"
 )
 
+// search user ip limit by login
 func (o *adminServer) SearchUserIPLimitLogin(ctx context.Context, req *admin.SearchUserIPLimitLoginReq) (*admin.SearchUserIPLimitLoginResp, error) {
 	defer log.ZDebug(ctx, "return")
 	if _, err := mctx.CheckAdmin(ctx); err != nil {
@@ -53,6 +53,7 @@ func (o *adminServer) SearchUserIPLimitLogin(ctx context.Context, req *admin.Sea
 	return &admin.SearchUserIPLimitLoginResp{Total: total, Limits: limits}, nil
 }
 
+// add user limit login
 func (o *adminServer) AddUserIPLimitLogin(ctx context.Context, req *admin.AddUserIPLimitLoginReq) (*admin.AddUserIPLimitLoginResp, error) {
 	defer log.ZDebug(ctx, "return")
 	if _, err := mctx.CheckAdmin(ctx); err != nil {
@@ -76,6 +77,7 @@ func (o *adminServer) AddUserIPLimitLogin(ctx context.Context, req *admin.AddUse
 	return &admin.AddUserIPLimitLoginResp{}, nil
 }
 
+// delete user by ip
 func (o *adminServer) DelUserIPLimitLogin(ctx context.Context, req *admin.DelUserIPLimitLoginReq) (*admin.DelUserIPLimitLoginResp, error) {
 	if _, err := mctx.CheckAdmin(ctx); err != nil {
 		return nil, err

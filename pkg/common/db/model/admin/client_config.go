@@ -18,9 +18,8 @@ import (
 	"context"
 
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
-	"gorm.io/gorm"
-
 	"github.com/OpenIMSDK/chat/pkg/common/db/table/admin"
+	"gorm.io/gorm"
 )
 
 func NewClientConfig(db *gorm.DB) admin.ClientConfigInterface {
@@ -31,10 +30,12 @@ type ClientConfig struct {
 	db *gorm.DB
 }
 
+// new tx
 func (o *ClientConfig) NewTx(tx any) admin.ClientConfigInterface {
 	return &ClientConfig{db: tx.(*gorm.DB)}
 }
 
+// set config
 func (o *ClientConfig) Set(ctx context.Context, config map[string]*string) error {
 	err := o.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		for key, value := range config {
@@ -61,6 +62,7 @@ func (o *ClientConfig) Set(ctx context.Context, config map[string]*string) error
 	return errs.Wrap(err)
 }
 
+// get config
 func (o *ClientConfig) Get(ctx context.Context) (map[string]string, error) {
 	var cs []*admin.ClientConfig
 	if err := o.db.WithContext(ctx).Find(&cs).Error; err != nil {

@@ -21,10 +21,12 @@ import (
 	"github.com/OpenIMSDK/chat/pkg/proto/chat"
 )
 
+// add single record
 func (*chatSvr) AddSignalRecord(ctx context.Context, req *chat.AddSignalRecordReq) (*chat.AddSignalRecordResp, error) {
 	return nil, errors.New("todo AddSignalRecord")
 }
 
+// get single record
 func (*chatSvr) GetSignalRecords(ctx context.Context, req *chat.GetSignalRecordsReq) (*chat.GetSignalRecordsResp, error) {
 	return nil, errors.New("todo GetSignalRecords")
 }

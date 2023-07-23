@@ -16,14 +16,14 @@ package admin
 
 import (
 	"context"
+
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/log"
-
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
-
 	"github.com/OpenIMSDK/chat/pkg/common/mctx"
 	"github.com/OpenIMSDK/chat/pkg/proto/admin"
 )
 
+// get client config
 func (o *adminServer) GetClientConfig(ctx context.Context, req *admin.GetClientConfigReq) (*admin.GetClientConfigResp, error) {
 	defer log.ZDebug(ctx, "return")
 	conf, err := o.Database.GetConfig(ctx)
@@ -33,6 +33,7 @@ func (o *adminServer) GetClientConfig(ctx context.Context, req *admin.GetClientC
 	return &admin.GetClientConfigResp{Config: conf}, nil
 }
 
+// set client config
 func (o *adminServer) SetClientConfig(ctx context.Context, req *admin.SetClientConfigReq) (*admin.SetClientConfigResp, error) {
 	defer log.ZDebug(ctx, "return")
 	if _, err := mctx.CheckAdmin(ctx); err != nil {

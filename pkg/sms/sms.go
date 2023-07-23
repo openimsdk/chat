@@ -17,8 +17,9 @@ package sms
 import (
 	"context"
 	"fmt"
-	"github.com/OpenIMSDK/chat/pkg/common/config"
 	"strings"
+
+	"github.com/OpenIMSDK/chat/pkg/common/config"
 )
 
 func New() (SMS, error) {
@@ -39,10 +40,12 @@ type SMS interface {
 
 type empty struct{}
 
+// empty name
 func (e empty) Name() string {
 	return "empty-sms"
 }
 
+// send sms code
 func (e empty) SendCode(ctx context.Context, areaCode string, phoneNumber string, verifyCode string) error {
 	return nil
 }

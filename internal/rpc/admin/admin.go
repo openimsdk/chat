@@ -16,10 +16,9 @@ package admin
 
 import (
 	"context"
+
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/mcontext"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/discoveryregistry"
-	"google.golang.org/grpc"
-
 	"github.com/OpenIMSDK/chat/pkg/common/config"
 	"github.com/OpenIMSDK/chat/pkg/common/constant"
 	"github.com/OpenIMSDK/chat/pkg/common/db/database"
@@ -31,6 +30,7 @@ import (
 	"github.com/OpenIMSDK/chat/pkg/proto/admin"
 	"github.com/OpenIMSDK/chat/pkg/rpclient/chat"
 	"github.com/OpenIMSDK/chat/pkg/rpclient/openim"
+	"google.golang.org/grpc"
 )
 
 func Start(discov discoveryregistry.SvcDiscoveryRegistry, server *grpc.Server) error {
@@ -66,12 +66,14 @@ func Start(discov discoveryregistry.SvcDiscoveryRegistry, server *grpc.Server) e
 	return nil
 }
 
+// define a admin server struct
 type adminServer struct {
 	Database database.AdminDatabaseInterface
 	Chat     *chat.ChatClient
 	OpenIM   *openim.OpenIMClient
 }
 
+// get user admin info
 func (o *adminServer) GetAdminInfo(ctx context.Context, req *admin.GetAdminInfoReq) (*admin.GetAdminInfoResp, error) {
 	userID, err := mctx.CheckAdmin(ctx)
 	if err != nil {
@@ -92,6 +94,7 @@ func (o *adminServer) GetAdminInfo(ctx context.Context, req *admin.GetAdminInfoR
 	}, nil
 }
 
+// admin update user info
 func (o *adminServer) AdminUpdateInfo(ctx context.Context, req *admin.AdminUpdateInfoReq) (*admin.AdminUpdateInfoResp, error) {
 	userID, err := mctx.CheckAdmin(ctx)
 	if err != nil {
@@ -111,6 +114,7 @@ func (o *adminServer) AdminUpdateInfo(ctx context.Context, req *admin.AdminUpdat
 	return &admin.AdminUpdateInfoResp{}, nil
 }
 
+// admin login
 func (o *adminServer) Login(ctx context.Context, req *admin.LoginReq) (*admin.LoginResp, error) {
 	a, err := o.Database.GetAdmin(ctx, req.Account)
 	if err != nil {
@@ -136,6 +140,7 @@ func (o *adminServer) Login(ctx context.Context, req *admin.LoginReq) (*admin.Lo
 	}, nil
 }
 
+// change admin password
 func (o *adminServer) ChangePassword(ctx context.Context, req *admin.ChangePasswordReq) (*admin.ChangePasswordResp, error) {
 	userID, err := mctx.CheckAdmin(ctx)
 	if err != nil {

@@ -18,7 +18,6 @@ import (
 	"context"
 
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/discoveryregistry"
-
 	"github.com/OpenIMSDK/chat/pkg/common/config"
 	"github.com/OpenIMSDK/chat/pkg/common/mctx"
 	"github.com/OpenIMSDK/chat/pkg/eerrs"
@@ -39,6 +38,7 @@ type AdminClient struct {
 	client admin.AdminClient
 }
 
+// get config
 func (o *AdminClient) GetConfig(ctx context.Context) (map[string]string, error) {
 	conf, err := o.client.GetClientConfig(ctx, &admin.GetClientConfigReq{})
 	if err != nil {
@@ -50,6 +50,7 @@ func (o *AdminClient) GetConfig(ctx context.Context) (map[string]string, error) 
 	return conf.Config, nil
 }
 
+// check invitate code
 func (o *AdminClient) CheckInvitationCode(ctx context.Context, invitationCode string) error {
 	resp, err := o.client.FindInvitationCode(ctx, &admin.FindInvitationCodeReq{Codes: []string{invitationCode}})
 	if err != nil {
@@ -64,21 +65,25 @@ func (o *AdminClient) CheckInvitationCode(ctx context.Context, invitationCode st
 	return nil
 }
 
+// check register
 func (o *AdminClient) CheckRegister(ctx context.Context, ip string) error {
 	_, err := o.client.CheckRegisterForbidden(ctx, &admin.CheckRegisterForbiddenReq{Ip: ip})
 	return err
 }
 
+// check login status
 func (o *AdminClient) CheckLogin(ctx context.Context, userID string, ip string) error {
 	_, err := o.client.CheckLoginForbidden(ctx, &admin.CheckLoginForbiddenReq{Ip: ip, UserID: userID})
 	return err
 }
 
+// user invitate code
 func (o *AdminClient) UseInvitationCode(ctx context.Context, userID string, invitationCode string) error {
 	_, err := o.client.UseInvitationCode(ctx, &admin.UseInvitationCodeReq{UserID: userID, Code: invitationCode})
 	return err
 }
 
+// check null or admin roots
 func (o *AdminClient) CheckNilOrAdmin(ctx context.Context) (bool, error) {
 	if !mctx.HaveOpUser(ctx) {
 		return false, nil
@@ -90,10 +95,12 @@ func (o *AdminClient) CheckNilOrAdmin(ctx context.Context) (bool, error) {
 	return true, nil
 }
 
+// create token
 func (o *AdminClient) CreateToken(ctx context.Context, userID string, userType int32) (*admin.CreateTokenResp, error) {
 	return o.client.CreateToken(ctx, &admin.CreateTokenReq{UserID: userID, UserType: userType})
 }
 
+// get default friend user ID
 func (o *AdminClient) GetDefaultFriendUserID(ctx context.Context) ([]string, error) {
 	resp, err := o.client.FindDefaultFriend(ctx, &admin.FindDefaultFriendReq{})
 	if err != nil {
@@ -102,6 +109,7 @@ func (o *AdminClient) GetDefaultFriendUserID(ctx context.Context) ([]string, err
 	return resp.UserIDs, nil
 }
 
+// get default groupID
 func (o *AdminClient) GetDefaultGroupID(ctx context.Context) ([]string, error) {
 	resp, err := o.client.FindDefaultGroup(ctx, &admin.FindDefaultGroupReq{})
 	if err != nil {

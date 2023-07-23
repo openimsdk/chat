@@ -19,6 +19,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// gorm find error
 func IsGormNotFound(err error) bool {
 	return errs.Unwrap(err) == gorm.ErrRecordNotFound
 }

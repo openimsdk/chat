@@ -16,15 +16,15 @@ package chat
 
 import (
 	"context"
+
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/log"
-
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
-
 	"github.com/OpenIMSDK/chat/pkg/common/constant"
 	"github.com/OpenIMSDK/chat/pkg/common/mctx"
 	"github.com/OpenIMSDK/chat/pkg/proto/chat"
 )
 
+// reset password
 func (o *chatSvr) ResetPassword(ctx context.Context, req *chat.ResetPasswordReq) (*chat.ResetPasswordResp, error) {
 	defer log.ZDebug(ctx, "return")
 	if req.Password == "" {
@@ -45,6 +45,7 @@ func (o *chatSvr) ResetPassword(ctx context.Context, req *chat.ResetPasswordReq)
 	return &chat.ResetPasswordResp{}, nil
 }
 
+// change password
 func (o *chatSvr) ChangePassword(ctx context.Context, req *chat.ChangePasswordReq) (*chat.ChangePasswordResp, error) {
 	defer log.ZDebug(ctx, "return")
 	if req.NewPassword == "" {

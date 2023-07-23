@@ -18,10 +18,10 @@ import (
 	"time"
 
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
-
 	"github.com/OpenIMSDK/chat/pkg/proto/chat"
 )
 
+// update attibute
 func ToDBAttributeUpdate(req *chat.UpdateUserInfoReq) (map[string]any, error) {
 	update := make(map[string]any)
 	if req.Account != nil {

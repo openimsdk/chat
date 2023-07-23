@@ -17,13 +17,14 @@ package admin
 import (
 	"context"
 	"fmt"
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/log"
 
+	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/log"
 	"github.com/OpenIMSDK/chat/pkg/common/db/dbutil"
 	"github.com/OpenIMSDK/chat/pkg/eerrs"
 	"github.com/OpenIMSDK/chat/pkg/proto/admin"
 )
 
+// check admin registeration whether in 403
 func (o *adminServer) CheckRegisterForbidden(ctx context.Context, req *admin.CheckRegisterForbiddenReq) (*admin.CheckRegisterForbiddenResp, error) {
 	defer log.ZDebug(ctx, "return")
 	forbiddens, err := o.Database.FindIPForbidden(ctx, []string{req.Ip})
@@ -38,6 +39,7 @@ func (o *adminServer) CheckRegisterForbidden(ctx context.Context, req *admin.Che
 	return &admin.CheckRegisterForbiddenResp{}, nil
 }
 
+// check admin login whether in 403
 func (o *adminServer) CheckLoginForbidden(ctx context.Context, req *admin.CheckLoginForbiddenReq) (*admin.CheckLoginForbiddenResp, error) {
 	defer log.ZDebug(ctx, "return")
 	forbiddens, err := o.Database.FindIPForbidden(ctx, []string{req.Ip})

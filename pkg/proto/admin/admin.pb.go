@@ -22,6 +22,9 @@ package admin
 
 import (
 	context "context"
+	reflect "reflect"
+	sync "sync"
+
 	sdkws "github.com/OpenIMSDK/Open-IM-Server/pkg/proto/sdkws"
 	wrapperspb "github.com/OpenIMSDK/Open-IM-Server/pkg/proto/wrapperspb"
 	common "github.com/OpenIMSDK/chat/pkg/proto/common"
@@ -30,8 +33,6 @@ import (
 	status "google.golang.org/grpc/status"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
-	reflect "reflect"
-	sync "sync"
 )
 
 const (
@@ -51,6 +52,7 @@ type LoginReq struct {
 	Password string `protobuf:"bytes,2,opt,name=password,proto3" json:"password"`
 }
 
+// reset
 func (x *LoginReq) Reset() {
 	*x = LoginReq{}
 	if protoimpl.UnsafeEnabled {
@@ -60,12 +62,15 @@ func (x *LoginReq) Reset() {
 	}
 }
 
+// string
 func (x *LoginReq) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
+// protomessage
 func (*LoginReq) ProtoMessage() {}
 
+// proto reflect
 func (x *LoginReq) ProtoReflect() protoreflect.Message {
 	mi := &file_admin_admin_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
@@ -83,6 +88,7 @@ func (*LoginReq) Descriptor() ([]byte, []int) {
 	return file_admin_admin_proto_rawDescGZIP(), []int{0}
 }
 
+// get account
 func (x *LoginReq) GetAccount() string {
 	if x != nil {
 		return x.Account
@@ -90,6 +96,7 @@ func (x *LoginReq) GetAccount() string {
 	return ""
 }
 
+// get password
 func (x *LoginReq) GetPassword() string {
 	if x != nil {
 		return x.Password
@@ -110,6 +117,7 @@ type LoginResp struct {
 	AdminUserID  string `protobuf:"bytes,6,opt,name=adminUserID,proto3" json:"adminUserID"`
 }
 
+// reset
 func (x *LoginResp) Reset() {
 	*x = LoginResp{}
 	if protoimpl.UnsafeEnabled {
@@ -123,8 +131,10 @@ func (x *LoginResp) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
+// protomessage
 func (*LoginResp) ProtoMessage() {}
 
+// protoreflect
 func (x *LoginResp) ProtoReflect() protoreflect.Message {
 	mi := &file_admin_admin_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
@@ -163,6 +173,7 @@ func (x *LoginResp) GetNickname() string {
 	return ""
 }
 
+// get face image url
 func (x *LoginResp) GetFaceURL() string {
 	if x != nil {
 		return x.FaceURL
@@ -170,6 +181,7 @@ func (x *LoginResp) GetFaceURL() string {
 	return ""
 }
 
+// get level
 func (x *LoginResp) GetLevel() int32 {
 	if x != nil {
 		return x.Level
@@ -177,6 +189,7 @@ func (x *LoginResp) GetLevel() int32 {
 	return 0
 }
 
+// get admin - user ID
 func (x *LoginResp) GetAdminUserID() string {
 	if x != nil {
 		return x.AdminUserID

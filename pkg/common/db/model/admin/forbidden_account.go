@@ -19,9 +19,8 @@ import (
 
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/db/ormutil"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
-	"gorm.io/gorm"
-
 	"github.com/OpenIMSDK/chat/pkg/common/db/table/admin"
+	"gorm.io/gorm"
 )
 
 func NewForbiddenAccount(db *gorm.DB) admin.ForbiddenAccountInterface {
@@ -41,15 +40,18 @@ func (o *ForbiddenAccount) Take(ctx context.Context, userID string) (*admin.Forb
 	return &f, errs.Wrap(o.db.WithContext(ctx).Where("user_id = ?", userID).Take(&f).Error)
 }
 
+// delete a forbidden account
 func (o *ForbiddenAccount) Delete(ctx context.Context, userIDs []string) error {
 	return errs.Wrap(o.db.WithContext(ctx).Where("user_id in ?", userIDs).Delete(&admin.ForbiddenAccount{}).Error)
 }
 
+// find	a forbidden account
 func (o *ForbiddenAccount) Find(ctx context.Context, userIDs []string) ([]*admin.ForbiddenAccount, error) {
 	var ms []*admin.ForbiddenAccount
 	return ms, errs.Wrap(o.db.WithContext(ctx).Where("user_id in ?", userIDs).Find(&ms).Error)
 }
 
+// search account
 func (o *ForbiddenAccount) Search(ctx context.Context, keyword string, page int32, size int32) (uint32, []*admin.ForbiddenAccount, error) {
 	return ormutil.GormSearch[admin.ForbiddenAccount](o.db.WithContext(ctx), []string{"user_id", "reason", "operator_user_id"}, keyword, page, size)
 }
