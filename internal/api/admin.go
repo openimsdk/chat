@@ -15,6 +15,7 @@
 package api
 
 import (
+	"encoding/json"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/a2r"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/apiresp"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/checker"
@@ -28,6 +29,7 @@ import (
 	"github.com/OpenIMSDK/chat/pkg/common/mctx"
 	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc"
+	"io"
 
 	"github.com/OpenIMSDK/chat/pkg/proto/admin"
 	"github.com/OpenIMSDK/chat/pkg/proto/chat"
@@ -280,7 +282,12 @@ func (o *AdminApi) SearchBlockUser(c *gin.Context) {
 
 func (o *AdminApi) SetClientConfig(c *gin.Context) {
 	var req admin.SetClientConfigReq
-	if err := c.BindJSON(&req); err != nil {
+	body, err := io.ReadAll(c.Request.Body)
+	if err != nil {
+		apiresp.GinError(c, err)
+		return
+	}
+	if err := json.Unmarshal(body, &req); err != nil {
 		apiresp.GinError(c, err)
 		return
 	}
