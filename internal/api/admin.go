@@ -281,27 +281,14 @@ func (o *AdminApi) SearchBlockUser(c *gin.Context) {
 }
 
 func (o *AdminApi) SetClientConfig(c *gin.Context) {
-
-	log.ZDebug(c, "----------------------------------------")
-
-	s := "{\"config\":{\"aaa\":null,\"bbb\":\"1234\"}}"
-	var v admin.SetClientConfigReq
-	if err := json.Unmarshal([]byte(s), &v); err != nil {
-		panic(err)
-	}
-	ss := fmt.Sprintf("%+v\n", v.Config)
-	vv, ok := v.Config["aaa"]
-	log.ZDebug(c, "sss ->", "res", fmt.Sprint(vv, ok, vv == nil))
-	log.ZDebug(c, "sss ->", "s", ss)
-	log.ZDebug(c, "sss ->", "raw", s)
-	log.ZDebug(c, "----------------------------------------")
-
 	var req admin.SetClientConfigReq
 	body, err := io.ReadAll(c.Request.Body)
 	if err != nil {
 		apiresp.GinError(c, err)
 		return
 	}
+	bs := fmt.Sprintf("%+v", body)
+	log.ZDebug(c, "SetClientConfig api", "bodybin", bs)
 	if err := json.Unmarshal(body, &req); err != nil {
 		apiresp.GinError(c, err)
 		return
