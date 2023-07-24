@@ -35,6 +35,9 @@ func (o *adminServer) GetClientConfig(ctx context.Context, req *admin.GetClientC
 
 func (o *adminServer) SetClientConfig(ctx context.Context, req *admin.SetClientConfigReq) (*admin.SetClientConfigResp, error) {
 	defer log.ZDebug(ctx, "return")
+	for key, value := range req.Config {
+		log.ZDebug(ctx, "rpc ---->", "key", key, "value", value, "isNil", value == nil)
+	}
 	if _, err := mctx.CheckAdmin(ctx); err != nil {
 		return nil, err
 	}

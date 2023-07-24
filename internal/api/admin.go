@@ -281,6 +281,8 @@ func (o *AdminApi) SearchBlockUser(c *gin.Context) {
 }
 
 func (o *AdminApi) SetClientConfig(c *gin.Context) {
+	// Config map[string]*wrapperspb.StringValue
+	// Config map[string]*string
 	var req admin.SetClientConfigReq
 	body, err := io.ReadAll(c.Request.Body)
 	if err != nil {
