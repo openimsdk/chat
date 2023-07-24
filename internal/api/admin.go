@@ -279,7 +279,22 @@ func (o *AdminApi) SearchBlockUser(c *gin.Context) {
 }
 
 func (o *AdminApi) SetClientConfig(c *gin.Context) {
-	a2r.Call(admin.AdminClient.SetClientConfig, o.adminClient, c)
+	var req admin.SetClientConfigReq
+	if err := c.BindJSON(&req); err != nil {
+		apiresp.GinError(c, err)
+		return
+	}
+	log.ZDebug(c, "SetClientConfig api", "req", &req)
+	if err := checker.Validate(&req); err != nil {
+		apiresp.GinError(c, err)
+		return
+	}
+	resp, err := o.adminClient.SetClientConfig(c, &req)
+	if err != nil {
+		apiresp.GinError(c, err)
+		return
+	}
+	apiresp.GinSuccess(c, resp)
 }
 
 func (o *AdminApi) GetClientConfig(c *gin.Context) {
