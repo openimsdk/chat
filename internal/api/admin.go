@@ -20,11 +20,9 @@ import (
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/checker"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/constant"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/log"
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/utils"
 	"github.com/OpenIMSDK/chat/pkg/common/apicall"
 	"github.com/OpenIMSDK/chat/pkg/common/apistruct"
-	"github.com/OpenIMSDK/chat/pkg/common/config"
 	"github.com/OpenIMSDK/chat/pkg/common/mctx"
 	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc"
@@ -54,27 +52,26 @@ func (o *AdminApi) AdminLogin(c *gin.Context) {
 	}
 	log.ZInfo(c, "AdminLogin api", "req", &req)
 	if err := checker.Validate(&req); err != nil {
-		apiresp.GinError(c, errs.ErrArgs.Wrap(err.Error())) // 参数校验失败
+		apiresp.GinError(c, err) // 参数校验失败
 		return
 	}
-	resp1, err := o.adminClient.Login(c, &req)
+	loginResp, err := o.adminClient.Login(c, &req)
 	if err != nil {
 		apiresp.GinError(c, err)
 		return
 	}
-	imAdminID := config.GetIMAdmin(resp1.AdminUserID)
-	imToken, err := o.imApiCaller.UserToken(c, imAdminID, constant.AdminPlatformID)
+	imToken, err := o.imApiCaller.UserToken(c, loginResp.AdminUserID, constant.AdminPlatformID)
 	if err != nil {
 		apiresp.GinError(c, err)
 		return
 	}
-	err = utils.CopyStructFields(&resp, resp1)
+	err = utils.CopyStructFields(&resp, loginResp)
 	if err != nil {
 		apiresp.GinError(c, err)
 		return
 	}
 	resp.ImToken = imToken
-	resp.ImUserID = imAdminID
+	resp.ImUserID = loginResp.AdminUserID
 	log.ZInfo(c, "AdminLogin api", "resp", resp)
 	apiresp.GinSuccess(c, resp)
 }
@@ -176,22 +173,16 @@ func (o *AdminApi) BlockUser(c *gin.Context) {
 		return
 	}
 	log.ZInfo(c, "BlockUser api", "req", &req)
+	if err := checker.Validate(&req); err != nil {
+		apiresp.GinError(c, err) // 参数校验失败
+		return
+	}
 	resp, err := o.adminClient.BlockUser(c, &req)
 	if err != nil {
 		apiresp.GinError(c, err)
 		return
 	}
-	if err := checker.Validate(&req); err != nil {
-		apiresp.GinError(c, errs.ErrArgs.Wrap(err.Error())) // 参数校验失败
-		return
-	}
-	opUserID := mctx.GetOpUserID(c)
-	imAdminID := config.GetIMAdmin(opUserID)
-	if imAdminID == "" {
-		apiresp.GinError(c, errs.ErrUserIDNotFound.Wrap("chatAdminID to imAdminID error"))
-		return
-	}
-	token, err := o.imApiCaller.AdminToken(c)
+	token, err := o.imApiCaller.UserToken(c, mctx.GetOpUserID(c), constant.AdminPlatformID)
 	if err != nil {
 		apiresp.GinError(c, err)
 		return

@@ -86,7 +86,7 @@ func (o *ChatApi) RegisterUser(c *gin.Context) {
 	}
 	log.ZInfo(c, "registerUser", "req", &req)
 	if err := checker.Validate(&req); err != nil {
-		apiresp.GinError(c, errs.ErrArgs.Wrap(err.Error())) // 参数校验失败
+		apiresp.GinError(c, err) // 参数校验失败
 		return
 	}
 	ip, err := o.getClientIP(c)
@@ -146,7 +146,7 @@ func (o *ChatApi) Login(c *gin.Context) {
 		return
 	}
 	if err := checker.Validate(&req); err != nil {
-		apiresp.GinError(c, errs.ErrArgs.Wrap(err.Error())) // 参数校验失败
+		apiresp.GinError(c, err) // 参数校验失败
 		return
 	}
 	ip, err := o.getClientIP(c)
@@ -182,12 +182,8 @@ func (o *ChatApi) ChangePassword(c *gin.Context) {
 
 func (o *ChatApi) UpdateUserInfo(c *gin.Context) {
 	var (
-		req        chat.UpdateUserInfoReq
-		resp       apistruct.UpdateUserInfoResp
-		imUserID   string
-		platformID int32
-		nickName   string
-		faceURL    string
+		req  chat.UpdateUserInfoReq
+		resp apistruct.UpdateUserInfoResp
 	)
 	if err := c.BindJSON(&req); err != nil {
 		apiresp.GinError(c, err)
@@ -195,41 +191,32 @@ func (o *ChatApi) UpdateUserInfo(c *gin.Context) {
 	}
 	log.ZInfo(c, "updateUserInfo", "req", &req)
 	if err := checker.Validate(&req); err != nil {
-		apiresp.GinError(c, errs.ErrArgs.Wrap(err.Error())) // 参数校验失败
+		apiresp.GinError(c, err) // 参数校验失败
 		return
 	}
-	resp1, err := o.chatClient.UpdateUserInfo(c, &req)
+	respUpdate, err := o.chatClient.UpdateUserInfo(c, &req)
 	if err != nil {
 		apiresp.GinError(c, err)
 		return
 	}
-	opUserID := mctx.GetOpUserID(c)
-	opUserType := mctx.GetUserType(c)
-	if opUserType == constant2.AdminUser {
-		platformID = constant.AdminPlatformID
-		imUserID = config.GetIMAdmin(opUserID)
-		if imUserID == "" {
-			apiresp.GinError(c, errs.ErrUserIDNotFound.Wrap("chatAdminID to imAdminID error"))
-			return
-		}
-	} else {
-		platformID = constant2.DefaultPlatform
-		imUserID = req.UserID
-	}
-	token, err := o.imApiCaller.UserToken(c, imUserID, platformID)
+	token, err := o.imApiCaller.AdminToken(c)
 	if err != nil {
 		apiresp.GinError(c, err)
 		return
 	}
+	var (
+		nickName string
+		faceURL  string
+	)
 	if req.Nickname != nil {
 		nickName = req.Nickname.Value
 	} else {
-		nickName = resp1.NickName
+		nickName = respUpdate.NickName
 	}
 	if req.FaceURL != nil {
 		faceURL = req.FaceURL.Value
 	} else {
-		faceURL = resp1.FaceUrl
+		faceURL = respUpdate.FaceUrl
 	}
 	err = o.imApiCaller.UpdateUserInfo(mctx.WithApiToken(c, token), req.UserID, nickName, faceURL)
 	if err != nil {
