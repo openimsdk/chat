@@ -191,19 +191,16 @@ func (o *AdminApi) BlockUser(c *gin.Context) {
 		apiresp.GinError(c, errs.ErrUserIDNotFound.Wrap("chatAdminID to imAdminID error"))
 		return
 	}
-	IMtoken, err := o.imApiCaller.UserToken(c, imAdminID, constant.AdminPlatformID)
+	token, err := o.imApiCaller.AdminToken(c)
 	if err != nil {
 		apiresp.GinError(c, err)
 		return
 	}
-	//c.Set(constant.Token, IMtoken)
-
-	err = o.imApiCaller.ForceOffLine(c, req.UserID, IMtoken)
+	err = o.imApiCaller.ForceOffLine(mctx.WithApiToken(c, token), req.UserID)
 	if err != nil {
 		apiresp.GinError(c, err)
 		return
 	}
-	log.ZInfo(c, "BlockUser Api", "resp", &resp)
 	apiresp.GinSuccess(c, resp)
 }
 

@@ -67,7 +67,7 @@ var Config struct {
 		WithStack           *bool   `yaml:"withStack"`
 	} `yaml:"log"`
 	Secret      *string `yaml:"secret"`
-	OpenIM_url  string  `yaml:"openIMUrl"`
+	OpenIMUrl   string  `yaml:"openIMUrl"`
 	TokenPolicy struct {
 		Expire *int64 `yaml:"expire"`
 	} `yaml:"tokenPolicy"`

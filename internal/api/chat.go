@@ -40,7 +40,6 @@ import (
 )
 
 func NewChat(chatConn, adminConn grpc.ClientConnInterface) *ChatApi {
-
 	return &ChatApi{chatClient: chat.NewChatClient(chatConn), adminClient: admin.NewAdminClient(adminConn), imApiCaller: apicall.NewCallerInterface()}
 }
 
@@ -96,13 +95,13 @@ func (o *ChatApi) RegisterUser(c *gin.Context) {
 		return
 	}
 	req.Ip = ip
-	resp1, err := o.chatClient.RegisterUser(c, &req)
+	respRegisterUser, err := o.chatClient.RegisterUser(c, &req)
 	if err != nil {
 		apiresp.GinError(c, err)
 		return
 	}
 	userInfo := &sdkws.UserInfo{
-		UserID:     resp1.UserID,
+		UserID:     respRegisterUser.UserID,
 		Nickname:   req.User.Nickname,
 		FaceURL:    req.User.FaceURL,
 		CreateTime: time.Now().UnixMilli(),
@@ -112,57 +111,29 @@ func (o *ChatApi) RegisterUser(c *gin.Context) {
 		apiresp.GinError(c, err)
 		return
 	}
-
-	imAdminID := config.GetDefaultIMAdmin()
-	token, err := o.imApiCaller.UserToken(c, imAdminID, constant.AdminPlatformID)
+	token, err := o.imApiCaller.AdminToken(c)
 	if err != nil {
-		log.ZError(c, "GetIMAdminUserToken Failed", err, "userID", imAdminID)
 		apiresp.GinError(c, err)
 		return
 	}
-	//c.Set(constant.Token, token)
-
-	t := mctx.WithOpUserID(c, config.Config.AdminList[0].AdminID, constant2.AdminUser)
-	resp2, err := o.adminClient.FindDefaultFriend(t, &admin.FindDefaultFriendReq{})
-	if err != nil {
-		log.ZError(t, "FindDefaultFriend Failed", err, "userID", req.User.UserID)
-		apiresp.GinError(c, err)
-		return
-	} else if len(resp2.UserIDs) > 0 {
-		if err := o.imApiCaller.ImportFriend(c, resp1.UserID, resp2.UserIDs, token); err != nil {
-			apiresp.GinError(c, err)
-			return
-		}
+	ctx := mctx.WithApiToken(mctx.WithAdminUser(c), token)
+	if resp, err := o.adminClient.FindDefaultFriend(ctx, &admin.FindDefaultFriendReq{}); err == nil {
+		_ = o.imApiCaller.ImportFriend(ctx, respRegisterUser.UserID, resp.UserIDs)
 	}
-
-	resp3, err := o.adminClient.FindDefaultGroup(t, &admin.FindDefaultGroupReq{})
-	if err != nil {
-		log.ZError(t, "FindDefaultGroupID Failed", err, "userID", req.User.UserID)
-		apiresp.GinError(c, err)
-		return
-	} else if len(resp3.GroupIDs) > 0 {
-		for _, groupID := range resp3.GroupIDs {
-			if err := o.imApiCaller.InviteToGroup(c, resp1.UserID, groupID, token); err != nil {
-				log.ZError(c, "inviteUserToGroup Failed", err, "userID", req.User.UserID, "groupID", groupID)
-				apiresp.GinError(c, err)
-				return
-			}
-		}
+	if resp, err := o.adminClient.FindDefaultGroup(ctx, &admin.FindDefaultGroupReq{}); err != nil {
+		_ = o.imApiCaller.InviteToGroup(c, respRegisterUser.UserID, resp.GroupIDs)
 	}
 	if req.AutoLogin {
-		token, err := o.imApiCaller.UserToken(c, resp1.UserID, req.Platform)
+		resp.ImToken, err = o.imApiCaller.UserToken(c, respRegisterUser.UserID, req.Platform)
 		if err != nil {
-			log.ZError(c, "GetIMAdminUserToken Failed", err, "userID", req.User.UserID)
 			apiresp.GinError(c, err)
 			return
 		}
-		resp.ImToken = token
 	}
-	resp.ChatToken = resp1.ChatToken
-	resp.UserID = resp1.UserID
+	resp.ChatToken = respRegisterUser.ChatToken
+	resp.UserID = respRegisterUser.UserID
 	log.ZInfo(c, "registerUser api", "resp", &resp)
 	apiresp.GinSuccess(c, &resp)
-	// a2r.Call(chat.ChatClient.RegisterUser, o.chatClient, c)
 }
 
 func (o *ChatApi) Login(c *gin.Context) {
@@ -178,7 +149,6 @@ func (o *ChatApi) Login(c *gin.Context) {
 		apiresp.GinError(c, errs.ErrArgs.Wrap(err.Error())) // 参数校验失败
 		return
 	}
-	log.ZInfo(c, "Login", "req", &req)
 	ip, err := o.getClientIP(c)
 	if err != nil {
 		apiresp.GinError(c, err)
@@ -197,7 +167,6 @@ func (o *ChatApi) Login(c *gin.Context) {
 	resp.ImToken = imToken
 	resp.UserID = resp1.UserID
 	resp.ChatToken = resp1.ChatToken
-	log.ZInfo(c, "Login api", "resp", &resp)
 	apiresp.GinSuccess(c, resp)
 }
 
@@ -252,8 +221,6 @@ func (o *ChatApi) UpdateUserInfo(c *gin.Context) {
 		apiresp.GinError(c, err)
 		return
 	}
-	//c.Set(constant.Token, token)
-
 	if req.Nickname != nil {
 		nickName = req.Nickname.Value
 	} else {
@@ -264,12 +231,11 @@ func (o *ChatApi) UpdateUserInfo(c *gin.Context) {
 	} else {
 		faceURL = resp1.FaceUrl
 	}
-	err = o.imApiCaller.UpdateUserInfo(c, req.UserID, nickName, faceURL, token)
+	err = o.imApiCaller.UpdateUserInfo(mctx.WithApiToken(c, token), req.UserID, nickName, faceURL)
 	if err != nil {
 		apiresp.GinError(c, err)
 		return
 	}
-	log.ZInfo(c, "updateUserInfo", "resp", &resp)
 	apiresp.GinSuccess(c, resp)
 }
 

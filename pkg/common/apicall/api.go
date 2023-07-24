@@ -1,95 +1,19 @@
 package apicall
 
 import (
-	"bytes"
-	"context"
-	"encoding/json"
-	"errors"
-	constant2 "github.com/OpenIMSDK/Open-IM-Server/pkg/common/constant"
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/log"
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/proto/auth"
+	"github.com/OpenIMSDK/Open-IM-Server/pkg/proto/friend"
+	"github.com/OpenIMSDK/Open-IM-Server/pkg/proto/group"
+	"github.com/OpenIMSDK/Open-IM-Server/pkg/proto/user"
 	"github.com/OpenIMSDK/chat/pkg/common/config"
-	"gorm.io/gorm/utils"
-	"io"
-	"net/http"
 )
 
-type baseApiResponse[T any] struct {
-	ErrCode int    `json:"errCode"`
-	ErrMsg  string `json:"errMsg"`
-	ErrDlt  string `json:"errDlt"`
-	Data    *T     `json:"data"`
-}
-
-type ApiCaller[Req, Resp any] interface {
-	Call(ctx context.Context, req *Req, token ...string) (*Resp, error)
-}
-
-func NewApiCaller[Req, Resp any](url string) ApiCaller[Req, Resp] {
-	return Api[Req, Resp](url)
-}
-
-type Api[Req, Resp any] string
-
-func (a Api[Req, Resp]) Call(ctx context.Context, req *Req, token ...string) (*Resp, error) {
-	reqBody, err := json.Marshal(req)
-	if err != nil {
-		return nil, err
-	}
-	request, err := http.NewRequestWithContext(ctx, http.MethodPost, config.Config.OpenIM_url+string(a), bytes.NewReader(reqBody))
-	if err != nil {
-		return nil, err
-	}
-	operationID := utils.ToString(ctx.Value(constant2.OperationID))
-	request.Header.Set(constant2.OperationID, operationID)
-	if token != nil {
-		request.Header.Set(constant2.Token, utils.ToString(token[0]))
-	}
-	response, err := http.DefaultClient.Do(request)
-	if err != nil {
-		return nil, err
-	}
-	log.ZDebug(ctx, "call api successfully", "api", string(a))
-	defer response.Body.Close()
-	if response.StatusCode != http.StatusOK {
-		return nil, errors.New(response.Status)
-	}
-	data, err := io.ReadAll(response.Body)
-	if err != nil {
-		return nil, err
-	}
-	log.ZDebug(ctx, "read respBody successfully")
-	var resp baseApiResponse[Resp]
-	if err := json.Unmarshal(data, &resp); err != nil {
-		return nil, err
-	}
-
-	if resp.ErrCode != 0 {
-		return nil, errs.NewCodeError(resp.ErrCode, resp.ErrMsg).WithDetail(resp.ErrDlt)
-	}
-	log.ZDebug(ctx, "unmarshal resp success")
-	return resp.Data, nil
-}
-
-var apiURL = config.Config.OpenIM_url
-
+// im api
 var (
-	UserToken = NewApiCaller[auth.UserTokenReq, auth.UserTokenResp](apiURL + "/auth/user_token")
+	importFriend   = NewApiCaller[friend.ImportFriendReq, friend.ImportFriendResp](config.Config.OpenIMUrl + "/friend/import_friend")
+	userToken      = NewApiCaller[auth.UserTokenReq, auth.UserTokenResp](config.Config.OpenIMUrl + "/auth/user_token")
+	inviteToGroup  = NewApiCaller[group.InviteUserToGroupReq, group.InviteUserToGroupResp](config.Config.OpenIMUrl + "/group/invite_user_to_group")
+	updateUserInfo = NewApiCaller[user.UpdateUserInfoReq, user.UpdateUserInfoResp](config.Config.OpenIMUrl + "/user/update_user_info")
+	registerUser   = NewApiCaller[user.UserRegisterReq, user.UserRegisterResp](config.Config.OpenIMUrl + "/user/user_register")
+	forceOffLine   = NewApiCaller[auth.ForceLogoutReq, auth.ForceLogoutResp](config.Config.OpenIMUrl + "/auth/force_logout")
 )
-
-func test() error {
-	ctx := context.Background()
-	resp, err := UserToken.Call(ctx, &auth.UserTokenReq{
-		Secret:     "",
-		PlatformID: 0,
-		UserID:     "",
-	})
-	if err != nil {
-		return err
-	}
-	_ = resp.Token
-	_ = resp.ExpireTimeSeconds
-
-	return nil
-}
