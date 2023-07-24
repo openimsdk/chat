@@ -287,6 +287,8 @@ func (o *AdminApi) SetClientConfig(c *gin.Context) {
 		apiresp.GinError(c, err)
 		return
 	}
+	s := "{\"config\":{\"aaa\":null,\"bbb\":\"1234\"}}"
+	body = []byte(s)
 	if err := json.Unmarshal(body, &req); err != nil {
 		apiresp.GinError(c, err)
 		return
