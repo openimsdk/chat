@@ -43,12 +43,7 @@ func (o *adminServer) SetClientConfig(ctx context.Context, req *admin.SetClientC
 	}
 	conf := make(map[string]*string)
 	for key, value := range req.Config {
-		if value == nil {
-			conf[key] = nil
-		} else {
-			temp := value.Value
-			conf[key] = &temp
-		}
+		conf[key] = value.GetValuePtr()
 	}
 	if err := o.Database.SetConfig(ctx, conf); err != nil {
 		return nil, err
