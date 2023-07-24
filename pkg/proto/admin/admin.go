@@ -128,13 +128,9 @@ func (x *DelInvitationCodeReq) Check() error {
 }
 
 func (x *SearchInvitationCodeReq) Check() error {
-	if x.Codes == nil {
-		return errs.ErrArgs.Wrap("codes is empty")
+	if !utils.Contain(x.Status, constant.InvitationCodeUnused, constant.InvitationCodeUsed, constant.InvitationCodeAll) {
+		return errs.ErrArgs.Wrap("state invalid")
 	}
-	if x.UserIDs == nil {
-		return errs.ErrArgs.Wrap("userIDs is empty")
-	}
-
 	if x.Pagination == nil {
 		return errs.ErrArgs.Wrap("pagination is empty")
 	}
