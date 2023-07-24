@@ -16,6 +16,7 @@ package main
 
 import (
 	"flag"
+	mw2 "github.com/OpenIMSDK/chat/pkg/common/mw"
 	"math/rand"
 	"net"
 	"strconv"
@@ -52,7 +53,7 @@ func main() {
 	}
 	zk.AddOption(mw.GrpcClient(), grpc.WithTransportCredentials(insecure.NewCredentials())) // 默认RPC中间件
 	engine := gin.Default()
-	engine.Use(mw.CorsHandler(), mw.GinParseOperationID())
+	engine.Use(mw.CorsHandler(), mw.GinParseOperationID(), mw2.GinLog())
 	api.NewAdminRoute(engine, zk)
 	defaultPorts := config.Config.AdminApi.GinPort
 	ginPort := flag.Int("port", defaultPorts[0], "get ginServerPort from cmd")
