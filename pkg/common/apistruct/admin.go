@@ -7,6 +7,6 @@ type AdminLoginResp struct {
 	FaceURL      string `json:"faceURL"`
 	Level        int32  `json:"level"`
 	AdminUserID  string `json:"adminUserID"`
-	ImUserID     string
-	ImToken      string
+	ImUserID     string `json:"imUserID"`
+	ImToken      string `json:"imToken"`
 }
