@@ -135,7 +135,7 @@ message GroupAttribute {
 
 message SearchDefaultGroupResp {
   uint32 total = 1;
-  repeated GroupAttribute groups = 2;
+  repeated string groupIDs = 2;
 }
 
 // ################### 邀请码 ###################

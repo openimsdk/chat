@@ -19,6 +19,7 @@ type CallerInterface interface {
 	UpdateUserInfo(ctx context.Context, userID string, nickName string, faceURL string) error
 	ForceOffLine(ctx context.Context, userID string) error
 	RegisterUser(ctx context.Context, users []*sdkws.UserInfo) error
+	FindGroupInfo(ctx context.Context, groupIDs []string) ([]*sdkws.GroupInfo, error)
 }
 
 type Caller struct {
@@ -91,4 +92,14 @@ func (c *Caller) ForceOffLine(ctx context.Context, userID string) error {
 		})
 	}
 	return nil
+}
+
+func (c *Caller) FindGroupInfo(ctx context.Context, groupIDs []string) ([]*sdkws.GroupInfo, error) {
+	resp, err := getGroupsInfo.Call(ctx, &group.GetGroupsInfoReq{
+		GroupIDs: groupIDs,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return resp.GroupInfos, nil
 }

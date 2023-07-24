@@ -20,6 +20,8 @@ import (
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/checker"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/constant"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/log"
+	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
+	"github.com/OpenIMSDK/Open-IM-Server/pkg/proto/sdkws"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/utils"
 	"github.com/OpenIMSDK/chat/pkg/common/apicall"
 	"github.com/OpenIMSDK/chat/pkg/common/apistruct"
@@ -105,7 +107,37 @@ func (o *AdminApi) FindDefaultFriend(c *gin.Context) {
 }
 
 func (o *AdminApi) AddDefaultGroup(c *gin.Context) {
-	a2r.Call(admin.AdminClient.AddDefaultGroup, o.adminClient, c)
+	var req admin.AddDefaultGroupReq
+	if err := c.BindJSON(&req); err != nil {
+		apiresp.GinError(c, err)
+		return
+	}
+	if err := checker.Validate(&req); err != nil {
+		apiresp.GinError(c, err)
+		return
+	}
+	token, err := o.imApiCaller.AdminToken(c)
+	if err != nil {
+		apiresp.GinError(c, err)
+		return
+	}
+	groups, err := o.imApiCaller.FindGroupInfo(mctx.WithApiToken(c, token), req.GroupIDs)
+	if err != nil {
+		apiresp.GinError(c, err)
+		return
+	}
+	if len(req.GroupIDs) != len(groups) {
+		apiresp.GinError(c, errs.ErrArgs.Wrap("group id not found"))
+		return
+	}
+	resp, err := o.adminClient.AddDefaultGroup(c, &admin.AddDefaultGroupReq{
+		GroupIDs: req.GroupIDs,
+	})
+	if err != nil {
+		apiresp.GinError(c, err)
+		return
+	}
+	apiresp.GinSuccess(c, resp)
 }
 
 func (o *AdminApi) DelDefaultGroup(c *gin.Context) {
@@ -117,7 +149,50 @@ func (o *AdminApi) FindDefaultGroup(c *gin.Context) {
 }
 
 func (o *AdminApi) SearchDefaultGroup(c *gin.Context) {
-	a2r.Call(admin.AdminClient.SearchDefaultGroup, o.adminClient, c)
+	var req admin.SearchDefaultGroupReq
+	if err := c.BindJSON(&req); err != nil {
+		apiresp.GinError(c, err)
+		return
+	}
+	if err := checker.Validate(&req); err != nil {
+		apiresp.GinError(c, err)
+		return
+	}
+	searchResp, err := o.adminClient.SearchDefaultGroup(c, &req)
+	if err != nil {
+		apiresp.GinError(c, err)
+		return
+	}
+	resp := apistruct.SearchDefaultGroupResp{
+		Total:  searchResp.Total,
+		Groups: make([]*sdkws.GroupInfo, 0, len(searchResp.GroupIDs)),
+	}
+	if len(searchResp.GroupIDs) > 0 {
+		token, err := o.imApiCaller.AdminToken(c)
+		if err != nil {
+			apiresp.GinError(c, err)
+			return
+		}
+		groups, err := o.imApiCaller.FindGroupInfo(mctx.WithApiToken(c, token), searchResp.GroupIDs)
+		if err != nil {
+			apiresp.GinError(c, err)
+			return
+		}
+		groupMap := make(map[string]*sdkws.GroupInfo)
+		for _, group := range groups {
+			groupMap[group.GroupID] = group
+		}
+		for _, groupID := range searchResp.GroupIDs {
+			if group, ok := groupMap[groupID]; ok {
+				resp.Groups = append(resp.Groups, group)
+			} else {
+				resp.Groups = append(resp.Groups, &sdkws.GroupInfo{
+					GroupID: groupID,
+				})
+			}
+		}
+	}
+	apiresp.GinSuccess(c, resp)
 }
 
 func (o *AdminApi) AddInvitationCode(c *gin.Context) {

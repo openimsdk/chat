@@ -2,6 +2,7 @@ package admin
 
 import (
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
+	"github.com/OpenIMSDK/Open-IM-Server/pkg/utils"
 	"github.com/OpenIMSDK/chat/pkg/common/constant"
 )
 
@@ -25,6 +26,9 @@ func (x *ChangePasswordReq) Check() error {
 func (x *AddDefaultFriendReq) Check() error {
 	if x.UserIDs == nil {
 		return errs.ErrArgs.Wrap("userIDs is empty")
+	}
+	if utils.Duplicate(x.UserIDs) {
+		return errs.ErrArgs.Wrap("userIDs has duplicate")
 	}
 	return nil
 }
@@ -52,6 +56,9 @@ func (x *SearchDefaultFriendReq) Check() error {
 func (x *AddDefaultGroupReq) Check() error {
 	if x.GroupIDs == nil {
 		return errs.ErrArgs.Wrap("GroupIDs is empty")
+	}
+	if utils.Duplicate(x.GroupIDs) {
+		return errs.ErrArgs.Wrap("GroupIDs has duplicate")
 	}
 	return nil
 }

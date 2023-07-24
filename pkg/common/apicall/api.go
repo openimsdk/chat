@@ -20,4 +20,5 @@ var (
 	updateUserInfo = NewApiCaller[user.UpdateUserInfoReq, user.UpdateUserInfoResp]("/user/update_user_info", imApi)
 	registerUser   = NewApiCaller[user.UserRegisterReq, user.UserRegisterResp]("/user/user_register", imApi)
 	forceOffLine   = NewApiCaller[auth.ForceLogoutReq, auth.ForceLogoutResp]("/auth/force_logout", imApi)
+	getGroupsInfo  = NewApiCaller[group.GetGroupsInfoReq, group.GetGroupsInfoResp]("/group/get_groups_info", imApi)
 )
