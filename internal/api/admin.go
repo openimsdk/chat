@@ -16,6 +16,7 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/a2r"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/apiresp"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/checker"
@@ -287,8 +288,18 @@ func (o *AdminApi) SetClientConfig(c *gin.Context) {
 		apiresp.GinError(c, err)
 		return
 	}
-	s := "{\"config\":{\"aaa\":null,\"bbb\":\"1234\"}}"
-	body = []byte(s)
+	go func() {
+		s := "{\"config\":{\"aaa\":null,\"bbb\":\"1234\"}}"
+
+		var v admin.SetClientConfigReq
+
+		if err := json.Unmarshal([]byte(s), &v); err != nil {
+			panic(err)
+		}
+		fmt.Printf("%+v\n", v.Config)
+		vv, ok := v.Config["aaa"]
+		fmt.Println(vv, ok)
+	}()
 	if err := json.Unmarshal(body, &req); err != nil {
 		apiresp.GinError(c, err)
 		return
