@@ -293,6 +293,10 @@ func (o *AdminApi) SetClientConfig(c *gin.Context) {
 		apiresp.GinError(c, err)
 		return
 	}
+	for key, value := range req.Config {
+		log.ZDebug(c, "---->", "key", key, "value", value, "isNil", value == nil)
+	}
+	log.ZDebug(c, "SetClientConfig api", "req", &req)
 	log.ZDebug(c, "SetClientConfig api", "req", &req)
 	if err := checker.Validate(&req); err != nil {
 		apiresp.GinError(c, err)
