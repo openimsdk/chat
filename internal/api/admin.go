@@ -175,7 +175,7 @@ func (o *AdminApi) BlockUser(c *gin.Context) {
 		apiresp.GinError(c, err)
 		return
 	}
-	log.ZInfo(c, "BlockUser Api", "req", &req)
+	log.ZInfo(c, "BlockUser api", "req", &req)
 	resp, err := o.adminClient.BlockUser(c, &req)
 	if err != nil {
 		apiresp.GinError(c, err)

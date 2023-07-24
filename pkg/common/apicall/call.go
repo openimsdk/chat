@@ -25,29 +25,36 @@ type ApiCaller[Req, Resp any] interface {
 	Call(ctx context.Context, req *Req) (*Resp, error)
 }
 
-func NewApiCaller[Req, Resp any](url string) ApiCaller[Req, Resp] {
-	return Api[Req, Resp](url)
+func NewApiCaller[Req, Resp any](api string, prefix func() string) ApiCaller[Req, Resp] {
+	return &caller[Req, Resp]{
+		api:    api,
+		prefix: prefix,
+	}
 }
 
-type Api[Req, Resp any] string
+type caller[Req, Resp any] struct {
+	api    string
+	prefix func() string
+}
 
-func (a Api[Req, Resp]) Call(ctx context.Context, req *Req) (*Resp, error) {
-	log.ZInfo(ctx, "api req", "addr", string(a), "req", req)
+func (a caller[Req, Resp]) Call(ctx context.Context, req *Req) (*Resp, error) {
 	resp, err := a.call(ctx, req)
 	if err != nil {
-		log.ZError(ctx, "api resp", err)
+		log.ZError(ctx, "caller resp", err)
 		return nil, err
 	}
-	log.ZError(ctx, "api resp", err, "resp", resp)
+	log.ZError(ctx, "caller resp", err, "resp", resp)
 	return resp, nil
 }
 
-func (a Api[Req, Resp]) call(ctx context.Context, req *Req) (*Resp, error) {
+func (a caller[Req, Resp]) call(ctx context.Context, req *Req) (*Resp, error) {
+	url := a.prefix() + a.api
+	log.ZInfo(ctx, "caller req", "addr", url, "req", req)
 	reqBody, err := json.Marshal(req)
 	if err != nil {
 		return nil, err
 	}
-	request, err := http.NewRequestWithContext(ctx, http.MethodPost, string(a), bytes.NewReader(reqBody))
+	request, err := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewReader(reqBody))
 	if err != nil {
 		return nil, err
 	}
@@ -61,7 +68,7 @@ func (a Api[Req, Resp]) call(ctx context.Context, req *Req) (*Resp, error) {
 	if err != nil {
 		return nil, err
 	}
-	log.ZDebug(ctx, "call api successfully", "api", string(a))
+	log.ZDebug(ctx, "call caller successfully", "code", response.Status)
 	defer response.Body.Close()
 	if response.StatusCode != http.StatusOK {
 		return nil, errors.New(response.Status)
@@ -70,7 +77,7 @@ func (a Api[Req, Resp]) call(ctx context.Context, req *Req) (*Resp, error) {
 	if err != nil {
 		return nil, err
 	}
-	log.ZDebug(ctx, "read respBody successfully")
+	log.ZDebug(ctx, "read respBody successfully", "body", string(data))
 	var resp baseApiResponse[Resp]
 	if err := json.Unmarshal(data, &resp); err != nil {
 		return nil, err
@@ -78,6 +85,5 @@ func (a Api[Req, Resp]) call(ctx context.Context, req *Req) (*Resp, error) {
 	if resp.ErrCode != 0 {
 		return nil, errs.NewCodeError(resp.ErrCode, resp.ErrMsg).WithDetail(resp.ErrDlt)
 	}
-	log.ZDebug(ctx, "unmarshal resp success")
 	return resp.Data, nil
 }
