@@ -28,12 +28,11 @@ import (
 	"github.com/OpenIMSDK/chat/pkg/common/apicall"
 	"github.com/OpenIMSDK/chat/pkg/common/apistruct"
 	"github.com/OpenIMSDK/chat/pkg/common/mctx"
+	"github.com/OpenIMSDK/chat/pkg/proto/admin"
+	"github.com/OpenIMSDK/chat/pkg/proto/chat"
 	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc"
 	"io"
-
-	"github.com/OpenIMSDK/chat/pkg/proto/admin"
-	"github.com/OpenIMSDK/chat/pkg/proto/chat"
 )
 
 func NewAdmin(chatConn, adminConn grpc.ClientConnInterface) *AdminApi {
@@ -282,24 +281,27 @@ func (o *AdminApi) SearchBlockUser(c *gin.Context) {
 }
 
 func (o *AdminApi) SetClientConfig(c *gin.Context) {
+
+	log.ZDebug(c, "----------------------------------------")
+
+	s := "{\"config\":{\"aaa\":null,\"bbb\":\"1234\"}}"
+	var v admin.SetClientConfigReq
+	if err := json.Unmarshal([]byte(s), &v); err != nil {
+		panic(err)
+	}
+	ss := fmt.Sprintf("%+v\n", v.Config)
+	vv, ok := v.Config["aaa"]
+	log.ZDebug(c, "sss ->", "res", fmt.Sprint(vv, ok, vv == nil))
+	log.ZDebug(c, "sss ->", "s", ss)
+	log.ZDebug(c, "sss ->", "raw", s)
+	log.ZDebug(c, "----------------------------------------")
+
 	var req admin.SetClientConfigReq
 	body, err := io.ReadAll(c.Request.Body)
 	if err != nil {
 		apiresp.GinError(c, err)
 		return
 	}
-	go func() {
-		s := "{\"config\":{\"aaa\":null,\"bbb\":\"1234\"}}"
-
-		var v admin.SetClientConfigReq
-
-		if err := json.Unmarshal([]byte(s), &v); err != nil {
-			panic(err)
-		}
-		fmt.Printf("%+v\n", v.Config)
-		vv, ok := v.Config["aaa"]
-		fmt.Println(vv, ok)
-	}()
 	if err := json.Unmarshal(body, &req); err != nil {
 		apiresp.GinError(c, err)
 		return
