@@ -2,6 +2,7 @@ package apicall
 
 import (
 	"context"
+	config2 "github.com/OpenIMSDK/Open-IM-Server/pkg/common/config"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/constant"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/proto/auth"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/proto/friend"
@@ -12,7 +13,7 @@ import (
 )
 
 type CallerInterface interface {
-	AdminToken(ctx context.Context) (string, error)
+	ImAdminTokenWithDefaultAdmin(ctx context.Context) (string, error)
 	ImportFriend(ctx context.Context, ownerUserID string, friendUserID []string) error
 	UserToken(ctx context.Context, userID string, platform int32) (string, error)
 	InviteToGroup(ctx context.Context, userID string, groupIDs []string) error
@@ -40,13 +41,13 @@ func (c *Caller) ImportFriend(ctx context.Context, ownerUserID string, friendUse
 	return err
 }
 
-func (c *Caller) AdminToken(ctx context.Context) (string, error) {
+func (c *Caller) ImAdminTokenWithDefaultAdmin(ctx context.Context) (string, error) {
 	return c.UserToken(ctx, config.GetDefaultIMAdmin(), constant.AdminPlatformID)
 }
 
 func (c *Caller) UserToken(ctx context.Context, userID string, platformID int32) (string, error) {
 	resp, err := userToken.Call(ctx, &auth.UserTokenReq{
-		Secret:     *config.Config.Secret,
+		Secret:     config2.Config.Secret,
 		PlatformID: platformID,
 		UserID:     userID,
 	})
@@ -78,7 +79,7 @@ func (c *Caller) UpdateUserInfo(ctx context.Context, userID string, nickName str
 
 func (c *Caller) RegisterUser(ctx context.Context, users []*sdkws.UserInfo) error {
 	_, err := registerUser.Call(ctx, &user.UserRegisterReq{
-		Secret: *config.Config.Secret,
+		Secret: config2.Config.Secret,
 		Users:  users,
 	})
 	return err

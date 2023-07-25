@@ -25,6 +25,7 @@ import (
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/utils"
 	"github.com/OpenIMSDK/chat/pkg/common/apicall"
 	"github.com/OpenIMSDK/chat/pkg/common/apistruct"
+	"github.com/OpenIMSDK/chat/pkg/common/config"
 	"github.com/OpenIMSDK/chat/pkg/common/mctx"
 	"github.com/OpenIMSDK/chat/pkg/proto/admin"
 	"github.com/OpenIMSDK/chat/pkg/proto/chat"
@@ -61,7 +62,8 @@ func (o *AdminApi) AdminLogin(c *gin.Context) {
 		apiresp.GinError(c, err)
 		return
 	}
-	imToken, err := o.imApiCaller.UserToken(c, loginResp.AdminUserID, constant.AdminPlatformID)
+	imAdminUserID := config.GetIMAdmin(loginResp.AdminUserID)
+	imToken, err := o.imApiCaller.UserToken(c, imAdminUserID, constant.AdminPlatformID)
 	if err != nil {
 		apiresp.GinError(c, err)
 		return
@@ -72,7 +74,7 @@ func (o *AdminApi) AdminLogin(c *gin.Context) {
 		return
 	}
 	resp.ImToken = imToken
-	resp.ImUserID = loginResp.AdminUserID
+	resp.ImUserID = imAdminUserID
 	log.ZInfo(c, "AdminLogin api", "resp", resp)
 	apiresp.GinSuccess(c, resp)
 }
@@ -115,12 +117,12 @@ func (o *AdminApi) AddDefaultGroup(c *gin.Context) {
 		apiresp.GinError(c, err)
 		return
 	}
-	token, err := o.imApiCaller.AdminToken(c)
+	imToken, err := o.imApiCaller.UserToken(c, config.GetIMAdmin(mctx.GetOpUserID(c)), constant.AdminPlatformID)
 	if err != nil {
 		apiresp.GinError(c, err)
 		return
 	}
-	groups, err := o.imApiCaller.FindGroupInfo(mctx.WithApiToken(c, token), req.GroupIDs)
+	groups, err := o.imApiCaller.FindGroupInfo(mctx.WithApiToken(c, imToken), req.GroupIDs)
 	if err != nil {
 		apiresp.GinError(c, err)
 		return
@@ -167,12 +169,12 @@ func (o *AdminApi) SearchDefaultGroup(c *gin.Context) {
 		Groups: make([]*sdkws.GroupInfo, 0, len(searchResp.GroupIDs)),
 	}
 	if len(searchResp.GroupIDs) > 0 {
-		token, err := o.imApiCaller.AdminToken(c)
+		imToken, err := o.imApiCaller.UserToken(c, config.GetIMAdmin(mctx.GetOpUserID(c)), constant.AdminPlatformID)
 		if err != nil {
 			apiresp.GinError(c, err)
 			return
 		}
-		groups, err := o.imApiCaller.FindGroupInfo(mctx.WithApiToken(c, token), searchResp.GroupIDs)
+		groups, err := o.imApiCaller.FindGroupInfo(mctx.WithApiToken(c, imToken), searchResp.GroupIDs)
 		if err != nil {
 			apiresp.GinError(c, err)
 			return
@@ -256,12 +258,12 @@ func (o *AdminApi) BlockUser(c *gin.Context) {
 		apiresp.GinError(c, err)
 		return
 	}
-	token, err := o.imApiCaller.UserToken(c, mctx.GetOpUserID(c), constant.AdminPlatformID)
+	imToken, err := o.imApiCaller.UserToken(c, config.GetIMAdmin(mctx.GetOpUserID(c)), constant.AdminPlatformID)
 	if err != nil {
 		apiresp.GinError(c, err)
 		return
 	}
-	err = o.imApiCaller.ForceOffLine(mctx.WithApiToken(c, token), req.UserID)
+	err = o.imApiCaller.ForceOffLine(mctx.WithApiToken(c, imToken), req.UserID)
 	if err != nil {
 		apiresp.GinError(c, err)
 		return

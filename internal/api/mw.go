@@ -99,6 +99,7 @@ func (o *MW) CheckToken(c *gin.Context) {
 		return
 	}
 	if err := o.isValidToken(c, userID, token); err != nil {
+		c.Abort()
 		apiresp.GinError(c, err)
 		return
 	}
@@ -113,6 +114,7 @@ func (o *MW) CheckAdmin(c *gin.Context) {
 		return
 	}
 	if err := o.isValidToken(c, userID, token); err != nil {
+		c.Abort()
 		apiresp.GinError(c, err)
 		return
 	}
@@ -127,6 +129,7 @@ func (o *MW) CheckUser(c *gin.Context) {
 		return
 	}
 	if err := o.isValidToken(c, userID, token); err != nil {
+		c.Abort()
 		apiresp.GinError(c, err)
 		return
 	}

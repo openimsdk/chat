@@ -62,7 +62,7 @@ log:
 #  isJson: false
 #  withStack: false
 
-secret: "tuoyun"
+#secret: "tuoyun"
 #tokenPolicy:
 #  expire: 86400
 

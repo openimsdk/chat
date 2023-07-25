@@ -16,9 +16,9 @@ package mctx
 
 import (
 	"context"
-	"fmt"
 	imConfig "github.com/OpenIMSDK/Open-IM-Server/pkg/common/config"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/utils"
+	"github.com/OpenIMSDK/chat/pkg/common/config"
 	"strconv"
 
 	constant2 "github.com/OpenIMSDK/Open-IM-Server/pkg/common/constant"
@@ -41,7 +41,6 @@ func Check(ctx context.Context) (string, int32, error) {
 	if opUserID == "" {
 		return "", 0, errs.ErrNoPermission.Wrap("opUserID empty")
 	}
-	fmt.Println(ctx.Value(constant.RpcOpUserType))
 	opUserTypeArr, ok := ctx.Value(constant.RpcOpUserType).([]string)
 	if !ok {
 		return "", 0, errs.ErrNoPermission.Wrap("missing user type")
@@ -111,8 +110,9 @@ func GetOpUserID(ctx context.Context) string {
 }
 
 func GetUserType(ctx context.Context) int32 {
-	userType, _ := ctx.Value(constant.RpcOpUserType).(int32)
-	return userType
+	userTypeArr, _ := ctx.Value(constant.RpcOpUserType).([]string)
+	userType, _ := strconv.Atoi(userTypeArr[0])
+	return int32(userType)
 }
 
 func WithOpUserID(ctx context.Context, opUserID string, userType int) context.Context {
@@ -126,6 +126,13 @@ func WithOpUserID(ctx context.Context, opUserID string, userType int) context.Co
 }
 
 func WithAdminUser(ctx context.Context) context.Context {
+	if len(config.Config.AdminList) > 0 {
+		ctx = WithOpUserID(ctx, config.Config.AdminList[0].AdminID, constant.AdminUser)
+	}
+	return ctx
+}
+
+func WithIMAdminUser(ctx context.Context) context.Context {
 	if len(imConfig.Config.Manager.UserID) > 0 {
 		ctx = WithOpUserID(ctx, imConfig.Config.Manager.UserID[0], constant.AdminUser)
 	}
