@@ -28,6 +28,7 @@ func (ClientConfig) TableName() string {
 
 type ClientConfigInterface interface {
 	NewTx(tx any) ClientConfigInterface
-	Set(ctx context.Context, config map[string]*string) error
+	Set(ctx context.Context, config map[string]string) error
 	Get(ctx context.Context) (map[string]string, error)
+	Del(ctx context.Context, keys []string) error
 }

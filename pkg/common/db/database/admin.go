@@ -36,7 +36,8 @@ type AdminDatabaseInterface interface {
 	FindOnShelf(ctx context.Context) ([]*table.Applet, error)
 	UpdateApplet(ctx context.Context, appletID string, update map[string]any) error
 	GetConfig(ctx context.Context) (map[string]string, error)
-	SetConfig(ctx context.Context, cs map[string]*string) error
+	SetConfig(ctx context.Context, cs map[string]string) error
+	DelConfig(ctx context.Context, keys []string) error
 	FindInvitationRegister(ctx context.Context, codes []string) ([]*table.InvitationRegister, error)
 	DelInvitationRegister(ctx context.Context, codes []string) error
 	UpdateInvitationRegister(ctx context.Context, code string, fields map[string]any) error
@@ -156,11 +157,14 @@ func (o *AdminDatabase) GetConfig(ctx context.Context) (map[string]string, error
 }
 
 // set config
-func (o *AdminDatabase) SetConfig(ctx context.Context, cs map[string]*string) error {
+func (o *AdminDatabase) SetConfig(ctx context.Context, cs map[string]string) error {
 	return o.clientConfig.Set(ctx, cs)
 }
 
-// find invitate registe
+func (o *AdminDatabase) DelConfig(ctx context.Context, keys []string) error {
+	return o.clientConfig.Del(ctx, keys)
+}
+
 func (o *AdminDatabase) FindInvitationRegister(ctx context.Context, codes []string) ([]*table.InvitationRegister, error) {
 	return o.invitationRegister.Find(ctx, codes)
 }

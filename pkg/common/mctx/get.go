@@ -116,10 +116,10 @@ func GetUserType(ctx context.Context) int32 {
 	return userType
 }
 
-func WithOpUserID(ctx context.Context, opUserID string, userType int32) context.Context {
+func WithOpUserID(ctx context.Context, opUserID string, userType int) context.Context {
 	headers, _ := ctx.Value(constant.RpcCustomHeader).([]string)
 	ctx = context.WithValue(ctx, constant.RpcOpUserID, opUserID)
-	ctx = context.WithValue(ctx, constant.RpcOpUserType, []string{strconv.Itoa(int(userType))})
+	ctx = context.WithValue(ctx, constant.RpcOpUserType, []string{strconv.Itoa(userType)})
 	if utils.IndexOf(constant.RpcOpUserType, headers...) < 0 {
 		ctx = context.WithValue(ctx, constant.RpcCustomHeader, append(headers, constant.RpcOpUserType))
 	}
@@ -128,7 +128,11 @@ func WithOpUserID(ctx context.Context, opUserID string, userType int32) context.
 
 func WithAdminUser(ctx context.Context) context.Context {
 	if len(imConfig.Config.Manager.UserID) > 0 {
-		ctx = WithOpUserID(ctx, imConfig.Config.Manager.UserID[0], int32(constant.AdminUser))
+		ctx = WithOpUserID(ctx, imConfig.Config.Manager.UserID[0], constant.AdminUser)
 	}
 	return ctx
+}
+
+func WithApiToken(ctx context.Context, token string) context.Context {
+	return context.WithValue(ctx, constant.CtxApiToken, token)
 }

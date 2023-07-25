@@ -70,7 +70,6 @@ func Start(discov discoveryregistry.SvcDiscoveryRegistry, server *grpc.Server) e
 type adminServer struct {
 	Database database.AdminDatabaseInterface
 	Chat     *chat.ChatClient
-	OpenIM   *openim.OpenIMClient
 }
 
 // get user admin info

@@ -55,3 +55,11 @@ func (o *ForbiddenAccount) Find(ctx context.Context, userIDs []string) ([]*admin
 func (o *ForbiddenAccount) Search(ctx context.Context, keyword string, page int32, size int32) (uint32, []*admin.ForbiddenAccount, error) {
 	return ormutil.GormSearch[admin.ForbiddenAccount](o.db.WithContext(ctx), []string{"user_id", "reason", "operator_user_id"}, keyword, page, size)
 }
+
+func (o *ForbiddenAccount) FindAllIDs(ctx context.Context) ([]string, error) {
+	var userIDs []string
+	if err := o.db.WithContext(ctx).Model(&admin.ForbiddenAccount{}).Pluck("user_id", &userIDs); err != nil {
+		return nil, errs.Wrap(err.Error)
+	}
+	return userIDs, nil
+}

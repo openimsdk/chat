@@ -13,6 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 OPENIM_ROOT=$(dirname "${BASH_SOURCE[0]}")/..
+
 SCRIPTS_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 BIN_DIR=$SCRIPTS_ROOT/../_output/bin
 # Include necessary files

@@ -12,15 +12,15 @@ import (
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/log"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/proto/auth"
+	"github.com/OpenIMSDK/Open-IM-Server/pkg/proto/friend"
+	"github.com/OpenIMSDK/Open-IM-Server/pkg/proto/group"
+	"github.com/OpenIMSDK/Open-IM-Server/pkg/proto/user"
 	"github.com/OpenIMSDK/chat/pkg/common/config"
 	"gorm.io/gorm/utils"
 )
 
-type baseApiResponse[T any] struct {
-	ErrCode int    `json:"errCode"`
-	ErrMsg  string `json:"errMsg"`
-	ErrDlt  string `json:"errDlt"`
-	Data    *T     `json:"data"`
+func imApi() string {
+	return config.Config.OpenIMUrl
 }
 
 type ApiCaller[Req, Resp any] interface {

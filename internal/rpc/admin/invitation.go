@@ -199,9 +199,6 @@ func (o *adminServer) SearchInvitationCode(ctx context.Context, req *admin.Searc
 	if _, err := mctx.CheckAdmin(ctx); err != nil {
 		return nil, err
 	}
-	if !utils.Contain(req.Status, constant.InvitationCodeUnused, constant.InvitationCodeUsed, constant.InvitationCodeAll) {
-		return nil, errs.ErrArgs.Wrap("state invalid")
-	}
 	total, list, err := o.Database.SearchInvitationRegister(ctx, req.Keyword, req.Status, req.UserIDs, req.Codes, req.Pagination.PageNumber, req.Pagination.ShowNumber)
 	if err != nil {
 		return nil, err

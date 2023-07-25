@@ -39,22 +39,20 @@ func (o *ClientConfig) NewTx(tx any) admin.ClientConfigInterface {
 func (o *ClientConfig) Set(ctx context.Context, config map[string]*string) error {
 	err := o.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		for key, value := range config {
-			if value == nil {
-				if err := tx.Where("`key` = ?", key).Delete(&admin.ClientConfig{}).Error; err != nil {
+			var cc admin.ClientConfig
+			if err := tx.Where("`key` = ?", key).Take(&cc).Error; err == nil {
+				if cc.Value == value {
+					continue
+				}
+				if err := tx.Where("`key` = ?", key).Model(&admin.ClientConfig{}).Update("value", value).Error; err != nil {
+					return err
+				}
+			} else if err == gorm.ErrRecordNotFound {
+				if err := tx.Create(&admin.ClientConfig{Key: key, Value: value}).Error; err != nil {
 					return err
 				}
 			} else {
-				if err := tx.Where("`key` = ?", key).Take(&admin.ClientConfig{}).Error; err == nil {
-					if err := tx.Where("`key` = ?", key).Model(&admin.ClientConfig{}).Update("value", *value).Error; err != nil {
-						return err
-					}
-				} else if err == gorm.ErrRecordNotFound {
-					if err := tx.Create(&admin.ClientConfig{Key: key, Value: *value}).Error; err != nil {
-						return err
-					}
-				} else {
-					return err
-				}
+				return err
 			}
 		}
 		return nil
@@ -62,7 +60,10 @@ func (o *ClientConfig) Set(ctx context.Context, config map[string]*string) error
 	return errs.Wrap(err)
 }
 
-// get config
+func (o *ClientConfig) Del(ctx context.Context, keys []string) error {
+	return errs.Wrap(o.db.WithContext(ctx).Where("`key` in ?", keys).Delete(&admin.ClientConfig{}).Error)
+}
+
 func (o *ClientConfig) Get(ctx context.Context) (map[string]string, error) {
 	var cs []*admin.ClientConfig
 	if err := o.db.WithContext(ctx).Find(&cs).Error; err != nil {

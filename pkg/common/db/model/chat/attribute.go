@@ -79,12 +79,10 @@ func (o *Attribute) Take(ctx context.Context, userID string) (*chat.Attribute, e
 // search normal user
 func (o *Attribute) SearchNormalUser(ctx context.Context, keyword string, forbiddenIDs []string, genders []int32, page int32, size int32) (uint32, []*chat.Attribute, error) {
 	db := o.db.WithContext(ctx)
-	if len(genders) > 0 {
-		if len(forbiddenIDs) == 0 {
-			db = db.Where("gender in ?", genders)
-		} else {
-			db = db.Where("gender in ? and user_id not in ?", genders, forbiddenIDs)
-		}
+	if len(forbiddenIDs) == 0 {
+		db = db.Where("gender in ?", genders)
+	} else {
+		db = db.Where("gender in ? and user_id not in ?", genders, forbiddenIDs)
 	}
 	return ormutil.GormSearch[chat.Attribute](db, []string{"user_id", "account", "nickname", "phone_number"}, keyword, page, size)
 }
