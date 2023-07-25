@@ -24,7 +24,6 @@ import (
 	"github.com/OpenIMSDK/chat/pkg/common/dbconn"
 	"github.com/OpenIMSDK/chat/pkg/proto/chat"
 	chatClient "github.com/OpenIMSDK/chat/pkg/rpclient/chat"
-	"github.com/OpenIMSDK/chat/pkg/rpclient/openim"
 	"github.com/OpenIMSDK/chat/pkg/sms"
 )
 
@@ -61,6 +60,5 @@ func Start(discov discoveryregistry.SvcDiscoveryRegistry, server *grpc.Server) e
 type chatSvr struct {
 	Database database.ChatDatabaseInterface
 	Admin    *chatClient.AdminClient
-	OpenIM   *openim.OpenIMClient
 	SMS      sms.SMS
 }

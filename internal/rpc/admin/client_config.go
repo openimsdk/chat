@@ -41,17 +41,19 @@ func (o *adminServer) SetClientConfig(ctx context.Context, req *admin.SetClientC
 	if len(req.Config) == 0 {
 		return nil, errs.ErrArgs.Wrap("update config empty")
 	}
-	conf := make(map[string]*string)
-	for key, value := range req.Config {
-		if value == nil {
-			conf[key] = nil
-		} else {
-			temp := value.Value
-			conf[key] = &temp
-		}
-	}
-	if err := o.Database.SetConfig(ctx, conf); err != nil {
+	if err := o.Database.SetConfig(ctx, req.Config); err != nil {
 		return nil, err
 	}
 	return &admin.SetClientConfigResp{}, nil
+}
+
+func (o *adminServer) DelClientConfig(ctx context.Context, req *admin.DelClientConfigReq) (*admin.DelClientConfigResp, error) {
+	defer log.ZDebug(ctx, "return")
+	if _, err := mctx.CheckAdmin(ctx); err != nil {
+		return nil, err
+	}
+	if err := o.Database.DelConfig(ctx, req.Keys); err != nil {
+		return nil, err
+	}
+	return &admin.DelClientConfigResp{}, nil
 }

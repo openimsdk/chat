@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 OPENIM_ROOT=$(dirname "${BASH_SOURCE[0]}")/..
-BIN_DIR=$OPENIM_ROOT/output/bin
+BIN_DIR=$OPENIM_ROOT/bin
 # Include necessary files
 
 source $OPENIM_ROOT/scripts/style_info.cfg

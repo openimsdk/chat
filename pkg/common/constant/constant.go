@@ -174,3 +174,5 @@ const (
 )
 
 const DefaultPlatform = 1
+
+const CtxApiToken = "api-token"

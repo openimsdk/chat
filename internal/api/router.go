@@ -113,6 +113,7 @@ func NewAdminRoute(router gin.IRouter, discov discoveryregistry.SvcDiscoveryRegi
 	userRouter.POST("/password/reset", admin.ResetUserPassword) // 重置用户密码
 
 	initGroup := router.Group("/client_config", mw.CheckAdmin)
-	initGroup.POST("/set", admin.SetClientConfig) // 设置客户端初始化配置
 	initGroup.POST("/get", admin.GetClientConfig) // 获取客户端初始化配置
+	initGroup.POST("/set", admin.SetClientConfig) // 设置客户端初始化配置
+	initGroup.POST("/del", admin.DelClientConfig) // 删除客户端初始化配置
 }

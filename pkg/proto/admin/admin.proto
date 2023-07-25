@@ -135,7 +135,7 @@ message GroupAttribute {
 
 message SearchDefaultGroupResp {
   uint32 total = 1;
-  repeated GroupAttribute groups = 2;
+  repeated string groupIDs = 2;
 }
 
 // ################### 邀请码 ###################
@@ -439,10 +439,17 @@ message SearchAppletResp {
 
 
 message SetClientConfigReq {
-  map<string, OpenIMServer.protobuf.StringValue> config = 1;
+  map<string, string> config = 1;
 }
 
 message SetClientConfigResp {
+}
+
+message DelClientConfigReq {
+  repeated string keys = 1;
+}
+
+message DelClientConfigResp {
 }
 
 message GetClientConfigReq {
@@ -515,5 +522,6 @@ service admin {
   // 客户端配置
   rpc GetClientConfig(GetClientConfigReq) returns(GetClientConfigResp);
   rpc SetClientConfig(SetClientConfigReq) returns(SetClientConfigResp);
+  rpc DelClientConfig(DelClientConfigReq) returns(DelClientConfigResp);
 
 }
