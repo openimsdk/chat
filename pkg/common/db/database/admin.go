@@ -16,8 +16,10 @@ package database
 
 import (
 	"context"
-
+	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/constant"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/db/tx"
+	"github.com/OpenIMSDK/chat/pkg/common/db/cache"
+	"github.com/redis/go-redis/v9"
 	"gorm.io/gorm"
 
 	"github.com/OpenIMSDK/chat/pkg/common/db/model/admin"
@@ -66,9 +68,11 @@ type AdminDatabaseInterface interface {
 	DelUserLimitLogin(ctx context.Context, ms []*table.LimitUserLoginIP) error
 	CountLimitUserLoginIP(ctx context.Context, userID string) (uint32, error)
 	GetLimitUserLoginIP(ctx context.Context, userID string, ip string) (*table.LimitUserLoginIP, error)
+	CacheToken(ctx context.Context, userID string, token string) error
+	GetTokens(ctx context.Context, userID string) (map[string]int32, error)
 }
 
-func NewAdminDatabase(db *gorm.DB) AdminDatabaseInterface {
+func NewAdminDatabase(db *gorm.DB, rdb redis.UniversalClient) AdminDatabaseInterface {
 	return &AdminDatabase{
 		tx:                 tx.NewGorm(db),
 		admin:              admin.NewAdmin(db),
@@ -80,6 +84,7 @@ func NewAdminDatabase(db *gorm.DB) AdminDatabaseInterface {
 		registerAddGroup:   admin.NewRegisterAddGroup(db),
 		applet:             admin.NewApplet(db),
 		clientConfig:       admin.NewClientConfig(db),
+		cache:              cache.NewTokenInterface(rdb),
 	}
 }
 
@@ -94,6 +99,7 @@ type AdminDatabase struct {
 	registerAddGroup   table.RegisterAddGroupInterface
 	applet             table.AppletInterface
 	clientConfig       table.ClientConfigInterface
+	cache              cache.TokenInterface
 }
 
 func (o *AdminDatabase) InitAdmin(ctx context.Context) error {
@@ -258,4 +264,12 @@ func (o *AdminDatabase) CountLimitUserLoginIP(ctx context.Context, userID string
 
 func (o *AdminDatabase) GetLimitUserLoginIP(ctx context.Context, userID string, ip string) (*table.LimitUserLoginIP, error) {
 	return o.limitUserLoginIP.Take(ctx, userID, ip)
+}
+
+func (o *AdminDatabase) CacheToken(ctx context.Context, userID string, token string) error {
+	return o.cache.AddTokenFlag(ctx, userID, token, constant.NormalToken)
+}
+
+func (o *AdminDatabase) GetTokens(ctx context.Context, userID string) (map[string]int32, error) {
+	return o.cache.GetTokensWithoutError(ctx, userID)
 }

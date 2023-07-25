@@ -452,6 +452,14 @@ message GetClientConfigResp {
   map<string, string> config = 1;
 }
 
+message GetUserTokenReq{
+  string userID=1;
+}
+
+message GetUserTokenResp{
+  map<string,int32> tokensMap=1;
+}
+
 service admin {
   //登录
   rpc Login(LoginReq) returns(LoginResp);
@@ -516,4 +524,5 @@ service admin {
   rpc GetClientConfig(GetClientConfigReq) returns(GetClientConfigResp);
   rpc SetClientConfig(SetClientConfigReq) returns(SetClientConfigResp);
 
+  rpc GetUserToken(GetUserTokenReq) returns (GetUserTokenResp);
 }
