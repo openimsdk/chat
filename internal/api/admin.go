@@ -15,8 +15,6 @@
 package api
 
 import (
-	"encoding/json"
-	"fmt"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/a2r"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/apiresp"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/checker"
@@ -32,7 +30,6 @@ import (
 	"github.com/OpenIMSDK/chat/pkg/proto/chat"
 	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc"
-	"io"
 )
 
 func NewAdmin(chatConn, adminConn grpc.ClientConnInterface) *AdminApi {
@@ -281,40 +278,11 @@ func (o *AdminApi) SearchBlockUser(c *gin.Context) {
 }
 
 func (o *AdminApi) SetClientConfig(c *gin.Context) {
-	// Config map[string]*wrapperspb.StringValue
-	// Config map[string]*string
-	var req admin.SetClientConfigReq
-	body, err := io.ReadAll(c.Request.Body)
-	if err != nil {
-		apiresp.GinError(c, err)
-		return
-	}
-	bs := fmt.Sprintf("%+v", body)
-	log.ZDebug(c, "SetClientConfig api", "bodybin", bs)
-	if err := json.Unmarshal(body, &req); err != nil {
-		apiresp.GinError(c, err)
-		return
-	}
-	for key, value := range req.Config {
-		log.ZDebug(c, "---->", "key", key, "value", value, "isNil", value == nil)
-	}
-	log.ZDebug(c, "SetClientConfig api", "req", &req)
-	for key, value := range req.Config {
-		log.ZDebug(c, "---->", "key", key, "value", value, "isNil", value == nil)
-	}
-	if err := checker.Validate(&req); err != nil {
-		apiresp.GinError(c, err)
-		return
-	}
-	for key, value := range req.Config {
-		log.ZDebug(c, "---->", "key", key, "value", value, "isNil", value == nil)
-	}
-	resp, err := o.adminClient.SetClientConfig(c, &req)
-	if err != nil {
-		apiresp.GinError(c, err)
-		return
-	}
-	apiresp.GinSuccess(c, resp)
+	a2r.Call(admin.AdminClient.SetClientConfig, o.adminClient, c)
+}
+
+func (o *AdminApi) DelClientConfig(c *gin.Context) {
+	a2r.Call(admin.AdminClient.DelClientConfig, o.adminClient, c)
 }
 
 func (o *AdminApi) GetClientConfig(c *gin.Context) {
