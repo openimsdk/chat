@@ -31,7 +31,6 @@ import (
 	"github.com/OpenIMSDK/chat/pkg/eerrs"
 	"github.com/OpenIMSDK/chat/pkg/proto/admin"
 	"github.com/OpenIMSDK/chat/pkg/rpclient/chat"
-	"github.com/OpenIMSDK/chat/pkg/rpclient/openim"
 )
 
 func Start(discov discoveryregistry.SvcDiscoveryRegistry, server *grpc.Server) error {
@@ -74,7 +73,6 @@ func Start(discov discoveryregistry.SvcDiscoveryRegistry, server *grpc.Server) e
 type adminServer struct {
 	Database database.AdminDatabaseInterface
 	Chat     *chat.ChatClient
-	OpenIM   *openim.OpenIMClient
 }
 
 func (o *adminServer) GetAdminInfo(ctx context.Context, req *admin.GetAdminInfoReq) (*admin.GetAdminInfoResp, error) {

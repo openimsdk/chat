@@ -2,6 +2,7 @@ package admin
 
 import (
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
+	"github.com/OpenIMSDK/Open-IM-Server/pkg/utils"
 	"github.com/OpenIMSDK/chat/pkg/common/constant"
 )
 
@@ -25,6 +26,9 @@ func (x *ChangePasswordReq) Check() error {
 func (x *AddDefaultFriendReq) Check() error {
 	if x.UserIDs == nil {
 		return errs.ErrArgs.Wrap("userIDs is empty")
+	}
+	if utils.Duplicate(x.UserIDs) {
+		return errs.ErrArgs.Wrap("userIDs has duplicate")
 	}
 	return nil
 }
@@ -52,6 +56,9 @@ func (x *SearchDefaultFriendReq) Check() error {
 func (x *AddDefaultGroupReq) Check() error {
 	if x.GroupIDs == nil {
 		return errs.ErrArgs.Wrap("GroupIDs is empty")
+	}
+	if utils.Duplicate(x.GroupIDs) {
+		return errs.ErrArgs.Wrap("GroupIDs has duplicate")
 	}
 	return nil
 }
@@ -121,13 +128,9 @@ func (x *DelInvitationCodeReq) Check() error {
 }
 
 func (x *SearchInvitationCodeReq) Check() error {
-	if x.Codes == nil {
-		return errs.ErrArgs.Wrap("codes is empty")
+	if !utils.Contain(x.Status, constant.InvitationCodeUnused, constant.InvitationCodeUsed, constant.InvitationCodeAll) {
+		return errs.ErrArgs.Wrap("state invalid")
 	}
-	if x.UserIDs == nil {
-		return errs.ErrArgs.Wrap("userIDs is empty")
-	}
-
 	if x.Pagination == nil {
 		return errs.ErrArgs.Wrap("pagination is empty")
 	}

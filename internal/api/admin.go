@@ -21,16 +21,15 @@ import (
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/constant"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/log"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
+	"github.com/OpenIMSDK/Open-IM-Server/pkg/proto/sdkws"
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/utils"
 	"github.com/OpenIMSDK/chat/pkg/common/apicall"
 	"github.com/OpenIMSDK/chat/pkg/common/apistruct"
-	"github.com/OpenIMSDK/chat/pkg/common/config"
 	"github.com/OpenIMSDK/chat/pkg/common/mctx"
-	"github.com/gin-gonic/gin"
-	"google.golang.org/grpc"
-
 	"github.com/OpenIMSDK/chat/pkg/proto/admin"
 	"github.com/OpenIMSDK/chat/pkg/proto/chat"
+	"github.com/gin-gonic/gin"
+	"google.golang.org/grpc"
 )
 
 func NewAdmin(chatConn, adminConn grpc.ClientConnInterface) *AdminApi {
@@ -54,27 +53,26 @@ func (o *AdminApi) AdminLogin(c *gin.Context) {
 	}
 	log.ZInfo(c, "AdminLogin api", "req", &req)
 	if err := checker.Validate(&req); err != nil {
-		apiresp.GinError(c, errs.ErrArgs.Wrap(err.Error())) // 参数校验失败
+		apiresp.GinError(c, err) // 参数校验失败
 		return
 	}
-	resp1, err := o.adminClient.Login(c, &req)
+	loginResp, err := o.adminClient.Login(c, &req)
 	if err != nil {
 		apiresp.GinError(c, err)
 		return
 	}
-	imAdminID := config.GetIMAdmin(resp1.AdminUserID)
-	imToken, err := o.imApiCaller.UserToken(c, imAdminID, constant.AdminPlatformID)
+	imToken, err := o.imApiCaller.UserToken(c, loginResp.AdminUserID, constant.AdminPlatformID)
 	if err != nil {
 		apiresp.GinError(c, err)
 		return
 	}
-	err = utils.CopyStructFields(&resp, resp1)
+	err = utils.CopyStructFields(&resp, loginResp)
 	if err != nil {
 		apiresp.GinError(c, err)
 		return
 	}
 	resp.ImToken = imToken
-	resp.ImUserID = imAdminID
+	resp.ImUserID = loginResp.AdminUserID
 	log.ZInfo(c, "AdminLogin api", "resp", resp)
 	apiresp.GinSuccess(c, resp)
 }
@@ -108,7 +106,37 @@ func (o *AdminApi) FindDefaultFriend(c *gin.Context) {
 }
 
 func (o *AdminApi) AddDefaultGroup(c *gin.Context) {
-	a2r.Call(admin.AdminClient.AddDefaultGroup, o.adminClient, c)
+	var req admin.AddDefaultGroupReq
+	if err := c.BindJSON(&req); err != nil {
+		apiresp.GinError(c, err)
+		return
+	}
+	if err := checker.Validate(&req); err != nil {
+		apiresp.GinError(c, err)
+		return
+	}
+	token, err := o.imApiCaller.AdminToken(c)
+	if err != nil {
+		apiresp.GinError(c, err)
+		return
+	}
+	groups, err := o.imApiCaller.FindGroupInfo(mctx.WithApiToken(c, token), req.GroupIDs)
+	if err != nil {
+		apiresp.GinError(c, err)
+		return
+	}
+	if len(req.GroupIDs) != len(groups) {
+		apiresp.GinError(c, errs.ErrArgs.Wrap("group id not found"))
+		return
+	}
+	resp, err := o.adminClient.AddDefaultGroup(c, &admin.AddDefaultGroupReq{
+		GroupIDs: req.GroupIDs,
+	})
+	if err != nil {
+		apiresp.GinError(c, err)
+		return
+	}
+	apiresp.GinSuccess(c, resp)
 }
 
 func (o *AdminApi) DelDefaultGroup(c *gin.Context) {
@@ -120,7 +148,50 @@ func (o *AdminApi) FindDefaultGroup(c *gin.Context) {
 }
 
 func (o *AdminApi) SearchDefaultGroup(c *gin.Context) {
-	a2r.Call(admin.AdminClient.SearchDefaultGroup, o.adminClient, c)
+	var req admin.SearchDefaultGroupReq
+	if err := c.BindJSON(&req); err != nil {
+		apiresp.GinError(c, err)
+		return
+	}
+	if err := checker.Validate(&req); err != nil {
+		apiresp.GinError(c, err)
+		return
+	}
+	searchResp, err := o.adminClient.SearchDefaultGroup(c, &req)
+	if err != nil {
+		apiresp.GinError(c, err)
+		return
+	}
+	resp := apistruct.SearchDefaultGroupResp{
+		Total:  searchResp.Total,
+		Groups: make([]*sdkws.GroupInfo, 0, len(searchResp.GroupIDs)),
+	}
+	if len(searchResp.GroupIDs) > 0 {
+		token, err := o.imApiCaller.AdminToken(c)
+		if err != nil {
+			apiresp.GinError(c, err)
+			return
+		}
+		groups, err := o.imApiCaller.FindGroupInfo(mctx.WithApiToken(c, token), searchResp.GroupIDs)
+		if err != nil {
+			apiresp.GinError(c, err)
+			return
+		}
+		groupMap := make(map[string]*sdkws.GroupInfo)
+		for _, group := range groups {
+			groupMap[group.GroupID] = group
+		}
+		for _, groupID := range searchResp.GroupIDs {
+			if group, ok := groupMap[groupID]; ok {
+				resp.Groups = append(resp.Groups, group)
+			} else {
+				resp.Groups = append(resp.Groups, &sdkws.GroupInfo{
+					GroupID: groupID,
+				})
+			}
+		}
+	}
+	apiresp.GinSuccess(c, resp)
 }
 
 func (o *AdminApi) AddInvitationCode(c *gin.Context) {
@@ -175,35 +246,26 @@ func (o *AdminApi) BlockUser(c *gin.Context) {
 		apiresp.GinError(c, err)
 		return
 	}
-	log.ZInfo(c, "BlockUser Api", "req", &req)
+	log.ZInfo(c, "BlockUser api", "req", &req)
+	if err := checker.Validate(&req); err != nil {
+		apiresp.GinError(c, err) // 参数校验失败
+		return
+	}
 	resp, err := o.adminClient.BlockUser(c, &req)
 	if err != nil {
 		apiresp.GinError(c, err)
 		return
 	}
-	if err := checker.Validate(&req); err != nil {
-		apiresp.GinError(c, errs.ErrArgs.Wrap(err.Error())) // 参数校验失败
-		return
-	}
-	opUserID := mctx.GetOpUserID(c)
-	imAdminID := config.GetIMAdmin(opUserID)
-	if imAdminID == "" {
-		apiresp.GinError(c, errs.ErrUserIDNotFound.Wrap("chatAdminID to imAdminID error"))
-		return
-	}
-	IMtoken, err := o.imApiCaller.UserToken(c, imAdminID, constant.AdminPlatformID)
+	token, err := o.imApiCaller.UserToken(c, mctx.GetOpUserID(c), constant.AdminPlatformID)
 	if err != nil {
 		apiresp.GinError(c, err)
 		return
 	}
-	//c.Set(constant.Token, IMtoken)
-
-	err = o.imApiCaller.ForceOffLine(c, req.UserID, IMtoken)
+	err = o.imApiCaller.ForceOffLine(mctx.WithApiToken(c, token), req.UserID)
 	if err != nil {
 		apiresp.GinError(c, err)
 		return
 	}
-	log.ZInfo(c, "BlockUser Api", "resp", &resp)
 	apiresp.GinSuccess(c, resp)
 }
 
@@ -217,6 +279,10 @@ func (o *AdminApi) SearchBlockUser(c *gin.Context) {
 
 func (o *AdminApi) SetClientConfig(c *gin.Context) {
 	a2r.Call(admin.AdminClient.SetClientConfig, o.adminClient, c)
+}
+
+func (o *AdminApi) DelClientConfig(c *gin.Context) {
+	a2r.Call(admin.AdminClient.DelClientConfig, o.adminClient, c)
 }
 
 func (o *AdminApi) GetClientConfig(c *gin.Context) {
