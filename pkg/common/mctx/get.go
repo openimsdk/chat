@@ -109,13 +109,13 @@ func GetOpUserID(ctx context.Context) string {
 	return userID
 }
 
-func GetUserType(ctx context.Context) (int32, error) {
+func GetUserType(ctx context.Context) (int, error) {
 	userTypeArr, _ := ctx.Value(constant.RpcOpUserType).([]string)
 	userType, err := strconv.Atoi(userTypeArr[0])
 	if err != nil {
 		return 0, errs.ErrNoPermission.Wrap("user type invalid " + err.Error())
 	}
-	return int32(userType), nil
+	return userType, nil
 }
 
 func WithOpUserID(ctx context.Context, opUserID string, userType int) context.Context {
