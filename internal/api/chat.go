@@ -200,7 +200,11 @@ func (o *ChatApi) UpdateUserInfo(c *gin.Context) {
 		apiresp.GinError(c, err)
 		return
 	}
-	opUserType := mctx.GetUserType(c)
+	opUserType, err := mctx.GetUserType(c)
+	if err != nil {
+		apiresp.GinError(c, err)
+		return
+	}
 	var imToken string
 	if opUserType == constant2.NormalUser {
 		imToken, err = o.imApiCaller.ImAdminTokenWithDefaultAdmin(c)
