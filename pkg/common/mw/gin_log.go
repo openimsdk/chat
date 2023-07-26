@@ -2,7 +2,7 @@ package mw
 
 import (
 	"bytes"
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/log"
+	"github.com/OpenIMSDK/tools/log"
 	"github.com/gin-gonic/gin"
 	"io"
 	"net/http"

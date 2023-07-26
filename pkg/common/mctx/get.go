@@ -17,12 +17,12 @@ package mctx
 import (
 	"context"
 	"fmt"
-	imConfig "github.com/OpenIMSDK/Open-IM-Server/pkg/common/config"
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/utils"
+	"github.com/OpenIMSDK/chat/pkg/common/config"
+	"github.com/OpenIMSDK/tools/utils"
 	"strconv"
 
-	constant2 "github.com/OpenIMSDK/Open-IM-Server/pkg/common/constant"
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
+	constant2 "github.com/OpenIMSDK/protocol/constant"
+	"github.com/OpenIMSDK/tools/errs"
 
 	"github.com/OpenIMSDK/chat/pkg/common/constant"
 	"github.com/OpenIMSDK/chat/pkg/common/tokenverify"
@@ -126,8 +126,8 @@ func WithOpUserID(ctx context.Context, opUserID string, userType int) context.Co
 }
 
 func WithAdminUser(ctx context.Context) context.Context {
-	if len(imConfig.Config.Manager.UserID) > 0 {
-		ctx = WithOpUserID(ctx, imConfig.Config.Manager.UserID[0], constant.AdminUser)
+	if len(config.Config.AdminList) > 0 {
+		ctx = WithOpUserID(ctx, config.Config.AdminList[0].ImAdminID, constant.AdminUser)
 	}
 	return ctx
 }

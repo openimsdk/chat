@@ -1,7 +1,7 @@
 package common
 
 import (
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
+	"github.com/OpenIMSDK/tools/errs"
 	"regexp"
 )
 

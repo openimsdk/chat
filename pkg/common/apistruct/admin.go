@@ -1,6 +1,6 @@
 package apistruct
 
-import "github.com/OpenIMSDK/Open-IM-Server/pkg/proto/sdkws"
+import "github.com/OpenIMSDK/protocol/sdkws"
 
 type AdminLoginResp struct {
 	AdminAccount string `json:"adminAccount"`

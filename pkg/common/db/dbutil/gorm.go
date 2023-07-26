@@ -15,7 +15,7 @@
 package dbutil
 
 import (
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
+	"github.com/OpenIMSDK/tools/errs"
 	"gorm.io/gorm"
 )
 
