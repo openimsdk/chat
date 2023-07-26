@@ -17,7 +17,7 @@ package chat
 import (
 	"context"
 
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
+	"github.com/OpenIMSDK/tools/errs"
 	"gorm.io/gorm"
 
 	"github.com/OpenIMSDK/chat/pkg/common/db/table/chat"

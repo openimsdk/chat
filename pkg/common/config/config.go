@@ -59,7 +59,7 @@ var Config struct {
 	} `yaml:"mysql"`
 	Log struct {
 		StorageLocation     *string `yaml:"storageLocation"`
-		RotationTime        *int    `yaml:"rotationTime"`
+		RotationTime        *uint   `yaml:"rotationTime"`
 		RemainRotationCount *uint   `yaml:"remainRotationCount"`
 		RemainLogLevel      *int    `yaml:"remainLogLevel"`
 		IsStdout            *bool   `yaml:"isStdout"`

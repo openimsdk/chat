@@ -1,15 +1,16 @@
 package chat
 
 import (
-	constant2 "github.com/OpenIMSDK/Open-IM-Server/pkg/common/constant"
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
 	"github.com/OpenIMSDK/chat/pkg/common/constant"
-	"github.com/OpenIMSDK/chat/pkg/proto/common"
+	constant2 "github.com/OpenIMSDK/protocol/constant"
+	"github.com/OpenIMSDK/tools/errs"
+	"regexp"
+	"strconv"
 )
 
 func (x *UpdateUserInfoReq) Check() error {
 	if x.Email != nil && x.Email.Value != "" {
-		if err := common.EmailCheck(x.Email.Value); err != nil {
+		if err := EmailCheck(x.Email.Value); err != nil {
 			return err
 		}
 	}
@@ -52,12 +53,12 @@ func (x *SendVerifyCodeReq) Check() error {
 	}
 	if x.AreaCode == "" {
 		return errs.ErrArgs.Wrap("AreaCode is empty")
-	} else if err := common.AreaCodeCheck(x.AreaCode); err != nil {
+	} else if err := AreaCodeCheck(x.AreaCode); err != nil {
 		return err
 	}
 	if x.PhoneNumber == "" {
 		return errs.ErrArgs.Wrap("PhoneNumber is empty")
-	} else if err := common.PhoneNumberCheck(x.PhoneNumber); err != nil {
+	} else if err := PhoneNumberCheck(x.PhoneNumber); err != nil {
 		return err
 	}
 	return nil
@@ -66,12 +67,12 @@ func (x *SendVerifyCodeReq) Check() error {
 func (x *VerifyCodeReq) Check() error {
 	if x.AreaCode == "" {
 		return errs.ErrArgs.Wrap("AreaCode is empty")
-	} else if err := common.AreaCodeCheck(x.AreaCode); err != nil {
+	} else if err := AreaCodeCheck(x.AreaCode); err != nil {
 		return err
 	}
 	if x.PhoneNumber == "" {
 		return errs.ErrArgs.Wrap("PhoneNumber is empty")
-	} else if err := common.PhoneNumberCheck(x.PhoneNumber); err != nil {
+	} else if err := PhoneNumberCheck(x.PhoneNumber); err != nil {
 		return err
 	}
 	if x.VerifyCode == "" {
@@ -92,16 +93,16 @@ func (x *RegisterUserReq) Check() error {
 	}
 	if x.User.AreaCode == "" {
 		return errs.ErrArgs.Wrap("AreaCode is empty")
-	} else if err := common.AreaCodeCheck(x.User.AreaCode); err != nil {
+	} else if err := AreaCodeCheck(x.User.AreaCode); err != nil {
 		return err
 	}
 	if x.User.PhoneNumber == "" {
 		return errs.ErrArgs.Wrap("PhoneNumber is empty")
-	} else if err := common.PhoneNumberCheck(x.User.PhoneNumber); err != nil {
+	} else if err := PhoneNumberCheck(x.User.PhoneNumber); err != nil {
 		return err
 	}
 	if x.User.Email != "" {
-		if err := common.EmailCheck(x.User.Email); err != nil {
+		if err := EmailCheck(x.User.Email); err != nil {
 			return err
 		}
 	}
@@ -109,19 +110,16 @@ func (x *RegisterUserReq) Check() error {
 }
 
 func (x *LoginReq) Check() error {
-	if x.DeviceID == "" {
-		return errs.ErrArgs.Wrap("DeviceID is empty")
-	}
 	if x.Platform < constant2.IOSPlatformID || x.Platform > constant2.AdminPlatformID {
 		return errs.ErrArgs.Wrap("platform is invalid")
 	}
 	if x.PhoneNumber != "" {
-		if err := common.PhoneNumberCheck(x.PhoneNumber); err != nil {
+		if err := PhoneNumberCheck(x.PhoneNumber); err != nil {
 			return err
 		}
 	}
 	if x.AreaCode != "" {
-		if err := common.AreaCodeCheck(x.AreaCode); err != nil {
+		if err := AreaCodeCheck(x.AreaCode); err != nil {
 			return err
 		}
 	}
@@ -134,12 +132,12 @@ func (x *ResetPasswordReq) Check() error {
 	}
 	if x.AreaCode == "" {
 		return errs.ErrArgs.Wrap("AreaCode is empty")
-	} else if err := common.AreaCodeCheck(x.AreaCode); err != nil {
+	} else if err := AreaCodeCheck(x.AreaCode); err != nil {
 		return err
 	}
 	if x.PhoneNumber == "" {
 		return errs.ErrArgs.Wrap("PhoneNumber is empty")
-	} else if err := common.PhoneNumberCheck(x.PhoneNumber); err != nil {
+	} else if err := PhoneNumberCheck(x.PhoneNumber); err != nil {
 		return err
 	}
 	if x.VerifyCode == "" {
@@ -193,6 +191,42 @@ func (x *SearchUserFullInfoReq) Check() error {
 	}
 	if x.Genders == nil {
 		return errs.ErrArgs.Wrap("Genders is empty")
+	}
+	return nil
+}
+
+func EmailCheck(email string) error {
+	pattern := `^[0-9a-z][_.0-9a-z-]{0,31}@([0-9a-z][0-9a-z-]{0,30}[0-9a-z]\.){1,4}[a-z]{2,4}$`
+	if err := regexMatch(pattern, email); err != nil {
+		return errs.Wrap(err, "Email is invalid")
+	}
+	return nil
+}
+
+func AreaCodeCheck(areaCode string) error {
+	pattern := `\+[1-9][0-9]{1,2}`
+	if err := regexMatch(pattern, areaCode); err != nil {
+		return errs.Wrap(err, "AreaCode is invalid")
+	}
+	return nil
+}
+
+func PhoneNumberCheck(phoneNumber string) error {
+	if phoneNumber == "" {
+		return errs.ErrArgs.Wrap("phoneNumber is empty")
+	}
+	_, err := strconv.ParseUint(phoneNumber, 10, 64)
+	if err != nil {
+		return errs.ErrArgs.Wrap("phoneNumber is invalid")
+	}
+	return nil
+}
+
+func regexMatch(pattern string, target string) error {
+	reg := regexp.MustCompile(pattern)
+	ok := reg.MatchString(target)
+	if !ok {
+		return errs.ErrArgs
 	}
 	return nil
 }

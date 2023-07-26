@@ -18,9 +18,9 @@ import (
 	"context"
 	"crypto/md5"
 	"encoding/hex"
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
 	"github.com/OpenIMSDK/chat/pkg/common/config"
 	"github.com/OpenIMSDK/chat/pkg/common/db/table/admin"
+	"github.com/OpenIMSDK/tools/errs"
 	"gorm.io/gorm"
 	"time"
 )

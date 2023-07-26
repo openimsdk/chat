@@ -16,12 +16,12 @@ package database
 
 import (
 	"context"
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/db/tx"
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
 	admin2 "github.com/OpenIMSDK/chat/pkg/common/db/model/admin"
 	"github.com/OpenIMSDK/chat/pkg/common/db/model/chat"
 	"github.com/OpenIMSDK/chat/pkg/common/db/table/admin"
 	table "github.com/OpenIMSDK/chat/pkg/common/db/table/chat"
+	"github.com/OpenIMSDK/tools/errs"
+	"github.com/OpenIMSDK/tools/tx"
 	"gorm.io/gorm"
 	"time"
 )
