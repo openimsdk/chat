@@ -109,9 +109,6 @@ func (x *RegisterUserReq) Check() error {
 }
 
 func (x *LoginReq) Check() error {
-	if x.DeviceID == "" {
-		return errs.ErrArgs.Wrap("DeviceID is empty")
-	}
 	if x.Platform < constant2.IOSPlatformID || x.Platform > constant2.AdminPlatformID {
 		return errs.ErrArgs.Wrap("platform is invalid")
 	}
