@@ -29,6 +29,13 @@ jobs:
       - name: Check out the repo
         uses: actions/checkout@v3
 
+# build chat
+      - name: Build chat
+        run: |
+          sudo make build
+          cd scripts
+          sudo ./build_all_service.sh
+
 # docker.io/openim/openim-server:latest
       - name: Log in to Docker Hub
         uses: docker/login-action@v2

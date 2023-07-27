@@ -315,18 +315,18 @@ milestones:
     # Default: '{{ .Tag }}'
     name_template: "Current Release"
 
-publishers:
-  - name: "fury.io"
-    ids:
-      - packages
-    dir: "{{ dir .ArtifactPath }}"
-    cmd: |
-      bash -c '
-      if [[ "{{ .Tag }}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-        curl -F package=@{{ .ArtifactName }} https://{{ .Env.FURY_TOKEN }}@push.fury.io/{{ .Env.USERNAME }}/
-      else
-        echo "Skipping deployment: Non-production release detected"
-      fi'
+# publishers:
+#   - name: "fury.io"
+#     ids:
+#       - packages
+#     dir: "{{ dir .ArtifactPath }}"
+#     cmd: |
+#       bash -c '
+#       if [[ "{{ .Tag }}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+#         curl -F package=@{{ .ArtifactName }} https://{{ .Env.FURY_TOKEN }}@push.fury.io/{{ .Env.USERNAME }}/
+#       else
+#         echo "Skipping deployment: Non-production release detected"
+#       fi'
 
 checksum:
   name_template: "{{ .ProjectName }}_checksums.txt"
