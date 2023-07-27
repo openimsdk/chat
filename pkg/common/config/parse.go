@@ -23,9 +23,8 @@ import (
 	"runtime"
 	"time"
 
-	openIMConfig "github.com/OpenIMSDK/Open-IM-Server/pkg/common/config"
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/constant"
-	openKeeper "github.com/OpenIMSDK/Open-IM-Server/pkg/discoveryregistry/zookeeper"
+	"github.com/OpenIMSDK/protocol/constant"
+	openKeeper "github.com/OpenIMSDK/tools/discoveryregistry/zookeeper"
 	"gopkg.in/yaml.v3"
 )
 
@@ -67,6 +66,7 @@ func InitConfig() error {
 	if err != nil {
 		return fmt.Errorf("conn zk error: %w", err)
 	}
+	defer zk.CloseZK()
 	var openIMConfigData []byte
 	for i := 0; i < 100; i++ {
 		var err error
@@ -86,29 +86,29 @@ func InitConfig() error {
 	if len(openIMConfigData) == 0 {
 		return errors.New("get zk config data failed")
 	}
-	if err := yaml.NewDecoder(bytes.NewReader(openIMConfigData)).Decode(&openIMConfig.Config); err != nil {
+	if err := yaml.NewDecoder(bytes.NewReader(openIMConfigData)).Decode(&imConfig); err != nil {
 		return fmt.Errorf("parse zk openIMConfig: %w", err)
 	}
-	configFieldCopy(&Config.Mysql.Address, openIMConfig.Config.Mysql.Address)
-	configFieldCopy(&Config.Mysql.Username, openIMConfig.Config.Mysql.Username)
-	configFieldCopy(&Config.Mysql.Password, openIMConfig.Config.Mysql.Password)
-	configFieldCopy(&Config.Mysql.Database, openIMConfig.Config.Mysql.Database)
-	configFieldCopy(&Config.Mysql.MaxOpenConn, openIMConfig.Config.Mysql.MaxOpenConn)
-	configFieldCopy(&Config.Mysql.MaxIdleConn, openIMConfig.Config.Mysql.MaxIdleConn)
-	configFieldCopy(&Config.Mysql.MaxLifeTime, openIMConfig.Config.Mysql.MaxLifeTime)
-	configFieldCopy(&Config.Mysql.LogLevel, openIMConfig.Config.Mysql.LogLevel)
-	configFieldCopy(&Config.Mysql.SlowThreshold, openIMConfig.Config.Mysql.SlowThreshold)
+	configFieldCopy(&Config.Mysql.Address, imConfig.Mysql.Address)
+	configFieldCopy(&Config.Mysql.Username, imConfig.Mysql.Username)
+	configFieldCopy(&Config.Mysql.Password, imConfig.Mysql.Password)
+	configFieldCopy(&Config.Mysql.Database, imConfig.Mysql.Database)
+	configFieldCopy(&Config.Mysql.MaxOpenConn, imConfig.Mysql.MaxOpenConn)
+	configFieldCopy(&Config.Mysql.MaxIdleConn, imConfig.Mysql.MaxIdleConn)
+	configFieldCopy(&Config.Mysql.MaxLifeTime, imConfig.Mysql.MaxLifeTime)
+	configFieldCopy(&Config.Mysql.LogLevel, imConfig.Mysql.LogLevel)
+	configFieldCopy(&Config.Mysql.SlowThreshold, imConfig.Mysql.SlowThreshold)
 
-	configFieldCopy(&Config.Log.StorageLocation, openIMConfig.Config.Log.StorageLocation)
-	configFieldCopy(&Config.Log.RotationTime, openIMConfig.Config.Log.RotationTime)
-	configFieldCopy(&Config.Log.RemainRotationCount, openIMConfig.Config.Log.RemainRotationCount)
-	configFieldCopy(&Config.Log.RemainLogLevel, openIMConfig.Config.Log.RemainLogLevel)
-	configFieldCopy(&Config.Log.IsStdout, openIMConfig.Config.Log.IsStdout)
-	configFieldCopy(&Config.Log.WithStack, openIMConfig.Config.Log.WithStack)
-	configFieldCopy(&Config.Log.IsJson, openIMConfig.Config.Log.IsJson)
+	configFieldCopy(&Config.Log.StorageLocation, imConfig.Log.StorageLocation)
+	configFieldCopy(&Config.Log.RotationTime, imConfig.Log.RotationTime)
+	configFieldCopy(&Config.Log.RemainRotationCount, imConfig.Log.RemainRotationCount)
+	configFieldCopy(&Config.Log.RemainLogLevel, imConfig.Log.RemainLogLevel)
+	configFieldCopy(&Config.Log.IsStdout, imConfig.Log.IsStdout)
+	configFieldCopy(&Config.Log.WithStack, imConfig.Log.WithStack)
+	configFieldCopy(&Config.Log.IsJson, imConfig.Log.IsJson)
 
-	configFieldCopy(&Config.Secret, openIMConfig.Config.Secret)
-	configFieldCopy(&Config.TokenPolicy.Expire, openIMConfig.Config.TokenPolicy.Expire)
+	configFieldCopy(&Config.Secret, imConfig.Secret)
+	configFieldCopy(&Config.TokenPolicy.Expire, imConfig.TokenPolicy.Expire)
 
 	configData, err := yaml.Marshal(&Config)
 	if err != nil {

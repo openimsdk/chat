@@ -19,8 +19,8 @@ import (
 	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/log"
 	"strconv"
 
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/apiresp"
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
+	"github.com/OpenIMSDK/tools/apiresp"
+	"github.com/OpenIMSDK/tools/errs"
 	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc"
 

@@ -15,8 +15,8 @@
 package main
 
 import (
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/log"
 	"github.com/OpenIMSDK/chat/pkg/common/chatrpcstart"
+	"github.com/OpenIMSDK/tools/log"
 
 	"github.com/OpenIMSDK/chat/internal/rpc/chat"
 	"github.com/OpenIMSDK/chat/pkg/common/config"
@@ -26,7 +26,7 @@ func main() {
 	if err := config.InitConfig(); err != nil {
 		panic(err)
 	}
-	if err := log.InitFromConfig("chat.log", "chat-rpc", *config.Config.Log.RemainLogLevel, *config.Config.Log.IsStdout, *config.Config.Log.IsJson, *config.Config.Log.StorageLocation, *config.Config.Log.RemainRotationCount); err != nil {
+	if err := log.InitFromConfig("chat.log", "chat-rpc", *config.Config.Log.RemainLogLevel, *config.Config.Log.IsStdout, *config.Config.Log.IsJson, *config.Config.Log.StorageLocation, *config.Config.Log.RemainRotationCount, *config.Config.Log.RotationTime); err != nil {
 		panic(err)
 	}
 	err := chatrpcstart.Start(config.Config.RpcPort.OpenImChatPort[0], config.Config.RpcRegisterName.OpenImChatName, 0, chat.Start)

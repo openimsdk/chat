@@ -16,21 +16,21 @@ package api
 
 import (
 	"fmt"
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/checker"
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/log"
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/proto/sdkws"
 	"github.com/OpenIMSDK/chat/pkg/common/apicall"
 	"github.com/OpenIMSDK/chat/pkg/common/apistruct"
 	constant2 "github.com/OpenIMSDK/chat/pkg/common/constant"
 	"github.com/OpenIMSDK/chat/pkg/common/mctx"
+	"github.com/OpenIMSDK/protocol/sdkws"
+	"github.com/OpenIMSDK/tools/checker"
+	"github.com/OpenIMSDK/tools/log"
 	"io"
 	"net"
 	"time"
 
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/a2r"
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/apiresp"
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/constant"
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
+	"github.com/OpenIMSDK/protocol/constant"
+	"github.com/OpenIMSDK/tools/a2r"
+	"github.com/OpenIMSDK/tools/apiresp"
+	"github.com/OpenIMSDK/tools/errs"
 	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc"
 

@@ -15,7 +15,7 @@
 package chat
 
 import (
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/discoveryregistry"
+	"github.com/OpenIMSDK/tools/discoveryregistry"
 	"google.golang.org/grpc"
 
 	"github.com/OpenIMSDK/chat/pkg/common/config"

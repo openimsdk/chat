@@ -16,10 +16,8 @@ package database
 
 import (
 	"context"
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/constant"
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/db/tx"
-	"github.com/OpenIMSDK/chat/pkg/common/db/cache"
-	"github.com/redis/go-redis/v9"
+
+	"github.com/OpenIMSDK/tools/tx"
 	"gorm.io/gorm"
 
 	"github.com/OpenIMSDK/chat/pkg/common/db/model/admin"

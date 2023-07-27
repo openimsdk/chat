@@ -15,10 +15,10 @@
 package tokenverify
 
 import (
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
 	"github.com/OpenIMSDK/chat/pkg/common/config"
 	"github.com/OpenIMSDK/chat/pkg/common/constant"
 	utils "github.com/OpenIMSDK/open_utils"
+	"github.com/OpenIMSDK/tools/errs"
 	"github.com/golang-jwt/jwt/v4"
 	"time"
 )

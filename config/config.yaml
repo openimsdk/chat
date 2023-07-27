@@ -62,7 +62,7 @@ log:
 #  isJson: false
 #  withStack: false
 
-#secret: "tuoyun"
+#secret: "openIM123"
 #tokenPolicy:
 #  expire: 86400
 
