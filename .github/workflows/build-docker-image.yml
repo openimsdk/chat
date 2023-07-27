@@ -79,12 +79,12 @@ jobs:
           tags: ${{ steps.meta2.outputs.tags }}
           labels: ${{ steps.meta2.outputs.labels }}
 
-# ghcr.io/openim/openim-chat:latest
+# ghcr.io/openimsdk/openim-chat:latest
       - name: Extract metadata (tags, labels) for Docker
         id: meta3
         uses: docker/metadata-action@v4.6.0
         with:
-          images: openimsdk/openim-chat
+          images: ghcr.io/openimsdk/openim-chat
 
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v2
