@@ -18,6 +18,7 @@ on:
   push:
     branches:
         - main
+        - develop
     paths-ignore:
         - "docs/**"
         - "README.md"
@@ -26,6 +27,7 @@ on:
   pull_request:
     branches:
         - main
+        - develop
     paths-ignore:
         - "README.md"
         - "README_zh-CN.md"
