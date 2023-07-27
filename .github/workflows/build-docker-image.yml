@@ -36,13 +36,13 @@ jobs:
           cd scripts
           sudo ./build_all_service.sh
 
+# docker.io/openim/openim-chat:latest
       - name: Extract metadata (tags, labels) for Docker
         id: meta
         uses: docker/metadata-action@v4.6.0
         with:
           images: openim/openim-chat
 
-# docker.io/openim/openim-chat:latest
       - name: Log in to Docker Hub
         uses: docker/login-action@v2
         with:
@@ -58,6 +58,12 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
 
 # registry.cn-hangzhou.aliyuncs.com/openimsdk/openim-chat:latest
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta2
+        uses: docker/metadata-action@v4.6.0
+        with:
+          images: registry.cn-hangzhou.aliyuncs.com/openimsdk/openim-chat
+
       - name: Log in to AliYun Docker Hub
         uses: docker/login-action@v2
         with:
@@ -70,10 +76,16 @@ jobs:
         with:
           context: .
           push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: ${{ steps.meta2.outputs.tags }}
+          labels: ${{ steps.meta2.outputs.labels }}
 
 # ghcr.io/openim/openim-chat:latest
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta3
+        uses: docker/metadata-action@v4.6.0
+        with:
+          images: openimsdk/openim-chat
+
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v2
         with:
@@ -86,8 +98,8 @@ jobs:
         with:
           context: .
           push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: ${{ steps.meta3.outputs.tags }}
+          labels: ${{ steps.meta3.outputs.labels }}
 
 # name: OpenIM Build Docker Images
 # on:
