@@ -53,5 +53,5 @@ type AttributeInterface interface {
 	TakePhone(ctx context.Context, areaCode string, phoneNumber string) (*Attribute, error)
 	TakeAccount(ctx context.Context, account string) (*Attribute, error)
 	Take(ctx context.Context, userID string) (*Attribute, error)
-	SearchNormalUser(ctx context.Context, keyword string, forbiddenID []string, genders []int32, page int32, size int32) (uint32, []*Attribute, error)
+	SearchNormalUser(ctx context.Context, keyword string, forbiddenID []string, gender int32, page int32, size int32) (uint32, []*Attribute, error)
 }
