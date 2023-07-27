@@ -34,9 +34,6 @@ func (x *SearchUserPublicInfoReq) Check() error {
 	if x.Pagination.ShowNumber < 1 {
 		return errs.ErrArgs.Wrap("showNumber is invalid")
 	}
-	if x.Genders == nil {
-		return errs.ErrArgs.Wrap("genders is empty")
-	}
 	return nil
 }
 
@@ -183,14 +180,8 @@ func (x *SearchUserFullInfoReq) Check() error {
 	if x.Pagination.ShowNumber < 1 {
 		return errs.ErrArgs.Wrap("showNumber is invalid")
 	}
-	if x.Genders == nil {
-		return errs.ErrArgs.Wrap("genders is empty")
-	}
 	if x.Normal > constant.FinDAllUser || x.Normal < constant.FindNormalUser {
 		return errs.ErrArgs.Wrap("normal flied is invalid")
-	}
-	if x.Genders == nil {
-		return errs.ErrArgs.Wrap("Genders is empty")
 	}
 	return nil
 }

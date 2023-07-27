@@ -35,7 +35,7 @@ type ChatDatabaseInterface interface {
 	TakeAttributeByPhone(ctx context.Context, areaCode string, phoneNumber string) (*table.Attribute, error)
 	TakeAttributeByAccount(ctx context.Context, account string) (*table.Attribute, error)
 	TakeAttributeByUserID(ctx context.Context, userID string) (*table.Attribute, error)
-	Search(ctx context.Context, normalUser int32, keyword string, genders []int32, pageNumber int32, showNumber int32) (uint32, []*table.Attribute, error)
+	Search(ctx context.Context, normalUser int32, keyword string, gender int32, pageNumber int32, showNumber int32) (uint32, []*table.Attribute, error)
 	CountVerifyCodeRange(ctx context.Context, account string, start time.Time, end time.Time) (uint32, error)
 	AddVerifyCode(ctx context.Context, verifyCode *table.VerifyCode, fn func() error) error
 	UpdateVerifyCodeIncrCount(ctx context.Context, id uint) error
@@ -112,7 +112,7 @@ func (o *ChatDatabase) TakeAttributeByUserID(ctx context.Context, userID string)
 	return o.attribute.Take(ctx, userID)
 }
 
-func (o *ChatDatabase) Search(ctx context.Context, normalUser int32, keyword string, genders []int32, pageNumber int32, showNumber int32) (total uint32, attributes []*table.Attribute, err error) {
+func (o *ChatDatabase) Search(ctx context.Context, normalUser int32, keyword string, genders int32, pageNumber int32, showNumber int32) (total uint32, attributes []*table.Attribute, err error) {
 	var forbiddenIDs []string
 	if normalUser == 1 {
 		forbiddenIDs, err = o.forbiddenAccount.FindAllIDs(ctx)

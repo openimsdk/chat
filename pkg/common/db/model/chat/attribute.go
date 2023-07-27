@@ -77,8 +77,14 @@ func (o *Attribute) Take(ctx context.Context, userID string) (*chat.Attribute, e
 	return &a, errs.Wrap(o.db.WithContext(ctx).Where("user_id = ?", userID).Take(&a).Error)
 }
 
-func (o *Attribute) SearchNormalUser(ctx context.Context, keyword string, forbiddenIDs []string, genders []int32, page int32, size int32) (uint32, []*chat.Attribute, error) {
+func (o *Attribute) SearchNormalUser(ctx context.Context, keyword string, forbiddenIDs []string, gender int32, page int32, size int32) (uint32, []*chat.Attribute, error) {
 	db := o.db.WithContext(ctx)
+	var genders []int32
+	if gender == 0 {
+		genders = append(genders, 1, 2)
+	} else {
+		genders = append(genders, gender)
+	}
 	if len(forbiddenIDs) == 0 {
 		db = db.Where("gender in ?", genders)
 	} else {
