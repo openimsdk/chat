@@ -110,9 +110,13 @@ func GetOpUserID(ctx context.Context) string {
 	return userID
 }
 
-func GetUserType(ctx context.Context) int32 {
-	userType, _ := ctx.Value(constant.RpcOpUserType).(int32)
-	return userType
+func GetUserType(ctx context.Context) (int, error) {
+	userTypeArr, _ := ctx.Value(constant.RpcOpUserType).([]string)
+	userType, err := strconv.Atoi(userTypeArr[0])
+	if err != nil {
+		return 0, errs.ErrNoPermission.Wrap("user type invalid " + err.Error())
+	}
+	return userType, nil
 }
 
 func WithOpUserID(ctx context.Context, opUserID string, userType int) context.Context {
@@ -127,7 +131,7 @@ func WithOpUserID(ctx context.Context, opUserID string, userType int) context.Co
 
 func WithAdminUser(ctx context.Context) context.Context {
 	if len(config.Config.AdminList) > 0 {
-		ctx = WithOpUserID(ctx, config.Config.AdminList[0].ImAdminID, constant.AdminUser)
+		ctx = WithOpUserID(ctx, config.Config.AdminList[0].AdminID, constant.AdminUser)
 	}
 	return ctx
 }
