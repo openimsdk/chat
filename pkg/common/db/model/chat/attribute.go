@@ -87,8 +87,9 @@ func (o *Attribute) SearchNormalUser(ctx context.Context, keyword string, forbid
 	}
 	if len(forbiddenIDs) == 0 {
 		db = db.Where("gender in ?", genders)
-	} else {
-		db = db.Where("gender in ? and user_id not in ?", genders, forbiddenIDs)
+	}
+	if len(forbiddenIDs) > 0 {
+		db = db.Where("user_id not in ?", forbiddenIDs)
 	}
 	return ormutil.GormSearch[chat.Attribute](db, []string{"user_id", "account", "nickname", "phone_number"}, keyword, page, size)
 }

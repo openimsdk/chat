@@ -18,7 +18,6 @@ import (
 	"fmt"
 	"github.com/OpenIMSDK/chat/pkg/common/apicall"
 	"github.com/OpenIMSDK/chat/pkg/common/apistruct"
-	constant2 "github.com/OpenIMSDK/chat/pkg/common/constant"
 	"github.com/OpenIMSDK/chat/pkg/common/mctx"
 	"github.com/OpenIMSDK/protocol/sdkws"
 	"github.com/OpenIMSDK/tools/checker"
@@ -161,7 +160,7 @@ func (o *ChatApi) Login(c *gin.Context) {
 		apiresp.GinError(c, err)
 		return
 	}
-	imToken, err := o.imApiCaller.UserToken(c, resp1.UserID, constant2.NormalUser)
+	imToken, err := o.imApiCaller.UserToken(c, resp1.UserID, req.Platform)
 	if err != nil {
 		return
 	}
