@@ -29,7 +29,7 @@ jobs:
       - name: Build and release Docker images
         uses: docker/build-push-action@v3
         with:
-          platforms: linux/amd64,linux/arm64/v8
+          platforms: linux/386,linux/amd64,linux/arm64/v8
           target: ${{ matrix.bin }}
           tags: ${{ steps.metadata.outputs.tags }}
           push: true
