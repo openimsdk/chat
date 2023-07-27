@@ -161,7 +161,7 @@ func (o *ChatApi) Login(c *gin.Context) {
 		apiresp.GinError(c, err)
 		return
 	}
-	imToken, err := o.imApiCaller.UserToken(c, resp1.UserID, constant2.NormalUser)
+	imToken, err := o.imApiCaller.UserToken(c, resp1.UserID, req.Platform)
 	if err != nil {
 		return
 	}

@@ -16,6 +16,7 @@ package database
 
 import (
 	"context"
+	constant2 "github.com/OpenIMSDK/chat/pkg/common/constant"
 	admin2 "github.com/OpenIMSDK/chat/pkg/common/db/model/admin"
 	"github.com/OpenIMSDK/chat/pkg/common/db/model/chat"
 	"github.com/OpenIMSDK/chat/pkg/common/db/table/admin"
@@ -114,7 +115,7 @@ func (o *ChatDatabase) TakeAttributeByUserID(ctx context.Context, userID string)
 
 func (o *ChatDatabase) Search(ctx context.Context, normalUser int32, keyword string, genders int32, pageNumber int32, showNumber int32) (total uint32, attributes []*table.Attribute, err error) {
 	var forbiddenIDs []string
-	if normalUser == 1 {
+	if normalUser == constant2.NormalUser {
 		forbiddenIDs, err = o.forbiddenAccount.FindAllIDs(ctx)
 		if err != nil {
 			return 0, nil, err

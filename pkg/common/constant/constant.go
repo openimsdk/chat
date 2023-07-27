@@ -169,8 +169,8 @@ const (
 )
 
 const (
+	FinDAllUser    = 0
 	FindNormalUser = 1
-	FinDAllUser    = 2
 )
 
 const DefaultPlatform = 1
