@@ -62,7 +62,7 @@ message FindUserPublicInfoResp{
 message SearchUserPublicInfoReq{
   string keyword = 1;
   OpenIMServer.sdkws.RequestPagination pagination = 2;
-  repeated int32 genders = 3;
+  int32 genders = 3;
 }
 
 message SearchUserPublicInfoResp{
@@ -231,7 +231,7 @@ message OpenIMCallbackResp {
 message SearchUserFullInfoReq{
   string keyword = 1;
   OpenIMServer.sdkws.RequestPagination pagination = 2;
-  repeated int32 genders = 3;
+  int32 genders = 3;
   int32 normal = 4;
 }
 

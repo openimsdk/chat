@@ -2,6 +2,7 @@ package apicall
 
 import (
 	"context"
+	"fmt"
 	"github.com/OpenIMSDK/chat/pkg/common/config"
 	"github.com/OpenIMSDK/protocol/auth"
 	"github.com/OpenIMSDK/protocol/constant"
@@ -12,7 +13,7 @@ import (
 )
 
 type CallerInterface interface {
-	AdminToken(ctx context.Context) (string, error)
+	ImAdminTokenWithDefaultAdmin(ctx context.Context) (string, error)
 	ImportFriend(ctx context.Context, ownerUserID string, friendUserID []string) error
 	UserToken(ctx context.Context, userID string, platform int32) (string, error)
 	InviteToGroup(ctx context.Context, userID string, groupIDs []string) error
@@ -40,11 +41,12 @@ func (c *Caller) ImportFriend(ctx context.Context, ownerUserID string, friendUse
 	return err
 }
 
-func (c *Caller) AdminToken(ctx context.Context) (string, error) {
+func (c *Caller) ImAdminTokenWithDefaultAdmin(ctx context.Context) (string, error) {
 	return c.UserToken(ctx, config.GetDefaultIMAdmin(), constant.AdminPlatformID)
 }
 
 func (c *Caller) UserToken(ctx context.Context, userID string, platformID int32) (string, error) {
+	fmt.Println(*config.Config.Secret)
 	resp, err := userToken.Call(ctx, &auth.UserTokenReq{
 		Secret:     *config.Config.Secret,
 		PlatformID: platformID,

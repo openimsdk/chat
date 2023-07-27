@@ -16,6 +16,7 @@ package admin
 
 import (
 	"context"
+	"github.com/OpenIMSDK/chat/pkg/common/db/cache"
 	"github.com/OpenIMSDK/tools/discoveryregistry"
 	"github.com/OpenIMSDK/tools/mcontext"
 	"google.golang.org/grpc"
@@ -51,7 +52,11 @@ func Start(discov discoveryregistry.SvcDiscoveryRegistry, server *grpc.Server) e
 	if err := db.AutoMigrate(tables...); err != nil {
 		return err
 	}
-	if err := database.NewAdminDatabase(db).InitAdmin(context.Background()); err != nil {
+	rdb, err := cache.NewRedis()
+	if err != nil {
+		return err
+	}
+	if err := database.NewAdminDatabase(db, rdb).InitAdmin(context.Background()); err != nil {
 		return err
 	}
 	if err := discov.CreateRpcRootNodes([]string{config.Config.RpcRegisterName.OpenImAdminName, config.Config.RpcRegisterName.OpenImChatName}); err != nil {
@@ -59,7 +64,7 @@ func Start(discov discoveryregistry.SvcDiscoveryRegistry, server *grpc.Server) e
 	}
 
 	admin.RegisterAdminServer(server, &adminServer{
-		Database: database.NewAdminDatabase(db),
+		Database: database.NewAdminDatabase(db, rdb),
 		Chat:     chat.NewChatClient(discov),
 	})
 	return nil
