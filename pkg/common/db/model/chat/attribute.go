@@ -81,7 +81,7 @@ func (o *Attribute) SearchNormalUser(ctx context.Context, keyword string, forbid
 	db := o.db.WithContext(ctx)
 	var genders []int32
 	if gender == 0 {
-		genders = append(genders, 1, 2)
+		genders = append(genders, 0, 1, 2)
 	} else {
 		genders = append(genders, gender)
 	}
