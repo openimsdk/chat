@@ -15,7 +15,7 @@
 
 OPENIM_ROOT=$(dirname "${BASH_SOURCE[0]}")/..
 SCRIPTS_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
-
+logs_dir="$OPENIM_ROOT/logs"
 source $OPENIM_ROOT/scripts/style_info.cfg
 source $OPENIM_ROOT/scripts/path_info.cfg
 source $OPENIM_ROOT/scripts/function.sh
@@ -72,7 +72,12 @@ for ((i = 0; i < ${#service_filename[*]}; i++)); do
       cmd="./${service_filename[$i]} -port ${service_ports[$j]}"
     fi
     echo $cmd
-    nohup $cmd >>../logs/openIM.log 2>&1 &
+    current_time=$(date "+%Y-%m-%d %H:%M:%S")
+     echo "strating creating logs..."
+     touch $SCRIPTS_ROOT/$current_time.log
+     echo "$SCRIPTS_ROOT/$current_time.log has been established"
+     chmod  777 $SCRIPTS_ROOT/$current_time.log
+     nohup $cmd >>"$SCRIPTS_ROOT/$current_time.log" 2>&1 &
     sleep 1
 #    pid="netstat -ntlp|grep $j |awk '{printf \$7}'|cut -d/ -f1"
 #    echo -e "${GREEN_PREFIX}${service_filename[$i]} start success,port number:${service_ports[$j]} pid:$(eval $pid)$COLOR_SUFFIX"
