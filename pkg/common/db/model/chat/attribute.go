@@ -85,9 +85,7 @@ func (o *Attribute) SearchNormalUser(ctx context.Context, keyword string, forbid
 	} else {
 		genders = append(genders, gender)
 	}
-	if len(forbiddenIDs) == 0 {
-		db = db.Where("gender in ?", genders)
-	}
+	db = db.Where("gender in ?", genders)
 	if len(forbiddenIDs) > 0 {
 		db = db.Where("user_id not in ?", forbiddenIDs)
 	}
