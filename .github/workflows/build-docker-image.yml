@@ -22,6 +22,11 @@ on:
       - v*
   workflow_dispatch:
 
+env:
+  # Common versions
+  GO_VERSION: "1.20"
+  DEFAULT_OWNER: "OpenIMSDK"
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -29,12 +34,23 @@ jobs:
       - name: Check out the repo
         uses: actions/checkout@v3
 
-# build chat
+      # build chat
       - name: Build chat
         run: |
           sudo make build
           cd scripts
           sudo ./build_all_service.sh
+
+      - name: Setup Golang with cache
+        uses: magnetikonline/action-golang-cache@v3
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: Install Dependencies
+        run: |
+          sudo apt update && sudo apt install -y gcc-aarch64-linux-gnu \
+            libbtrfs-dev libgpgme-dev libdevmapper-dev \
+            qemu-user-static binfmt-support
 
 # docker.io/openim/openim-chat:latest
       - name: Extract metadata (tags, labels) for Docker
@@ -100,4 +116,3 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta3.outputs.tags }}
           labels: ${{ steps.meta3.outputs.labels }}
-
