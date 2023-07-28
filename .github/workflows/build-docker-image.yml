@@ -35,11 +35,11 @@ jobs:
         uses: actions/checkout@v3
 
       # build chat
-      - name: Build chat
-        run: |
-          sudo make build
-          cd scripts
-          sudo ./build_all_service.sh
+    #   - name: Build chat
+    #     run: |
+    #       sudo make build
+    #       cd scripts
+    #       sudo ./build_all_service.sh
 
       - name: Setup Golang with cache
         uses: magnetikonline/action-golang-cache@v3
