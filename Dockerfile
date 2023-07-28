@@ -5,15 +5,13 @@ WORKDIR /workspace
 
 ENV GOPROXY=https://goproxy.cn
 
-# Copy go mod and go sum files then download dependencies
-COPY go.mod go.sum ./
-RUN go mod download
-
 ARG GOARCH
 ARG GOOS
 
 # Copy source code files into the image
 COPY . .
+
+RUN go mod download
 
 # Compile the source code
 RUN CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} go build -o ./bin/open_im_admin ./cmd/rpc/admin
