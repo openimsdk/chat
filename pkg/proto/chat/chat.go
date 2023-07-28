@@ -180,6 +180,9 @@ func (x *SearchUserFullInfoReq) Check() error {
 	if x.Pagination.ShowNumber < 1 {
 		return errs.ErrArgs.Wrap("showNumber is invalid")
 	}
+	if x.Normal < constant.FinDAllUser || x.Normal > constant.FindNormalUser {
+		return errs.ErrArgs.Wrap("normal flied is invalid")
+	}
 	return nil
 }
 

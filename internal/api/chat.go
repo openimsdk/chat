@@ -18,6 +18,7 @@ import (
 	"fmt"
 	"github.com/OpenIMSDK/chat/pkg/common/apicall"
 	"github.com/OpenIMSDK/chat/pkg/common/apistruct"
+	constant2 "github.com/OpenIMSDK/chat/pkg/common/constant"
 	"github.com/OpenIMSDK/chat/pkg/common/mctx"
 	"github.com/OpenIMSDK/protocol/sdkws"
 	"github.com/OpenIMSDK/tools/checker"
@@ -111,17 +112,18 @@ func (o *ChatApi) RegisterUser(c *gin.Context) {
 		apiresp.GinError(c, err)
 		return
 	}
-	token, err := o.imApiCaller.AdminToken(c)
+	imToken, err := o.imApiCaller.ImAdminTokenWithDefaultAdmin(c)
 	if err != nil {
 		apiresp.GinError(c, err)
 		return
 	}
-	ctx := mctx.WithApiToken(mctx.WithAdminUser(c), token)
-	if resp, err := o.adminClient.FindDefaultFriend(ctx, &admin.FindDefaultFriendReq{}); err == nil {
-		_ = o.imApiCaller.ImportFriend(ctx, respRegisterUser.UserID, resp.UserIDs)
+	apiCtx := mctx.WithApiToken(c, imToken)
+	rpcCtx := mctx.WithAdminUser(c)
+	if resp, err := o.adminClient.FindDefaultFriend(rpcCtx, &admin.FindDefaultFriendReq{}); err == nil {
+		_ = o.imApiCaller.ImportFriend(apiCtx, respRegisterUser.UserID, resp.UserIDs)
 	}
-	if resp, err := o.adminClient.FindDefaultGroup(ctx, &admin.FindDefaultGroupReq{}); err != nil {
-		_ = o.imApiCaller.InviteToGroup(c, respRegisterUser.UserID, resp.GroupIDs)
+	if resp, err := o.adminClient.FindDefaultGroup(rpcCtx, &admin.FindDefaultGroupReq{}); err == nil {
+		_ = o.imApiCaller.InviteToGroup(apiCtx, respRegisterUser.UserID, resp.GroupIDs)
 	}
 	if req.AutoLogin {
 		resp.ImToken, err = o.imApiCaller.UserToken(c, respRegisterUser.UserID, req.Platform)
@@ -202,7 +204,20 @@ func (o *ChatApi) UpdateUserInfo(c *gin.Context) {
 		apiresp.GinError(c, err)
 		return
 	}
-	token, err := o.imApiCaller.AdminToken(c)
+	opUserType, err := mctx.GetUserType(c)
+	if err != nil {
+		apiresp.GinError(c, err)
+		return
+	}
+	var imToken string
+	if opUserType == constant2.NormalUser {
+		imToken, err = o.imApiCaller.ImAdminTokenWithDefaultAdmin(c)
+	} else if opUserType == constant2.AdminUser {
+		imToken, err = o.imApiCaller.UserToken(c, config.GetIMAdmin(mctx.GetOpUserID(c)), constant.AdminPlatformID)
+	} else {
+		apiresp.GinError(c, errs.ErrArgs.Wrap("opUserType unknown"))
+		return
+	}
 	if err != nil {
 		apiresp.GinError(c, err)
 		return
@@ -221,7 +236,7 @@ func (o *ChatApi) UpdateUserInfo(c *gin.Context) {
 	} else {
 		faceURL = respUpdate.FaceUrl
 	}
-	err = o.imApiCaller.UpdateUserInfo(mctx.WithApiToken(c, token), req.UserID, nickName, faceURL)
+	err = o.imApiCaller.UpdateUserInfo(mctx.WithApiToken(c, imToken), req.UserID, nickName, faceURL)
 	if err != nil {
 		apiresp.GinError(c, err)
 		return

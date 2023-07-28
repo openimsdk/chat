@@ -23,9 +23,13 @@ import (
 	"github.com/OpenIMSDK/chat/pkg/proto/admin"
 )
 
-func (*adminServer) CreateToken(ctx context.Context, req *admin.CreateTokenReq) (*admin.CreateTokenResp, error) {
+func (o *adminServer) CreateToken(ctx context.Context, req *admin.CreateTokenReq) (*admin.CreateTokenResp, error) {
 	defer log.ZDebug(ctx, "return")
 	token, err := tokenverify.CreateToken(req.UserID, req.UserType, *config.Config.TokenPolicy.Expire)
+	if err != nil {
+		return nil, err
+	}
+	err = o.Database.CacheToken(ctx, req.UserID, token)
 	if err != nil {
 		return nil, err
 	}
@@ -43,4 +47,18 @@ func (*adminServer) ParseToken(ctx context.Context, req *admin.ParseTokenReq) (*
 		UserID:   userID,
 		UserType: userType,
 	}, nil
+}
+
+func (o *adminServer) GetUserToken(ctx context.Context, req *admin.GetUserTokenReq) (*admin.GetUserTokenResp, error) {
+
+	tokensMap, err := o.Database.GetTokens(ctx, req.UserID)
+
+	if err != nil {
+
+		return nil, err
+
+	}
+
+	return &admin.GetUserTokenResp{TokensMap: tokensMap}, nil
+
 }

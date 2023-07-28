@@ -38,6 +38,11 @@ var Config struct {
 		RegisterIP string `yaml:"registerIP"`
 		ListenIP   string `yaml:"listenIP"`
 	} `yaml:"rpc"`
+	Redis struct {
+		Address  []string `yaml:"address"`
+		Username string   `yaml:"username"`
+		Password string   `yaml:"password"`
+	} `yaml:"redis"`
 	RpcPort struct {
 		OpenImAdminPort []int `yaml:"openImAdminPort"`
 		OpenImChatPort  []int `yaml:"openImChatPort"`
