@@ -199,12 +199,16 @@ changelog:
       order: 9999
 
 dockers:
-  - image_templates:
-      - "openim/openim-chat:{{ .Tag }}-amd64"
-      - "ghcr.io/openimsdk/openim-chat:{{ .Tag }}-amd64"
-      - "registry.cn-hangzhou.aliyuncs.com/openimsdk/openim-chat:{{ .Tag }}-amd64"
+
+  - ids: chat
+    goos: linux
+    goarch: amd64
     dockerfile: Dockerfile
     use: buildx
+    image_templates:
+      - "openim/openim-chat:{{ .Tag }}-amd64"
+      - "ghcr.io/{{ .Env.USERNAME }}/openim-chat:{{ .Tag }}-amd64"
+      - "registry.cn-hangzhou.aliyuncs.com/openimsdk/openim-chat:{{ .Tag }}-amd64"
     build_flag_templates:
       - "--pull"
       - "--label=io.artifacthub.package.readme-url=https://raw.githubusercontent.com/OpenIMSDK/chat/main/README.md"
@@ -218,14 +222,16 @@ dockers:
       - "--label=org.opencontainers.image.version={{.Version}}"
       - "--label=org.opencontainers.image.source={{.GitURL}}"
       - "--platform=linux/amd64"
-    goarch: amd64
 
-  - image_templates:
+  - ids: chat
+    goos: linux
+    goarch: amd64
+    dockerfile: Dockerfile
+    use: buildx
+    image_templates:
       - "openim/openim-chat:{{ .Tag }}-arm64"
       - "ghcr.io/openimsdk/openim-chat:{{ .Tag }}-arm64"
       - "registry.cn-hangzhou.aliyuncs.com/openimsdk/openim-chat:{{ .Tag }}-arm64"
-    dockerfile: Dockerfile
-    use: buildx
     build_flag_templates:
       - "--pull"
       - "--label=io.artifacthub.package.readme-url=https://raw.githubusercontent.com/OpenIMSDK/chat/main/README.md"
@@ -239,33 +245,32 @@ dockers:
       - "--label=org.opencontainers.image.version={{.Version}}"
       - "--label=org.opencontainers.image.source={{.GitURL}}"
       - "--platform=linux/arm64"
-    goarch: arm64
 
-# docker_manifests:
-#   - name_template: "openim/openim-chat:{{ .Tag }}"
-#     image_templates:
-#       - "openim/openim-chat:{{ .Tag }}-amd64"
-#       - "openim/openim-chat:{{ .Tag }}-arm64"
-#   - name_template: "ghcr.io/openimsdk/openim-chat:{{ .Tag }}"
-#     image_templates:
-#       - "ghcr.io/openimsdk/openim-chat:{{ .Tag }}-amd64"
-#       - "ghcr.io/openimsdk/openim-chat:{{ .Tag }}-arm64"
-#   - name_template: "registry.cn-hangzhou.aliyuncs.com/openimsdk/openim-chat:{{ .Tag }}"
-#     image_templates:
-#       - "registry.cn-hangzhou.aliyuncs.com/openimsdk/openim-chat:{{ .Tag }}-amd64"
-#       - "registry.cn-hangzhou.aliyuncs.com/openimsdk/openim-chat:{{ .Tag }}-arm64"
-#   - name_template: "openim/openim-chat:latest"
-#     image_templates:
-#       - "openim/openim-chat:{{ .Tag }}-amd64"
-#       - "openim/openim-chat:{{ .Tag }}-arm64"
-#   - name_template: "ghcr.io/openimsdk/openim-chat:latest"
-#     image_templates:
-#       - "ghcr.io/openimsdk/openim-chat:{{ .Tag }}-amd64"
-#       - "ghcr.io/openimsdk/openim-chat:{{ .Tag }}-arm64"
-#   - name_template: "registry.cn-hangzhou.aliyuncs.com/openimsdk/openim-chat:latest"
-#     image_templates:
-#       - "registry.cn-hangzhou.aliyuncs.com/openimsdk/openim-chat:{{ .Tag }}-amd64"
-#       - "registry.cn-hangzhou.aliyuncs.com/openimsdk/openim-chat:{{ .Tag }}-arm64"
+docker_manifests:
+  - name_template: "openim/openim-chat:{{ .Tag }}"
+    image_templates:
+      - "openim/openim-chat:{{ .Tag }}-amd64"
+      - "openim/openim-chat:{{ .Tag }}-arm64"
+  - name_template: "ghcr.io/openimsdk/openim-chat:{{ .Tag }}"
+    image_templates:
+      - "ghcr.io/openimsdk/openim-chat:{{ .Tag }}-amd64"
+      - "ghcr.io/openimsdk/openim-chat:{{ .Tag }}-arm64"
+  - name_template: "registry.cn-hangzhou.aliyuncs.com/openimsdk/openim-chat:{{ .Tag }}"
+    image_templates:
+      - "registry.cn-hangzhou.aliyuncs.com/openimsdk/openim-chat:{{ .Tag }}-amd64"
+      - "registry.cn-hangzhou.aliyuncs.com/openimsdk/openim-chat:{{ .Tag }}-arm64"
+  - name_template: "openim/openim-chat:latest"
+    image_templates:
+      - "openim/openim-chat:{{ .Tag }}-amd64"
+      - "openim/openim-chat:{{ .Tag }}-arm64"
+  - name_template: "ghcr.io/openimsdk/openim-chat:latest"
+    image_templates:
+      - "ghcr.io/openimsdk/openim-chat:{{ .Tag }}-amd64"
+      - "ghcr.io/openimsdk/openim-chat:{{ .Tag }}-arm64"
+  - name_template: "registry.cn-hangzhou.aliyuncs.com/openimsdk/openim-chat:latest"
+    image_templates:
+      - "registry.cn-hangzhou.aliyuncs.com/openimsdk/openim-chat:{{ .Tag }}-amd64"
+      - "registry.cn-hangzhou.aliyuncs.com/openimsdk/openim-chat:{{ .Tag }}-arm64"
 
 nfpms:
   - id: packages
@@ -323,24 +328,29 @@ milestones:
     # Default: '{{ .Tag }}'
     name_template: "Current Release"
 
-# publishers:
-#   - name: "fury.io"
-#     ids:
-#       - packages
-#     dir: "{{ dir .ArtifactPath }}"
-#     cmd: |
-#       bash -c '
-#       if [[ "{{ .Tag }}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-#         curl -F package=@{{ .ArtifactName }} https://{{ .Env.FURY_TOKEN }}@push.fury.io/{{ .Env.USERNAME }}/
-#       else
-#         echo "Skipping deployment: Non-production release detected"
-#       fi'
+publishers:
+  - name: "fury.io"
+    ids:
+      - packages
+    dir: "{{ dir .ArtifactPath }}"
+    cmd: |
+      bash -c '
+      if [[ "{{ .Tag }}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+        curl -F package=@{{ .ArtifactName }} https://{{ .Env.FURY_TOKEN }}@push.fury.io/openim/
+      else
+        echo "Skipping deployment: Non-production release detected"
+      fi'
+
 
 checksum:
   name_template: "{{ .ProjectName }}_checksums.txt"
   algorithm: sha256
 
+snapshot:
+  name_template: "{{ .Tag }}-next"
+
 release:
+  prerelease: auto
   footer: |
 
     ## Welcome to the {{ .Tag }} release of [chat](https://github.com/OpenIMSDK/chat)!🎉🎉!
@@ -381,3 +391,9 @@ release:
     📱 **WeChat**: Add us on WeChat (QR Code) and indicate that you are a user or developer of chat. We'll process your request as soon as possible.
 
     Remember, your contributions play a vital role in making OpenIM successful, and we look forward to your active participation in our community! 🙌
+
+# webhook
+# announce:
+#   slack:
+#     enabled: false
+#     message_template: "slack {{ .Tag }} is out! Check it out: https://github.com/OpenIMSDK/Open-IM-Server/releases/tag/{{ .Tag }}"
