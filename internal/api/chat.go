@@ -23,6 +23,7 @@ import (
 	"github.com/OpenIMSDK/protocol/sdkws"
 	"github.com/OpenIMSDK/tools/checker"
 	"github.com/OpenIMSDK/tools/log"
+	"github.com/OpenIMSDK/tools/mcontext"
 	"io"
 	"net"
 	"time"
@@ -194,6 +195,9 @@ func (o *ChatApi) UpdateUserInfo(c *gin.Context) {
 	if err := checker.Validate(&req); err != nil {
 		apiresp.GinError(c, err) // 参数校验失败
 		return
+	}
+	if req.UserID == "" {
+		req.UserID = mcontext.GetOpUserID(c)
 	}
 	respUpdate, err := o.chatClient.UpdateUserInfo(c, &req)
 	if err != nil {
