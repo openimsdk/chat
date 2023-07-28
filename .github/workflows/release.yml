@@ -82,9 +82,9 @@ jobs:
           username: ${{ secrets.ALIREGISTRY_USERNAME }}
           password: ${{ secrets.ALIREGISTRY_TOKEN }}
 
-      - name: snapcraft-login
-        if: startsWith(github.ref, 'refs/tags/v')
-        run: snapcraft login --with <(echo "${{ secrets.SNAPCRAFT_TOKEN }}")
+    #   - name: snapcraft-login
+    #     if: startsWith(github.ref, 'refs/tags/v')
+    #     run: snapcraft login --with <(echo "${{ secrets.SNAPCRAFT_TOKEN }}")
 
       - uses: goreleaser/goreleaser-action@v4
         with:
