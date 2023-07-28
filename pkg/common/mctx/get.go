@@ -16,7 +16,6 @@ package mctx
 
 import (
 	"context"
-	"fmt"
 	"github.com/OpenIMSDK/chat/pkg/common/config"
 	"github.com/OpenIMSDK/tools/utils"
 	"strconv"
@@ -41,7 +40,6 @@ func Check(ctx context.Context) (string, int32, error) {
 	if opUserID == "" {
 		return "", 0, errs.ErrNoPermission.Wrap("opUserID empty")
 	}
-	fmt.Println(ctx.Value(constant.RpcOpUserType))
 	opUserTypeArr, ok := ctx.Value(constant.RpcOpUserType).([]string)
 	if !ok {
 		return "", 0, errs.ErrNoPermission.Wrap("missing user type")
