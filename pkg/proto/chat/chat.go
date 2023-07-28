@@ -9,6 +9,9 @@ import (
 )
 
 func (x *UpdateUserInfoReq) Check() error {
+	if x.UserID == "" {
+		return errs.ErrArgs.Wrap("userID is empty")
+	}
 	if x.Email != nil && x.Email.Value != "" {
 		if err := EmailCheck(x.Email.Value); err != nil {
 			return err
