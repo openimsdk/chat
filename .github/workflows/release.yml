@@ -21,9 +21,6 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - name: Fetch Current version
-        id: get-current-tag
-        uses: actions-ecosystem/action-get-latest-tag@v1.6.0
 
       - name: setup-snapcraft
         # FIXME: the mkdirs are a hack for https://github.com/goreleaser/goreleaser/issues/1715
@@ -46,7 +43,7 @@ jobs:
             ./_output/dist/*.apk
           key: ${{ github.ref }}
 
-      - uses: sigstore/cosign-installer@v3.1.1
+    - uses: sigstore/cosign-installer@v3.1.1
       - uses: anchore/sbom-action/download-syft@v0.14.3
       - uses: crazy-max/ghaction-upx@v2
         with:
