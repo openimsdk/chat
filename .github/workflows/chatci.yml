@@ -81,12 +81,3 @@ jobs:
         run: |
           sudo make build
           echo "Build source code for host platform successfully"
-
-    #   - name: Collect Test Coverage File
-    #     uses: actions/upload-artifact@v1.0.0
-    #     with:
-    #       name: main-output
-    #       path: _output/tmp/coverage.out
-
-    #   - name: Set up Docker Buildx
-    #     uses: docker/setup-buildx-action@v1

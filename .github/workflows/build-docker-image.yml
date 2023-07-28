@@ -34,13 +34,6 @@ jobs:
       - name: Check out the repo
         uses: actions/checkout@v3
 
-      # build chat
-    #   - name: Build chat
-    #     run: |
-    #       sudo make build
-    #       cd scripts
-    #       sudo ./build_all_service.sh
-
       - name: Setup Golang with cache
         uses: magnetikonline/action-golang-cache@v3
         with:
@@ -91,6 +84,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: .
+          platforms: linux/amd64,linux/arm64
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta2.outputs.tags }}
           labels: ${{ steps.meta2.outputs.labels }}
