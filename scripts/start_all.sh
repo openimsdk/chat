@@ -57,7 +57,7 @@ for ((i = 0; i < ${#service_filename[*]}; i++)); do
     kill -9 $(eval $pid)
     sleep 0.5
   fi
-  cd $OPENIM_ROOT/bin
+  cd $SCRIPTS_ROOT/../_output/bin
   #Get the rpc port in the configuration file
   portList=$(cat $config_path | grep ${service_port_name[$i]} | awk -F '[:]' '{print $NF}')
   list_to_string ${portList}
