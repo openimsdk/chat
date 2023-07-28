@@ -32,9 +32,9 @@ jobs:
         with:
           # list of Docker images to use as base name for tags
           images: |
-            openim/$IMAGE_NAME
-            ghcr.io/${{github.repository_owner}}/$IMAGE_NAME
-            registry.cn-hangzhou.aliyuncs.com/${{github.repository_owner}}/$IMAGE_NAME
+            openim/${{env.IMAGE_NAME}}
+            ghcr.io/${{github.repository_owner}}/${{env.IMAGE_NAME}}
+            registry.cn-hangzhou.aliyuncs.com/${{github.repository_owner}}/${{env.IMAGE_NAME}}
 
           # generate Docker tags based on the following events/attributes
           tags: |
