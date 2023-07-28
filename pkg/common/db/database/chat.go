@@ -115,7 +115,7 @@ func (o *ChatDatabase) TakeAttributeByUserID(ctx context.Context, userID string)
 
 func (o *ChatDatabase) Search(ctx context.Context, normalUser int32, keyword string, genders int32, pageNumber int32, showNumber int32) (total uint32, attributes []*table.Attribute, err error) {
 	var forbiddenIDs []string
-	if normalUser == constant2.NormalUser {
+	if int(normalUser) == constant2.NormalUser {
 		forbiddenIDs, err = o.forbiddenAccount.FindAllIDs(ctx)
 		if err != nil {
 			return 0, nil, err

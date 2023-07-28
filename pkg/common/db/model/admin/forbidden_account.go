@@ -16,7 +16,6 @@ package admin
 
 import (
 	"context"
-
 	"github.com/OpenIMSDK/tools/errs"
 	"github.com/OpenIMSDK/tools/ormutil"
 	"gorm.io/gorm"
@@ -56,8 +55,8 @@ func (o *ForbiddenAccount) Search(ctx context.Context, keyword string, page int3
 
 func (o *ForbiddenAccount) FindAllIDs(ctx context.Context) ([]string, error) {
 	var userIDs []string
-	if err := o.db.WithContext(ctx).Model(&admin.ForbiddenAccount{}).Pluck("user_id", &userIDs); err != nil {
-		return nil, errs.Wrap(err.Error)
+	if err := o.db.WithContext(ctx).Model(&admin.ForbiddenAccount{}).Pluck("user_id", &userIDs).Error; err != nil {
+		return nil, errs.Wrap(err)
 	}
 	return userIDs, nil
 }
