@@ -19,6 +19,7 @@ import (
 	mw2 "github.com/OpenIMSDK/chat/pkg/common/mw"
 	"math/rand"
 	"net"
+	"net/http"
 	"strconv"
 	"time"
 
@@ -31,9 +32,13 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 
 	"github.com/gin-gonic/gin"
+	_ "net/http/pprof"
 )
 
 func main() {
+	go func() {
+		_ = http.ListenAndServe(":6062", nil)
+	}()
 	rand.Seed(time.Now().UnixNano())
 	err := config.InitConfig()
 	if err != nil {
