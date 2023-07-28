@@ -31,17 +31,17 @@ func (o *chatSvr) UpdateUserInfo(ctx context.Context, req *chat.UpdateUserInfoRe
 	if err != nil {
 		return nil, err
 	}
+	if req.UserID == "" {
+		return nil, errs.ErrArgs.Wrap("user id is empty")
+	}
 	switch userType {
 	case constant.NormalUser:
-		if req.UserID == "" {
-			req.UserID = opUserID
-		}
+		//if req.UserID == "" {
+		//	req.UserID = opUserID
+		//}
 		if req.UserID != opUserID {
 			return nil, errs.ErrNoPermission.Wrap("only admin can update other user info")
 		}
-		//if req.Email != nil {
-		//	return nil, errs.ErrNoPermission.Wrap("email can not be updated")
-		//}
 		if req.AreaCode != nil {
 			return nil, errs.ErrNoPermission.Wrap("areaCode can not be updated")
 		}
@@ -55,9 +55,8 @@ func (o *chatSvr) UpdateUserInfo(ctx context.Context, req *chat.UpdateUserInfoRe
 			return nil, errs.ErrNoPermission.Wrap("level can not be updated")
 		}
 	case constant.AdminUser:
-		if req.UserID == "" {
-			return nil, errs.ErrArgs.Wrap("user id is empty")
-		}
+	default:
+		return nil, errs.ErrNoPermission.Wrap("user type error")
 	}
 	update, err := ToDBAttributeUpdate(req)
 	if err != nil {
