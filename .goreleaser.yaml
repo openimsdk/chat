@@ -199,13 +199,7 @@ changelog:
       order: 9999
 
 dockers:
-
-  - ids: chat
-    goos: linux
-    goarch: amd64
-    dockerfile: Dockerfile
-    use: buildx
-    image_templates:
+  - image_templates:
       - "openim/openim-chat:{{ .Tag }}-amd64"
       - "ghcr.io/{{ .Env.USERNAME }}/openim-chat:{{ .Tag }}-amd64"
       - "registry.cn-hangzhou.aliyuncs.com/openimsdk/openim-chat:{{ .Tag }}-amd64"
@@ -222,13 +216,14 @@ dockers:
       - "--label=org.opencontainers.image.version={{.Version}}"
       - "--label=org.opencontainers.image.source={{.GitURL}}"
       - "--platform=linux/amd64"
-
-  - ids: chat
+    ids: |
+      - chat
     goos: linux
     goarch: amd64
     dockerfile: Dockerfile
     use: buildx
-    image_templates:
+
+  - image_templates:
       - "openim/openim-chat:{{ .Tag }}-arm64"
       - "ghcr.io/openimsdk/openim-chat:{{ .Tag }}-arm64"
       - "registry.cn-hangzhou.aliyuncs.com/openimsdk/openim-chat:{{ .Tag }}-arm64"
@@ -245,6 +240,12 @@ dockers:
       - "--label=org.opencontainers.image.version={{.Version}}"
       - "--label=org.opencontainers.image.source={{.GitURL}}"
       - "--platform=linux/arm64"
+    ids: |
+      - chat
+    goos: linux
+    goarch: arm64
+    dockerfile: Dockerfile
+    use: buildx
 
 docker_manifests:
   - name_template: "openim/openim-chat:{{ .Tag }}"
@@ -341,6 +342,14 @@ publishers:
         echo "Skipping deployment: Non-production release detected"
       fi'
 
+snapcrafts:
+  - name_template: "{{ .ProjectName }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}"
+    summary: openim is open source instant messaging
+    description: |
+      OpenIM yyds
+    grade: stable
+    confinement: classic
+    publish: true
 
 checksum:
   name_template: "{{ .ProjectName }}_checksums.txt"
