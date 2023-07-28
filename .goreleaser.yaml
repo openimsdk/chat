@@ -218,6 +218,7 @@ dockers:
       - "--label=org.opencontainers.image.version={{.Version}}"
       - "--label=org.opencontainers.image.source={{.GitURL}}"
       - "--platform=linux/amd64"
+    goarch: amd64
 
   - image_templates:
       - "openim/openim-chat:{{ .Tag }}-arm64"
@@ -240,31 +241,31 @@ dockers:
       - "--platform=linux/arm64"
     goarch: arm64
 
-docker_manifests:
-  - name_template: "openim/openim-chat:{{ .Tag }}"
-    image_templates:
-      - "openim/openim-chat:{{ .Tag }}-amd64"
-      - "openim/openim-chat:{{ .Tag }}-arm64"
-  - name_template: "ghcr.io/openimsdk/openim-chat:{{ .Tag }}"
-    image_templates:
-      - "ghcr.io/openimsdk/openim-chat:{{ .Tag }}-amd64"
-      - "ghcr.io/openimsdk/openim-chat:{{ .Tag }}-arm64"
-  - name_template: "registry.cn-hangzhou.aliyuncs.com/openimsdk/openim-chat:{{ .Tag }}"
-    image_templates:
-      - "registry.cn-hangzhou.aliyuncs.com/openimsdk/openim-chat:{{ .Tag }}-amd64"
-      - "registry.cn-hangzhou.aliyuncs.com/openimsdk/openim-chat:{{ .Tag }}-arm64"
-  - name_template: "openim/openim-chat:latest"
-    image_templates:
-      - "openim/openim-chat:{{ .Tag }}-amd64"
-      - "openim/openim-chat:{{ .Tag }}-arm64"
-  - name_template: "ghcr.io/openimsdk/openim-chat:latest"
-    image_templates:
-      - "ghcr.io/openimsdk/openim-chat:{{ .Tag }}-amd64"
-      - "ghcr.io/openimsdk/openim-chat:{{ .Tag }}-arm64"
-  - name_template: "registry.cn-hangzhou.aliyuncs.com/openimsdk/openim-chat:latest"
-    image_templates:
-      - "registry.cn-hangzhou.aliyuncs.com/openimsdk/openim-chat:{{ .Tag }}-amd64"
-      - "registry.cn-hangzhou.aliyuncs.com/openimsdk/openim-chat:{{ .Tag }}-arm64"
+# docker_manifests:
+#   - name_template: "openim/openim-chat:{{ .Tag }}"
+#     image_templates:
+#       - "openim/openim-chat:{{ .Tag }}-amd64"
+#       - "openim/openim-chat:{{ .Tag }}-arm64"
+#   - name_template: "ghcr.io/openimsdk/openim-chat:{{ .Tag }}"
+#     image_templates:
+#       - "ghcr.io/openimsdk/openim-chat:{{ .Tag }}-amd64"
+#       - "ghcr.io/openimsdk/openim-chat:{{ .Tag }}-arm64"
+#   - name_template: "registry.cn-hangzhou.aliyuncs.com/openimsdk/openim-chat:{{ .Tag }}"
+#     image_templates:
+#       - "registry.cn-hangzhou.aliyuncs.com/openimsdk/openim-chat:{{ .Tag }}-amd64"
+#       - "registry.cn-hangzhou.aliyuncs.com/openimsdk/openim-chat:{{ .Tag }}-arm64"
+#   - name_template: "openim/openim-chat:latest"
+#     image_templates:
+#       - "openim/openim-chat:{{ .Tag }}-amd64"
+#       - "openim/openim-chat:{{ .Tag }}-arm64"
+#   - name_template: "ghcr.io/openimsdk/openim-chat:latest"
+#     image_templates:
+#       - "ghcr.io/openimsdk/openim-chat:{{ .Tag }}-amd64"
+#       - "ghcr.io/openimsdk/openim-chat:{{ .Tag }}-arm64"
+#   - name_template: "registry.cn-hangzhou.aliyuncs.com/openimsdk/openim-chat:latest"
+#     image_templates:
+#       - "registry.cn-hangzhou.aliyuncs.com/openimsdk/openim-chat:{{ .Tag }}-amd64"
+#       - "registry.cn-hangzhou.aliyuncs.com/openimsdk/openim-chat:{{ .Tag }}-arm64"
 
 nfpms:
   - id: packages
@@ -341,6 +342,9 @@ checksum:
 
 release:
   footer: |
+
+    ## Welcome to the {{ .Tag }} release of [chat](https://github.com/OpenIMSDK/chat)!🎉🎉!
+
     **Full Changelog**: https://github.com/OpenIMSDK/chat/compare/{{ .PreviousTag }}...{{ .Tag }}
 
     ## Helping out
