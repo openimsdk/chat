@@ -1,10 +1,12 @@
-name: ci
+name: ci2
 
 on:
-  push:
-    branches:
-      - "main"
-
+    push:
+      branches:
+        - main
+      tags:
+        - v*
+    workflow_dispatch:
 jobs:
   docker:
     runs-on: ubuntu-latest
