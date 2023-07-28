@@ -17,12 +17,17 @@ package main
 import (
 	"github.com/OpenIMSDK/chat/pkg/common/chatrpcstart"
 	"github.com/OpenIMSDK/tools/log"
+	"net/http"
 
 	"github.com/OpenIMSDK/chat/internal/rpc/admin"
 	"github.com/OpenIMSDK/chat/pkg/common/config"
+	_ "net/http/pprof"
 )
 
 func main() {
+	go func() {
+		_ = http.ListenAndServe(":6063", nil)
+	}()
 	if err := config.InitConfig(); err != nil {
 		panic(err)
 	}
