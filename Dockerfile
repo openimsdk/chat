@@ -1,20 +1,44 @@
-FROM ubuntu
+# Use golang as the builder stage
+FROM golang:1.20 as builder
 
-# 设置固定的项目路径
+WORKDIR /workspace
+
+ENV GOPROXY=https://goproxy.cn
+
+# Copy go mod and go sum files then download dependencies
+COPY go.mod go.sum ./
+RUN go mod download
+
+ARG GOARCH
+ARG GOOS
+
+# Copy source code files into the image
+COPY . .
+
+# Compile the source code
+RUN CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} go build -o ./bin/open_im_admin ./cmd/rpc/admin
+RUN CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} go build -o ./bin/open_im_admin_api ./cmd/api/admin_api
+RUN CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} go build -o ./bin/open_im_chat ./cmd/rpc/chat
+RUN CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} go build -o ./bin/open_im_chat_api ./cmd/api/chat_api
+
+
+# Build the runtime stage
+FROM debian
+
+# Set fixed project path
 ENV WORKDIR /chat
 ENV CMDDIR $WORKDIR/scripts
-
 ENV CONFIG_NAME $WORKDIR/config/config.yaml
 
-# 将可执行文件复制到目标目录
-ADD ./bin/open_im_admin $WORKDIR/bin/open_im_admin
-ADD ./bin/open_im_admin_api $WORKDIR/bin/open_im_admin_api
-ADD ./bin/open_im_chat $WORKDIR/bin/open_im_chat
-ADD ./bin/open_im_chat_api $WORKDIR/bin/open_im_chat_api
-ADD ./scripts $WORKDIR/scripts
-ADD ./config/config.yaml $WORKDIR/config/config.yaml
+# Copy the executable files to the target directory
+COPY --from=builder /workspace/bin/open_im_admin $WORKDIR/bin/open_im_admin
+COPY --from=builder /workspace/bin/open_im_admin_api $WORKDIR/bin/open_im_admin_api
+COPY --from=builder /workspace/bin/open_im_chat $WORKDIR/bin/open_im_chat
+COPY --from=builder /workspace/bin/open_im_chat_api $WORKDIR/bin/open_im_chat_api
+COPY --from=builder /workspace/scripts $WORKDIR/scripts
+COPY --from=builder /workspace/config/config.yaml $WORKDIR/config/config.yaml
 
-# 创建用于挂载的几个目录，添加可执行权限
+# Create several directories for mounting and add executable permissions
 RUN mkdir $WORKDIR/logs && \
     chmod +x $WORKDIR/bin/open_im_admin $WORKDIR/bin/open_im_chat $WORKDIR/bin/open_im_admin_api $WORKDIR/bin/open_im_chat_api
 RUN apt-get -qq update \
