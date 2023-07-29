@@ -198,48 +198,47 @@ changelog:
     - title: Other work
       order: 9999
 
-dockers:
-  - image_templates:
-      - "openim/openim-chat:{{ .Tag }}-amd64"
-      - "ghcr.io/openimsdk/openim-chat:{{ .Tag }}-amd64"
-      - "registry.cn-hangzhou.aliyuncs.com/openimsdk/openim-chat:{{ .Tag }}-amd64"
-    dockerfile: Dockerfile
-    use: buildx
-    build_flag_templates:
-      - "--pull"
-      - "--label=io.artifacthub.package.readme-url=https://raw.githubusercontent.com/OpenIMSDK/chat/main/README.md"
-      - "--label=io.artifacthub.package.logo-url=hhttps://github.com/OpenIMSDK/chat/blob/main/assets/logo/openim-logo-green.png"
-      - '--label=io.artifacthub.package.maintainers=[{"name":"Xinwei Xiong","email":"3293172751nss@gmail.com"}]'
-      - "--label=io.artifacthub.package.license=Apace-2.0"
-      - "--label=org.opencontainers.image.description=OpenIM Open source top instant messaging system"
-      - "--label=org.opencontainers.image.created={{.Date}}"
-      - "--label=org.opencontainers.image.name={{.ProjectName}}"
-      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
-      - "--label=org.opencontainers.image.version={{.Version}}"
-      - "--label=org.opencontainers.image.source={{.GitURL}}"
-      - "--platform=linux/amd64"
-    goarch: amd64
+# dockers:
+#   - image_templates:
+#       - "openim/openim-chat:{{ .Tag }}-amd64"
+#       - "ghcr.io/openimsdk/openim-chat:{{ .Tag }}-amd64"
+#       - "registry.cn-hangzhou.aliyuncs.com/openimsdk/openim-chat:{{ .Tag }}-amd64"
+#     dockerfile: Dockerfile
+#     use: buildx
+#     build_flag_templates:
+#       - "--pull"
+#       - "--label=io.artifacthub.package.readme-url=https://raw.githubusercontent.com/OpenIMSDK/chat/main/README.md"
+#       - "--label=io.artifacthub.package.logo-url=hhttps://github.com/OpenIMSDK/chat/blob/main/assets/logo/openim-logo-green.png"
+#       - '--label=io.artifacthub.package.maintainers=[{"name":"Xinwei Xiong","email":"3293172751nss@gmail.com"}]'
+#       - "--label=io.artifacthub.package.license=Apace-2.0"
+#       - "--label=org.opencontainers.image.description=OpenIM Open source top instant messaging system"
+#       - "--label=org.opencontainers.image.created={{.Date}}"
+#       - "--label=org.opencontainers.image.name={{.ProjectName}}"
+#       - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+#       - "--label=org.opencontainers.image.version={{.Version}}"
+#       - "--label=org.opencontainers.image.source={{.GitURL}}"
+#       - "--platform=linux/amd64"
 
-  - image_templates:
-      - "openim/openim-chat:{{ .Tag }}-arm64"
-      - "ghcr.io/openimsdk/openim-chat:{{ .Tag }}-arm64"
-      - "registry.cn-hangzhou.aliyuncs.com/openimsdk/openim-chat:{{ .Tag }}-arm64"
-    dockerfile: Dockerfile
-    use: buildx
-    build_flag_templates:
-      - "--pull"
-      - "--label=io.artifacthub.package.readme-url=https://raw.githubusercontent.com/OpenIMSDK/chat/main/README.md"
-      - "--label=io.artifacthub.package.logo-url=hhttps://github.com/OpenIMSDK/chat/blob/main/assets/logo/openim-logo-green.png"
-      - '--label=io.artifacthub.package.maintainers=[{"name":"Xinwei Xiong","email":"3293172751nss@gmail.com"}]'
-      - "--label=io.artifacthub.package.license=Apace-2.0"
-      - "--label=org.opencontainers.image.description=OpenIM Open source top instant messaging system"
-      - "--label=org.opencontainers.image.created={{.Date}}"
-      - "--label=org.opencontainers.image.name={{.ProjectName}}"
-      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
-      - "--label=org.opencontainers.image.version={{.Version}}"
-      - "--label=org.opencontainers.image.source={{.GitURL}}"
-      - "--platform=linux/arm64"
-    goarch: arm64
+#   - image_templates:
+#       - "openim/openim-chat:{{ .Tag }}-arm64"
+#       - "ghcr.io/openimsdk/openim-chat:{{ .Tag }}-arm64"
+#       - "registry.cn-hangzhou.aliyuncs.com/openimsdk/openim-chat:{{ .Tag }}-arm64"
+#     dockerfile: Dockerfile
+#     use: buildx
+#     build_flag_templates:
+#       - "--pull"
+#       - "--label=io.artifacthub.package.readme-url=https://raw.githubusercontent.com/OpenIMSDK/chat/main/README.md"
+#       - "--label=io.artifacthub.package.logo-url=hhttps://github.com/OpenIMSDK/chat/blob/main/assets/logo/openim-logo-green.png"
+#       - '--label=io.artifacthub.package.maintainers=[{"name":"Xinwei Xiong","email":"3293172751nss@gmail.com"}]'
+#       - "--label=io.artifacthub.package.license=Apace-2.0"
+#       - "--label=org.opencontainers.image.description=OpenIM Open source top instant messaging system"
+#       - "--label=org.opencontainers.image.created={{.Date}}"
+#       - "--label=org.opencontainers.image.name={{.ProjectName}}"
+#       - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+#       - "--label=org.opencontainers.image.version={{.Version}}"
+#       - "--label=org.opencontainers.image.source={{.GitURL}}"
+#       - "--platform=linux/arm64"
+#     goarch: arm64
 
 # docker_manifests:
 #   - name_template: "openim/openim-chat:{{ .Tag }}"
@@ -349,7 +348,13 @@ release:
 
     ## Helping out
 
+    We release logs are recorded on [✨ CHANGELOG](https://github.com/OpenIMSDK/Open-IM-Server/blob/main/CHANGELOG/CHANGELOG.md)
+
+    For information on versions of OpenIM and how to maintain branches, read [📚this article](https://github.com/OpenIMSDK/Open-IM-Server/blob/main/docs/conversions/version.md)
+
     This release is only possible thanks to **all** the support of some **awesome people**!
+
+    https://github.com/OpenIMSDK/Open-IM-Server/blob/main/docs/conversions/version.md
 
     **Want to be one of them 😘?**
 
