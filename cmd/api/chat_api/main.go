@@ -16,12 +16,14 @@ package main
 
 import (
 	"flag"
-	mw2 "github.com/OpenIMSDK/chat/pkg/common/mw"
+	"fmt"
 	"math/rand"
 	"net"
 	"net/http"
 	"strconv"
 	"time"
+
+	mw2 "github.com/OpenIMSDK/chat/pkg/common/mw"
 
 	"github.com/OpenIMSDK/chat/internal/api"
 	"github.com/OpenIMSDK/chat/pkg/common/config"
@@ -31,17 +33,28 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
-	"github.com/gin-gonic/gin"
 	_ "net/http/pprof"
+
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
 	go func() {
 		_ = http.ListenAndServe(":6062", nil)
 	}()
+	var configFile string
+	flag.StringVar(&configFile, "config_folder_path", "../config/config.yaml", "Config full path:")
+
+	// defaultPorts := config.Config.ChatApi.GinPort
+	var ginPort int
+	flag.IntVar(&ginPort, "port", 10008, "get ginServerPort from cmd")
+
+	flag.Parse()
 	rand.Seed(time.Now().UnixNano())
-	err := config.InitConfig()
+
+	err := config.InitConfig(configFile)
 	if err != nil {
+		fmt.Println("err ", err.Error())
 		panic(err)
 	}
 	if err := log.InitFromConfig("chat.log", "chat-api", *config.Config.Log.RemainLogLevel, *config.Config.Log.IsStdout, *config.Config.Log.IsJson, *config.Config.Log.StorageLocation, *config.Config.Log.RemainRotationCount, *config.Config.Log.RotationTime); err != nil {
@@ -60,10 +73,8 @@ func main() {
 	engine := gin.Default()
 	engine.Use(mw.CorsHandler(), mw.GinParseOperationID(), mw2.GinLog())
 	api.NewChatRoute(engine, zk)
-	defaultPorts := config.Config.ChatApi.GinPort
-	ginPort := flag.Int("port", defaultPorts[0], "get ginServerPort from cmd")
-	flag.Parse()
-	address := net.JoinHostPort(config.Config.ChatApi.ListenIP, strconv.Itoa(*ginPort))
+
+	address := net.JoinHostPort(config.Config.ChatApi.ListenIP, strconv.Itoa(ginPort))
 	if err := engine.Run(address); err != nil {
 		panic(err)
 	}

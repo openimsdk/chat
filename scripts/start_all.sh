@@ -67,9 +67,9 @@ for ((i = 0; i < ${#service_filename[*]}; i++)); do
   #Start related rpc services based on the number of ports
   for ((j = 0; j < ${#service_ports[*]}; j++)); do
     #Start the service in the background
-    cmd="./${service_filename[$i]} -port ${service_ports[$j]} "
+    cmd="./${service_filename[$i]} -port ${service_ports[$j]} --config_folder_path ${config_path}"
     if [ $i -eq 0 -o $i -eq 1 ]; then
-      cmd="./${service_filename[$i]} -port ${service_ports[$j]}"
+      cmd="./${service_filename[$i]} -port ${service_ports[$j]} --config_folder_path ${config_path}"
     fi
     echo $cmd
     nohup $cmd >>../logs/openIM.log 2>&1 &

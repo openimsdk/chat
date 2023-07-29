@@ -15,26 +15,38 @@
 package main
 
 import (
+	"flag"
+	"net/http"
+
 	"github.com/OpenIMSDK/chat/pkg/common/chatrpcstart"
 	"github.com/OpenIMSDK/tools/log"
-	"net/http"
+
+	_ "net/http/pprof"
 
 	"github.com/OpenIMSDK/chat/internal/rpc/admin"
 	"github.com/OpenIMSDK/chat/pkg/common/config"
-	_ "net/http/pprof"
 )
 
 func main() {
 	go func() {
 		_ = http.ListenAndServe(":6063", nil)
 	}()
-	if err := config.InitConfig(); err != nil {
+	var configFile string
+	flag.StringVar(&configFile, "config_folder_path", "../config/config.yaml", "Config full path")
+
+	var rpcPort int
+
+	flag.IntVar(&rpcPort, "port", 30200, "get rpc ServerPort from cmd")
+
+
+	flag.Parse()
+	if err := config.InitConfig(configFile); err != nil {
 		panic(err)
 	}
 	if err := log.InitFromConfig("chat.log", "admin-rpc", *config.Config.Log.RemainLogLevel, *config.Config.Log.IsStdout, *config.Config.Log.IsJson, *config.Config.Log.StorageLocation, *config.Config.Log.RemainRotationCount, *config.Config.Log.RotationTime); err != nil {
 		panic(err)
 	}
-	err := chatrpcstart.Start(config.Config.RpcPort.OpenImAdminPort[0], config.Config.RpcRegisterName.OpenImAdminName, 0, admin.Start)
+	err := chatrpcstart.Start(rpcPort, config.Config.RpcRegisterName.OpenImAdminName, 0, admin.Start)
 	if err != nil {
 		panic(err)
 	}
