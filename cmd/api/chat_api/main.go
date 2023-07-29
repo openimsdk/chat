@@ -43,7 +43,7 @@ func main() {
 		_ = http.ListenAndServe(":6062", nil)
 	}()
 	var configFile string
-	flag.StringVar(&configFile, "config_folder_path", "", "Config full path:")
+	flag.StringVar(&configFile, "config_folder_path", "../config/config.yaml", "Config full path:")
 
 	// defaultPorts := config.Config.ChatApi.GinPort
 	var ginPort int

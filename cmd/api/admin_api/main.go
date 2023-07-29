@@ -42,7 +42,7 @@ func main() {
 		_ = http.ListenAndServe(":6061", nil)
 	}()
 	var configFile string
-	flag.StringVar(&configFile, "config_folder_path", "", "Config full path")
+	flag.StringVar(&configFile, "config_folder_path", "../config/config.yaml", "Config full path")
 
 	var ginPort int
 

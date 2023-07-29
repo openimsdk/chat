@@ -32,7 +32,13 @@ func main() {
 		_ = http.ListenAndServe(":6063", nil)
 	}()
 	var configFile string
-	flag.StringVar(&configFile, "config_folder_path", "", "Config full path")
+	flag.StringVar(&configFile, "config_folder_path", "../config/config.yaml", "Config full path")
+
+	var rpcPort int
+
+	flag.IntVar(&rpcPort, "port", 30200, "get rpc ServerPort from cmd")
+
+
 	flag.Parse()
 	if err := config.InitConfig(configFile); err != nil {
 		panic(err)
@@ -40,7 +46,7 @@ func main() {
 	if err := log.InitFromConfig("chat.log", "admin-rpc", *config.Config.Log.RemainLogLevel, *config.Config.Log.IsStdout, *config.Config.Log.IsJson, *config.Config.Log.StorageLocation, *config.Config.Log.RemainRotationCount, *config.Config.Log.RotationTime); err != nil {
 		panic(err)
 	}
-	err := chatrpcstart.Start(config.Config.RpcPort.OpenImAdminPort[0], config.Config.RpcRegisterName.OpenImAdminName, 0, admin.Start)
+	err := chatrpcstart.Start(rpcPort, config.Config.RpcRegisterName.OpenImAdminName, 0, admin.Start)
 	if err != nil {
 		panic(err)
 	}
