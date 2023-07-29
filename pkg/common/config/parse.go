@@ -116,6 +116,11 @@ func InitConfig(configFile string) error {
 	configFieldCopy(&Config.Secret, imConfig.Secret)
 	configFieldCopy(&Config.TokenPolicy.Expire, imConfig.TokenPolicy.Expire)
 
+	// Redis
+	configFieldCopy(&Config.Redis.Address, imConfig.Redis.Address)
+	configFieldCopy(&Config.Redis.Password, imConfig.Redis.Password)
+	configFieldCopy(&Config.Redis.Username, imConfig.Redis.Username)
+
 	configData, err := yaml.Marshal(&Config)
 	fmt.Printf("debug: %s\nconfig:\n%s\n", time.Now(), string(configData))
 	if err != nil {
