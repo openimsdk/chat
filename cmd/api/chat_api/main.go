@@ -19,7 +19,6 @@ import (
 	"fmt"
 	"math/rand"
 	"net"
-	"net/http"
 	"strconv"
 	"time"
 
@@ -33,15 +32,10 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
-	_ "net/http/pprof"
-
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	go func() {
-		_ = http.ListenAndServe(":6062", nil)
-	}()
 	var configFile string
 	flag.StringVar(&configFile, "config_folder_path", "../config/config.yaml", "Config full path:")
 
