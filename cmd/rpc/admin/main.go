@@ -38,7 +38,6 @@ func main() {
 
 	flag.IntVar(&rpcPort, "port", 30200, "get rpc ServerPort from cmd")
 
-
 	flag.Parse()
 	if err := config.InitConfig(configFile); err != nil {
 		panic(err)

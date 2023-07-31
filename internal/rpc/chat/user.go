@@ -16,6 +16,7 @@ package chat
 
 import (
 	"context"
+
 	"github.com/OpenIMSDK/chat/pkg/common/constant"
 	"github.com/OpenIMSDK/chat/pkg/common/mctx"
 	"github.com/OpenIMSDK/chat/pkg/eerrs"

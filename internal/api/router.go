@@ -16,6 +16,7 @@ package api
 
 import (
 	"context"
+
 	"github.com/OpenIMSDK/chat/pkg/common/config"
 	"github.com/OpenIMSDK/tools/discoveryregistry"
 	"github.com/gin-gonic/gin"

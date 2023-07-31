@@ -16,8 +16,6 @@ package chat
 
 import (
 	"context"
-
-
 	"gorm.io/gorm"
 
 	"github.com/OpenIMSDK/chat/pkg/common/db/table/chat"
