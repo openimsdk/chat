@@ -22,7 +22,7 @@ on:
     types:
       - assigned
   pull_request:
-    types: 
+    types:
       - assigned
 
 jobs:

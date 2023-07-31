@@ -44,6 +44,7 @@ jobs:
       run: |
         sudo make build
         sudo chmod +x ./scripts/build_all_service.sh
+        sudo ./scripts/build_all_service.sh
       shell: bash
 
     - name: deploy all services
@@ -71,7 +72,7 @@ jobs:
 
     - name: start all services
       run: |
-        echo "pwd = $(pwd)"
+        ls -al && echo "pwd = $(pwd)"
         sudo chmod +x ./scripts/start_all.sh
         cd ./scripts
         sudo ./start_all.sh
@@ -79,6 +80,7 @@ jobs:
 
     - name: Check all services
       run: |
+        ls -al && echo "pwd = $(pwd)"
         sudo chmod +x ./check_all.sh
         sudo ./check_all.sh
         sudo cat ../logs/openIM.log 2>/dev/null
@@ -86,6 +88,7 @@ jobs:
 
     - name: Print openIM.log
       run: |
+        ls -al && echo "pwd = $(pwd)"
         sudo cat ../logs/* 2>/dev/null
         sudo cat ../logs/* 2>/dev/null >> "$GITHUB_OUTPUT"
       shell: bash
