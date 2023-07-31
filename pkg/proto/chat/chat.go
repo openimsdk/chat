@@ -9,6 +9,9 @@ import (
 )
 
 func (x *UpdateUserInfoReq) Check() error {
+	if x.UserID == "" {
+		return errs.ErrArgs.Wrap("userID is empty")
+	}
 	if x.Email != nil && x.Email.Value != "" {
 		if err := EmailCheck(x.Email.Value); err != nil {
 			return err
@@ -180,7 +183,7 @@ func (x *SearchUserFullInfoReq) Check() error {
 	if x.Pagination.ShowNumber < 1 {
 		return errs.ErrArgs.Wrap("showNumber is invalid")
 	}
-	if x.Normal > constant.FinDAllUser || x.Normal < constant.FindNormalUser {
+	if x.Normal < constant.FinDAllUser || x.Normal > constant.FindNormalUser {
 		return errs.ErrArgs.Wrap("normal flied is invalid")
 	}
 	return nil

@@ -62,7 +62,7 @@ log:
 #  isJson: false
 #  withStack: false
 
-secret: openIM123
+# secret: openIM123
 #tokenPolicy:
 #  expire: 86400
 

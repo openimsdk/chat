@@ -43,7 +43,7 @@ func (a caller[Req, Resp]) Call(ctx context.Context, req *Req) (*Resp, error) {
 		log.ZError(ctx, "caller resp", err)
 		return nil, err
 	}
-	log.ZError(ctx, "caller resp", err, "resp", resp)
+	log.ZInfo(ctx, "resp", resp)
 	return resp, nil
 }
 
