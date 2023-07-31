@@ -212,76 +212,76 @@ changelog:
     - title: Other work
       order: 9999
 
-dockers:
-  - image_templates:
-      - "openim/openim-chat:{{ .Tag }}-amd64"
-      - "ghcr.io/openimsdk/openim-chat:{{ .Tag }}-amd64"
-      - "registry.cn-hangzhou.aliyuncs.com/openimsdk/openim-chat:{{ .Tag }}-amd64"
-    build_flag_templates:
-      - "--pull"
-      - "--label=io.artifacthub.package.readme-url=https://raw.githubusercontent.com/OpenIMSDK/chat/main/README.md"
-      - "--label=io.artifacthub.package.logo-url=hhttps://github.com/OpenIMSDK/chat/blob/main/assets/logo/openim-logo-green.png"
-      - '--label=io.artifacthub.package.maintainers=[{"name":"Xinwei Xiong","email":"3293172751nss@gmail.com"}]'
-      - "--label=io.artifacthub.package.license=Apace-2.0"
-      - "--label=org.opencontainers.image.description=OpenIM Open source top instant messaging system"
-      - "--label=org.opencontainers.image.created={{.Date}}"
-      - "--label=org.opencontainers.image.name={{.ProjectName}}"
-      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
-      - "--label=org.opencontainers.image.version={{.Version}}"
-      - "--label=org.opencontainers.image.source={{.GitURL}}"
-      - "--platform=linux/amd64"
-    goos: linux
-    goarch: amd64
-    dockerfile: Dockerfile
-    use: buildx
+# dockers:
+#   - image_templates:
+#       - "openim/openim-chat:{{ .Tag }}-amd64"
+#       - "ghcr.io/openimsdk/openim-chat:{{ .Tag }}-amd64"
+#       - "registry.cn-hangzhou.aliyuncs.com/openimsdk/openim-chat:{{ .Tag }}-amd64"
+#     build_flag_templates:
+#       - "--pull"
+#       - "--label=io.artifacthub.package.readme-url=https://raw.githubusercontent.com/OpenIMSDK/chat/main/README.md"
+#       - "--label=io.artifacthub.package.logo-url=hhttps://github.com/OpenIMSDK/chat/blob/main/assets/logo/openim-logo-green.png"
+#       - '--label=io.artifacthub.package.maintainers=[{"name":"Xinwei Xiong","email":"3293172751nss@gmail.com"}]'
+#       - "--label=io.artifacthub.package.license=Apace-2.0"
+#       - "--label=org.opencontainers.image.description=OpenIM Open source top instant messaging system"
+#       - "--label=org.opencontainers.image.created={{.Date}}"
+#       - "--label=org.opencontainers.image.name={{.ProjectName}}"
+#       - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+#       - "--label=org.opencontainers.image.version={{.Version}}"
+#       - "--label=org.opencontainers.image.source={{.GitURL}}"
+#       - "--platform=linux/amd64"
+#     goos: linux
+#     goarch: amd64
+#     dockerfile: Dockerfile
+#     use: buildx
 
-  - image_templates:
-      - "openim/openim-chat:{{ .Tag }}-arm64"
-      - "ghcr.io/openimsdk/openim-chat:{{ .Tag }}-arm64"
-      - "registry.cn-hangzhou.aliyuncs.com/openimsdk/openim-chat:{{ .Tag }}-arm64"
-    build_flag_templates:
-      - "--pull"
-      - "--label=io.artifacthub.package.readme-url=https://raw.githubusercontent.com/OpenIMSDK/chat/main/README.md"
-      - "--label=io.artifacthub.package.logo-url=hhttps://github.com/OpenIMSDK/chat/blob/main/assets/logo/openim-logo-green.png"
-      - '--label=io.artifacthub.package.maintainers=[{"name":"Xinwei Xiong","email":"3293172751nss@gmail.com"}]'
-      - "--label=io.artifacthub.package.license=Apace-2.0"
-      - "--label=org.opencontainers.image.description=OpenIM Open source top instant messaging system"
-      - "--label=org.opencontainers.image.created={{.Date}}"
-      - "--label=org.opencontainers.image.name={{.ProjectName}}"
-      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
-      - "--label=org.opencontainers.image.version={{.Version}}"
-      - "--label=org.opencontainers.image.source={{.GitURL}}"
-      - "--platform=linux/arm64"
-    goos: linux
-    goarch: arm64
-    dockerfile: Dockerfile
-    use: buildx
+#   - image_templates:
+#       - "openim/openim-chat:{{ .Tag }}-arm64"
+#       - "ghcr.io/openimsdk/openim-chat:{{ .Tag }}-arm64"
+#       - "registry.cn-hangzhou.aliyuncs.com/openimsdk/openim-chat:{{ .Tag }}-arm64"
+#     build_flag_templates:
+#       - "--pull"
+#       - "--label=io.artifacthub.package.readme-url=https://raw.githubusercontent.com/OpenIMSDK/chat/main/README.md"
+#       - "--label=io.artifacthub.package.logo-url=hhttps://github.com/OpenIMSDK/chat/blob/main/assets/logo/openim-logo-green.png"
+#       - '--label=io.artifacthub.package.maintainers=[{"name":"Xinwei Xiong","email":"3293172751nss@gmail.com"}]'
+#       - "--label=io.artifacthub.package.license=Apace-2.0"
+#       - "--label=org.opencontainers.image.description=OpenIM Open source top instant messaging system"
+#       - "--label=org.opencontainers.image.created={{.Date}}"
+#       - "--label=org.opencontainers.image.name={{.ProjectName}}"
+#       - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+#       - "--label=org.opencontainers.image.version={{.Version}}"
+#       - "--label=org.opencontainers.image.source={{.GitURL}}"
+#       - "--platform=linux/arm64"
+#     goos: linux
+#     goarch: arm64
+#     dockerfile: Dockerfile
+#     use: buildx
 
-docker_manifests:
-  - name_template: "openim/openim-chat:{{ .Tag }}"
-    image_templates:
-      - "openim/openim-chat:{{ .Tag }}-amd64"
-      - "openim/openim-chat:{{ .Tag }}-arm64"
-  - name_template: "ghcr.io/openimsdk/openim-chat:{{ .Tag }}"
-    image_templates:
-      - "ghcr.io/openimsdk/openim-chat:{{ .Tag }}-amd64"
-      - "ghcr.io/openimsdk/openim-chat:{{ .Tag }}-arm64"
-  - name_template: "registry.cn-hangzhou.aliyuncs.com/openimsdk/openim-chat:{{ .Tag }}"
-    image_templates:
-      - "registry.cn-hangzhou.aliyuncs.com/openimsdk/openim-chat:{{ .Tag }}-amd64"
-      - "registry.cn-hangzhou.aliyuncs.com/openimsdk/openim-chat:{{ .Tag }}-arm64"
-  - name_template: "openim/openim-chat:latest"
-    image_templates:
-      - "openim/openim-chat:{{ .Tag }}-amd64"
-      - "openim/openim-chat:{{ .Tag }}-arm64"
-  - name_template: "ghcr.io/openimsdk/openim-chat:latest"
-    image_templates:
-      - "ghcr.io/openimsdk/openim-chat:{{ .Tag }}-amd64"
-      - "ghcr.io/openimsdk/openim-chat:{{ .Tag }}-arm64"
-  - name_template: "registry.cn-hangzhou.aliyuncs.com/openimsdk/openim-chat:latest"
-    image_templates:
-      - "registry.cn-hangzhou.aliyuncs.com/openimsdk/openim-chat:{{ .Tag }}-amd64"
-      - "registry.cn-hangzhou.aliyuncs.com/openimsdk/openim-chat:{{ .Tag }}-arm64"
+# docker_manifests:
+#   - name_template: "openim/openim-chat:{{ .Tag }}"
+#     image_templates:
+#       - "openim/openim-chat:{{ .Tag }}-amd64"
+#       - "openim/openim-chat:{{ .Tag }}-arm64"
+#   - name_template: "ghcr.io/openimsdk/openim-chat:{{ .Tag }}"
+#     image_templates:
+#       - "ghcr.io/openimsdk/openim-chat:{{ .Tag }}-amd64"
+#       - "ghcr.io/openimsdk/openim-chat:{{ .Tag }}-arm64"
+#   - name_template: "registry.cn-hangzhou.aliyuncs.com/openimsdk/openim-chat:{{ .Tag }}"
+#     image_templates:
+#       - "registry.cn-hangzhou.aliyuncs.com/openimsdk/openim-chat:{{ .Tag }}-amd64"
+#       - "registry.cn-hangzhou.aliyuncs.com/openimsdk/openim-chat:{{ .Tag }}-arm64"
+#   - name_template: "openim/openim-chat:latest"
+#     image_templates:
+#       - "openim/openim-chat:{{ .Tag }}-amd64"
+#       - "openim/openim-chat:{{ .Tag }}-arm64"
+#   - name_template: "ghcr.io/openimsdk/openim-chat:latest"
+#     image_templates:
+#       - "ghcr.io/openimsdk/openim-chat:{{ .Tag }}-amd64"
+#       - "ghcr.io/openimsdk/openim-chat:{{ .Tag }}-arm64"
+#   - name_template: "registry.cn-hangzhou.aliyuncs.com/openimsdk/openim-chat:latest"
+#     image_templates:
+#       - "registry.cn-hangzhou.aliyuncs.com/openimsdk/openim-chat:{{ .Tag }}-amd64"
+#       - "registry.cn-hangzhou.aliyuncs.com/openimsdk/openim-chat:{{ .Tag }}-arm64"
 
 nfpms:
   - id: packages
@@ -318,26 +318,26 @@ nfpms:
 # Default: './dist'
 dist: ./_output/dist
 
-# .goreleaser.yaml
-milestones:
-  # You can have multiple milestone configs
-  -
-    # Repository for the milestone
-    # Default is extracted from the origin remote URL
-    repo:
-      owner: user
-      name: repo
+# # .goreleaser.yaml
+# milestones:
+#   # You can have multiple milestone configs
+#   -
+#     # Repository for the milestone
+#     # Default is extracted from the origin remote URL
+#     repo:
+#       owner: OpenIMSDK
+#       name: chat
 
-    # Whether to close the milestone
-    close: true
+#     # Whether to close the milestone
+#     close: true
 
-    # Fail release on errors, such as missing milestone.
-    fail_on_error: false
+#     # Fail release on errors, such as missing milestone.
+#     fail_on_error: false
 
-    # Name of the milestone
-    #
-    # Default: '{{ .Tag }}'
-    name_template: "Current Release"
+#     # Name of the milestone
+#     #
+#     Default: '{{ .Tag }}'
+#     name_template: "Current Release"
 
 publishers:
   - name: "fury.io"
