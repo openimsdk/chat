@@ -81,6 +81,7 @@ jobs:
     - name: Check all services
       run: |
         ls -al && echo "pwd = $(pwd)"
+        cd ./scripts
         sudo chmod +x ./check_all.sh
         sudo ./check_all.sh
         sudo cat ../logs/openIM.log 2>/dev/null
@@ -89,7 +90,7 @@ jobs:
     - name: Print openIM.log
       run: |
         ls -al && echo "pwd = $(pwd)"
-        sudo cat ../logs/* 2>/dev/null
-        sudo cat ../logs/* 2>/dev/null >> "$GITHUB_OUTPUT"
+        sudo cat ./logs/* 2>/dev/null
+        sudo cat ./logs/* 2>/dev/null >> "$GITHUB_OUTPUT"
       shell: bash
       continue-on-error: true
