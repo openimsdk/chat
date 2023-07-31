@@ -215,7 +215,7 @@ changelog:
 dockers:
   - image_templates:
       - "openim/openim-chat:{{ .Tag }}-amd64"
-      - "ghcr.io/{{ .Env.USERNAME }}/openim-chat:{{ .Tag }}-amd64"
+      - "ghcr.io/openimsdk/openim-chat:{{ .Tag }}-amd64"
       - "registry.cn-hangzhou.aliyuncs.com/openimsdk/openim-chat:{{ .Tag }}-amd64"
     build_flag_templates:
       - "--pull"
