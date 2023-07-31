@@ -65,6 +65,9 @@ jobs:
       - uses: cachix/install-nix-action@v22
         with:
           github_access_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: snapcraft-login
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: snapcraft login --with <(echo "${{ secrets.SNAPCRAFT_TOKEN }}")
       # More assembly might be required: Docker logins, GPG, etc. It all depends
       # on your needs.
       - name: Set up QEMU
@@ -96,10 +99,6 @@ jobs:
           username: ${{ secrets.ALIREGISTRY_USERNAME }}
           password: ${{ secrets.ALIREGISTRY_TOKEN }}
 
-    #   - name: snapcraft-login
-    #     if: startsWith(github.ref, 'refs/tags/v')
-    #     run: snapcraft login --with <(echo "${{ secrets.SNAPCRAFT_TOKEN }}")
-
       - uses: goreleaser/goreleaser-action@v4
         with:
           # either 'goreleaser' (default) or 'goreleaser-pro':
@@ -112,3 +111,5 @@ jobs:
           # Your GoReleaser Pro key, if you are using the 'goreleaser-pro'
           # distribution:
           # GORELEASER_KEY: ${{ secrets.GORELEASER_KEY }}
+          FURY_TOKEN: ${{ secrets.FURY_TOKEN }}
+          
