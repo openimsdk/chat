@@ -356,14 +356,14 @@ publishers:
         echo "Skipping deployment: Non-production release detected"
       fi'
 
-snapcrafts:
-  - name_template: "{{ .ProjectName }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}"
-    summary: openim is open source instant messaging
-    description: |
-      OpenIM yyds
-    grade: stable
-    confinement: classic
-    publish: true
+# snapcrafts:
+#   - name_template: "{{ .ProjectName }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}"
+#     summary: openim is open source instant messaging
+#     description: |
+#       OpenIM yyds
+#     grade: stable
+#     confinement: classic
+#     publish: true
 
 checksum:
   name_template: "{{ .ProjectName }}_checksums.txt"

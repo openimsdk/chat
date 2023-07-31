@@ -65,9 +65,9 @@ jobs:
       - uses: cachix/install-nix-action@v22
         with:
           github_access_token: ${{ secrets.GITHUB_TOKEN }}
-      - name: snapcraft-login
-        if: startsWith(github.ref, 'refs/tags/v')
-        run: snapcraft login --with <(echo "${{ secrets.SNAPCRAFT_TOKEN }}")
+    #   - name: snapcraft-login
+    #     if: startsWith(github.ref, 'refs/tags/v')
+    #     run: snapcraft login --with <(echo "${{ secrets.SNAPCRAFT_TOKEN }}")
       # More assembly might be required: Docker logins, GPG, etc. It all depends
       # on your needs.
       - name: Set up QEMU
