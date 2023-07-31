@@ -16,9 +16,10 @@ package mctx
 
 import (
 	"context"
+	"strconv"
+
 	"github.com/OpenIMSDK/chat/pkg/common/config"
 	"github.com/OpenIMSDK/tools/utils"
-	"strconv"
 
 	constant2 "github.com/OpenIMSDK/protocol/constant"
 	"github.com/OpenIMSDK/tools/errs"

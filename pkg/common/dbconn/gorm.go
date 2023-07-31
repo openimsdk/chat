@@ -16,6 +16,8 @@ package dbconn
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/OpenIMSDK/chat/pkg/common/config"
 	"github.com/OpenIMSDK/tools/errs"
 	"github.com/OpenIMSDK/tools/log"
@@ -24,7 +26,6 @@ import (
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
-	"time"
 )
 
 func NewMysqlGormDB() (*gorm.DB, error) {

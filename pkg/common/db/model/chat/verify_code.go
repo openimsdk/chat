@@ -16,10 +16,11 @@ package chat
 
 import (
 	"context"
+	"time"
+
 	"github.com/OpenIMSDK/chat/pkg/common/db/table/chat"
 	"github.com/OpenIMSDK/tools/errs"
 	"gorm.io/gorm"
-	"time"
 )
 
 func NewVerifyCode(db *gorm.DB) *VerifyCode {

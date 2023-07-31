@@ -16,6 +16,7 @@ package admin
 
 import (
 	"context"
+
 	"github.com/OpenIMSDK/tools/log"
 
 	"github.com/OpenIMSDK/chat/pkg/common/config"
@@ -50,15 +51,10 @@ func (*adminServer) ParseToken(ctx context.Context, req *admin.ParseTokenReq) (*
 }
 
 func (o *adminServer) GetUserToken(ctx context.Context, req *admin.GetUserTokenReq) (*admin.GetUserTokenResp, error) {
-
 	tokensMap, err := o.Database.GetTokens(ctx, req.UserID)
-
 	if err != nil {
-
 		return nil, err
-
 	}
 
 	return &admin.GetUserTokenResp{TokensMap: tokensMap}, nil
-
 }
