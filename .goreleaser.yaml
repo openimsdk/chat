@@ -230,8 +230,7 @@ dockers:
       - "--label=org.opencontainers.image.version={{.Version}}"
       - "--label=org.opencontainers.image.source={{.GitURL}}"
       - "--platform=linux/amd64"
-    ids: |
-      - chat
+    ids: openim-chat
     goos: linux
     goarch: amd64
     dockerfile: Dockerfile
@@ -254,8 +253,7 @@ dockers:
       - "--label=org.opencontainers.image.version={{.Version}}"
       - "--label=org.opencontainers.image.source={{.GitURL}}"
       - "--platform=linux/arm64"
-    ids: |
-      - chat
+    ids: openim-chat
     goos: linux
     goarch: arm64
     dockerfile: Dockerfile
