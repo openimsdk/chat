@@ -33,7 +33,6 @@ RUN CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} go build -o ./bin/open_im_admin_
 RUN CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} go build -o ./bin/open_im_chat ./cmd/rpc/chat
 RUN CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} go build -o ./bin/open_im_chat_api ./cmd/api/chat_api
 
-
 # Build the runtime stage
 FROM debian
 
