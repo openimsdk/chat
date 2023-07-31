@@ -72,7 +72,16 @@ for ((i = 0; i < ${#service_filename[*]}; i++)); do
       cmd="./${service_filename[$i]} -port ${service_ports[$j]} --config_folder_path ${config_path}"
     fi
     echo $cmd
-    nohup $cmd >>../logs/openIM.log 2>&1 &
+    current_time=$(date "+%Y-%m-%d_%H-%M-%S")
+        # 创建日志文件名
+        log_file_name="chat_${current_time}.log"
+        # 设置日志文件路径
+        log_file_path="$SCRIPTS_ROOT/../${log_file_name}"
+        # 创建日志文件
+        touch "$log_file_path"
+        # 设置日志文件权限为777
+        chmod 777 "$log_file_path"
+        nohup $cmd >> $log_file_path 2>&1 &
     sleep 1
 #    pid="netstat -ntlp|grep $j |awk '{printf \$7}'|cut -d/ -f1"
 #    echo -e "${GREEN_PREFIX}${service_filename[$i]} start success,port number:${service_ports[$j]} pid:$(eval $pid)$COLOR_SUFFIX"
