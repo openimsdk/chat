@@ -25,6 +25,7 @@ import (
 
 	"github.com/OpenIMSDK/protocol/constant"
 	openKeeper "github.com/OpenIMSDK/tools/discoveryregistry/zookeeper"
+	"github.com/OpenIMSDK/tools/utils"
 	"gopkg.in/yaml.v3"
 )
 
@@ -34,26 +35,31 @@ var (
 	Root = filepath.Join(filepath.Dir(b), "../../..")
 )
 
-func readConfig() ([]byte, error) {
-	cfgName := os.Getenv("CONFIG_NAME")
-	if len(cfgName) != 0 {
-		data, err := os.ReadFile(filepath.Join(cfgName, "config", "config.yaml"))
-		if err != nil {
-			data, err = os.ReadFile(filepath.Join(Root, "config", "config.yaml"))
-			if err != nil {
-				return nil, err
-			}
-		} else {
-			Root = cfgName
-		}
-		return data, nil
-	} else {
-		return os.ReadFile(fmt.Sprintf("../config/%s", "config.yaml"))
+func readConfig(configFile string) ([]byte, error) {
+	b, err := os.ReadFile(configFile)
+	if err != nil {
+		return nil, utils.Wrap(err, configFile)
 	}
+	return b, nil
+	// cfgName := os.Getenv("CONFIG_NAME")
+	// if len(cfgName) != 0 {
+	// 	data, err := os.ReadFile(filepath.Join(cfgName, "config", "config.yaml"))
+	// 	if err != nil {
+	// 		data, err = os.ReadFile(filepath.Join(Root, "config", "config.yaml"))
+	// 		if err != nil {
+	// 			return nil, err
+	// 		}
+	// 	} else {
+	// 		Root = cfgName
+	// 	}
+	// 	return data, nil
+	// } else {
+	// 	return os.ReadFile(fmt.Sprintf("../config/%s", "config.yaml"))
+	// }
 }
 
-func InitConfig() error {
-	data, err := readConfig()
+func InitConfig(configFile string) error {
+	data, err := readConfig(configFile)
 	if err != nil {
 		return fmt.Errorf("read loacl config file error: %w", err)
 	}
@@ -64,7 +70,7 @@ func InitConfig() error {
 		openKeeper.WithFreq(time.Hour), openKeeper.WithUserNameAndPassword(Config.Zookeeper.Username,
 			Config.Zookeeper.Password), openKeeper.WithRoundRobin(), openKeeper.WithTimeout(10), openKeeper.WithLogger(&zkLogger{}))
 	if err != nil {
-		return fmt.Errorf("conn zk error: %w", err)
+		return utils.Wrap(err, "conn zk error ")
 	}
 	defer zk.CloseZK()
 	var openIMConfigData []byte
@@ -111,8 +117,9 @@ func InitConfig() error {
 	configFieldCopy(&Config.TokenPolicy.Expire, imConfig.TokenPolicy.Expire)
 
 	configData, err := yaml.Marshal(&Config)
+	fmt.Printf("debug: %s\nconfig:\n%s\n", time.Now(), string(configData))
 	if err != nil {
-		return err
+		return utils.Wrap(err, configFile)
 	}
 	fmt.Printf("%s\nconfig:\n%s\n", time.Now(), string(configData))
 

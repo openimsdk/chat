@@ -42,7 +42,7 @@ COPY --from=builder /workspace/config/config.yaml $WORKDIR/config/config.yaml
 RUN mkdir $WORKDIR/logs && \
     chmod +x $WORKDIR/bin/open_im_admin $WORKDIR/bin/open_im_chat $WORKDIR/bin/open_im_admin_api $WORKDIR/bin/open_im_chat_api
 RUN apt-get -qq update \
-    && apt-get -qq install -y --no-install-recommends ca-certificates curl
+    && apt-get -qq install -y --no-install-recommends ca-certificates curl bash
 
 VOLUME ["/chat/logs","/chat/config","/chat/scripts"]
 
