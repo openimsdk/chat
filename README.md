@@ -5,7 +5,10 @@
 Refer to `config/config.yaml` for configuration instructions
 
 ## 🧩 Awesome features
-
+1. This repository implement a business system, which consists of two parts: User related function and background management function
+2. The business system depends on the api of the im system ([Open-IM-Server repository](https://github.com/OpenIMSDK/Open-IM-Server)) and implement various functions by calling the api of the im system
+3. User related part includes some regular functions like user login, user register, user info update, etc.
+4. Background management provides api for admin to manage the im system containing functions like user management, message mangement,group management,etc.
 
 ## 🛫 Quick start 
 
@@ -18,8 +21,17 @@ git clone https://github.com/OpenIMSDK/chat openim-chat && export openim-chat=$(
 ```
 
 ### Developing chat
+
+If you wish to deploy chat, then you should first install and deploy OpenIM, this [Open-IM-Server repository](https://github.com/OpenIMSDK/Open-IM-Server)
+
+```bash
+git clone -b release-v3.1 https://github.com/OpenIMSDK/Open-IM-Server.git openim && export openim=$(pwd)/openim && cd $openim
+sudo docker compose up -d
 ```
 
+Installing Chat
+```
+make install
 ```
 
 ## 🛫 Quick start 
@@ -33,7 +45,6 @@ git clone https://github.com/OpenIMSDK/chat openim-chat && export openim-chat=$(
 
 ```bash
 make build
-```
 ```
 
 ### 📖 Contributors get up to speed
