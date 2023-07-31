@@ -1,16 +1,13 @@
 name: OpenIM Buildx Docker Images
 
 on:
-    schedule:
-      - cron: "0 10 * * *"
     push:
       branches:
-        - "**"
+        - main
+        - release-*
       tags:
-        - "v*.*.*"
-    pull_request:
-      branches:
-        - "main"
+        - v*
+    workflow_dispatch:
 
 env:
   IMAGE_NAME: openim-chat
