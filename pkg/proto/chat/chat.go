@@ -150,9 +150,6 @@ func (x *ChangePasswordReq) Check() error {
 	if x.UserID == "" {
 		return errs.ErrArgs.Wrap("userID is empty")
 	}
-	if x.CurrentPassword == "" {
-		return errs.ErrArgs.Wrap("currentPassword is empty")
-	}
 	if x.NewPassword == "" {
 		return errs.ErrArgs.Wrap("newPassword is empty")
 	}
