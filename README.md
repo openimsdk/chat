@@ -5,7 +5,10 @@
 Refer to `config/config.yaml` for configuration instructions
 
 ## 🧩 Awesome features
-
+1. This repository implement a business system, which consists of two parts: User related function and background management function
+2. The business system depends on the api of the im system ([Open-IM-Server repository](https://github.com/OpenIMSDK/Open-IM-Server)) and implement various functions by calling the api of the im system
+3. User related part includes some regular functions like user login, user register, user info update, etc.
+4. Background management provides api for admin to manage the im system containing functions like user management, message mangement,group management,etc.
 
 ## 🛫 Quick start 
 
