@@ -241,9 +241,7 @@ func (o *AdminApi) ParseToken(c *gin.Context) {
 }
 
 func (o *AdminApi) BlockUser(c *gin.Context) {
-	var (
-		req admin.BlockUserReq
-	)
+	var req admin.BlockUserReq
 	if err := c.BindJSON(&req); err != nil {
 		apiresp.GinError(c, err)
 		return

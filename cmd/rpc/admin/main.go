@@ -16,28 +16,20 @@ package main
 
 import (
 	"flag"
-	"net/http"
-
 	"github.com/OpenIMSDK/chat/pkg/common/chatrpcstart"
 	"github.com/OpenIMSDK/tools/log"
-
-	_ "net/http/pprof"
 
 	"github.com/OpenIMSDK/chat/internal/rpc/admin"
 	"github.com/OpenIMSDK/chat/pkg/common/config"
 )
 
 func main() {
-	go func() {
-		_ = http.ListenAndServe(":6063", nil)
-	}()
 	var configFile string
 	flag.StringVar(&configFile, "config_folder_path", "../config/config.yaml", "Config full path")
 
 	var rpcPort int
 
 	flag.IntVar(&rpcPort, "port", 30200, "get rpc ServerPort from cmd")
-
 
 	flag.Parse()
 	if err := config.InitConfig(configFile); err != nil {

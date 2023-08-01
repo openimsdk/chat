@@ -16,6 +16,8 @@ package database
 
 import (
 	"context"
+	"time"
+
 	constant2 "github.com/OpenIMSDK/chat/pkg/common/constant"
 	admin2 "github.com/OpenIMSDK/chat/pkg/common/db/model/admin"
 	"github.com/OpenIMSDK/chat/pkg/common/db/model/chat"
@@ -24,7 +26,6 @@ import (
 	"github.com/OpenIMSDK/tools/errs"
 	"github.com/OpenIMSDK/tools/tx"
 	"gorm.io/gorm"
-	"time"
 )
 
 type ChatDatabaseInterface interface {

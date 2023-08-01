@@ -16,6 +16,10 @@ package api
 
 import (
 	"fmt"
+	"io"
+	"net"
+	"time"
+
 	"github.com/OpenIMSDK/chat/pkg/common/apicall"
 	"github.com/OpenIMSDK/chat/pkg/common/apistruct"
 	constant2 "github.com/OpenIMSDK/chat/pkg/common/constant"
@@ -23,9 +27,6 @@ import (
 	"github.com/OpenIMSDK/protocol/sdkws"
 	"github.com/OpenIMSDK/tools/checker"
 	"github.com/OpenIMSDK/tools/log"
-	"io"
-	"net"
-	"time"
 
 	"github.com/OpenIMSDK/protocol/constant"
 	"github.com/OpenIMSDK/tools/a2r"

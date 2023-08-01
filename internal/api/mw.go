@@ -15,6 +15,8 @@
 package api
 
 import (
+	"strconv"
+
 	"github.com/OpenIMSDK/chat/pkg/common/constant"
 	constant2 "github.com/OpenIMSDK/protocol/constant"
 	"github.com/OpenIMSDK/tools/apiresp"
@@ -22,7 +24,6 @@ import (
 	"github.com/OpenIMSDK/tools/log"
 	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc"
-	"strconv"
 
 	"github.com/OpenIMSDK/chat/pkg/proto/admin"
 )
@@ -84,6 +85,7 @@ func (o *MW) isValidToken(c *gin.Context, userID string, token string) error {
 	}
 	return nil
 }
+
 func (o *MW) setToken(c *gin.Context, userID string, userType int32) {
 	c.Set(constant.RpcOpUserID, userID)
 	c.Set(constant.RpcOpUserType, []string{strconv.Itoa(int(userType))})
