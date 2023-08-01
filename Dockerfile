@@ -12,51 +12,42 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Use golang as the builder stage
-FROM golang:1.20 as builder
-
-WORKDIR /workspace
-
-ENV GOPROXY=https://goproxy.cn
-
 ARG GOARCH
 ARG GOOS
 
-# Copy source code files into the image
+# Use golang as the builder stage
+FROM golang:1.20 AS builder
+
+ARG GO111MODULE=on
+ARG GOPROXY=https://goproxy.cn,direct
+
+WORKDIR /openim/openim-chat
+
+ENV GO111MODULE=$GO111MODULE
+ENV GOPROXY=$GOPROXY
+
 COPY . .
 
 RUN go mod download
 
 # Compile the source code
-RUN CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} go build -o ./bin/open_im_admin ./cmd/rpc/admin
-RUN CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} go build -o ./bin/open_im_admin_api ./cmd/api/admin_api
-RUN CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} go build -o ./bin/open_im_chat ./cmd/rpc/chat
-RUN CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} go build -o ./bin/open_im_chat_api ./cmd/api/chat_api
+RUN CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} go build -o /openim/openim-chat/bin/open_im_admin ./cmd/rpc/admin
+RUN CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} go build -o /openim/openim-chat/bin/open_im_admin_api ./cmd/api/admin_api
+RUN CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} go build -o /openim/openim-chat/bin/open_im_chat ./cmd/rpc/chat
+RUN CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} go build -o /openim/openim-chat/bin/open_im_chat_api ./cmd/api/chat_api
 
 # Build the runtime stage
-FROM alpine
-
-RUN echo "https://mirrors.aliyun.com/alpine/v3.4/main" > /etc/apk/repositories && \
-    apk --no-cache add tzdata ca-certificates bash
+FROM ghcr.io/openim-sigs/openim-bash-image:v1.0.1
 
 # Set fixed project path
-ENV WORKDIR /chat
-ENV CMDDIR $WORKDIR/scripts
-ENV CONFIG_NAME $WORKDIR/config/config.yaml
+WORKDIR /openim/openim-chat
 
 # Copy the executable files to the target directory
-COPY --from=builder /workspace/bin/open_im_admin $WORKDIR/bin/open_im_admin
-COPY --from=builder /workspace/bin/open_im_admin_api $WORKDIR/bin/open_im_admin_api
-COPY --from=builder /workspace/bin/open_im_chat $WORKDIR/bin/open_im_chat
-COPY --from=builder /workspace/bin/open_im_chat_api $WORKDIR/bin/open_im_chat_api
-COPY --from=builder /workspace/scripts $WORKDIR/scripts
-COPY --from=builder /workspace/config/config.yaml $WORKDIR/config/config.yaml
+COPY --from=builder ${OPENIM_CHAT_BINDIR} /openim/openim-chat/bin
 
-# Create several directories for mounting and add executable permissions
-RUN mkdir $WORKDIR/logs && \
-    chmod +x $WORKDIR/bin/open_im_admin $WORKDIR/bin/open_im_chat $WORKDIR/bin/open_im_admin_api $WORKDIR/bin/open_im_chat_api
+COPY --from=builder ${OPENIM_CHAT_CMDDIR} /openim/openim-chat/scripts
+COPY --from=builder ${OPENIM_CHAT_CONFIG_NAME} /openim/openim-chat/config/config.yaml
 
-VOLUME ["/chat/logs","/chat/config","/chat/scripts"]
+WORKDIR $OPENIM_CHAT_CMDDIR
 
-WORKDIR $CMDDIR
 CMD ["./docker_start_all.sh"]
