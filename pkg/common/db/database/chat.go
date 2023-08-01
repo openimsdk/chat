@@ -50,6 +50,10 @@ type ChatDatabaseInterface interface {
 	LoginRecord(ctx context.Context, record *table.UserLoginRecord, verifyCodeID *uint) error
 	UpdatePassword(ctx context.Context, userID string, password string) error
 	UpdatePasswordAndDeleteVerifyCode(ctx context.Context, userID string, password string, code uint) error
+	NewUserCountTotal(ctx context.Context, before *time.Time) (int64, error)
+	NewUserCountRangeEverydayTotal(ctx context.Context, start *time.Time, end *time.Time) (map[string]int64, error)
+	UserLoginCountTotal(ctx context.Context, before *time.Time) (int64, error)
+	UserLoginCountRangeEverydayTotal(ctx context.Context, start *time.Time, end *time.Time) (map[string]int64, error)
 }
 
 func NewChatDatabase(db *gorm.DB) ChatDatabaseInterface {
@@ -215,4 +219,20 @@ func (o *ChatDatabase) UpdatePasswordAndDeleteVerifyCode(ctx context.Context, us
 		}
 		return nil
 	})
+}
+
+func (o *ChatDatabase) NewUserCountTotal(ctx context.Context, before *time.Time) (int64, error) {
+	return o.register.CountTotal(ctx, before)
+}
+
+func (o *ChatDatabase) NewUserCountRangeEverydayTotal(ctx context.Context, start *time.Time, end *time.Time) (map[string]int64, error) {
+	return o.register.CountRangeEverydayTotal(ctx, start, end)
+}
+
+func (o *ChatDatabase) UserLoginCountTotal(ctx context.Context, before *time.Time) (int64, error) {
+	return o.userLoginRecord.CountTotal(ctx, before)
+}
+
+func (o *ChatDatabase) UserLoginCountRangeEverydayTotal(ctx context.Context, start *time.Time, end *time.Time) (map[string]int64, error) {
+	return o.userLoginRecord.CountRangeEverydayTotal(ctx, start, end)
 }

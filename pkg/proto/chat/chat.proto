@@ -240,6 +240,27 @@ message SearchUserFullInfoResp{
   repeated OpenIMChat.common.UserFullInfo users = 2;
 }
 
+message NewUserCountReq{
+  int64 start =1;
+  int64 end=2;
+}
+
+message NewUserCountResp{
+  int64 total=1;
+  int64 before=2;
+  map<string,int64>Count=3;
+}
+
+message UserLoginCountReq{
+  int64 start =1;
+  int64 end=2;
+}
+
+message UserLoginCountResp{
+  int64 total=1;
+  int64 before=2;
+  map<string,int64>Count=3;
+}
 
 service chat {
   //编辑个人资料 自己或者管理员调用
@@ -265,4 +286,8 @@ service chat {
   rpc GetSignalRecords(GetSignalRecordsReq) returns(GetSignalRecordsResp);
 
   rpc OpenIMCallback(OpenIMCallbackReq) returns(OpenIMCallbackResp);
+
+  //统计
+  rpc NewUserCount(NewUserCountReq) returns (NewUserCountResp);
+  rpc UserLoginCount(UserLoginCountReq) returns (UserLoginCountResp);
 }
