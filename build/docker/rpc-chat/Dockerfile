@@ -26,6 +26,8 @@ WORKDIR /openim/openim-chat
 ENV GO111MODULE=$GO111MODULE
 ENV GOPROXY=$GOPROXY
 
+COPY go.mod .
+COPY go.sum .
 COPY . .
 
 RUN go mod download
@@ -42,3 +44,4 @@ env PORT=30300
 
 EXPOSE ${PORT}
 CMD ["${OPENIM_CHAT_BINDIR}/open_im_chat_rpc","--port", "${PORT}","--config_folder_path","${OPENIM_CHAT_CONFIG_NAME}"]
+CMD ["/openim/openim-chat/bin/open_im_chat_rpc","--port", "30300","--config_folder_path","/openim/openim-chat/config/config.yaml"]
