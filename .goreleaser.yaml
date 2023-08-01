@@ -215,7 +215,7 @@ changelog:
 # dockers:
 #   - image_templates:
 #       - "openim/openim-chat:{{ .Tag }}-amd64"
-#       - "ghcr.io/{{ .Env.USERNAME }}/openim-chat:{{ .Tag }}-amd64"
+#       - "ghcr.io/openimsdk/openim-chat:{{ .Tag }}-amd64"
 #       - "registry.cn-hangzhou.aliyuncs.com/openimsdk/openim-chat:{{ .Tag }}-amd64"
 #     build_flag_templates:
 #       - "--pull"
@@ -230,8 +230,6 @@ changelog:
 #       - "--label=org.opencontainers.image.version={{.Version}}"
 #       - "--label=org.opencontainers.image.source={{.GitURL}}"
 #       - "--platform=linux/amd64"
-#     ids: |
-#       - chat
 #     goos: linux
 #     goarch: amd64
 #     dockerfile: Dockerfile
@@ -254,8 +252,6 @@ changelog:
 #       - "--label=org.opencontainers.image.version={{.Version}}"
 #       - "--label=org.opencontainers.image.source={{.GitURL}}"
 #       - "--platform=linux/arm64"
-#     ids: |
-#       - chat
 #     goos: linux
 #     goarch: arm64
 #     dockerfile: Dockerfile
@@ -322,26 +318,26 @@ nfpms:
 # Default: './dist'
 dist: ./_output/dist
 
-# .goreleaser.yaml
-milestones:
-  # You can have multiple milestone configs
-  -
-    # Repository for the milestone
-    # Default is extracted from the origin remote URL
-    repo:
-      owner: user
-      name: repo
+# # .goreleaser.yaml
+# milestones:
+#   # You can have multiple milestone configs
+#   -
+#     # Repository for the milestone
+#     # Default is extracted from the origin remote URL
+#     repo:
+#       owner: OpenIMSDK
+#       name: chat
 
-    # Whether to close the milestone
-    close: true
+#     # Whether to close the milestone
+#     close: true
 
-    # Fail release on errors, such as missing milestone.
-    fail_on_error: false
+#     # Fail release on errors, such as missing milestone.
+#     fail_on_error: false
 
-    # Name of the milestone
-    #
-    # Default: '{{ .Tag }}'
-    name_template: "Current Release"
+#     # Name of the milestone
+#     #
+#     Default: '{{ .Tag }}'
+#     name_template: "Current Release"
 
 publishers:
   - name: "fury.io"
@@ -388,7 +384,7 @@ release:
 
     This release is only possible thanks to **all** the support of some **awesome people**!
 
-    https://github.com/OpenIMSDK/Open-IM-Server/blob/main/docs/conversions/version.md
+    If you wish to use mirroring, read OpenIM's [image management policy](https://github.com/OpenIMSDK/Open-IM-Server/blob/main/docs/conversions/images.md)
 
     **Want to be one of them 😘?**
 
