@@ -1,0 +1,38 @@
+name: Create Tag
+
+on:
+  issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
+
+jobs:
+  create_tag:
+    runs-on: ubuntu-latest
+    if: startsWith(github.event.comment.body, '/create tag')
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Validate version number and get comment
+        id: validate
+        run: |
+          COMMENT="${{ github.event.comment.body }}"
+          VERSION=$(echo $COMMENT | cut -d ' ' -f 3)
+          TAG_COMMENT=$(echo $COMMENT | cut -d '"' -f 2)
+          if [[ $VERSION =~ ^v([0-9]+\.){2}[0-9]+$ ]]; then
+            echo "::set-output name=version::$VERSION"
+            echo "::set-output name=tag_comment::$TAG_COMMENT"
+          else
+            echo "Invalid version number."
+            exit 1
+          fi
+
+      - name: Create a new tag
+        env:
+          GH_TOKEN: ${{ secrets.BOT_GITHUB_TOKEN }}
+        run: |
+          VERSION=${{ steps.validate.outputs.version }}
+          TAG_COMMENT=${{ steps.validate.outputs.tag_comment }}
+          git tag -a $VERSION -m "$TAG_COMMENT"
+          git push origin $VERSION
