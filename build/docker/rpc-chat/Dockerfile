@@ -1,0 +1,44 @@
+# Copyright © 2023 OpenIM open source community. All rights reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Set go mod installation source and proxy
+ARG GOARCH
+ARG GOOS
+
+FROM golang:1.20 AS builder
+
+ARG GO111MODULE=on
+ARG GOPROXY=https://goproxy.cn,direct
+
+WORKDIR /openim/openim-chat
+
+ENV GO111MODULE=$GO111MODULE
+ENV GOPROXY=$GOPROXY
+
+COPY . .
+
+RUN go mod download
+RUN CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} go build -o /openim/openim-chat/bin/open_im_chat_rpc ./cmd/rpc/chat
+
+FROM ghcr.io/openim-sigs/openim-bash-image:v1.0.1
+
+WORKDIR ${CHAT_WORKDIR}
+
+COPY --from=builder ${OPENIM_CHAT_BINDIR}/open_im_chat_rpc /openim/openim-chat/bin/open_im_chat_rpc
+COPY --from=builder ${OPENIM_CHAT_CONFIG_NAME} /openim/openim-chat/config/config.yaml
+
+env PORT=30300
+
+EXPOSE ${PORT}
+CMD ["${OPENIM_CHAT_BINDIR}/open_im_chat_rpc","--port", "${PORT}","--config_folder_path","${OPENIM_CHAT_CONFIG_NAME}"]
