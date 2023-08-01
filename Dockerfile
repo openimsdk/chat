@@ -34,7 +34,10 @@ RUN CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} go build -o ./bin/open_im_chat .
 RUN CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} go build -o ./bin/open_im_chat_api ./cmd/api/chat_api
 
 # Build the runtime stage
-FROM debian
+FROM alpine
+
+RUN echo "https://mirrors.aliyun.com/alpine/v3.4/main" > /etc/apk/repositories && \
+    apk --no-cache add tzdata ca-certificates bash
 
 # Set fixed project path
 ENV WORKDIR /chat
@@ -52,8 +55,6 @@ COPY --from=builder /workspace/config/config.yaml $WORKDIR/config/config.yaml
 # Create several directories for mounting and add executable permissions
 RUN mkdir $WORKDIR/logs && \
     chmod +x $WORKDIR/bin/open_im_admin $WORKDIR/bin/open_im_chat $WORKDIR/bin/open_im_admin_api $WORKDIR/bin/open_im_chat_api
-RUN apt-get -qq update \
-    && apt-get -qq install -y --no-install-recommends ca-certificates curl bash
 
 VOLUME ["/chat/logs","/chat/config","/chat/scripts"]
 

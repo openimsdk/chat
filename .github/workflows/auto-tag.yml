@@ -21,8 +21,8 @@ jobs:
           VERSION=$(echo $COMMENT | cut -d ' ' -f 3)
           TAG_COMMENT=$(echo $COMMENT | cut -d '"' -f 2)
           if [[ $VERSION =~ ^v([0-9]+\.){2}[0-9]+$ ]]; then
-            echo "::set-output name=version::$VERSION"
-            echo "::set-output name=tag_comment::$TAG_COMMENT"
+            echo "version=$VERSION" >> $GITHUB_STATE
+            echo "tag_comment=$TAG_COMMENT" >> $GITHUB_STATE
           else
             echo "Invalid version number."
             exit 1
@@ -32,7 +32,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.BOT_GITHUB_TOKEN }}
         run: |
-          VERSION=${{ steps.validate.outputs.version }}
-          TAG_COMMENT=${{ steps.validate.outputs.tag_comment }}
-          git tag -a $VERSION -m "$TAG_COMMENT"
+          source $GITHUB_STATE
+          git tag -a $VERSION -m "$tag_comment"
           git push origin $VERSION
+          echo "tag_created=$VERSION" >> $GITHUB_OUTPUT

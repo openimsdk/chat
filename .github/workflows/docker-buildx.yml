@@ -12,54 +12,38 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: OpenIM Buildx Docker Images
+name: Docker Buildx Images CI
 
 on:
-    push:
-      branches:
-        - main
-        - release-*
-      tags:
-        - v*
-    workflow_dispatch:
-
-env:
-  IMAGE_NAME: openim-chat
-  # Common versions
-  GO_VERSION: "1.20"
-  DEFAULT_OWNER: "OpenIMSDK"
+  schedule:
+  - cron: '0 23 * * *'
+  push:
+    branches:
+      - release-*
+      - main
+    tags:
+      - v*
+  workflow_dispatch:
 
 jobs:
-  build:
+  docker:
     runs-on: ubuntu-latest
-    # strategy:
-    #   matrix:
-    #     bin:
-    #       - openim-chat
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
-
-      - name: Setup Docker Buildx
+      - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
-      - name: Setup Golang with cache
-        uses: magnetikonline/action-golang-cache@v3
-        with:
-          go-version: ${{ env.GO_VERSION }}
-
-      - name: Docker metadata
+      - name: Extract metadata (tags, labels) for Docker
         id: meta
-        uses: docker/metadata-action@v4
+        uses: docker/metadata-action@v4.6.0
         with:
-          # list of Docker images to use as base name for tags
           images: |
-            openim/${{env.IMAGE_NAME}}
-            registry.cn-hangzhou.aliyuncs.com/${{github.repository_owner}}/${{env.IMAGE_NAME}}
-            ghcr.io/${{github.repository_owner}}/${{env.IMAGE_NAME}}
+            openim/openim-chat
+            openimsdk/openim-chat
+            registry.cn-hangzhou.aliyuncs.com/openimsdk/openim-chat
 
           # generate Docker tags based on the following events/attributes
           tags: |
@@ -71,17 +55,17 @@ jobs:
             type=semver,pattern={{major}}
             type=sha
 
-      - name: Log in to Docker Hub
+      - name: Login to Docker Hub
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Log in to GitHub Container Registry
+      - name: Login to GitHub Container Registry
         uses: docker/login-action@v2
         with:
           registry: ghcr.io
-          username: ${{ github.actor }}
+          username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Log in to AliYun Docker Hub
@@ -91,10 +75,11 @@ jobs:
           username: ${{ secrets.ALIREGISTRY_USERNAME }}
           password: ${{ secrets.ALIREGISTRY_TOKEN }}
 
-      - name: Build and release Docker images
+      - name: Build and push
         uses: docker/build-push-action@v4
         with:
           context: .
-        #   platforms: linux/amd64,linux/arm64
-          tags: ${{ steps.meta.outputs.tags }},latest
+          platforms: linux/amd64,linux/arm64
           push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.labels }}
+          labels: ${{ steps.meta.outputs.labels }}
