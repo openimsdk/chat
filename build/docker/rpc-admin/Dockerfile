@@ -31,7 +31,7 @@ COPY . .
 RUN go mod download
 RUN CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} go build -o /openim/openim-chat/bin/open_im_admin_rpc ./cmd/rpc/admin
 
-FROM ghcr.io/openim-sigs/openim-bash-image:v1.0.1
+FROM ghcr.io/openim-sigs/openim-bash-image:latest
 
 WORKDIR ${CHAT_WORKDIR}
 
@@ -41,4 +41,4 @@ COPY --from=builder ${OPENIM_CHAT_CONFIG_NAME} /openim/openim-chat/config/config
 env PORT=30200
 
 EXPOSE ${PORT}
-CMD ["sh", "-c","${OPENIM_CHAT_BINDIR}/open_im_admin_rpc","--port", "${PORT}","--config_folder_path","${OPENIM_CHAT_CONFIG_NAME}"]
+CMD ["sh", "-c", "${OPENIM_CHAT_BINDIR}/open_im_admin_rpc","--port", "${PORT}","--config_folder_path","${OPENIM_CHAT_CONFIG_NAME}"]

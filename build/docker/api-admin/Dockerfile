@@ -34,7 +34,7 @@ COPY . .
 RUN go mod download
 RUN CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} go build -o /openim/openim-chat/bin/open_im_admin_api ./cmd/api/admin_api
 
-FROM ghcr.io/openim-sigs/openim-bash-image:v1.0.1
+FROM ghcr.io/openim-sigs/openim-bash-image:latest
 
 WORKDIR ${CHAT_WORKDIR}
 
