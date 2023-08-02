@@ -12,89 +12,99 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: OpenIM Buildx Docker Images
+name: Docker Buildx Images CI
 
 on:
-    push:
-      branches:
-        - main
-        - release-*
-      tags:
-        - v*
-    workflow_dispatch:
-
-env:
-  IMAGE_NAME: openim-chat
-  # Common versions
-  GO_VERSION: "1.20"
-  DEFAULT_OWNER: "OpenIMSDK"
+  schedule:
+  - cron: '0 23 * * *'
+  push:
+    branches:
+      - release-*
+      - main
+    tags:
+      - v*
+  workflow_dispatch:
 
 jobs:
-  build:
+  build-ghcr:
     runs-on: ubuntu-latest
-    # strategy:
-    #   matrix:
-    #     bin:
-    #       - openim-chat
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-
+        
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
-
-      - name: Setup Docker Buildx
+        
+      - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
-
-      - name: Setup Golang with cache
-        uses: magnetikonline/action-golang-cache@v3
-        with:
-          go-version: ${{ env.GO_VERSION }}
-
-      - name: Docker metadata
-        id: meta
-        uses: docker/metadata-action@v4
-        with:
-          # list of Docker images to use as base name for tags
-          images: |
-            openim/${{env.IMAGE_NAME}}
-            registry.cn-hangzhou.aliyuncs.com/${{github.repository_owner}}/${{env.IMAGE_NAME}}
-            ghcr.io/${{github.repository_owner}}/${{env.IMAGE_NAME}}
-
-          # generate Docker tags based on the following events/attributes
-          tags: |
-            type=schedule
-            type=ref,event=branch
-            type=ref,event=pr
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=semver,pattern={{major}}
-            type=sha
-
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v2
         with:
           registry: ghcr.io
-          username: ${{ github.actor }}
+          username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Log in to AliYun Docker Hub
-        uses: docker/login-action@v2
+      - name: Extract metadata (tags, labels) for Docker chat-api-admin
+        id: meta1
+        uses: docker/metadata-action@v4.6.0
         with:
-          registry: registry.cn-hangzhou.aliyuncs.com
-          username: ${{ secrets.ALIREGISTRY_USERNAME }}
-          password: ${{ secrets.ALIREGISTRY_TOKEN }}
+          images: ghcr.io/openimsdk/chat-api-admin
 
-      - name: Build and release Docker images
+      - name: Build and push Docker image for chat-api-admin
         uses: docker/build-push-action@v4
         with:
           context: .
-        #   platforms: linux/amd64,linux/arm64
-          tags: ${{ steps.meta.outputs.tags }},latest
+          file: ./build/docker/api-admin/Dockerfile
+          platforms: linux/amd64,linux/arm64
           push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta1.outputs.tags }}
+          labels: ${{ steps.meta1.outputs.labels }}
+
+      - name: Extract metadata (tags, labels) for Docker chat-api-chat
+        id: meta2
+        uses: docker/metadata-action@v4.6.0
+        with:
+          images: ghcr.io/openimsdk/chat-api-chat
+
+      - name: Build and push Docker image for chat-api-chat
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: ./build/docker/api-chat/Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta2.outputs.tags }}
+          labels: ${{ steps.meta2.outputs.labels }}
+
+      - name: Extract metadata (tags, labels) for Docker chat-rpc-admin
+        id: meta3
+        uses: docker/metadata-action@v4.6.0
+        with:
+          images: ghcr.io/openimsdk/chat-rpc-admin
+
+      - name: Build and push Docker image for chat-rpc-admin
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: ./build/docker/rpc-admin/Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta3.outputs.tags }}
+          labels: ${{ steps.meta3.outputs.labels }}
+
+      - name: Extract metadata (tags, labels) for Docker chat-rpc-chat
+        id: meta4
+        uses: docker/metadata-action@v4.6.0
+        with:
+          images: ghcr.io/openimsdk/chat-rpc-chat
+
+      - name: Build and push Docker image for chat-rpc-chat
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: ./build/docker/rpc-chat/Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta4.outputs.tags }}
+          labels: ${{ steps.meta4.outputs.labels }}

@@ -214,9 +214,9 @@ changelog:
 
 # dockers:
 #   - image_templates:
-#       - "openim/openim-chat:{{ .Tag }}-amd64"
-#       - "ghcr.io/openimsdk/openim-chat:{{ .Tag }}-amd64"
-#       - "registry.cn-hangzhou.aliyuncs.com/openimsdk/openim-chat:{{ .Tag }}-amd64"
+#       - "openim/openim-chat-api-chat:{{ .Tag }}-amd64"
+#       - "ghcr.io/openimsdk/openim-chat-api-chat:{{ .Tag }}-amd64"
+#       - "registry.cn-hangzhou.aliyuncs.com/openimsdk/openim-chat-api-chat:{{ .Tag }}-amd64"
 #     build_flag_templates:
 #       - "--pull"
 #       - "--label=io.artifacthub.package.readme-url=https://raw.githubusercontent.com/OpenIMSDK/chat/main/README.md"
@@ -232,13 +232,13 @@ changelog:
 #       - "--platform=linux/amd64"
 #     goos: linux
 #     goarch: amd64
-#     dockerfile: Dockerfile
+#     dockerfile: ./build/docker/api-chat/Dockerfile
 #     use: buildx
 
 #   - image_templates:
-#       - "openim/openim-chat:{{ .Tag }}-arm64"
-#       - "ghcr.io/openimsdk/openim-chat:{{ .Tag }}-arm64"
-#       - "registry.cn-hangzhou.aliyuncs.com/openimsdk/openim-chat:{{ .Tag }}-arm64"
+#       - "openim/openim-chat-api-chat:{{ .Tag }}-arm64"
+#       - "ghcr.io/openimsdk/openim-chat-api-chat:{{ .Tag }}-arm64"
+#       - "registry.cn-hangzhou.aliyuncs.com/openimsdk/openim-chat-api-chat:{{ .Tag }}-arm64"
 #     build_flag_templates:
 #       - "--pull"
 #       - "--label=io.artifacthub.package.readme-url=https://raw.githubusercontent.com/OpenIMSDK/chat/main/README.md"
@@ -254,34 +254,78 @@ changelog:
 #       - "--platform=linux/arm64"
 #     goos: linux
 #     goarch: arm64
-#     dockerfile: Dockerfile
+#     dockerfile: ./build/docker/api-chat/Dockerfile
+#     use: buildx
+
+#   - image_templates:
+#       - "openim/openim-chat-api-admin:{{ .Tag }}-amd64"
+#       - "ghcr.io/openimsdk/openim-chat-api-admin:{{ .Tag }}-amd64"
+#       - "registry.cn-hangzhou.aliyuncs.com/openimsdk/openim-chat-api-admin:{{ .Tag }}-amd64"
+#     build_flag_templates:
+#       - "--pull"
+#       - "--label=io.artifacthub.package.readme-url=https://raw.githubusercontent.com/OpenIMSDK/chat/main/README.md"
+#       - "--label=io.artifacthub.package.logo-url=hhttps://github.com/OpenIMSDK/chat/blob/main/assets/logo/openim-logo-green.png"
+#       - '--label=io.artifacthub.package.maintainers=[{"name":"Xinwei Xiong","email":"3293172751nss@gmail.com"}]'
+#       - "--label=io.artifacthub.package.license=Apace-2.0"
+#       - "--label=org.opencontainers.image.description=OpenIM Open source top instant messaging system"
+#       - "--label=org.opencontainers.image.created={{.Date}}"
+#       - "--label=org.opencontainers.image.name={{.ProjectName}}"
+#       - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+#       - "--label=org.opencontainers.image.version={{.Version}}"
+#       - "--label=org.opencontainers.image.source={{.GitURL}}"
+#       - "--platform=linux/amd64"
+#     goos: linux
+#     goarch: amd64
+#     dockerfile: ./build/docker/api-admin/Dockerfile
+#     use: buildx
+
+#   - image_templates:
+#       - "openim/openim-chat-api-admin:{{ .Tag }}-arm64"
+#       - "ghcr.io/openimsdk/openim-chat-api-admin:{{ .Tag }}-arm64"
+#       - "registry.cn-hangzhou.aliyuncs.com/openimsdk/openim-chat-api-admin:{{ .Tag }}-arm64"
+#     build_flag_templates:
+#       - "--pull"
+#       - "--label=io.artifacthub.package.readme-url=https://raw.githubusercontent.com/OpenIMSDK/chat/main/README.md"
+#       - "--label=io.artifacthub.package.logo-url=hhttps://github.com/OpenIMSDK/chat/blob/main/assets/logo/openim-logo-green.png"
+#       - '--label=io.artifacthub.package.maintainers=[{"name":"Xinwei Xiong","email":"3293172751nss@gmail.com"}]'
+#       - "--label=io.artifacthub.package.license=Apace-2.0"
+#       - "--label=org.opencontainers.image.description=OpenIM Open source top instant messaging system"
+#       - "--label=org.opencontainers.image.created={{.Date}}"
+#       - "--label=org.opencontainers.image.name={{.ProjectName}}"
+#       - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+#       - "--label=org.opencontainers.image.version={{.Version}}"
+#       - "--label=org.opencontainers.image.source={{.GitURL}}"
+#       - "--platform=linux/arm64"
+#     goos: linux
+#     goarch: arm64
+#     dockerfile: ./build/docker/api-admin/Dockerfile
 #     use: buildx
 
 # docker_manifests:
-#   - name_template: "openim/openim-chat:{{ .Tag }}"
+#   - name_template: "openim/openim-chat-api-admin:{{ .Tag }}"
 #     image_templates:
-#       - "openim/openim-chat:{{ .Tag }}-amd64"
-#       - "openim/openim-chat:{{ .Tag }}-arm64"
+#       - "openim/openim-chat-api-admin:{{ .Tag }}-amd64"
+#       - "openim/openim-chat-api-admin:{{ .Tag }}-arm64"
 #   - name_template: "ghcr.io/openimsdk/openim-chat:{{ .Tag }}"
 #     image_templates:
 #       - "ghcr.io/openimsdk/openim-chat:{{ .Tag }}-amd64"
 #       - "ghcr.io/openimsdk/openim-chat:{{ .Tag }}-arm64"
-#   - name_template: "registry.cn-hangzhou.aliyuncs.com/openimsdk/openim-chat:{{ .Tag }}"
+#   - name_template: "registry.cn-hangzhou.aliyuncs.com/openimsdk/openim-chat-api-admin:{{ .Tag }}"
 #     image_templates:
-#       - "registry.cn-hangzhou.aliyuncs.com/openimsdk/openim-chat:{{ .Tag }}-amd64"
-#       - "registry.cn-hangzhou.aliyuncs.com/openimsdk/openim-chat:{{ .Tag }}-arm64"
-#   - name_template: "openim/openim-chat:latest"
+#       - "registry.cn-hangzhou.aliyuncs.com/openimsdk/openim-chat-api-admin:{{ .Tag }}-amd64"
+#       - "registry.cn-hangzhou.aliyuncs.com/openimsdk/openim-chat-api-admin:{{ .Tag }}-arm64"
+#   - name_template: "openim/openim-chat-api-admin:latest"
 #     image_templates:
-#       - "openim/openim-chat:{{ .Tag }}-amd64"
-#       - "openim/openim-chat:{{ .Tag }}-arm64"
-#   - name_template: "ghcr.io/openimsdk/openim-chat:latest"
+#       - "openim/openim-chat-api-chat:{{ .Tag }}-amd64"
+#       - "openim/openim-chat-api-chat:{{ .Tag }}-arm64"
+#   - name_template: "ghcr.io/openimsdk/openim-chat-api-chat:latest"
 #     image_templates:
-#       - "ghcr.io/openimsdk/openim-chat:{{ .Tag }}-amd64"
-#       - "ghcr.io/openimsdk/openim-chat:{{ .Tag }}-arm64"
-#   - name_template: "registry.cn-hangzhou.aliyuncs.com/openimsdk/openim-chat:latest"
+#       - "ghcr.io/openimsdk/openim-chat-api-chat:{{ .Tag }}-amd64"
+#       - "ghcr.io/openimsdk/openim-chat-api-chat:{{ .Tag }}-arm64"
+#   - name_template: "registry.cn-hangzhou.aliyuncs.com/openimsdk/openim-chat-api-chat:latest"
 #     image_templates:
-#       - "registry.cn-hangzhou.aliyuncs.com/openimsdk/openim-chat:{{ .Tag }}-amd64"
-#       - "registry.cn-hangzhou.aliyuncs.com/openimsdk/openim-chat:{{ .Tag }}-arm64"
+#       - "registry.cn-hangzhou.aliyuncs.com/openimsdk/openim-chat-api-chat:{{ .Tag }}-amd64"
+#       - "registry.cn-hangzhou.aliyuncs.com/openimsdk/openim-chat-api-chat:{{ .Tag }}-arm64"
 
 nfpms:
   - id: packages
