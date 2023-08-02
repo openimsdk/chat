@@ -37,7 +37,7 @@ RUN CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} go build -o /openim/openim-chat/
 RUN CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} go build -o /openim/openim-chat/bin/open_im_chat_api ./cmd/api/chat_api
 
 # Build the runtime stage
-FROM ghcr.io/openim-sigs/openim-bash-image:v1.0.1
+FROM ghcr.io/openim-sigs/openim-bash-image:latest
 
 # Set fixed project path
 WORKDIR /openim/openim-chat
@@ -48,6 +48,6 @@ COPY --from=builder ${OPENIM_CHAT_BINDIR} /openim/openim-chat/bin
 COPY --from=builder ${OPENIM_CHAT_CMDDIR} /openim/openim-chat/scripts
 COPY --from=builder ${OPENIM_CHAT_CONFIG_NAME} /openim/openim-chat/config/config.yaml
 
-WORKDIR $OPENIM_CHAT_CMDDIR
+WORKDIR /openim/openim-chat/scripts
 
 CMD ["./docker_start_all.sh"]
