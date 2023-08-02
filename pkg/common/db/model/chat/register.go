@@ -16,6 +16,7 @@ package chat
 
 import (
 	"context"
+	"time"
 
 	"github.com/OpenIMSDK/tools/errs"
 	"gorm.io/gorm"
@@ -37,4 +38,37 @@ func (o *Register) NewTx(tx any) chat.RegisterInterface {
 
 func (o *Register) Create(ctx context.Context, registers ...*chat.Register) error {
 	return errs.Wrap(o.db.WithContext(ctx).Create(registers).Error)
+}
+
+func (o *Register) CountTotal(ctx context.Context, before *time.Time) (count int64, err error) {
+	db := o.db.WithContext(ctx).Model(&chat.Register{})
+	if before != nil {
+		db.Where("create_time < ?", before)
+	}
+	if err := db.Count(&count).Error; err != nil {
+		return 0, errs.Wrap(err)
+	}
+	return count, nil
+}
+
+func (o *Register) CountRangeEverydayTotal(ctx context.Context, start *time.Time, end *time.Time) (map[string]int64, error) {
+	var res []struct {
+		Date  time.Time `gorm:"column:date"`
+		Count int64     `gorm:"column:count"`
+	}
+	err := o.db.WithContext(ctx).
+		Model(&chat.Register{}).
+		Select("DATE(create_time) AS date, count(1) AS count").
+		Where("create_time >= ? and create_time < ?", start, end).
+		Group("date").
+		Find(&res).
+		Error
+	if err != nil {
+		return nil, errs.Wrap(err)
+	}
+	v := make(map[string]int64)
+	for _, r := range res {
+		v[r.Date.Format("2006-01-02")] = r.Count
+	}
+	return v, nil
 }

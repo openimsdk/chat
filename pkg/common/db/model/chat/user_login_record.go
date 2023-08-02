@@ -16,6 +16,10 @@ package chat
 
 import (
 	"context"
+
+	"github.com/OpenIMSDK/tools/errs"
+	"time"
+
 	"gorm.io/gorm"
 
 	"github.com/OpenIMSDK/chat/pkg/common/db/table/chat"
@@ -37,4 +41,37 @@ func (o *UserLoginRecord) NewTx(tx any) chat.UserLoginRecordInterface {
 
 func (o *UserLoginRecord) Create(ctx context.Context, records ...*chat.UserLoginRecord) error {
 	return o.db.WithContext(ctx).Create(&records).Error
+}
+
+func (o *UserLoginRecord) CountTotal(ctx context.Context, before *time.Time) (count int64, err error) {
+	db := o.db.WithContext(ctx).Model(&chat.UserLoginRecord{})
+	if before != nil {
+		db.Where("create_time < ?", before)
+	}
+	if err := db.Count(&count).Error; err != nil {
+		return 0, errs.Wrap(err)
+	}
+	return count, nil
+}
+
+func (o *UserLoginRecord) CountRangeEverydayTotal(ctx context.Context, start *time.Time, end *time.Time) (map[string]int64, error) {
+	var res []struct {
+		Date  time.Time `gorm:"column:date"`
+		Count int64     `gorm:"column:count"`
+	}
+	err := o.db.WithContext(ctx).
+		Model(&chat.UserLoginRecord{}).
+		Select("DATE(create_time) AS date, count(1) AS count").
+		Where("create_time >= ? and create_time < ?", start, end).
+		Group("date").
+		Find(&res).
+		Error
+	if err != nil {
+		return nil, errs.Wrap(err)
+	}
+	v := make(map[string]int64)
+	for _, r := range res {
+		v[r.Date.Format("2006-01-02")] = r.Count
+	}
+	return v, nil
 }

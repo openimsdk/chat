@@ -37,4 +37,6 @@ func (Register) TableName() string {
 type RegisterInterface interface {
 	NewTx(tx any) RegisterInterface
 	Create(ctx context.Context, registers ...*Register) error
+	CountTotal(ctx context.Context, before *time.Time) (int64, error)
+	CountRangeEverydayTotal(ctx context.Context, start *time.Time, end *time.Time) (map[string]int64, error)
 }
