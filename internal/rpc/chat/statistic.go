@@ -36,22 +36,18 @@ func (o *chatSvr) UserLoginCount(ctx context.Context, req *chat.UserLoginCountRe
 	if req.Start > req.End {
 		return nil, errs.ErrArgs.Wrap("start > end")
 	}
-	total, err := o.Database.UserLoginCountTotal(ctx, nil)
+	total, err := o.Database.NewUserCountTotal(ctx, nil)
 	if err != nil {
 		return nil, err
 	}
 	start := time.UnixMilli(req.Start)
-	before, err := o.Database.UserLoginCountTotal(ctx, &start)
-	if err != nil {
-		return nil, err
-	}
 	end := time.UnixMilli(req.End)
-	count, err := o.Database.UserLoginCountRangeEverydayTotal(ctx, &start, &end)
+	count, loginCount, err := o.Database.UserLoginCountRangeEverydayTotal(ctx, &start, &end)
 	if err != nil {
 		return nil, err
 	}
-	resp.Total = total
-	resp.Before = before
+	resp.LoginCount = loginCount
+	resp.UnloginCount = total - loginCount
 	resp.Count = count
 	return resp, nil
 }

@@ -54,7 +54,7 @@ type ChatDatabaseInterface interface {
 	NewUserCountTotal(ctx context.Context, before *time.Time) (int64, error)
 	NewUserCountRangeEverydayTotal(ctx context.Context, start *time.Time, end *time.Time) (map[string]int64, error)
 	UserLoginCountTotal(ctx context.Context, before *time.Time) (int64, error)
-	UserLoginCountRangeEverydayTotal(ctx context.Context, start *time.Time, end *time.Time) (map[string]int64, error)
+	UserLoginCountRangeEverydayTotal(ctx context.Context, start *time.Time, end *time.Time) (map[string]int64, int64, error)
 }
 
 func NewChatDatabase(db *gorm.DB) ChatDatabaseInterface {
@@ -234,6 +234,6 @@ func (o *ChatDatabase) UserLoginCountTotal(ctx context.Context, before *time.Tim
 	return o.userLoginRecord.CountTotal(ctx, before)
 }
 
-func (o *ChatDatabase) UserLoginCountRangeEverydayTotal(ctx context.Context, start *time.Time, end *time.Time) (map[string]int64, error) {
+func (o *ChatDatabase) UserLoginCountRangeEverydayTotal(ctx context.Context, start *time.Time, end *time.Time) (map[string]int64, int64, error) {
 	return o.userLoginRecord.CountRangeEverydayTotal(ctx, start, end)
 }
