@@ -12,10 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Set go mod installation source and proxy
 ARG GOARCH
 ARG GOOS
 
-# Use golang as the builder stage
 FROM golang:1.20 AS builder
 
 ARG GO111MODULE=on
@@ -26,28 +26,21 @@ WORKDIR /openim/openim-chat
 ENV GO111MODULE=$GO111MODULE
 ENV GOPROXY=$GOPROXY
 
+COPY go.mod .
+COPY go.sum .
 COPY . .
 
 RUN go mod download
+RUN CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} go build -o /openim/openim-chat/bin/open_im_chat_rpc ./cmd/rpc/chat
 
-# Compile the source code
-RUN CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} go build -o /openim/openim-chat/bin/open_im_admin ./cmd/rpc/admin
-RUN CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} go build -o /openim/openim-chat/bin/open_im_admin_api ./cmd/api/admin_api
-RUN CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} go build -o /openim/openim-chat/bin/open_im_chat ./cmd/rpc/chat
-RUN CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} go build -o /openim/openim-chat/bin/open_im_chat_api ./cmd/api/chat_api
+FROM ghcr.io/openim-sigs/openim-bash-image:latest
 
-# Build the runtime stage
-FROM ghcr.io/openim-sigs/openim-bash-image:v1.0.1
+WORKDIR ${CHAT_WORKDIR}
 
-# Set fixed project path
-WORKDIR /openim/openim-chat
-
-# Copy the executable files to the target directory
-COPY --from=builder ${OPENIM_CHAT_BINDIR} /openim/openim-chat/bin
-
-COPY --from=builder ${OPENIM_CHAT_CMDDIR} /openim/openim-chat/scripts
+COPY --from=builder ${OPENIM_CHAT_BINDIR}/open_im_chat_rpc /openim/openim-chat/bin/open_im_chat_rpc
 COPY --from=builder ${OPENIM_CHAT_CONFIG_NAME} /openim/openim-chat/config/config.yaml
 
-WORKDIR $OPENIM_CHAT_CMDDIR
+env PORT=30300
 
-CMD ["./docker_start_all.sh"]
+EXPOSE ${PORT}
+CMD ["sh", "-c","${OPENIM_CHAT_BINDIR}/open_im_chat_rpc","--port", "${PORT}","--config_folder_path","${OPENIM_CHAT_CONFIG_NAME}"]
