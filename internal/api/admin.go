@@ -305,10 +305,6 @@ func (o *AdminApi) SearchApplet(c *gin.Context) {
 	a2r.Call(admin.AdminClient.SearchApplet, o.adminClient, c)
 }
 
-func (o *AdminApi) NewUserCount(c *gin.Context) {
-	a2r.Call(chat.ChatClient.NewUserCount, o.chatClient, c)
-}
-
 func (o *AdminApi) LoginUserCount(c *gin.Context) {
 	a2r.Call(chat.ChatClient.UserLoginCount, o.chatClient, c)
 }

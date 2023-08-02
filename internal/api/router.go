@@ -119,6 +119,5 @@ func NewAdminRoute(router gin.IRouter, discov discoveryregistry.SvcDiscoveryRegi
 	initGroup.POST("/del", admin.DelClientConfig) // 删除客户端初始化配置
 
 	statistic := router.Group("/statistic", mw.CheckAdmin)
-	statistic.POST("/new_user_count", admin.NewUserCount)
 	statistic.POST("/login_user_count", admin.LoginUserCount)
 }
