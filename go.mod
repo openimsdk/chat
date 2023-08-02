@@ -12,22 +12,22 @@ require (
 	github.com/jinzhu/copier v0.3.5 // indirect
 	github.com/lestrrat-go/file-rotatelogs v2.4.0+incompatible // indirect
 	github.com/pkg/errors v0.9.1 // indirect
-	google.golang.org/grpc v1.56.2
+	google.golang.org/grpc v1.57.0
 	google.golang.org/protobuf v1.31.0
 	gopkg.in/yaml.v3 v3.0.1
-	gorm.io/driver/mysql v1.3.5
+	gorm.io/driver/mysql v1.5.1
 	gorm.io/gorm v1.25.2
 )
 
 require (
 	github.com/alibabacloud-go/darabonba-openapi v0.2.1
 	github.com/alibabacloud-go/dysmsapi-20170525/v2 v2.0.18
-	github.com/alibabacloud-go/tea v1.1.20
-	github.com/go-sql-driver/mysql v1.6.0
+	github.com/alibabacloud-go/tea v1.2.1
+	github.com/go-sql-driver/mysql v1.7.1
 )
 
 require (
-	github.com/OpenIMSDK/protocol v0.0.1
+	github.com/OpenIMSDK/protocol v0.0.3
 	github.com/OpenIMSDK/tools v0.0.13
 	github.com/redis/go-redis/v9 v9.0.5
 )
