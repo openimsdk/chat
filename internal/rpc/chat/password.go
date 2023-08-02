@@ -31,7 +31,7 @@ func (o *chatSvr) ResetPassword(ctx context.Context, req *chat.ResetPasswordReq)
 	if req.Password == "" {
 		return nil, errs.ErrArgs.Wrap("password must be set")
 	}
-	verifyCodeID, err := o.verifyCode(ctx, o.verifyCodeJoin(req.VerifyCode, req.PhoneNumber), req.VerifyCode)
+	verifyCodeID, err := o.verifyCode(ctx, o.verifyCodeJoin(req.AreaCode, req.PhoneNumber), req.VerifyCode)
 	if err != nil {
 		return nil, err
 	}
