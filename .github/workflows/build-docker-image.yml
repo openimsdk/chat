@@ -64,7 +64,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: .
-          platforms: linux/amd64,linux/arm64,linux/ppc64le,linux/riscv64,linux/s390x
+          platforms: linux/amd64,linux/arm64,linux/ppc64le,linux/s390x
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -96,7 +96,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: .
-          platforms: linux/amd64,linux/arm64,linux/ppc64le,linux/riscv64,linux/s390x
+          platforms: linux/amd64,linux/arm64,linux/ppc64le,linux/s390x
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta2.outputs.tags }}
           labels: ${{ steps.meta2.outputs.labels }}
@@ -128,7 +128,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: .
-          platforms: linux/amd64,linux/arm64,linux/ppc64le,linux/riscv64,linux/s390x
+          platforms: linux/amd64,linux/arm64,linux/ppc64le,linux/s390x
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta3.outputs.tags }}
           labels: ${{ steps.meta3.outputs.labels }}
