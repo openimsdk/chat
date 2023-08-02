@@ -26,60 +26,85 @@ on:
   workflow_dispatch:
 
 jobs:
-  docker:
+  build-ghcr:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+        
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
+        
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta
-        uses: docker/metadata-action@v4.6.0
-        with:
-          images: |
-            openim/openim-chat
-            openimsdk/openim-chat
-            registry.cn-hangzhou.aliyuncs.com/openimsdk/openim-chat
-
-          # generate Docker tags based on the following events/attributes
-          tags: |
-            type=schedule
-            type=ref,event=branch
-            type=ref,event=pr
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=semver,pattern={{major}}
-            type=sha
-
-      - name: Login to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-
-      - name: Login to GitHub Container Registry
+      - name: Log in to GitHub Container Registry
         uses: docker/login-action@v2
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Log in to AliYun Docker Hub
-        uses: docker/login-action@v2
+      - name: Extract metadata (tags, labels) for Docker chat-api-admin
+        id: meta1
+        uses: docker/metadata-action@v4.6.0
         with:
-          registry: registry.cn-hangzhou.aliyuncs.com
-          username: ${{ secrets.ALIREGISTRY_USERNAME }}
-          password: ${{ secrets.ALIREGISTRY_TOKEN }}
+          images: ghcr.io/openimsdk/chat-api-admin
 
-      - name: Build and push
+      - name: Build and push Docker image for chat-api-admin
         uses: docker/build-push-action@v4
         with:
           context: .
-          platforms: linux/amd64,linux/arm64
+          file: ./build/docker/api-admin/Dockerfile
+          platforms: linux/amd64,linux/arm64,linux/ppc64le,linux/s390x
           push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.meta.outputs.labels }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: ${{ steps.meta1.outputs.tags }}
+          labels: ${{ steps.meta1.outputs.labels }}
+
+      - name: Extract metadata (tags, labels) for Docker chat-api-chat
+        id: meta2
+        uses: docker/metadata-action@v4.6.0
+        with:
+          images: ghcr.io/openimsdk/chat-api-chat
+
+      - name: Build and push Docker image for chat-api-chat
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: ./build/docker/api-chat/Dockerfile
+          platforms: linux/amd64,linux/arm64,linux/ppc64le,linux/s390x
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta2.outputs.tags }}
+          labels: ${{ steps.meta2.outputs.labels }}
+
+      - name: Extract metadata (tags, labels) for Docker chat-rpc-admin
+        id: meta3
+        uses: docker/metadata-action@v4.6.0
+        with:
+          images: ghcr.io/openimsdk/chat-rpc-admin
+
+      - name: Build and push Docker image for chat-rpc-admin
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: ./build/docker/rpc-admin/Dockerfile
+          platforms: linux/amd64,linux/arm64,linux/ppc64le,linux/s390x
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta3.outputs.tags }}
+          labels: ${{ steps.meta3.outputs.labels }}
+
+      - name: Extract metadata (tags, labels) for Docker chat-rpc-chat
+        id: meta4
+        uses: docker/metadata-action@v4.6.0
+        with:
+          images: ghcr.io/openimsdk/chat-rpc-chat
+
+      - name: Build and push Docker image for chat-rpc-chat
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: ./build/docker/rpc-chat/Dockerfile
+          platforms: linux/amd64,linux/arm64,linux/ppc64le,linux/s390x
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta4.outputs.tags }}
+          labels: ${{ steps.meta4.outputs.labels }}
