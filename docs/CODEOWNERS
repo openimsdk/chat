@@ -1,6 +1,7 @@
 # This is a comment.
 # Each line is a file pattern followed by one or more owners.
 
+*  @cubxxw @openimsdk/bot @Bloomingg @FGadvancer  @skiffer-git  @wangchuxiao-dev @withchao
 # README files
 README.md @openimsdk/openim @cubxxw @openimsdk/bot @Bloomingg @FGadvancer  @skiffer-git  @wangchuxiao-dev @withchao
 
@@ -44,7 +45,7 @@ docs/* 3293172751nss@gmail.com @openimsdk/bot @skiffer-git
 
 # In this example, @octocat owns any file in an apps directory
 # anywhere in your repository.
-api/ @openimsdk/openim @cubxxw @skiffer-git
+api/ @openimsdk/openim @cubxxw @skiffer-git @wangchuxiao-dev
 
 # This is a comment.
 # Each line is a file pattern followed by one or more owners.
