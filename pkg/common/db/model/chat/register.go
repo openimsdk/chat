@@ -50,25 +50,3 @@ func (o *Register) CountTotal(ctx context.Context, before *time.Time) (count int
 	}
 	return count, nil
 }
-
-func (o *Register) CountRangeEverydayTotal(ctx context.Context, start *time.Time, end *time.Time) (map[string]int64, error) {
-	var res []struct {
-		Date  time.Time `gorm:"column:date"`
-		Count int64     `gorm:"column:count"`
-	}
-	err := o.db.WithContext(ctx).
-		Model(&chat.Register{}).
-		Select("DATE(create_time) AS date, count(1) AS count").
-		Where("create_time >= ? and create_time < ?", start, end).
-		Group("date").
-		Find(&res).
-		Error
-	if err != nil {
-		return nil, errs.Wrap(err)
-	}
-	v := make(map[string]int64)
-	for _, r := range res {
-		v[r.Date.Format("2006-01-02")] = r.Count
-	}
-	return v, nil
-}
