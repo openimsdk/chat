@@ -39,7 +39,6 @@ message AdminUpdateInfoReq {
   OpenIMServer.protobuf.StringValue password = 2;
   OpenIMServer.protobuf.StringValue faceURL = 3;
   OpenIMServer.protobuf.StringValue nickname = 4;
-  OpenIMServer.protobuf.StringValue userID = 5;
   OpenIMServer.protobuf.Int32Value level = 6;
 }
 
