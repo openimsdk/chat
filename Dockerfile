@@ -37,7 +37,7 @@ RUN CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} go build -o /openim/openim-chat/
 RUN CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} go build -o /openim/openim-chat/bin/open_im_chat_api ./cmd/api/chat_api
 
 # Build the runtime stage
-FROM ghcr.io/openim-sigs/openim-bash-image:v1.0.1
+FROM ghcr.io/openim-sigs/openim-bash-image:v1.3.0
 
 # Set fixed project path
 WORKDIR /openim/openim-chat
