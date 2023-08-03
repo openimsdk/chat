@@ -120,4 +120,5 @@ func NewAdminRoute(router gin.IRouter, discov discoveryregistry.SvcDiscoveryRegi
 
 	statistic := router.Group("/statistic", mw.CheckAdmin)
 	statistic.POST("/login_user_count", admin.LoginUserCount)
+	statistic.POST("/new_user_count", admin.NewUserCount)
 }

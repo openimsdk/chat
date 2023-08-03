@@ -17,7 +17,6 @@ package apicall
 import (
 	"context"
 	"fmt"
-
 	"github.com/OpenIMSDK/chat/pkg/common/config"
 	"github.com/OpenIMSDK/protocol/auth"
 	"github.com/OpenIMSDK/protocol/constant"
@@ -36,6 +35,7 @@ type CallerInterface interface {
 	ForceOffLine(ctx context.Context, userID string) error
 	RegisterUser(ctx context.Context, users []*sdkws.UserInfo) error
 	FindGroupInfo(ctx context.Context, groupIDs []string) ([]*sdkws.GroupInfo, error)
+	UserRegisterCount(ctx context.Context, start int64, end int64) (map[string]int64, int64, error)
 }
 
 type Caller struct{}
@@ -118,4 +118,15 @@ func (c *Caller) FindGroupInfo(ctx context.Context, groupIDs []string) ([]*sdkws
 		return nil, err
 	}
 	return resp.GroupInfos, nil
+}
+
+func (c *Caller) UserRegisterCount(ctx context.Context, start int64, end int64) (map[string]int64, int64, error) {
+	resp, err := registerUserCount.Call(ctx, &user.UserRegisterCountReq{
+		Start: start,
+		End:   end,
+	})
+	if err != nil {
+		return nil, 0, err
+	}
+	return resp.Count, resp.Total, nil
 }

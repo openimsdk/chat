@@ -28,11 +28,12 @@ func imApi() string {
 
 // im caller.
 var (
-	importFriend   = NewApiCaller[friend.ImportFriendReq, friend.ImportFriendResp]("/friend/import_friend", imApi)
-	userToken      = NewApiCaller[auth.UserTokenReq, auth.UserTokenResp]("/auth/user_token", imApi)
-	inviteToGroup  = NewApiCaller[group.InviteUserToGroupReq, group.InviteUserToGroupResp]("/group/invite_user_to_group", imApi)
-	updateUserInfo = NewApiCaller[user.UpdateUserInfoReq, user.UpdateUserInfoResp]("/user/update_user_info", imApi)
-	registerUser   = NewApiCaller[user.UserRegisterReq, user.UserRegisterResp]("/user/user_register", imApi)
-	forceOffLine   = NewApiCaller[auth.ForceLogoutReq, auth.ForceLogoutResp]("/auth/force_logout", imApi)
-	getGroupsInfo  = NewApiCaller[group.GetGroupsInfoReq, group.GetGroupsInfoResp]("/group/get_groups_info", imApi)
+	importFriend      = NewApiCaller[friend.ImportFriendReq, friend.ImportFriendResp]("/friend/import_friend", imApi)
+	userToken         = NewApiCaller[auth.UserTokenReq, auth.UserTokenResp]("/auth/user_token", imApi)
+	inviteToGroup     = NewApiCaller[group.InviteUserToGroupReq, group.InviteUserToGroupResp]("/group/invite_user_to_group", imApi)
+	updateUserInfo    = NewApiCaller[user.UpdateUserInfoReq, user.UpdateUserInfoResp]("/user/update_user_info", imApi)
+	registerUser      = NewApiCaller[user.UserRegisterReq, user.UserRegisterResp]("/user/user_register", imApi)
+	forceOffLine      = NewApiCaller[auth.ForceLogoutReq, auth.ForceLogoutResp]("/auth/force_logout", imApi)
+	getGroupsInfo     = NewApiCaller[group.GetGroupsInfoReq, group.GetGroupsInfoResp]("/group/get_groups_info", imApi)
+	registerUserCount = NewApiCaller[user.UserRegisterCountReq, user.UserRegisterCountResp]("/user/register", imApi)
 )

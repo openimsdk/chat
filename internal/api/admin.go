@@ -23,6 +23,7 @@ import (
 	"github.com/OpenIMSDK/chat/pkg/proto/chat"
 	"github.com/OpenIMSDK/protocol/constant"
 	"github.com/OpenIMSDK/protocol/sdkws"
+	"github.com/OpenIMSDK/protocol/user"
 	"github.com/OpenIMSDK/tools/a2r"
 	"github.com/OpenIMSDK/tools/apiresp"
 	"github.com/OpenIMSDK/tools/checker"
@@ -307,4 +308,31 @@ func (o *AdminApi) SearchApplet(c *gin.Context) {
 
 func (o *AdminApi) LoginUserCount(c *gin.Context) {
 	a2r.Call(chat.ChatClient.UserLoginCount, o.chatClient, c)
+}
+
+func (o *AdminApi) NewUserCount(c *gin.Context) {
+	var req user.UserRegisterCountReq
+	var resp apistruct.NewUserCountResp
+	if err := c.BindJSON(&req); err != nil {
+		apiresp.GinError(c, err)
+		return
+	}
+	log.ZInfo(c, "NewUserCount api", "req", &req)
+	if err := checker.Validate(&req); err != nil {
+		apiresp.GinError(c, err) // 参数校验失败
+		return
+	}
+	imToken, err := o.imApiCaller.UserToken(c, config.GetIMAdmin(mctx.GetOpUserID(c)), constant.AdminPlatformID)
+	if err != nil {
+		apiresp.GinError(c, err)
+		return
+	}
+	dateCount, total, err := o.imApiCaller.UserRegisterCount(mctx.WithApiToken(c, imToken), req.Start, req.End)
+	if err != nil {
+		apiresp.GinError(c, err)
+		return
+	}
+	resp.DateCount = dateCount
+	resp.Total = total
+	apiresp.GinSuccess(c, resp)
 }

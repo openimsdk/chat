@@ -31,3 +31,8 @@ type SearchDefaultGroupResp struct {
 	Total  uint32             `json:"total"`
 	Groups []*sdkws.GroupInfo `json:"groups"`
 }
+
+type NewUserCountResp struct {
+	Total     int64            `json:"total"`
+	DateCount map[string]int64 `json:"date_count"`
+}
