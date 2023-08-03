@@ -26,28 +26,25 @@ WORKDIR /openim/openim-chat
 ENV GO111MODULE=$GO111MODULE
 ENV GOPROXY=$GOPROXY
 
-COPY . .
-
+COPY go.mod go.sum ./
 RUN go mod download
 
+COPY . .
+
 # Compile the source code
-RUN CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} go build -o /openim/openim-chat/bin/open_im_admin ./cmd/rpc/admin
-RUN CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} go build -o /openim/openim-chat/bin/open_im_admin_api ./cmd/api/admin_api
-RUN CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} go build -o /openim/openim-chat/bin/open_im_chat ./cmd/rpc/chat
-RUN CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} go build -o /openim/openim-chat/bin/open_im_chat_api ./cmd/api/chat_api
+RUN CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} go build -o /openim/openim-chat/bin/admin-rpc ./cmd/rpc/admin-rpc
+RUN CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} go build -o /openim/openim-chat/bin/admin-api ./cmd/api/admin-api
+RUN CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} go build -o /openim/openim-chat/bin/chat-rpc ./cmd/rpc/chat-rpc
+RUN CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} go build -o /openim/openim-chat/bin/chat-api ./cmd/api/chat-api
 
 # Build the runtime stage
-FROM ghcr.io/openim-sigs/openim-bash-image:latest
+FROM ghcr.io/openim-sigs/openim-bash-image:v1.3.0
 
 # Set fixed project path
 WORKDIR /openim/openim-chat
 
-# Copy the executable files to the target directory
 COPY --from=builder ${OPENIM_CHAT_BINDIR} /openim/openim-chat/bin
-
 COPY --from=builder ${OPENIM_CHAT_CMDDIR} /openim/openim-chat/scripts
 COPY --from=builder ${OPENIM_CHAT_CONFIG_NAME} /openim/openim-chat/config/config.yaml
 
-WORKDIR /openim/openim-chat/scripts
-
-CMD ["./docker_start_all.sh"]
+CMD ["bash","-c","${OPENIM_CHAT_CMDDIR}/docker_start_all.sh"]

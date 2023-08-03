@@ -23,24 +23,29 @@
 # ==============================================================================
 #
 
+LC_ALL=C
+
+local_branch="$(git rev-parse --abbrev-ref HEAD)"
+valid_branch_regex="^(main|master|develop|release(-[a-zA-Z0-9._-]+)?)$|(feature|feat|openim|hotfix|test|bug|bot|ci|cicd|style|)\/[a-z0-9._-]+$|^HEAD$"
+
 YELLOW="\e[93m"
 GREEN="\e[32m"
 RED="\e[31m"
 ENDCOLOR="\e[0m"
 
 printMessage() {
-   printf "${YELLOW}OpenIM : $1${ENDCOLOR}\n"
+   printf "${YELLOW}openim : $1${ENDCOLOR}\n"
 }
 
 printSuccess() {
-   printf "${GREEN}OpenIM : $1${ENDCOLOR}\n"
+   printf "${GREEN}openim : $1${ENDCOLOR}\n"
 }
 
 printError() {
-   printf "${RED}OpenIM : $1${ENDCOLOR}\n"
+   printf "${RED}openim : $1${ENDCOLOR}\n"
 }
 
-printMessage "Running local OpenIM pre-commit hook."
+printMessage "Running local openim pre-commit hook."
 
 # flutter format .
 # https://gist.github.com/cubxxw/126b72104ac0b0ca484c9db09c3e5694#file-githook-md
@@ -95,4 +100,12 @@ then
     printMessage "If you really need to commit this file, you can override the size limit by setting the GIT_FILE_SIZE_LIMIT environment variable, e.g. GIT_FILE_SIZE_LIMIT=42000000 for 42MB. Or, commit with the --no-verify switch to skip the check entirely."
 	  printError "Commit aborted"
     exit 1;
+fi
+
+if [[ ! $local_branch =~ $valid_branch_regex ]]
+then
+    printError "There is something wrong with your branch name. Branch names in this project must adhere to this contract: $valid_branch_regex. 
+Your commit will be rejected. You should rename your branch to a valid name(feat/name OR bug/name) and try again."
+    printError "For more on this, read on: https://gist.github.com/cubxxw/126b72104ac0b0ca484c9db09c3e5694"
+    exit 1
 fi

@@ -15,9 +15,11 @@
 
 #Include shell font styles and some basic information
 SCRIPTS_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+OPENIM_ROOT=$(dirname "${SCRIPTS_ROOT}")/..
 
-source $SCRIPTS_ROOT/style_info.cfg
-source $SCRIPTS_ROOT/path_info.cfg
+#Include shell font styles and some basic information
+source $SCRIPTS_ROOT/style_info.sh
+source $SCRIPTS_ROOT/path_info.sh
 source $SCRIPTS_ROOT/function.sh
 
 service_port_name=(
@@ -36,11 +38,10 @@ for i in ${service_port_name[*]}; do
     port=$(ss -tunlp| grep open_im | awk '{print $5}' | grep -w ${j} | awk -F '[:]' '{print $NF}')
     if [[ ${port} -ne ${j} ]]; then
       echo -e ${YELLOW_PREFIX}${i}${COLOR_SUFFIX}${RED_PREFIX}" service does not start normally,not initiated port is "${COLOR_SUFFIX}${YELLOW_PREFIX}${j}${COLOR_SUFFIX}
-      echo -e ${RED_PREFIX}"please check ../logs/openIM.log "${COLOR_SUFFIX}
+      echo -e ${RED_PREFIX}"please check ${OPENIM_ROOT}/logs/openIM.log "${COLOR_SUFFIX}
       exit -1
     else
       echo -e ${j}${GREEN_PREFIX}" port has been listening,belongs service is "${i}${COLOR_SUFFIX}
     fi
   done
 done
-

@@ -17,8 +17,8 @@
 SCRIPTS_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 OPENIM_ROOT=$(dirname "${BASH_SOURCE[0]}")/..
 
-source $OPENIM_ROOT/scripts/style_info.cfg
-source $OPENIM_ROOT/scripts/path_info.cfg
+source $OPENIM_ROOT/scripts/style_info.sh
+source $OPENIM_ROOT/scripts/path_info.sh
 source $OPENIM_ROOT/scripts/function.sh
 
 list1=$(cat $config_path | grep openImPushPort | awk -F '[:]' '{print $NF}')

@@ -29,19 +29,21 @@ WORKDIR /openim/openim-chat
 ENV GO111MODULE=$GO111MODULE
 ENV GOPROXY=$GOPROXY
 
+COPY go.mod go.sum ./
+RUN go mod download
+
 COPY . .
 
-RUN go mod download
-RUN CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} go build -o /openim/openim-chat/bin/open_im_admin_api ./cmd/api/admin_api
+RUN CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} go build -o /openim/openim-chat/bin/admin-api ./cmd/api/admin-api
 
 FROM ghcr.io/openim-sigs/openim-bash-image:latest
 
 WORKDIR ${CHAT_WORKDIR}
 
-COPY --from=builder ${OPENIM_CHAT_BINDIR}/open_im_admin_api /openim/openim-chat/bin/open_im_admin_api
+COPY --from=builder ${OPENIM_CHAT_BINDIR}/admin-api /openim/openim-chat/bin/admin-api
 COPY --from=builder ${OPENIM_CHAT_CONFIG_NAME} /openim/openim-chat/config/config.yaml
 
 env PORT=10009
 
 EXPOSE ${PORT}
-CMD ["sh","-c","${OPENIM_CHAT_BINDIR}/open_im_admin_api","--port", "${PORT}","--config_folder_path","${OPENIM_CHAT_CONFIG_NAME}"]
+CMD ["bash","-c","${OPENIM_CHAT_BINDIR}/admin-api --port ${PORT} --config_folder_path ${OPENIM_CHAT_CONFIG_NAME}"]

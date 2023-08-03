@@ -16,14 +16,31 @@
 OPENIM_ROOT=$(dirname "${BASH_SOURCE[0]}")/..
 SCRIPTS_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 
-source $OPENIM_ROOT/scripts/style_info.cfg
-source $OPENIM_ROOT/scripts/path_info.cfg
-source $OPENIM_ROOT/scripts/function.sh
+source $SCRIPTS_ROOT/style_info.sh
+source $SCRIPTS_ROOT/path_info.sh
+source $SCRIPTS_ROOT/function.sh
+
+echo -e "${YELLOW_PREFIX}=======>SCRIPTS_ROOT=$SCRIPTS_ROOT${COLOR_SUFFIX}"
+echo -e "${YELLOW_PREFIX}=======>OPENIM_ROOT=$OPENIM_ROOT${COLOR_SUFFIX}"
+echo -e "${YELLOW_PREFIX}=======>pwd=$PWD${COLOR_SUFFIX}"
+
+if [ ! -d "${OPENIM_ROOT}/_output/bin/platforms" ]; then
+  # exec build_all_service.sh
+  "${SCRIPTS_ROOT}/build_all_service.sh"
+fi
+
+bin_dir="$SCRIPTS_ROOT/../bin"
+logs_dir="$SCRIPTS_ROOT/../logs"
+sdk_db_dir="$SCRIPTS_ROOT/../sdk/db/"
+
+echo -e "${YELLOW_PREFIX}=======>bin_dir=$bin_dir${COLOR_SUFFIX}"
+echo -e "${YELLOW_PREFIX}=======>logs_dir=$logs_dir${COLOR_SUFFIX}"
+echo -e "${YELLOW_PREFIX}=======>sdk_db_dir=$sdk_db_dir${COLOR_SUFFIX}"
 
 #service filename
 service_filename=(
- open_im_chat_api
- open_im_admin_api
+  chat-api
+  admin-api
   #rpc
   open_im_admin
   open_im_chat
@@ -57,22 +74,21 @@ for ((i = 0; i < ${#service_filename[*]}; i++)); do
     kill -9 $(eval $pid)
     sleep 0.5
   fi
-  cd $OPENIM_ROOT/bin
+  cd $SCRIPTS_ROOT
   #Get the rpc port in the configuration file
   portList=$(cat $config_path | grep ${service_port_name[$i]} | awk -F '[:]' '{print $NF}')
   list_to_string ${portList}
   service_ports=($ports_array)
 
-
   #Start related rpc services based on the number of ports
   for ((j = 0; j < ${#service_ports[*]}; j++)); do
     #Start the service in the background
-    cmd="./${service_filename[$i]} -port ${service_ports[$j]} --config_folder_path ${config_path}"
+    cmd="$bin_dir/${service_filename[$i]} -port ${service_ports[$j]} --config_folder_path ${config_path}"
     if [ $i -eq 0 -o $i -eq 1 ]; then
-      cmd="./${service_filename[$i]} -port ${service_ports[$j]} --config_folder_path ${config_path}"
+      cmd="$bin_dir/${service_filename[$i]} -port ${service_ports[$j]} --config_folder_path ${config_path}"
     fi
     echo $cmd
-    nohup $cmd >>../logs/openIM.log 2>&1 &
+    nohup $cmd >>${logs_dir}/openIM.log 2>&1 &
     sleep 1
 #    pid="netstat -ntlp|grep $j |awk '{printf \$7}'|cut -d/ -f1"
 #    echo -e "${GREEN_PREFIX}${service_filename[$i]} start success,port number:${service_ports[$j]} pid:$(eval $pid)$COLOR_SUFFIX"

@@ -13,16 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-OPENIM_ROOT=$(dirname "${BASH_SOURCE[0]}")/..
+SCRIPTS_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+OPENIM_ROOT=$(dirname "${SCRIPTS_ROOT}")/..
 
-SCRIPTS_ROOT=$OPENIM_ROOT/scripts
-cd $SCRIPTS_ROOT
-
-chmod +x ./*.sh
-./start_all.sh
+${SCRIPTS_ROOT}/start_all.sh
 
 i=1
 while ((i == 1))
 do
-    sleep 5
+  sleep 5
 done
