@@ -46,4 +46,4 @@ COPY --from=builder ${OPENIM_CHAT_CONFIG_NAME} /openim/openim-chat/config/config
 
 VOLUME ["/openim/openim-chat/_output","/openim/openim-chat/logs","/openim/openim-chat/config","/openim/openim-chat/scripts"]
 
-CMD ${OPENIM_CHAT_CMDDIR}/start_all.sh
+CMD ${OPENIM_CHAT_CMDDIR}/docker_start_all.sh
