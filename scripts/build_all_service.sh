@@ -50,7 +50,7 @@ if [ ! -d $sdk_db_dir ]; then
   mkdir -p $sdk_db_dir
 fi
 
-cd $OPENIM_ROOT
+cd $SCRIPTS_ROOT/..
 
 # CPU core number
 cpu_count=$(lscpu | grep -e '^CPU(s):' | awk '{print $2}')

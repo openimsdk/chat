@@ -13,8 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-OPENIM_ROOT=$(dirname "${BASH_SOURCE[0]}")/..
+#Include shell font styles and some basic information
 SCRIPTS_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+OPENIM_ROOT=$(dirname "${SCRIPTS_ROOT}")/..
 
 source $SCRIPTS_ROOT/style_info.sh
 source $SCRIPTS_ROOT/path_info.sh
@@ -24,12 +25,13 @@ echo -e "${YELLOW_PREFIX}=======>SCRIPTS_ROOT=$SCRIPTS_ROOT${COLOR_SUFFIX}"
 echo -e "${YELLOW_PREFIX}=======>OPENIM_ROOT=$OPENIM_ROOT${COLOR_SUFFIX}"
 echo -e "${YELLOW_PREFIX}=======>pwd=$PWD${COLOR_SUFFIX}"
 
-if [ ! -d "${OPENIM_ROOT}/_output/bin/platforms" ]; then
-  # exec build_all_service.sh
-  "${SCRIPTS_ROOT}/build_all_service.sh"
-fi
+# if [ ! -d "${OPENIM_ROOT}/_output/bin/platforms" ]; then
+#   cd $OPENIM_ROOT
+#   # exec build_all_service.sh
+#   "${SCRIPTS_ROOT}/build_all_service.sh"
+# fi
 
-bin_dir="$SCRIPTS_ROOT/../bin"
+bin_dir="$BIN_DIR"
 logs_dir="$SCRIPTS_ROOT/../logs"
 sdk_db_dir="$SCRIPTS_ROOT/../sdk/db/"
 
@@ -42,8 +44,8 @@ service_filename=(
   chat-api
   admin-api
   #rpc
-  open_im_admin
-  open_im_chat
+  admin-rpc
+  chat-rpc
 )
 
 #service config port name
@@ -63,7 +65,7 @@ cd $SCRIPTS_ROOT
 
 for ((i = 0; i < ${#service_filename[*]}; i++)); do
   #Check whether the service exists
-  service_name="ps -aux |grep -w ${service_filename[$i]} |grep -v grep"
+  service_name="ps |grep -w ${service_filename[$i]} |grep -v grep"
   count="${service_name}| wc -l"
 
   if [ $(eval ${count}) -gt 0 ]; then
@@ -75,6 +77,7 @@ for ((i = 0; i < ${#service_filename[*]}; i++)); do
     sleep 0.5
   fi
   cd $SCRIPTS_ROOT
+
   #Get the rpc port in the configuration file
   portList=$(cat $config_path | grep ${service_port_name[$i]} | awk -F '[:]' '{print $NF}')
   list_to_string ${portList}

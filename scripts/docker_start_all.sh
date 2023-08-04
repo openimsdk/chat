@@ -13,13 +13,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+#Include shell font styles and some basic information
 SCRIPTS_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
-OPENIM_ROOT=$(dirname "${SCRIPTS_ROOT}")/..
+OPENIM_ROOT=$(dirname "${BASH_SOURCE[0]}")/..
 
 ${SCRIPTS_ROOT}/start_all.sh
 
-i=1
-while ((i == 1))
-do
-  sleep 5
+#fixme The 10 second delay to start the project is for the docker-compose one-click to start openIM when the infrastructure dependencies are not started
+
+sleep 10
+time=`date +"%Y-%m-%d %H:%M:%S"`
+echo "==========================================================">>$OPENIM_ROOT/logs/openIM.log 2>&1 &
+echo "==========================================================">>$OPENIM_ROOT/logs/openIM.log 2>&1 &
+echo "==========================================================">>$OPENIM_ROOT/logs/openIM.log 2>&1 &
+echo "==========server start time:${time}===========">>$OPENIM_ROOT/logs/openIM.log 2>&1 &
+echo "==========================================================">>$OPENIM_ROOT/logs/openIM.log 2>&1 &
+echo "==========================================================">>$OPENIM_ROOT/logs/openIM.log 2>&1 &
+echo "==========================================================">>$OPENIM_ROOT/logs/openIM.log 2>&1 &
+for i in ${need_to_start_server_shell[*]}; do
+  $i
 done
+
+sleep 15
+
+#fixme prevents the openIM service exit after execution in the docker container
+tail -f /dev/null

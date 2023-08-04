@@ -29,22 +29,19 @@ ENV GOPROXY=$GOPROXY
 COPY go.mod go.sum ./
 RUN go mod download
 
-COPY . .
+# Copy all files to the container
+ADD . .
 
-# Compile the source code
-RUN CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} go build -o /openim/openim-chat/bin/admin-rpc ./cmd/rpc/admin-rpc
-RUN CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} go build -o /openim/openim-chat/bin/admin-api ./cmd/api/admin-api
-RUN CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} go build -o /openim/openim-chat/bin/chat-rpc ./cmd/rpc/chat-rpc
-RUN CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} go build -o /openim/openim-chat/bin/chat-api ./cmd/api/chat-api
+RUN /bin/sh -c "make clean"
+RUN /bin/sh -c "make build"
 
 # Build the runtime stage
 FROM ghcr.io/openim-sigs/openim-bash-image:v1.3.0
 
-# Set fixed project path
-WORKDIR /openim/openim-chat
+WORKDIR ${CHAT_WORKDIR}
 
-COPY --from=builder ${OPENIM_CHAT_BINDIR} /openim/openim-chat/bin
+COPY --from=builder /openim/openim-chat/_output/bin/platforms /openim/openim-chat/_output/bin/platforms
 COPY --from=builder ${OPENIM_CHAT_CMDDIR} /openim/openim-chat/scripts
 COPY --from=builder ${OPENIM_CHAT_CONFIG_NAME} /openim/openim-chat/config/config.yaml
 
-CMD ["bash","-c","${OPENIM_CHAT_CMDDIR}/docker_start_all.sh"]
+CMD ${OPENIM_CHAT_CMDDIR}/docker_start_all.sh

@@ -2,11 +2,9 @@
 
 #Don't put the space between "="
 
-OPENIM_ROOT=$(dirname "${BASH_SOURCE[0]}")/..
+#Include shell font styles and some basic information
 SCRIPTS_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
-
-demo_server_name="chat-api"
-demo_server_binary_root="${OPENIM_ROOT}/bin/"
+OPENIM_ROOT=$(dirname "${BASH_SOURCE[0]}")/..
 
 # Determine the architecture and version
 architecture=$(uname -m)
@@ -40,14 +38,14 @@ fi
 echo -e "${BLUE_PREFIX}================> Architecture: $architecture${COLOR_SUFFIX}"
 
 # Set the BIN_DIR based on the architecture and version
-BIN_DIR=${supported_architectures["$version-$architecture"]}
+BIN_DIR=${SCRIPTS_ROOT}/../${supported_architectures["$version-$architecture"]}
 
 echo -e "${BLUE_PREFIX}================> BIN_DIR: $OPENIM_ROOT/$BIN_DIR${COLOR_SUFFIX}"
 
 #Global configuration file default dir
-config_path="$SCRIPTS_ROOT/../config/config.yaml"
+config_path="$OPENIM_ROOT/config/config.yaml"
 configfile_path="$OPENIM_ROOT/config"
-log_path="$SCRIPTS_ROOT/../log"
+log_path="$OPENIM_ROOT/log"
 
 #servicefile dir path
 service_source_root=(
@@ -60,10 +58,8 @@ service_source_root=(
 )
 #service filename
 service_names=(
-  #api service filename
   chat-api
   admin-api
-  #rpc service filename
-  admin-rpc
   chat-rpc
+  admin-rpc
 )
