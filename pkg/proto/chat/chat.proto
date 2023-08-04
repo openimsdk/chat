@@ -240,25 +240,14 @@ message SearchUserFullInfoResp{
   repeated OpenIMChat.common.UserFullInfo users = 2;
 }
 
-message NewUserCountReq{
-  int64 start =1;
-  int64 end=2;
-}
-
-message NewUserCountResp{
-  int64 total=1;
-  int64 before=2;
-  map<string,int64>Count=3;
-}
-
 message UserLoginCountReq{
   int64 start =1;
   int64 end=2;
 }
 
 message UserLoginCountResp{
-  int64 total=1;
-  int64 before=2;
+  int64 loginCount=1;
+  int64 unloginCount=2;
   map<string,int64>Count=3;
 }
 
@@ -288,6 +277,5 @@ service chat {
   rpc OpenIMCallback(OpenIMCallbackReq) returns(OpenIMCallbackResp);
 
   //统计
-  rpc NewUserCount(NewUserCountReq) returns (NewUserCountResp);
   rpc UserLoginCount(UserLoginCountReq) returns (UserLoginCountResp);
 }

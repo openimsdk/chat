@@ -57,9 +57,9 @@ func ToDBAdminUpdate(req *admin.AdminUpdateInfoReq) (map[string]any, error) {
 		}
 		update["nickname"] = req.Nickname.Value
 	}
-	if req.UserID != nil {
-		update["user_id"] = req.UserID.Value
-	}
+	//if req.UserID != nil {
+	//	update["user_id"] = req.UserID.Value
+	//}
 	if req.Level != nil {
 		update["level"] = req.Level.Value
 	}
