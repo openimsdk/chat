@@ -1,7 +1,8 @@
 .PHONY: all build run gotool install clean help
 
-BINARY_NAME=open_im_admin
+BINARY_NAME=chat-api
 BIN_DIR=../../../bin/
+
 
 all: gotool build
 

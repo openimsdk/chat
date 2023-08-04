@@ -17,12 +17,12 @@
 #
 # Store this file as .git/hooks/commit-msg in your repository in order to
 # enforce checking for proper commit message format before actual commits.
-# You may need to make the script executable by 'chmod +x .git/hooks/commit-msg'.
+# You may need to make the scripts executable by 'chmod +x .git/hooks/commit-msg'.
 
 # commit-msg use go-gitlint tool, install go-gitlint via `go get github.com/llorllale/go-gitlint/cmd/go-gitlint`
 # go-gitlint --msg-file="$1"
 
-# An example hook script to check the commit log message.
+# An example hook scripts to check the commit log message.
 # Called by "git commit" with one argument, the name of the file
 # that has the commit message.  The hook should exit with non-zero
 # status after issuing an appropriate message if it wants to stop the
@@ -56,11 +56,12 @@ test "" = "$(grep '^Signed-off-by: ' "$1" |
 }
 
 # TODO: go-gitlint dir set
-GITLINT_DIR="./_output/tools/go-gitlint"
+OPENIM_ROOT=$(dirname "${BASH_SOURCE[0]}")/../..
+GITLINT_DIR="$OPENIM_ROOT/_output/tools/go-gitlint"
 
 $GITLINT_DIR \
     --msg-file=$1 \
-    --subject-regex="^(build|chore|ci|docs|feat|feature|fix|perf|refactor|revert|style|test)(.*)?:\s?.*" \
+    --subject-regex="^(build|chore|ci|docs|feat|feature|fix|perf|refactor|revert|style|bot|test)(.*)?:\s?.*" \
     --subject-maxlen=150 \
     --subject-minlen=10 \
     --body-regex=".*" \
@@ -74,4 +75,18 @@ then
     printError "Please fix your commit message to match kubecub coding standards"
     printError "https://gist.github.com/cubxxw/126b72104ac0b0ca484c9db09c3e5694#file-githook-md"
     exit 1
+fi
+
+### Add Sign-off-by line to the end of the commit message
+# Get local git config
+NAME=$(git config user.name)
+EMAIL=$(git config user.email)
+
+# Check if the commit message contains a sign-off line
+grep -qs "^Signed-off-by: " "$1"
+SIGNED_OFF_BY_EXISTS=$?
+
+# Add "Signed-off-by" line if it doesn't exist
+if [ $SIGNED_OFF_BY_EXISTS -ne 0 ]; then
+  echo -e "\nSigned-off-by: $NAME <$EMAIL>" >> "$1"
 fi

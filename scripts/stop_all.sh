@@ -17,14 +17,14 @@
 SCRIPTS_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 OPENIM_ROOT=$(dirname "${BASH_SOURCE[0]}")/..
 
-source $OPENIM_ROOT/scripts/style_info.cfg
-source $OPENIM_ROOT/scripts/path_info.cfg
+source $OPENIM_ROOT/scripts/style_info.sh
+source $OPENIM_ROOT/scripts/path_info.sh
 
 cd "$SCRIPTS_ROOT"
 
 for i in ${service_names[*]}; do
   #Check whether the service exists
-  name="ps -aux |grep -w $i |grep -v grep"
+  name="ps -T |grep -w $i |grep -v grep"
   count="${name}| wc -l"
   if [ $(eval ${count}) -gt 0 ]; then
     pid="${name}| awk '{print \$2}'"

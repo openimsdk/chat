@@ -25,9 +25,9 @@ before:
 report_sizes: true
 
 builds:
-  - binary: chat_api
-    id: chat_api
-    main: ./cmd/api/chat_api/main.go
+  - binary: chat-api
+    id: chat-api
+    main: ./cmd/api/chat-api/main.go
     goos:
       - darwin
       - linux
@@ -52,9 +52,9 @@ builds:
       - goos: windows
         goarch: ppc64le
 
-  - binary: admin_api
-    id: admin_api
-    main: ./cmd/api/admin_api/main.go
+  - binary: admin-api
+    id: admin-api
+    main: ./cmd/api/admin-api/main.go
     goos:
       - darwin
       - linux
@@ -79,9 +79,9 @@ builds:
       - goos: windows
         goarch: ppc64le
 
-  - binary: chat_rpc
-    id: chat_rpc
-    main: ./cmd/rpc/chat/main.go
+  - binary: chat-rpc
+    id: chat-rpc
+    main: ./cmd/rpc/chat-rpc/main.go
     goos:
       - darwin
       - linux
@@ -106,9 +106,9 @@ builds:
       - goos: windows
         goarch: ppc64le
 
-  - binary: admin_rpc
-    id: admin_rpc
-    main: ./cmd/rpc/admin/main.go
+  - binary: admin-rpc
+    id: admin-rpc
+    main: ./cmd/rpc/admin-rpc/main.go
     goos:
       - darwin
       - linux
@@ -330,10 +330,10 @@ changelog:
 nfpms:
   - id: packages
     builds:
-      - admin_api
-      - chat_api
-      - chat_rpc
-      - admin_rpc
+      - admin-api
+      - chat-api
+      - chat-rpc
+      - admin-rpc
     # Your app's vendor.
     vendor: OpenIMSDK
     homepage: https://github.com/OpenIMSDK/chat
@@ -422,17 +422,13 @@ release:
 
     ## Helping out
 
-    We release logs are recorded on [✨ CHANGELOG](https://github.com/OpenIMSDK/Open-IM-Server/blob/main/CHANGELOG/CHANGELOG.md)
+    + We release logs are recorded on [✨ CHANGELOG](https://github.com/OpenIMSDK/Open-IM-Server/blob/main/CHANGELOG/CHANGELOG.md)
 
-    For information on versions of OpenIM and how to maintain branches, read [📚this article](https://github.com/OpenIMSDK/Open-IM-Server/blob/main/docs/conversions/version.md)
+    + For information on versions of OpenIM and how to maintain branches, read [📚this article](https://github.com/OpenIMSDK/Open-IM-Server/blob/main/docs/conversions/version.md)
 
-    This release is only possible thanks to **all** the support of some **awesome people**!
-
-    If you wish to use mirroring, read OpenIM's [image management policy](https://github.com/OpenIMSDK/Open-IM-Server/blob/main/docs/conversions/images.md)
+    + If you wish to use mirroring, read OpenIM's [image management policy](https://github.com/OpenIMSDK/Open-IM-Server/blob/main/docs/conversions/images.md)
 
     **Want to be one of them 😘?**
-
-    Contributions to this project are welcome! Please see [CONTRIBUTING.md](https://github.com/OpenIMSDK/Open-IM-Server/blob/main/CONTRIBUTING.md) for details.
 
     <p align="center">
         <a href="https://github.com/kubbot" style="float: left; margin-right: 10px;">
@@ -445,6 +441,12 @@ release:
             <img src="https://github.com/openimbot/openimbot/blob/main/assets/icon/red%E9%80%8F%E6%98%8E.png" width="50" height="50" />
         </a>
     </p>
+
+    > **Note**
+    > @openimbot and @kubbot have made great contributions to the community as community 🤖robots(@openimsdk/bot), respectively.
+    > Thanks to the @openimsdk/openim team for all their hard work on this release.
+    > Thank you to all the [💕developers and contributors](https://github.com/OpenIMSDK/chat/graphs/contributors), people from all over the world, OpenIM brings us together
+    > Contributions to this project are welcome! Please see [CONTRIBUTING.md](https://github.com/OpenIMSDK/Open-IM-Server/blob/main/CONTRIBUTING.md) for details.
 
 
     ## Get Involved with OpenIM!

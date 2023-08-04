@@ -1,6 +1,6 @@
 .PHONY: all build run gotool install clean help
 
-BINARY_NAME=open_im_chat
+BINARY_NAME=chat-rpc
 BIN_DIR=../../../bin/
 
 all: gotool build
