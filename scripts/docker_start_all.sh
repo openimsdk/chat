@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 # Copyright © 2023 OpenIM open source community. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,8 +30,12 @@ echo "==========server start time:${time}===========">>$OPENIM_ROOT/logs/openIM.
 echo "==========================================================">>$OPENIM_ROOT/logs/openIM.log 2>&1 &
 echo "==========================================================">>$OPENIM_ROOT/logs/openIM.log 2>&1 &
 echo "==========================================================">>$OPENIM_ROOT/logs/openIM.log 2>&1 &
-for i in ${need_to_start_server_shell[*]}; do
-  $i
+
+
+i=1
+while ((i == 1))
+do
+  sleep 5
 done
 
 sleep 15

@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 # Copyright © 2023 OpenIM open source community. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");

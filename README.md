@@ -87,23 +87,21 @@ make all
 
 ### Chat Start
 
- ```
- ./scripts/start_all.sh
- ```
+```bash
+./scripts/start_all.sh
+```
 
 ### Chat Detection
 
- ```
-cd scripts
-./check_all.sh
+```bash
+./scripts/check_all.sh
  ```
 
 ### Chat Stop
 
- ```
-cd scripts
-./stop_all.sh
- ```
+```bash
+./scripts/stop_all.sh
+```
 
 ## Contributing
 

@@ -44,6 +44,6 @@ COPY --from=builder /openim/openim-chat/_output/bin/platforms /openim/openim-cha
 COPY --from=builder ${OPENIM_CHAT_CMDDIR} /openim/openim-chat/scripts
 COPY --from=builder ${OPENIM_CHAT_CONFIG_NAME} /openim/openim-chat/config/config.yaml
 
-VOLUME ["/openim/openim-chat/logs","/openim/openim-chat/config","/openim/openim-chat/scripts"]
+VOLUME ["/openim/openim-chat/_output","/openim/openim-chat/logs","/openim/openim-chat/config","/openim/openim-chat/scripts"]
 
 CMD ${OPENIM_CHAT_CMDDIR}/start_all.sh
