@@ -1,7 +1,7 @@
 github.com/OpenIMSDK/open_utils v1.0.8 h1:IopxWgJwEF5ZAPsRuiZZOfcxNOQOCt/p8VDENcHN9r4=
 github.com/OpenIMSDK/open_utils v1.0.8/go.mod h1:FLoaQblWUVKQgqt2LrNzfSZLT6D3DICBn1kcOMDLUOI=
-github.com/OpenIMSDK/protocol v0.0.3 h1:CFQtmnyW+1dYKVFaVaHcJ6oYuMiMdNfU2gC1xz3K/9I=
-github.com/OpenIMSDK/protocol v0.0.3/go.mod h1:F25dFrwrIx3lkNoiuf6FkCfxuwf8L4Z8UIsdTHP/r0Y=
+github.com/OpenIMSDK/protocol v0.0.4 h1:zEEAi677nog+k4u3e5h36nvYeb1XAwcKQ3Uc2tzxHYs=
+github.com/OpenIMSDK/protocol v0.0.4/go.mod h1:F25dFrwrIx3lkNoiuf6FkCfxuwf8L4Z8UIsdTHP/r0Y=
 github.com/OpenIMSDK/tools v0.0.13 h1:rcw4HS8S2DPZR9UOBxD8/ol9UBMzXBypzOVEytDRIMo=
 github.com/OpenIMSDK/tools v0.0.13/go.mod h1:eg+q4A34Qmu73xkY0mt37FHGMCMfC6CtmOnm0kFEGFI=
 github.com/alibabacloud-go/alibabacloud-gateway-spi v0.0.4 h1:iC9YFYKDGEy3n/FtqJnOkZsene9olVspKmkX5A2YBEo=
