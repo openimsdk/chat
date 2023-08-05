@@ -36,7 +36,7 @@ RUN /bin/sh -c "make clean"
 RUN /bin/sh -c "make build"
 
 # Build the runtime stage
-FROM ghcr.io/openim-sigs/openim-bash-image:v1.3.0
+FROM ghcr.io/openim-sigs/openim-bash-image:latest
 
 WORKDIR ${CHAT_WORKDIR}
 
