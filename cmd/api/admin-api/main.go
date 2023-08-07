@@ -44,8 +44,6 @@ func main() {
 	flag.IntVar(&ginPort, "port", 10009, "get ginServerPort from cmd")
 
 	flag.Parse()
-
-	rand.Seed(time.Now().UnixNano())
 	if err := config.InitConfig(configFile); err != nil {
 		panic(err)
 	}
