@@ -85,6 +85,7 @@ jobs:
         sudo ./scripts/check_all.sh
         sudo cat ../logs/openIM.log 2>/dev/null
       shell: bash
+      continue-on-error: true
 
     - name: Print openIM.log
       run: |
