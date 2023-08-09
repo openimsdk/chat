@@ -18,6 +18,7 @@ import (
 	"context"
 	"crypto/md5"
 	"encoding/hex"
+	"github.com/OpenIMSDK/tools/log"
 	"time"
 
 	"github.com/OpenIMSDK/chat/pkg/common/config"
@@ -55,7 +56,12 @@ func (o *Admin) InitAdmin(ctx context.Context) error {
 	if err := o.db.WithContext(ctx).Model(&admin.Admin{}).Count(&count).Error; err != nil {
 		return errs.Wrap(err)
 	}
-	if count > 0 || len(config.Config.AdminList) == 0 {
+	if count > 0 {
+		log.ZInfo(ctx, "Admins are already registered in database", "admin count", count)
+		return nil
+	}
+	if len(config.Config.AdminList) == 0 {
+		log.ZInfo(ctx, "AdminList is empty", "adminList", config.Config.AdminList)
 		return nil
 	}
 	now := time.Now()
