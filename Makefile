@@ -155,7 +155,7 @@ EXCLUDE_TESTS=github.com/OpenIMSDK/chat/test
 
 ## all: Build all the necessary targets.
 .PHONY: all
-all: copyright-verify build # tidy lint cover
+all: copyright-verify tidy build start check #lint cover
 
 ## build: Build binaries by default.
 .PHONY: build
@@ -254,6 +254,24 @@ test:
 .PHONY: cover
 cover: test
 	@$(GO) test -cover
+
+## start: Start the chat all service.
+.PHONY: start
+start:
+	@echo "===========> Starting the service"
+	@$(ROOT_DIR)/scripts/start_all.sh
+
+## check: Check the chat all service.
+.PHONY: check
+check:
+	@echo "===========> Checking the service"
+	@$(ROOT_DIR)/scripts/check_all.sh
+
+## stop: Stop the chat all service.
+.PHONY: stop
+stop:
+	@echo "===========> Stopping the service"
+	@$(ROOT_DIR)/scripts/stop_all.sh
 
 ## docker-build: Build docker image with the manager.
 .PHONY: docker-build
