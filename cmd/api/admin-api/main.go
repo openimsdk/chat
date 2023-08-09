@@ -35,6 +35,7 @@ import (
 )
 
 func main() {
+	rand.Seed(time.Now().UnixNano())
 	var configFile string
 	flag.StringVar(&configFile, "config_folder_path", "../config/config.yaml", "Config full path")
 
@@ -43,8 +44,6 @@ func main() {
 	flag.IntVar(&ginPort, "port", 10009, "get ginServerPort from cmd")
 
 	flag.Parse()
-
-	rand.Seed(time.Now().UnixNano())
 	if err := config.InitConfig(configFile); err != nil {
 		panic(err)
 	}

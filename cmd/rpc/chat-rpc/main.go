@@ -18,12 +18,15 @@ import (
 	"flag"
 	"github.com/OpenIMSDK/chat/pkg/common/chatrpcstart"
 	"github.com/OpenIMSDK/tools/log"
+	"math/rand"
+	"time"
 
 	"github.com/OpenIMSDK/chat/internal/rpc/chat"
 	"github.com/OpenIMSDK/chat/pkg/common/config"
 )
 
 func main() {
+	rand.Seed(time.Now().UnixNano())
 	var configFile string
 	flag.StringVar(&configFile, "config_folder_path", "../config/config.yaml", "Config full path")
 
