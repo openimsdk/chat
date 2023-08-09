@@ -46,4 +46,4 @@ COPY --from=builder ${OPENIM_CHAT_CONFIG_NAME} /openim/openim-chat/config/config
 ENV PORT=30300
 
 EXPOSE ${PORT}
-CMD ["bash", "-c","${OPENIM_CHAT_BINDIR}/platforms/${OS}/${ARCH}/chat-rpc --port ${PORT} --config_folder_path ${OPENIM_CHAT_CONFIG_NAME}"]
+CMD ["bash", "-c","${OPENIM_CHAT_BINDIR}/platforms/$(get_os)/$(get_arch)/chat-rpc --port ${PORT} --config_folder_path ${OPENIM_CHAT_CONFIG_NAME}"]
