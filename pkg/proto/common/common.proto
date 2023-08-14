@@ -68,3 +68,12 @@ message AppletInfo  {
   uint32 status = 10;
   int64 createTime = 11;
 }
+
+message LogInfo{
+  string userID=1;
+  int32 platform=2;
+  string url=3;
+  int64 createTime=4;
+  string nickname=5;
+  string logID=6;
+}

@@ -53,6 +53,10 @@ func NewChatRoute(router gin.IRouter, discov discoveryregistry.SvcDiscoveryRegis
 	router.Group("/client_config").POST("/get", chat.GetClientConfig) // 获取客户端初始化配置
 
 	router.Group("/callback").POST("/open_im", chat.OpenIMCallback) // 回调
+
+	logs := router.Group("/logs", mw.CheckToken)
+	logs.POST("/upload", chat.UploadLogs)
+	logs.POST("/delete", chat.DeleteLogs)
 }
 
 func NewAdminRoute(router gin.IRouter, discov discoveryregistry.SvcDiscoveryRegistry) {
@@ -121,4 +125,7 @@ func NewAdminRoute(router gin.IRouter, discov discoveryregistry.SvcDiscoveryRegi
 	statistic := router.Group("/statistic", mw.CheckAdmin)
 	statistic.POST("/new_user_count", admin.NewUserCount)
 	statistic.POST("/login_user_count", admin.LoginUserCount)
+
+	logs := router.Group("/logs", mw.CheckAdmin)
+	logs.POST("/search", admin.SearchLogs)
 }

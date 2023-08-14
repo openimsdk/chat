@@ -251,6 +251,35 @@ message UserLoginCountResp{
   map<string,int64>Count=3;
 }
 
+
+message UploadLogsReq{
+  string userID=1;
+  int32 platform=2;
+  string url=3;
+}
+
+message UploadLogsResp{
+}
+
+message DeleteLogsReq{
+  repeated string logIDs=1;
+}
+
+message DeleteLogsResp{
+}
+
+message SearchLogsReq{
+  string keyword=1;
+  int64 startTime=2;
+  int64 endTime=3;
+  OpenIMServer.sdkws.RequestPagination pagination = 4;
+}
+
+message SearchLogsResp{
+  repeated OpenIMChat.common.LogInfo LogsInfos=1;
+  uint32 total=2;
+}
+
 service chat {
   //编辑个人资料 自己或者管理员调用
   rpc UpdateUserInfo(UpdateUserInfoReq) returns(UpdateUserInfoResp);
@@ -278,4 +307,8 @@ service chat {
 
   //统计
   rpc UserLoginCount(UserLoginCountReq) returns (UserLoginCountResp);
+  //日志
+  rpc UploadLogs(UploadLogsReq) returns (UploadLogsResp);
+  rpc DeleteLogs(DeleteLogsReq) returns (DeleteLogsResp);
+  rpc SearchLogs(SearchLogsReq) returns (SearchLogsResp);
 }

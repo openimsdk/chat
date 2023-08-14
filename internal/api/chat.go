@@ -307,3 +307,11 @@ func (o *ChatApi) getClientIP(c *gin.Context) (string, error) {
 	}
 	return ip, nil
 }
+
+func (o *ChatApi) UploadLogs(c *gin.Context) {
+	a2r.Call(chat.ChatClient.UploadLogs, o.chatClient, c)
+}
+
+func (o *ChatApi) DeleteLogs(c *gin.Context) {
+	a2r.Call(chat.ChatClient.DeleteLogs, o.chatClient, c)
+}

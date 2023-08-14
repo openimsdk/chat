@@ -63,3 +63,17 @@ func DbToPbUserFullInfo(attribute *chat.Attribute) *common.UserFullInfo {
 func DbToPbUserFullInfos(attributes []*chat.Attribute) []*common.UserFullInfo {
 	return utils.Slice(attributes, DbToPbUserFullInfo)
 }
+
+func DbToPbLogInfo(log *chat.Log) *common.LogInfo {
+	return &common.LogInfo{
+		UserID:     log.UserID,
+		Platform:   utils.StringToInt32(log.Platform),
+		Url:        log.Url,
+		CreateTime: log.CreateTime.UnixMilli(),
+		LogID:      log.LogID,
+	}
+}
+
+func DbToPbLogInfos(logs []*chat.Log) []*common.LogInfo {
+	return utils.Slice(logs, DbToPbLogInfo)
+}

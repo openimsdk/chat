@@ -15,6 +15,7 @@
 package chat
 
 import (
+	"github.com/OpenIMSDK/tools/utils"
 	"regexp"
 	"strconv"
 
@@ -197,6 +198,38 @@ func (x *SearchUserFullInfoReq) Check() error {
 	}
 	if x.Normal < constant.FinDAllUser || x.Normal > constant.FindNormalUser {
 		return errs.ErrArgs.Wrap("normal flied is invalid")
+	}
+	return nil
+}
+
+func (x *DeleteLogsReq) Check() error {
+	if x.LogIDs == nil {
+		return errs.ErrArgs.Wrap("LogIDs is empty")
+	}
+	if utils.Duplicate(x.LogIDs) {
+		return errs.ErrArgs.Wrap("Logs has duplicate")
+	}
+	return nil
+}
+
+func (x *UploadLogsReq) Check() error {
+	if x.Url == "" {
+		return errs.ErrArgs.Wrap("Url is empty")
+	}
+	if x.Platform < constant2.IOSPlatformID || x.Platform > constant2.AdminPlatformID {
+		return errs.ErrArgs.Wrap("Platform is invalid")
+	}
+	return nil
+}
+func (x *SearchLogsReq) Check() error {
+	if x.Pagination == nil {
+		return errs.ErrArgs.Wrap("Pagination is empty")
+	}
+	if x.Pagination.PageNumber < 1 {
+		return errs.ErrArgs.Wrap("pageNumber is invalid")
+	}
+	if x.Pagination.ShowNumber < 1 {
+		return errs.ErrArgs.Wrap("showNumber is invalid")
 	}
 	return nil
 }
