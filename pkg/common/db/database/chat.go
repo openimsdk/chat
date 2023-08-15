@@ -54,6 +54,10 @@ type ChatDatabaseInterface interface {
 	NewUserCountTotal(ctx context.Context, before *time.Time) (int64, error)
 	UserLoginCountTotal(ctx context.Context, before *time.Time) (int64, error)
 	UserLoginCountRangeEverydayTotal(ctx context.Context, start *time.Time, end *time.Time) (map[string]int64, int64, error)
+	UploadLogs(ctx context.Context, logs []*table.Log) error
+	DeleteLogs(ctx context.Context, logID []string, userID string) error
+	SearchLogs(ctx context.Context, keyword string, start time.Time, end time.Time, pageNumber int32, showNumber int32) (uint32, []*table.Log, error)
+	GetLogs(ctx context.Context, LogIDs []string, userID string) ([]*table.Log, error)
 }
 
 func NewChatDatabase(db *gorm.DB) ChatDatabaseInterface {
@@ -65,6 +69,7 @@ func NewChatDatabase(db *gorm.DB) ChatDatabaseInterface {
 		userLoginRecord:  chat.NewUserLoginRecord(db),
 		verifyCode:       chat.NewVerifyCode(db),
 		forbiddenAccount: admin2.NewForbiddenAccount(db),
+		log:              chat.NewLogs(db),
 	}
 }
 
@@ -76,6 +81,23 @@ type ChatDatabase struct {
 	userLoginRecord  table.UserLoginRecordInterface
 	verifyCode       table.VerifyCodeInterface
 	forbiddenAccount admin.ForbiddenAccountInterface
+	log              table.LogInterface
+}
+
+func (o *ChatDatabase) GetLogs(ctx context.Context, LogIDs []string, userID string) ([]*table.Log, error) {
+	return o.log.Get(ctx, LogIDs, userID)
+}
+
+func (o *ChatDatabase) DeleteLogs(ctx context.Context, logID []string, userID string) error {
+	return o.log.Delete(ctx, logID, userID)
+}
+
+func (o *ChatDatabase) SearchLogs(ctx context.Context, keyword string, start time.Time, end time.Time, pageNumber int32, showNumber int32) (uint32, []*table.Log, error) {
+	return o.log.Search(ctx, keyword, start, end, pageNumber, showNumber)
+}
+
+func (o *ChatDatabase) UploadLogs(ctx context.Context, logs []*table.Log) error {
+	return o.log.Create(ctx, logs)
 }
 
 func (o *ChatDatabase) IsNotFound(err error) bool {

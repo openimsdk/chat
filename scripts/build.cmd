@@ -1,7 +1,7 @@
 @echo off
 
-set "api_apps=admin_api chat_api"
-set "rpc_apps=admin_rpc chat_rpc"
+set "api_apps=admin-api chat-api"
+set "rpc_apps=admin-rpc chat-rpc"
 
 for %%a in (%api_apps%) do (
     go build -o %%a.exe ../cmd/api/%%a/main.go
