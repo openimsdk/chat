@@ -66,6 +66,7 @@ func DbToPbUserFullInfos(attributes []*chat.Attribute) []*common.UserFullInfo {
 
 func DbToPbLogInfo(log *chat.Log) *common.LogInfo {
 	return &common.LogInfo{
+		Filename:   log.FileName,
 		UserID:     log.UserID,
 		Platform:   utils.StringToInt32(log.Platform),
 		Url:        log.Url,

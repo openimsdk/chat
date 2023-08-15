@@ -76,4 +76,5 @@ message LogInfo{
   int64 createTime=4;
   string nickname=5;
   string logID=6;
+  string filename=7;
 }

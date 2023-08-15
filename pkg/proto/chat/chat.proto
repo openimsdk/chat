@@ -256,6 +256,7 @@ message UploadLogsReq{
   string userID=1;
   int32 platform=2;
   string url=3;
+  string filename=4;
 }
 
 message UploadLogsResp{

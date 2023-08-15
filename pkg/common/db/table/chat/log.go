@@ -11,6 +11,7 @@ type Log struct {
 	UserID     string    `gorm:"column:user_id;type:char(64)"`
 	CreateTime time.Time `gorm:"column:create_time"`
 	Url        string    `gorm:"column:url;type varchar(255)"`
+	FileName   string    `gorm:"column:filename;type varchar(255)"`
 }
 
 type LogInterface interface {

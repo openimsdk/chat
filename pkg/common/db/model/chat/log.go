@@ -18,7 +18,10 @@ func (l *Logs) Create(ctx context.Context, log *chat.Log) error {
 }
 
 func (l *Logs) Search(ctx context.Context, keyword string, start time.Time, end time.Time, pageNumber int32, showNumber int32) (uint32, []*chat.Log, error) {
-	db := l.db.WithContext(ctx).Where("create_time>=? and create_time <= ?", start, end)
+	db := l.db.WithContext(ctx).Where("create_time >= ?", start)
+	if end.UnixMilli() != 0 {
+		db = l.db.WithContext(ctx).Where("create_time <= ?", end)
+	}
 	return ormutil.GormSearch[chat.Log](db, []string{"user_id"}, keyword, pageNumber, showNumber)
 }
 

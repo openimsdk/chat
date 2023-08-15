@@ -39,6 +39,7 @@ func (o *chatSvr) UploadLogs(ctx context.Context, req *chat.UploadLogsReq) (*cha
 		return nil, err
 	}
 	log := table.Log{
+		FileName:   req.Filename,
 		Platform:   utils.ToString(req.Platform),
 		UserID:     req.UserID,
 		CreateTime: time.Now(),
@@ -57,6 +58,9 @@ func (o *chatSvr) UploadLogs(ctx context.Context, req *chat.UploadLogsReq) (*cha
 	}
 	if log.LogID == "" {
 		return nil, errs.ErrData.Wrap("Log id gen error")
+	}
+	if log.FileName == "" {
+		log.FileName = fmt.Sprintf("%v-%v-%v", req.UserID, log.LogID, log.CreateTime.UnixMilli())
 	}
 	err := o.Database.UploadLogs(ctx, &log)
 	if err != nil {
