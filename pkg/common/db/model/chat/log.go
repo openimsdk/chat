@@ -13,7 +13,7 @@ type Logs struct {
 	db *gorm.DB
 }
 
-func (l *Logs) Create(ctx context.Context, log *chat.Log) error {
+func (l *Logs) Create(ctx context.Context, log []*chat.Log) error {
 	return errs.Wrap(l.db.WithContext(ctx).Create(log).Error)
 }
 

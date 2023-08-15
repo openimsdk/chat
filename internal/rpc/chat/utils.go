@@ -72,6 +72,8 @@ func DbToPbLogInfo(log *chat.Log) *common.LogInfo {
 		Url:        log.Url,
 		CreateTime: log.CreateTime.UnixMilli(),
 		LogID:      log.LogID,
+		SystemType: log.SystemType,
+		Ex:         log.Ex,
 	}
 }
 

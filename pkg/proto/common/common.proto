@@ -77,4 +77,6 @@ message LogInfo{
   string nickname=5;
   string logID=6;
   string filename=7;
+  string systemType=8;
+  string ex=9;
 }

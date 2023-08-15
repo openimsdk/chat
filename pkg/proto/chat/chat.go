@@ -213,8 +213,8 @@ func (x *DeleteLogsReq) Check() error {
 }
 
 func (x *UploadLogsReq) Check() error {
-	if x.Url == "" {
-		return errs.ErrArgs.Wrap("Url is empty")
+	if x.FileURLs == nil {
+		return errs.ErrArgs.Wrap("FileUrls is empty")
 	}
 	if x.Platform < constant2.IOSPlatformID || x.Platform > constant2.AdminPlatformID {
 		return errs.ErrArgs.Wrap("Platform is invalid")

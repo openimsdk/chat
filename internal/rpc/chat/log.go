@@ -35,34 +35,37 @@ func (o *chatSvr) IsNotFound(err error) bool {
 }
 
 func (o *chatSvr) UploadLogs(ctx context.Context, req *chat.UploadLogsReq) (*chat.UploadLogsResp, error) {
-	if _, err := o.Database.GetUser(ctx, req.UserID); err != nil {
+	var DBlogs []*table.Log
+	userID, _, err := mctx.Check(ctx)
+	if _, err := o.Database.GetUser(ctx, userID); err != nil {
 		return nil, err
 	}
-	log := table.Log{
-		FileName:   req.Filename,
-		Platform:   utils.ToString(req.Platform),
-		UserID:     req.UserID,
-		CreateTime: time.Now(),
-		Url:        req.Url,
-	}
-	for i := 0; i < 20; i++ {
-		id := o.genLogID()
-		logs, err := o.Database.GetLogs(ctx, []string{id}, "")
-		if err != nil {
-			return nil, err
+	for _, fileURL := range req.FileURLs {
+		log := table.Log{
+			SystemType: req.SystemType,
+			Platform:   utils.ToString(req.Platform),
+			UserID:     userID,
+			CreateTime: time.Now(),
+			Url:        fileURL.URL,
+			FileName:   fileURL.Filename,
 		}
-		if len(logs) == 0 {
-			log.LogID = id
-			break
+		for i := 0; i < 20; i++ {
+			id := o.genLogID()
+			logs, err := o.Database.GetLogs(ctx, []string{id}, "")
+			if err != nil {
+				return nil, err
+			}
+			if len(logs) == 0 {
+				log.LogID = id
+				break
+			}
 		}
+		if log.LogID == "" {
+			return nil, errs.ErrData.Wrap("Log id gen error")
+		}
+		DBlogs = append(DBlogs, &log)
 	}
-	if log.LogID == "" {
-		return nil, errs.ErrData.Wrap("Log id gen error")
-	}
-	if log.FileName == "" {
-		log.FileName = fmt.Sprintf("%v-%v-%v", req.UserID, log.LogID, log.CreateTime.UnixMilli())
-	}
-	err := o.Database.UploadLogs(ctx, &log)
+	err = o.Database.UploadLogs(ctx, DBlogs)
 	if err != nil {
 		return nil, err
 	}

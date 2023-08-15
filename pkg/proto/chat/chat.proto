@@ -251,12 +251,15 @@ message UserLoginCountResp{
   map<string,int64>Count=3;
 }
 
-
+message fileURL{
+  string filename=1;
+  string URL=2;
+}
 message UploadLogsReq{
-  string userID=1;
-  int32 platform=2;
-  string url=3;
-  string filename=4;
+  int32 platform=1;
+  repeated fileURL fileURLs=2;
+  string systemType=3;
+  string ex=4;
 }
 
 message UploadLogsResp{

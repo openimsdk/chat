@@ -54,7 +54,7 @@ type ChatDatabaseInterface interface {
 	NewUserCountTotal(ctx context.Context, before *time.Time) (int64, error)
 	UserLoginCountTotal(ctx context.Context, before *time.Time) (int64, error)
 	UserLoginCountRangeEverydayTotal(ctx context.Context, start *time.Time, end *time.Time) (map[string]int64, int64, error)
-	UploadLogs(ctx context.Context, logs *table.Log) error
+	UploadLogs(ctx context.Context, logs []*table.Log) error
 	DeleteLogs(ctx context.Context, logID []string, userID string) error
 	SearchLogs(ctx context.Context, keyword string, start time.Time, end time.Time, pageNumber int32, showNumber int32) (uint32, []*table.Log, error)
 	GetLogs(ctx context.Context, LogIDs []string, userID string) ([]*table.Log, error)
@@ -96,7 +96,7 @@ func (o *ChatDatabase) SearchLogs(ctx context.Context, keyword string, start tim
 	return o.log.Search(ctx, keyword, start, end, pageNumber, showNumber)
 }
 
-func (o *ChatDatabase) UploadLogs(ctx context.Context, logs *table.Log) error {
+func (o *ChatDatabase) UploadLogs(ctx context.Context, logs []*table.Log) error {
 	return o.log.Create(ctx, logs)
 }
 
