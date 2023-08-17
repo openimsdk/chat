@@ -16,7 +16,7 @@
 
 #fixme This scripts is to stop the service
 SCRIPTS_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
-OPENIM_ROOT=$(dirname "${BASH_SOURCE[0]}")/.. &&pwd
+OPENIM_ROOT=$(cd $(dirname "${BASH_SOURCE[0]}")/.. &&pwd)
 
 source $OPENIM_ROOT/scripts/style_info.sh
 source $OPENIM_ROOT/scripts/path_info.sh
