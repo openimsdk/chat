@@ -34,9 +34,7 @@ service_port_name=(
 
 switch=$(cat $config_path | grep demoswitch |awk -F '[:]' '{print $NF}')
 for i in ${service_port_name[*]}; do
-  echo -e "===========${i}========"
   list=$(cat $config_path | grep -w ${i} | awk -F '[:]' '{print $NF}')
-  echo -e "===========list:${list}========"
   list_to_string $list
   for j in ${ports_array}; do
     port=$(ss -tunlp| grep -E 'api|rpc|open_im' | awk '{print $5}' | grep -w ${j} | awk -F '[:]' '{print $NF}')
