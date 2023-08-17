@@ -35,7 +35,6 @@ for i in ${service_port_name[*]}; do
   echo -e "${list}"
   list_to_string $list
   for j in ${ports_array}; do
-    echo -e "========${j}======="
       name="ps -aux |grep -w $j |grep -v grep"
       count="${name}| wc -l"
       if [ $(eval ${count}) -gt 0 ]; then
