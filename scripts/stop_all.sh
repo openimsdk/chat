@@ -34,6 +34,7 @@ switch=$(cat $config_path | grep demoswitch |awk -F '[:]' '{print $NF}')
 for i in ${service_port_name[*]}; do
   list=$(cat $config_path | grep -w ${i} | awk -F '[:]' '{print $NF}')
   list_to_string $list
+  echo list
   for j in ${ports_array}; do
     echo -e "========${j}======="
       name="ps -aux |grep -w $i |grep -v grep"
