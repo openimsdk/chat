@@ -239,7 +239,7 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 	if req.User.UserID == "" {
 		for i := 0; i < 20; i++ {
 			userID := o.genUserID()
-			_, err := o.Database.GetUser(ctx, req.User.UserID)
+			_, err := o.Database.GetUser(ctx, userID)
 			if err == nil {
 				continue
 			} else if dbutil.IsGormNotFound(err) {

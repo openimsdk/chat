@@ -336,3 +336,7 @@ func (o *AdminApi) NewUserCount(c *gin.Context) {
 	resp.Total = total
 	apiresp.GinSuccess(c, resp)
 }
+
+func (o *AdminApi) SearchLogs(c *gin.Context) {
+	a2r.Call(chat.ChatClient.SearchLogs, o.chatClient, c)
+}

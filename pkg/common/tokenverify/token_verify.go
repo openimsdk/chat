@@ -30,8 +30,9 @@ const (
 )
 
 type claims struct {
-	UserID   string
-	UserType int32
+	UserID     string
+	UserType   int32
+	PlatformID int32
 	jwt.RegisteredClaims
 }
 
@@ -85,7 +86,11 @@ func getToken(t string) (string, int32, error) {
 			return "", 0, errs.ErrTokenNotValidYet.Wrap()
 		}
 	} else {
-		if claims, ok := token.Claims.(*claims); ok && token.Valid {
+		claims, ok := token.Claims.(*claims)
+		if claims.PlatformID != 0 {
+			return "", 0, errs.ErrTokenNotExist.Wrap()
+		}
+		if ok && token.Valid {
 			return claims.UserID, claims.UserType, nil
 		}
 		return "", 0, errs.ErrTokenNotValidYet.Wrap()
