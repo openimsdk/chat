@@ -16,7 +16,7 @@ require (
 	google.golang.org/protobuf v1.31.0
 	gopkg.in/yaml.v3 v3.0.1
 	gorm.io/driver/mysql v1.5.1
-	gorm.io/gorm v1.25.2
+	gorm.io/gorm v1.25.3
 )
 
 require (
@@ -27,7 +27,7 @@ require (
 )
 
 require (
-	github.com/OpenIMSDK/protocol v0.0.6
+	github.com/OpenIMSDK/protocol v0.0.12
 	github.com/OpenIMSDK/tools v0.0.13
 	github.com/redis/go-redis/v9 v9.0.5
 )
