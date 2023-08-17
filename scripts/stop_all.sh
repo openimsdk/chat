@@ -31,6 +31,7 @@ service_port_name=(
 
 for i in ${service_port_name[*]}; do
   list=$(cat $config_path | grep -w ${i} | awk -F '[:]' '{print $NF}')
+  echo -e "========1======="
   list_to_string $list
   for j in ${ports_array}; do
     echo -e "========${j}======="
