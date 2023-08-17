@@ -25,6 +25,7 @@ cd "$SCRIPTS_ROOT"
 
 for i in ${service_names[*]}; do
   #Check whether the service exists
+  echo -e "========${i}======="
   name="ps -aux |grep -w $i |grep -v grep"
   count="${name}| wc -l"
   echo -e "==========$(eval ${count})=========="
