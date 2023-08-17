@@ -42,6 +42,7 @@ func (o *chatSvr) UploadLogs(ctx context.Context, req *chat.UploadLogsReq) (*cha
 	}
 	for _, fileURL := range req.FileURLs {
 		log := table.Log{
+			Version:    req.Version,
 			SystemType: req.SystemType,
 			Platform:   utils.ToString(req.Platform),
 			UserID:     userID,
