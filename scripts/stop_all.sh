@@ -32,7 +32,6 @@ service_port_name=(
 
 for i in ${service_port_name[*]}; do
   list=$(cat $OPENIM_ROOT/config/config.yaml | grep -w ${i} | awk -F '[:]' '{print $NF}')
-  echo -e "${list}"
   list_to_string $list
   for j in ${ports_array}; do
       name="ps -aux |grep -w $j |grep -v grep"
