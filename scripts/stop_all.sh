@@ -23,17 +23,28 @@ source $OPENIM_ROOT/scripts/path_info.sh
 
 cd "$SCRIPTS_ROOT"
 
-for i in ${service_names[*]}; do
-  #Check whether the service exists
-  echo -e "========${i}======="
-  name="ps -aux |grep -w $i |grep -v grep"
-  count="${name}| wc -l"
-  echo -e "==========$(eval ${count})=========="
-  if [ $(eval ${count}) -gt 0 ]; then
-    pid="${name}| awk '{print \$2}'"
-    echo -e "${SKY_BLUE_PREFIX}Killing service:$i pid:$(eval $pid)${COLOR_SUFFIX}"
-    #kill the service that existed
-    kill -9 $(eval $pid)
-    echo -e "${SKY_BLUE_PREFIX}service:$i was killed ${COLOR_SUFFIX}"
-  fi
+service_port_name=(
+ openImChatApiPort
+ openImAdminApiPort
+   #api port name
+   openImAdminPort
+   openImChatPort
+)
+
+for i in ${service_port_name[*]}; do
+  list=$(cat $config_path | grep -w ${i} | awk -F '[:]' '{print $NF}')
+  list_to_string $list
+  for j in ${ports_array}; do
+    echo -e "========${j}======="
+      name="ps -aux |grep -w $i |grep -v grep"
+      count="${name}| wc -l"
+      echo -e "==========$(eval ${count})=========="
+      if [ $(eval ${count}) -gt 0 ]; then
+        pid="${name}| awk '{print \$2}'"
+        echo -e "${SKY_BLUE_PREFIX}Killing service:$i pid:$(eval $pid)${COLOR_SUFFIX}"
+        #kill the service that existed
+        kill -9 $(eval $pid)
+        echo -e "${SKY_BLUE_PREFIX}service:$i was killed ${COLOR_SUFFIX}"
+      fi
+  done
 done
