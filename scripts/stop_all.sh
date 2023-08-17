@@ -31,14 +31,13 @@ service_port_name=(
 )
 
 for i in ${service_port_name[*]}; do
-  list=$(cat $config_path | grep -w ${i} | awk -F '[:]' '{print $NF}')
-  list_to_string $list
+  list=$(cat $SCRIPTS_ROOT/config/config.yaml | grep -w ${i} | awk -F '[:]' '{print $NF}')
   echo -e "${list}"
+  list_to_string $list
   for j in ${ports_array}; do
     echo -e "========${j}======="
-      name="ps -aux |grep -w $i |grep -v grep"
+      name="ps -aux |grep -w $j |grep -v grep"
       count="${name}| wc -l"
-      echo -e "==========$(eval ${count})=========="
       if [ $(eval ${count}) -gt 0 ]; then
         pid="${name}| awk '{print \$2}'"
         echo -e "${SKY_BLUE_PREFIX}Killing service:$i pid:$(eval $pid)${COLOR_SUFFIX}"
