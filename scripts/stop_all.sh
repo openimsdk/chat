@@ -16,7 +16,7 @@
 
 #fixme This scripts is to stop the service
 SCRIPTS_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
-OPENIM_ROOT=$(dirname "${BASH_SOURCE[0]}")/..
+OPENIM_ROOT=$(dirname "${BASH_SOURCE[0]}")/.. &&pwd
 
 source $OPENIM_ROOT/scripts/style_info.sh
 source $OPENIM_ROOT/scripts/path_info.sh
@@ -31,7 +31,7 @@ service_port_name=(
 )
 
 for i in ${service_port_name[*]}; do
-  list=$(cat $SCRIPTS_ROOT/../config/config.yaml | grep -w ${i} | awk -F '[:]' '{print $NF}')
+  list=$(cat $/config/config.yaml | grep -w ${i} | awk -F '[:]' '{print $NF}')
   echo -e "${list}"
   list_to_string $list
   for j in ${ports_array}; do
