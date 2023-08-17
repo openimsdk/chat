@@ -13,6 +13,7 @@ type Log struct {
 	Url        string    `gorm:"column:url;type varchar(255)"`
 	FileName   string    `gorm:"column:filename;type varchar(255)"`
 	SystemType string    `gorm:"column:system_type;type varchar(255)"`
+	Version    string    `gorm:"column:version;type varchar(255)"`
 	Ex         string    `gorm:"column:ex;type varchar(255)"`
 }
 

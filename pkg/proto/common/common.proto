@@ -79,4 +79,5 @@ message LogInfo{
   string filename=7;
   string systemType=8;
   string ex=9;
+  string version=10;
 }

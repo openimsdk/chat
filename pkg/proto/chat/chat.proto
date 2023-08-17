@@ -259,6 +259,7 @@ message UploadLogsReq{
   int32 platform=1;
   repeated fileURL fileURLs=2;
   string systemType=3;
+  string version=5;
   string ex=4;
 }
 
