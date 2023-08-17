@@ -20,6 +20,7 @@ OPENIM_ROOT=$(dirname "${BASH_SOURCE[0]}")/..
 
 source $OPENIM_ROOT/scripts/style_info.sh
 source $OPENIM_ROOT/scripts/path_info.sh
+source $SCRIPTS_ROOT/function.sh
 
 service_port_name=(
  openImChatApiPort
@@ -32,7 +33,6 @@ service_port_name=(
 switch=$(cat $config_path | grep demoswitch |awk -F '[:]' '{print $NF}')
 for i in ${service_port_name[*]}; do
   list=$(cat $config_path | grep -w ${i} | awk -F '[:]' '{print $NF}')
-  echo -e "========${list}======="
   list_to_string $list
   for j in ${ports_array}; do
     echo -e "========${j}======="
