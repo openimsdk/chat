@@ -41,11 +41,9 @@ echo -e "${BOLD_PREFIX}_________________________________________________________
 
 bin_dir="$BIN_DIR"
 logs_dir="$OPENIM_ROOT/logs"
-sdk_db_dir="$OPENIM_ROOT/db/sdk/"
 
 echo "==> bin_dir=$bin_dir"
 echo "==> logs_dir=$logs_dir"
-echo "==> sdk_db_dir=$sdk_db_dir"
 
 
 cd $SCRIPTS_ROOT/..
