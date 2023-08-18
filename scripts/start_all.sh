@@ -37,11 +37,9 @@ echo -e "${YELLOW_PREFIX}=======>pwd=$PWD${COLOR_SUFFIX}"
 
 bin_dir="$BIN_DIR"
 logs_dir="$SCRIPTS_ROOT/../logs"
-sdk_db_dir="$SCRIPTS_ROOT/../sdk/db/"
 
 echo -e "${YELLOW_PREFIX}=======>bin_dir=$bin_dir${COLOR_SUFFIX}"
 echo -e "${YELLOW_PREFIX}=======>logs_dir=$logs_dir${COLOR_SUFFIX}"
-echo -e "${YELLOW_PREFIX}=======>sdk_db_dir=$sdk_db_dir${COLOR_SUFFIX}"
 
 #service filename
 service_filename=(
@@ -65,6 +63,10 @@ service_prometheus_port_name=(
 
 )
 
+# Automatically created when there is no bin, logs folder
+if [ ! -d $logs_dir ]; then
+  mkdir -p $logs_dir
+fi
 cd $SCRIPTS_ROOT
 
 for ((i = 0; i < ${#service_filename[*]}; i++)); do
