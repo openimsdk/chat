@@ -65,6 +65,15 @@ service_prometheus_port_name=(
 
 )
 
+# Automatically created when there is no bin, logs folder
+if [ ! -d $logs_dir ]; then
+  echo -e "=======${OPENIM_ROOT}====="
+  mkdir -p $logs_dir
+fi
+if [ ! -d $sdk_db_dir ]; then
+  mkdir -p $sdk_db_dir
+fi
+
 cd $SCRIPTS_ROOT
 
 for ((i = 0; i < ${#service_filename[*]}; i++)); do
