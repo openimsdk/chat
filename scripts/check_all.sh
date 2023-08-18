@@ -37,7 +37,7 @@ for i in ${service_port_name[*]}; do
   list=$(cat $config_path | grep -w ${i} | awk -F '[:]' '{print $NF}')
   list_to_string $list
   for j in ${ports_array}; do
-    port=$(ss -tunlp| grep -E 'api|rpc|open_im' | awk '{print $5}' | grep -w ${j} | awk -F '[:]' '{print $NF}')
+    port=$(ps -ef |grep -E 'api|rpc|open_im' |awk '{print $10}'| grep -w ${j})
     if [[ ${port} -ne ${j} ]]; then
       echo -e ${YELLOW_PREFIX}${i}${COLOR_SUFFIX}${RED_PREFIX}" service does not start normally,not initiated port is "${COLOR_SUFFIX}${YELLOW_PREFIX}${j}${COLOR_SUFFIX}
       echo -e ${RED_PREFIX}"please check ../logs/openIM.log "${COLOR_SUFFIX}
