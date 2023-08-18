@@ -71,17 +71,17 @@ cd $SCRIPTS_ROOT
 
 for ((i = 0; i < ${#service_filename[*]}; i++)); do
   #Check whether the service exists
-  service_name="ps |grep -w ${service_filename[$i]} |grep -v grep"
-  count="${service_name}| wc -l"
-
-  if [ $(eval ${count}) -gt 0 ]; then
-    pid="${service_name}| awk '{print \$2}'"
-    echo  "${service_filename[$i]} service has been started,pid:$(eval $pid)"
-    echo  "killing the service ${service_filename[$i]} pid:$(eval $pid)"
-    #kill the service that existed
-    kill -9 $(eval $pid)
-    sleep 0.5
-  fi
+#  service_name="ps |grep -w ${service_filename[$i]} |grep -v grep"
+#  count="${service_name}| wc -l"
+#
+#  if [ $(eval ${count}) -gt 0 ]; then
+#    pid="${service_name}| awk '{print \$2}'"
+#    echo  "${service_filename[$i]} service has been started,pid:$(eval $pid)"
+#    echo  "killing the service ${service_filename[$i]} pid:$(eval $pid)"
+#    #kill the service that existed
+#    kill -9 $(eval $pid)
+#    sleep 0.5
+#  fi
   cd $SCRIPTS_ROOT
 
   #Get the rpc port in the configuration file
