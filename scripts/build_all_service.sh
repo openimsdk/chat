@@ -49,6 +49,7 @@ echo "==> sdk_db_dir=$sdk_db_dir"
 
 # Automatically created when there is no bin, logs folder
 if [ ! -d $logs_dir ]; then
+  echo -e "=======${OPENIM_ROOT}====="
   mkdir -p $logs_dir
 fi
 if [ ! -d $sdk_db_dir ]; then
