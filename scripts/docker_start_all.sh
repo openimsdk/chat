@@ -80,7 +80,7 @@ for ((i = 0; i < ${#service_filenames[*]}; i++)); do
   service_ports=()
   for line in "${portList[@]}"; do
     if [[ $line == *"${service_port_names[$i]}"* ]]; then
-      port=$(echo "$line" | awk -F ':' '{print $NF}')
+      port=$(echo "$line" | awk -F '[  ]+' '{print $4} ')
       service_ports+=("$port")
     fi
   done
@@ -93,7 +93,7 @@ for ((i = 0; i < ${#service_filenames[*]}; i++)); do
       cmd="$bin_dir/$service_name -port $port --config_folder_path $config_path"
     fi
     echo "$cmd"
-    nohup "$cmd" >> "${logs_dir}/openIM.log" 2>&1 &
+    nohup $cmd >> "${logs_dir}/openIM.log" 2>&1 &
     sleep 1
   done
 done
