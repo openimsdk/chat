@@ -16,32 +16,34 @@ package database
 
 import (
 	"context"
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/db/tx"
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
+	"time"
+
+	constant2 "github.com/OpenIMSDK/chat/pkg/common/constant"
 	admin2 "github.com/OpenIMSDK/chat/pkg/common/db/model/admin"
 	"github.com/OpenIMSDK/chat/pkg/common/db/model/chat"
 	"github.com/OpenIMSDK/chat/pkg/common/db/table/admin"
 	table "github.com/OpenIMSDK/chat/pkg/common/db/table/chat"
+	"github.com/OpenIMSDK/tools/errs"
+	"github.com/OpenIMSDK/tools/tx"
 	"gorm.io/gorm"
-	"time"
 )
 
 type ChatDatabaseInterface interface {
 	IsNotFound(err error) bool
 	GetUser(ctx context.Context, userID string) (account *table.Account, err error)
-	UpdateUseInfo(ctx context.Context, userID string, attribute map[string]any, fn func() error) (err error)
+	UpdateUseInfo(ctx context.Context, userID string, attribute map[string]any) (err error)
 	FindAttribute(ctx context.Context, userIDs []string) ([]*table.Attribute, error)
 	FindAttributeByAccount(ctx context.Context, accounts []string) ([]*table.Attribute, error)
 	TakeAttributeByPhone(ctx context.Context, areaCode string, phoneNumber string) (*table.Attribute, error)
 	TakeAttributeByAccount(ctx context.Context, account string) (*table.Attribute, error)
 	TakeAttributeByUserID(ctx context.Context, userID string) (*table.Attribute, error)
-	Search(ctx context.Context, normalUser int32, keyword string, genders []int32, pageNumber int32, showNumber int32) (uint32, []*table.Attribute, error)
+	Search(ctx context.Context, normalUser int32, keyword string, gender int32, pageNumber int32, showNumber int32) (uint32, []*table.Attribute, error)
 	CountVerifyCodeRange(ctx context.Context, account string, start time.Time, end time.Time) (uint32, error)
 	AddVerifyCode(ctx context.Context, verifyCode *table.VerifyCode, fn func() error) error
 	UpdateVerifyCodeIncrCount(ctx context.Context, id uint) error
 	TakeLastVerifyCode(ctx context.Context, account string) (*table.VerifyCode, error)
 	DelVerifyCode(ctx context.Context, id uint) error
-	RegisterUser(ctx context.Context, register *table.Register, account *table.Account, attribute *table.Attribute, fn func() error) error
+	RegisterUser(ctx context.Context, register *table.Register, account *table.Account, attribute *table.Attribute) error
 	GetAccount(ctx context.Context, userID string) (*table.Account, error)
 	GetAttribute(ctx context.Context, userID string) (*table.Attribute, error)
 	GetAttributeByAccount(ctx context.Context, account string) (*table.Attribute, error)
@@ -49,6 +51,13 @@ type ChatDatabaseInterface interface {
 	LoginRecord(ctx context.Context, record *table.UserLoginRecord, verifyCodeID *uint) error
 	UpdatePassword(ctx context.Context, userID string, password string) error
 	UpdatePasswordAndDeleteVerifyCode(ctx context.Context, userID string, password string, code uint) error
+	NewUserCountTotal(ctx context.Context, before *time.Time) (int64, error)
+	UserLoginCountTotal(ctx context.Context, before *time.Time) (int64, error)
+	UserLoginCountRangeEverydayTotal(ctx context.Context, start *time.Time, end *time.Time) (map[string]int64, int64, error)
+	UploadLogs(ctx context.Context, logs []*table.Log) error
+	DeleteLogs(ctx context.Context, logID []string, userID string) error
+	SearchLogs(ctx context.Context, keyword string, start time.Time, end time.Time, pageNumber int32, showNumber int32) (uint32, []*table.Log, error)
+	GetLogs(ctx context.Context, LogIDs []string, userID string) ([]*table.Log, error)
 }
 
 func NewChatDatabase(db *gorm.DB) ChatDatabaseInterface {
@@ -60,6 +69,7 @@ func NewChatDatabase(db *gorm.DB) ChatDatabaseInterface {
 		userLoginRecord:  chat.NewUserLoginRecord(db),
 		verifyCode:       chat.NewVerifyCode(db),
 		forbiddenAccount: admin2.NewForbiddenAccount(db),
+		log:              chat.NewLogs(db),
 	}
 }
 
@@ -71,6 +81,23 @@ type ChatDatabase struct {
 	userLoginRecord  table.UserLoginRecordInterface
 	verifyCode       table.VerifyCodeInterface
 	forbiddenAccount admin.ForbiddenAccountInterface
+	log              table.LogInterface
+}
+
+func (o *ChatDatabase) GetLogs(ctx context.Context, LogIDs []string, userID string) ([]*table.Log, error) {
+	return o.log.Get(ctx, LogIDs, userID)
+}
+
+func (o *ChatDatabase) DeleteLogs(ctx context.Context, logID []string, userID string) error {
+	return o.log.Delete(ctx, logID, userID)
+}
+
+func (o *ChatDatabase) SearchLogs(ctx context.Context, keyword string, start time.Time, end time.Time, pageNumber int32, showNumber int32) (uint32, []*table.Log, error) {
+	return o.log.Search(ctx, keyword, start, end, pageNumber, showNumber)
+}
+
+func (o *ChatDatabase) UploadLogs(ctx context.Context, logs []*table.Log) error {
+	return o.log.Create(ctx, logs)
 }
 
 func (o *ChatDatabase) IsNotFound(err error) bool {
@@ -81,15 +108,12 @@ func (o *ChatDatabase) GetUser(ctx context.Context, userID string) (account *tab
 	return o.account.Take(ctx, userID)
 }
 
-func (o *ChatDatabase) UpdateUseInfo(ctx context.Context, userID string, attribute map[string]any, fn func() error) (err error) {
+func (o *ChatDatabase) UpdateUseInfo(ctx context.Context, userID string, attribute map[string]any) (err error) {
 	return o.tx.Transaction(func(tx any) error {
 		if len(attribute) > 0 {
 			if err := o.attribute.NewTx(tx).Update(ctx, userID, attribute); err != nil {
 				return err
 			}
-		}
-		if fn != nil {
-			return fn()
 		}
 		return nil
 	})
@@ -115,15 +139,12 @@ func (o *ChatDatabase) TakeAttributeByUserID(ctx context.Context, userID string)
 	return o.attribute.Take(ctx, userID)
 }
 
-func (o *ChatDatabase) Search(ctx context.Context, normalUser int32, keyword string, genders []int32, pageNumber int32, showNumber int32) (uint32, []*table.Attribute, error) {
-	var forbiddenIDs = []string{}
-	if normalUser == 1 {
-		_, forbiddenUsers, err := o.forbiddenAccount.Search(ctx, keyword, pageNumber, showNumber)
+func (o *ChatDatabase) Search(ctx context.Context, normalUser int32, keyword string, genders int32, pageNumber int32, showNumber int32) (total uint32, attributes []*table.Attribute, err error) {
+	var forbiddenIDs []string
+	if int(normalUser) == constant2.NormalUser {
+		forbiddenIDs, err = o.forbiddenAccount.FindAllIDs(ctx)
 		if err != nil {
 			return 0, nil, err
-		}
-		for _, forbiddenUser := range forbiddenUsers {
-			forbiddenIDs = append(forbiddenIDs, forbiddenUser.UserID)
 		}
 	}
 	total, totalUser, err := o.attribute.SearchNormalUser(ctx, keyword, forbiddenIDs, genders, pageNumber, showNumber)
@@ -161,7 +182,7 @@ func (o *ChatDatabase) DelVerifyCode(ctx context.Context, id uint) error {
 	return o.verifyCode.Delete(ctx, id)
 }
 
-func (o *ChatDatabase) RegisterUser(ctx context.Context, register *table.Register, account *table.Account, attribute *table.Attribute, fn func() error) error {
+func (o *ChatDatabase) RegisterUser(ctx context.Context, register *table.Register, account *table.Account, attribute *table.Attribute) error {
 	return o.tx.Transaction(func(tx any) error {
 		if err := o.register.NewTx(tx).Create(ctx, register); err != nil {
 			return err
@@ -171,9 +192,6 @@ func (o *ChatDatabase) RegisterUser(ctx context.Context, register *table.Registe
 		}
 		if err := o.attribute.NewTx(tx).Create(ctx, attribute); err != nil {
 			return err
-		}
-		if fn != nil {
-			return fn()
 		}
 		return nil
 	})
@@ -223,4 +241,16 @@ func (o *ChatDatabase) UpdatePasswordAndDeleteVerifyCode(ctx context.Context, us
 		}
 		return nil
 	})
+}
+
+func (o *ChatDatabase) NewUserCountTotal(ctx context.Context, before *time.Time) (int64, error) {
+	return o.register.CountTotal(ctx, before)
+}
+
+func (o *ChatDatabase) UserLoginCountTotal(ctx context.Context, before *time.Time) (int64, error) {
+	return o.userLoginRecord.CountTotal(ctx, before)
+}
+
+func (o *ChatDatabase) UserLoginCountRangeEverydayTotal(ctx context.Context, start *time.Time, end *time.Time) (map[string]int64, int64, error) {
+	return o.userLoginRecord.CountRangeEverydayTotal(ctx, start, end)
 }

@@ -16,11 +16,13 @@ package mctx
 
 import (
 	"context"
-	imConfig "github.com/OpenIMSDK/Open-IM-Server/pkg/common/config"
 	"strconv"
 
-	constant2 "github.com/OpenIMSDK/Open-IM-Server/pkg/common/constant"
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
+	"github.com/OpenIMSDK/chat/pkg/common/config"
+	"github.com/OpenIMSDK/tools/utils"
+
+	constant2 "github.com/OpenIMSDK/protocol/constant"
+	"github.com/OpenIMSDK/tools/errs"
 
 	"github.com/OpenIMSDK/chat/pkg/common/constant"
 	"github.com/OpenIMSDK/chat/pkg/common/tokenverify"
@@ -107,15 +109,32 @@ func GetOpUserID(ctx context.Context) string {
 	return userID
 }
 
-func WithOpUserID(ctx context.Context, opUserID string, userType int32) context.Context {
+func GetUserType(ctx context.Context) (int, error) {
+	userTypeArr, _ := ctx.Value(constant.RpcOpUserType).([]string)
+	userType, err := strconv.Atoi(userTypeArr[0])
+	if err != nil {
+		return 0, errs.ErrNoPermission.Wrap("user type invalid " + err.Error())
+	}
+	return userType, nil
+}
+
+func WithOpUserID(ctx context.Context, opUserID string, userType int) context.Context {
+	headers, _ := ctx.Value(constant.RpcCustomHeader).([]string)
 	ctx = context.WithValue(ctx, constant.RpcOpUserID, opUserID)
-	ctx = context.WithValue(ctx, constant.RpcOpUserType, []string{strconv.Itoa(int(userType))})
+	ctx = context.WithValue(ctx, constant.RpcOpUserType, []string{strconv.Itoa(userType)})
+	if utils.IndexOf(constant.RpcOpUserType, headers...) < 0 {
+		ctx = context.WithValue(ctx, constant.RpcCustomHeader, append(headers, constant.RpcOpUserType))
+	}
 	return ctx
 }
 
 func WithAdminUser(ctx context.Context) context.Context {
-	if len(imConfig.Config.Manager.UserID) > 0 {
-		ctx = WithOpUserID(ctx, imConfig.Config.Manager.UserID[0], int32(constant.AdminUser))
+	if len(config.Config.AdminList) > 0 {
+		ctx = WithOpUserID(ctx, config.Config.AdminList[0].AdminID, constant.AdminUser)
 	}
 	return ctx
+}
+
+func WithApiToken(ctx context.Context, token string) context.Context {
+	return context.WithValue(ctx, constant.CtxApiToken, token)
 }

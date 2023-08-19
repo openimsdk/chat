@@ -15,7 +15,7 @@
 package chat
 
 import (
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/utils"
+	"github.com/OpenIMSDK/tools/utils"
 
 	"github.com/OpenIMSDK/chat/pkg/common/db/table/chat"
 	"github.com/OpenIMSDK/chat/pkg/proto/common"
@@ -62,4 +62,22 @@ func DbToPbUserFullInfo(attribute *chat.Attribute) *common.UserFullInfo {
 
 func DbToPbUserFullInfos(attributes []*chat.Attribute) []*common.UserFullInfo {
 	return utils.Slice(attributes, DbToPbUserFullInfo)
+}
+
+func DbToPbLogInfo(log *chat.Log) *common.LogInfo {
+	return &common.LogInfo{
+		Filename:   log.FileName,
+		UserID:     log.UserID,
+		Platform:   utils.StringToInt32(log.Platform),
+		Url:        log.Url,
+		CreateTime: log.CreateTime.UnixMilli(),
+		LogID:      log.LogID,
+		SystemType: log.SystemType,
+		Version:    log.Version,
+		Ex:         log.Ex,
+	}
+}
+
+func DbToPbLogInfos(logs []*chat.Log) []*common.LogInfo {
+	return utils.Slice(logs, DbToPbLogInfo)
 }

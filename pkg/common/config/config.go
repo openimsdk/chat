@@ -38,6 +38,11 @@ var Config struct {
 		RegisterIP string `yaml:"registerIP"`
 		ListenIP   string `yaml:"listenIP"`
 	} `yaml:"rpc"`
+	Redis struct {
+		Address  *[]string `yaml:"address"`
+		Username *string   `yaml:"username"`
+		Password *string   `yaml:"password"`
+	} `yaml:"redis"`
 	RpcPort struct {
 		OpenImAdminPort []int `yaml:"openImAdminPort"`
 		OpenImChatPort  []int `yaml:"openImChatPort"`
@@ -59,7 +64,7 @@ var Config struct {
 	} `yaml:"mysql"`
 	Log struct {
 		StorageLocation     *string `yaml:"storageLocation"`
-		RotationTime        *int    `yaml:"rotationTime"`
+		RotationTime        *uint   `yaml:"rotationTime"`
 		RemainRotationCount *uint   `yaml:"remainRotationCount"`
 		RemainLogLevel      *int    `yaml:"remainLogLevel"`
 		IsStdout            *bool   `yaml:"isStdout"`
@@ -67,6 +72,7 @@ var Config struct {
 		WithStack           *bool   `yaml:"withStack"`
 	} `yaml:"log"`
 	Secret      *string `yaml:"secret"`
+	OpenIMUrl   string  `yaml:"openIMUrl"`
 	TokenPolicy struct {
 		Expire *int64 `yaml:"expire"`
 	} `yaml:"tokenPolicy"`
@@ -85,5 +91,12 @@ var Config struct {
 			VerificationCodeTemplateCode string `yaml:"verificationCodeTemplateCode"`
 		} `yaml:"ali"`
 	} `yaml:"verifyCode"`
-	ProxyHeader string `yaml:"proxyHeader"`
+	ProxyHeader string  `yaml:"proxyHeader"`
+	AdminList   []Admin `yaml:"adminList"`
+}
+
+type Admin struct {
+	AdminID   string `yaml:"adminID"`
+	NickName  string `yaml:"nickname"`
+	ImAdminID string `yaml:"imAdmin"`
 }

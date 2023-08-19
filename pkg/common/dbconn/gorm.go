@@ -16,15 +16,16 @@ package dbconn
 
 import (
 	"fmt"
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/log"
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/mw/specialerror"
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
+	"time"
+
 	"github.com/OpenIMSDK/chat/pkg/common/config"
+	"github.com/OpenIMSDK/tools/errs"
+	"github.com/OpenIMSDK/tools/log"
+	"github.com/OpenIMSDK/tools/mw/specialerror"
 	mysqlDriver "github.com/go-sql-driver/mysql"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
-	"time"
 )
 
 func NewMysqlGormDB() (*gorm.DB, error) {

@@ -1,4 +1,4 @@
-// Copyright © 2023 OpenIM open source community. All rights reserved.
+// Copyright © 2023 OpenIM. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
 syntax = "proto3";
 package OpenIMServer.sdkws;
 import "pub/wrapperspb.proto";
-option go_package = "github.com/OpenIMSDK/Open-IM-Server/pkg/proto/sdkws";
+option go_package = "github.com/OpenIMSDK/protocol/sdkws";
 
 ////////////////////////////////base///////////////////////////////
 
@@ -71,23 +71,17 @@ message PublicUserInfo{
   string userID = 1;
   string nickname = 2;
   string faceURL = 3;
-  int32 gender = 4;
-  string ex = 5;
+  string ex = 4;
 }
 
 message UserInfo{
   string userID = 1;
   string nickname = 2;
   string faceURL = 3;
-  int32 gender = 4;
-  string phoneNumber = 5;
-  uint32 birth = 6;
-  string email = 7;
-  string ex = 8;
-  int64 createTime = 9;
-  int32 appMangerLevel = 10;
-  int32 globalRecvMsgOpt = 11;
-  int64 birthday = 13;
+  string ex = 4;
+  int64 createTime = 5;
+  int32 appMangerLevel = 6;
+  int32 globalRecvMsgOpt = 7;
 }
 
 message FriendInfo{
@@ -127,56 +121,55 @@ message FriendRequest{
   string fromUserID = 1;
   string fromNickname = 2;
   string fromFaceURL = 3;
-  int32 fromGender = 4;
-  string toUserID = 5;
-  string toNickname = 6;
-  string toFaceURL = 7;
-  int32 toGender = 8;
-  int32 handleResult = 9;
-  string reqMsg = 10;
-  int64 createTime = 11;
-  string handlerUserID = 12;
-  string handleMsg = 13;
-  int64 handleTime = 14;
-  string ex = 15;
+  string toUserID = 4;
+  string toNickname = 5;
+  string toFaceURL = 6;
+  int32 handleResult = 7;
+  string reqMsg = 8;
+  int64 createTime = 9;
+  string handlerUserID = 10;
+  string handleMsg = 11;
+  int64 handleTime = 12;
+  string ex = 13;
 }
 
 
 ///////////////////////////////////base end/////////////////////////////////////
+enum PullOrder{
+  PullOrderAsc = 0;
+  PullOrderDesc = 1;
+
+}
 message PullMessageBySeqsReq{
   string userID = 1;
-  repeated int64 seqs = 3;
-  map <string, seqs>groupSeqs = 4;
+  repeated SeqRange seqRanges = 2;
+  PullOrder order = 3;
 }
 
-message seqs {
-  repeated int64 seqs = 1;
+message SeqRange {
+  string conversationID = 1;
+  int64 begin = 2;
+  int64 end = 3;
+  int64 num = 4;
 }
 
-
-message MsgDataList {
-  repeated MsgData msgDataList = 1;
+message PullMsgs {
+  repeated MsgData Msgs = 1;
+  bool isEnd = 2;
 }
 
 message PullMessageBySeqsResp {
-  repeated MsgData list = 1;
-  map<string, MsgDataList> groupMsgDataList = 2;
+  map<string, PullMsgs> msgs = 1;
+  map<string, PullMsgs> notificationMsgs = 2;
 }
 
-
-
-message GetMaxAndMinSeqReq {
-  repeated string groupIDs = 1;
-  string userID = 2;
+message GetMaxSeqReq {
+  string userID = 1;
 }
-message MaxAndMinSeq{
-  int64 maxSeq = 1;
-  int64 minSeq = 2;
-}
-message GetMaxAndMinSeqResp {
-  int64 maxSeq = 1;
-  int64 minSeq = 2;
-  map<string, MaxAndMinSeq> groupMaxAndMinSeq = 5;
+
+message GetMaxSeqResp {
+  map<string, int64> maxSeqs = 1;
+  map<string, int64> minSeqs = 2;
 }
 
 message UserSendMsgResp {
@@ -202,13 +195,16 @@ message MsgData {
   int64 sendTime = 15;
   int64 createTime = 16;
   int32 status = 17;
-  map<string, bool> options = 18;
-  OfflinePushInfo offlinePushInfo = 19;
-  repeated string atUserIDList = 20;
-  bytes msgDataList = 21;
+  bool isRead = 18;
+  map<string, bool> options = 19;
+  OfflinePushInfo offlinePushInfo = 20;
+  repeated string atUserIDList = 21;
   string attachedInfo = 22;
-  string  ex = 23;
-
+  string ex = 23;
+}
+message PushMessages{
+  map<string, PullMsgs> msgs = 1;
+  map<string, PullMsgs> notificationMsgs = 2;
 }
 message OfflinePushInfo{
   string title = 1;
@@ -216,6 +212,7 @@ message OfflinePushInfo{
   string ex = 3;
   string iOSPushSound = 4;
   bool iOSBadgeCount = 5;
+  string signalInfo = 6;
 }
 
 
@@ -249,6 +246,16 @@ message GroupInfoSetTips{
   GroupMemberFullInfo opUser = 1; //who do this
   int64 muteTime = 2;
   GroupInfo group = 3;
+}
+
+message GroupInfoSetNameTips{
+  GroupMemberFullInfo opUser = 1; //who do this
+  GroupInfo group = 2;
+}
+
+message GroupInfoSetAnnouncementTips{
+  GroupMemberFullInfo opUser = 1; //who do this
+  GroupInfo group = 2;
 }
 
 //	OnJoinGroupApplication()
@@ -288,7 +295,8 @@ message GroupOwnerTransferredTips{
   GroupInfo group = 1;
   GroupMemberFullInfo opUser = 2;
   GroupMemberFullInfo newGroupOwner = 3;
-  int64 operationTime = 4;
+  string oldGroupOwner = 4;
+  int64 operationTime = 5;
 }
 
 
@@ -355,7 +363,6 @@ message GroupMemberInfoSetTips{
   GroupMemberFullInfo changedUser = 4;
 }
 
-
 //////////////////////friend/////////////////////
 
 message FriendApplication{
@@ -420,194 +427,80 @@ message UserInfoUpdatedTips{
 
 //////////////////////conversation/////////////////////
 message ConversationUpdateTips{
-  string UserID = 1;
+  string userID = 1;
   repeated string conversationIDList = 2;
-  int64 updateUnreadCountTime = 3;
-
-
 }
 
 message ConversationSetPrivateTips{
   string recvID = 1;
   string sendID = 2;
   bool isPrivate = 3;
+  string conversationID = 4;
+}
+
+message ConversationHasReadTips {
+  string userID = 1;
+  string conversationID = 2;
+  int64 hasReadSeq = 3;
+  int64 unreadCountTime = 4;
+}
+
+message NotificationElem {
+  string detail = 1;
 }
 
 ////////////////////message///////////////////////
+message seqs {
+  repeated int64 seqs = 1;
+}
+
 message DeleteMessageTips{
   string opUserID = 1;
   string userID = 2;
   repeated int64 seqs = 3;
 }
-///cms
-message RequestPagination {
-  int32 pageNumber = 1;
-  int32 showNumber = 2;
+
+
+message RevokeMsgTips{
+  string revokerUserID = 1;
+  string clientMsgID = 2;
+  int64 revokeTime = 3;
+  int32 sesstionType = 5;
+  int64 seq = 6;
+  string conversationID = 7;
 }
 
 
-
-///////////////////signal//////////////
-message SignalReq {
-  oneof payload {
-    SignalInviteReq invite = 1;
-    SignalInviteInGroupReq inviteInGroup = 2;
-    SignalCancelReq  cancel = 3;
-    SignalAcceptReq accept = 4;
-    SignalHungUpReq hungUp = 5;
-    SignalRejectReq reject = 6;
-    SignalGetRoomByGroupIDReq getRoomByGroupID = 7;
-
-    SignalOnRoomParticipantConnectedReq onRoomParticipantConnectedReq = 8;
-    SignalOnRoomParticipantDisconnectedReq onRoomParticipantDisconnectedReq = 9;
-    SignalGetTokenByRoomIDReq getTokenByRoomID = 10;
-  }
+message MessageRevokedContent {
+	string revokerID = 1;          
+	int32 revokerRole = 2;             
+	string clientMsgID = 3;              
+	string revokerNickname = 4;             
+	int64 revokeTime = 5;         
+	int64 sourceMessageSendTime = 6;        
+	string sourceMessageSendID = 7;    
+	string sourceMessageSenderNickname = 8;  
+	int32 sessionType = 10;
+	int64 seq = 11;                         
+	string ex = 12;                        
 }
 
-message SignalResp {
-  oneof payload {
-    SignalInviteReply invite = 1;
-    SignalInviteInGroupReply inviteInGroup = 2;
-    SignalCancelReply cancel = 3;
-    SignalAcceptReply accept = 4;
-    SignalHungUpReply hungUp = 5;
-    SignalRejectReply reject = 6;
-    SignalGetRoomByGroupIDReply getRoomByGroupID = 7;
-    SignalGetTokenByRoomIDReply getTokenByRoomID = 8;
-  }
+message ClearConversationTips {
+  string userID = 1;
+  repeated string conversationIDs = 2;
 }
 
-
-message InvitationInfo  {
-  string inviterUserID = 1;
-  repeated string inviteeUserIDList = 2;
-  string customData = 3;
-  string  groupID = 4;
-  string roomID = 5;
-  int32 timeout = 6;
-  string mediaType = 7;
-  int32 platformID = 8;
-  int32 sessionType = 9;
-  int32 initiateTime = 10;
-  repeated string busyLineUserIDList = 11;
+message DeleteMsgsTips {
+  string userID  = 1;
+  string conversationID = 2;
+  repeated int64 seqs = 3;
 }
 
-message ParticipantMetaData{
-  GroupInfo groupInfo = 1;
-  GroupMemberFullInfo groupMemberInfo = 2;
-  PublicUserInfo userInfo = 3;
-}
-
-message SignalInviteReq {
-  string opUserID = 1;
-  InvitationInfo invitation = 2;
-  OfflinePushInfo offlinePushInfo = 3;
-  ParticipantMetaData participant = 4;
-
-}
-
-message SignalInviteReply {
-  string token = 1;
-  string roomID = 2;
-  string liveURL = 3;
-  repeated string busyLineUserIDList = 4;
-}
-
-message SignalInviteInGroupReq {
-  string opUserID = 1;
-  InvitationInfo invitation = 2;
-  OfflinePushInfo offlinePushInfo = 3;
-  ParticipantMetaData participant = 4;
-}
-
-message SignalInviteInGroupReply {
-  string token = 1;
-  string roomID = 2;
-  string liveURL = 3;
-  repeated string busyLineUserIDList = 4;
-}
-
-message SignalCancelReq {
-  string opUserID = 1;
-  InvitationInfo invitation = 2;
-  OfflinePushInfo offlinePushInfo = 3;
-  ParticipantMetaData participant = 4;
-}
-
-message SignalCancelReply {
-
-}
-
-message SignalAcceptReq {
-  string opUserID = 1;
-  InvitationInfo invitation = 2;
-  OfflinePushInfo offlinePushInfo = 3;
-  ParticipantMetaData participant = 4;
-  int32 opUserPlatformID = 5;
-}
-
-message SignalAcceptReply {
-  string token = 1;
-  string roomID = 2;
-  string liveURL = 3;
-}
-
-message SignalHungUpReq {
-  string opUserID = 1;
-  InvitationInfo invitation = 2;
-  OfflinePushInfo offlinePushInfo = 3;
-}
-
-message SignalHungUpReply {
-
-}
-
-
-message SignalRejectReq {
-  string opUserID = 1;
-  InvitationInfo invitation = 2;
-  OfflinePushInfo offlinePushInfo = 3;
-  ParticipantMetaData participant = 4;
-  int32 opUserPlatformID = 5;
-}
-
-message SignalRejectReply {
-
-}
-
-message SignalGetRoomByGroupIDReq {
-  string opUserID = 1;
-  string groupID = 2;
-  ParticipantMetaData participant = 3;
-}
-
-message SignalGetRoomByGroupIDReply {
-  InvitationInfo invitation = 1;
-  repeated ParticipantMetaData participant = 2;
-  string roomID = 3;
-}
-
-message SignalOnRoomParticipantConnectedReq {
-  InvitationInfo invitation = 1;
-  repeated ParticipantMetaData participant = 2;
-  string groupID = 3;
-}
-
-message SignalOnRoomParticipantDisconnectedReq {
-  InvitationInfo invitation = 1;
-  repeated ParticipantMetaData participant = 2;
-  string groupID = 3;
-}
-
-message SignalGetTokenByRoomIDReq {
-  string roomID = 1;
-  string opUserID = 2;
-  ParticipantMetaData participant = 3;
-}
-
-message SignalGetTokenByRoomIDReply {
-  string token = 1;
-  string liveURL = 2;
+message MarkAsReadTips {
+  string markAsReadUserID = 1;
+  string conversationID = 2;
+  repeated int64 seqs = 3;
+  int64 hasReadSeq = 4;
 }
 
 
@@ -619,26 +512,8 @@ message SetAppBackgroundStatusReq {
 message SetAppBackgroundStatusResp {
 }
 
-message ExtendMsgSet {
-  string sourceID = 1;
-  int32 sessionType = 2;
-  map <string, ExtendMsg>extendMsgs = 3;
-  int64 MaxMsgUpdateTime = 4;
-  int32 extendMsgNum = 5;
-  int64 createTime = 6;
-}
 
-message ExtendMsg {
-  map <string, KeyValue>reactionExtensionList = 1;
-  string clientMsgID = 2;
-  int64 msgFirstModifyTime = 3;
-  string attachedInfo = 4;
-  string ex = 5;
+message RequestPagination {
+  int32 pageNumber = 1;
+  int32 showNumber = 2;
 }
-
-message KeyValue {
-  string typeKey = 1;
-  string value = 2;
-  int64 latestUpdateTime = 3;
-}
-

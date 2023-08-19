@@ -17,8 +17,8 @@ package api
 import (
 	"context"
 
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/discoveryregistry"
 	"github.com/OpenIMSDK/chat/pkg/common/config"
+	"github.com/OpenIMSDK/tools/discoveryregistry"
 	"github.com/gin-gonic/gin"
 )
 
@@ -53,6 +53,10 @@ func NewChatRoute(router gin.IRouter, discov discoveryregistry.SvcDiscoveryRegis
 	router.Group("/client_config").POST("/get", chat.GetClientConfig) // 获取客户端初始化配置
 
 	router.Group("/callback").POST("/open_im", chat.OpenIMCallback) // 回调
+
+	logs := router.Group("/logs", mw.CheckToken)
+	logs.POST("/upload", chat.UploadLogs)
+	logs.POST("/delete", chat.DeleteLogs)
 }
 
 func NewAdminRoute(router gin.IRouter, discov discoveryregistry.SvcDiscoveryRegistry) {
@@ -114,6 +118,14 @@ func NewAdminRoute(router gin.IRouter, discov discoveryregistry.SvcDiscoveryRegi
 	userRouter.POST("/password/reset", admin.ResetUserPassword) // 重置用户密码
 
 	initGroup := router.Group("/client_config", mw.CheckAdmin)
-	initGroup.POST("/set", admin.SetClientConfig) // 设置客户端初始化配置
 	initGroup.POST("/get", admin.GetClientConfig) // 获取客户端初始化配置
+	initGroup.POST("/set", admin.SetClientConfig) // 设置客户端初始化配置
+	initGroup.POST("/del", admin.DelClientConfig) // 删除客户端初始化配置
+
+	statistic := router.Group("/statistic", mw.CheckAdmin)
+	statistic.POST("/new_user_count", admin.NewUserCount)
+	statistic.POST("/login_user_count", admin.LoginUserCount)
+
+	logs := router.Group("/logs", mw.CheckAdmin)
+	logs.POST("/search", admin.SearchLogs)
 }

@@ -16,35 +16,33 @@ package chat
 
 import (
 	"context"
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/log"
-
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/proto/sdkws"
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/proto/user"
 
 	"github.com/OpenIMSDK/chat/pkg/common/constant"
 	"github.com/OpenIMSDK/chat/pkg/common/mctx"
 	"github.com/OpenIMSDK/chat/pkg/eerrs"
 	"github.com/OpenIMSDK/chat/pkg/proto/chat"
+	"github.com/OpenIMSDK/tools/errs"
+	"github.com/OpenIMSDK/tools/log"
 )
 
 func (o *chatSvr) UpdateUserInfo(ctx context.Context, req *chat.UpdateUserInfoReq) (*chat.UpdateUserInfoResp, error) {
 	defer log.ZDebug(ctx, "return")
+	resp := &chat.UpdateUserInfoResp{}
 	opUserID, userType, err := mctx.Check(ctx)
 	if err != nil {
 		return nil, err
 	}
+	if req.UserID == "" {
+		return nil, errs.ErrArgs.Wrap("user id is empty")
+	}
 	switch userType {
 	case constant.NormalUser:
-		if req.UserID == "" {
-			req.UserID = opUserID
-		}
+		//if req.UserID == "" {
+		//	req.UserID = opUserID
+		//}
 		if req.UserID != opUserID {
 			return nil, errs.ErrNoPermission.Wrap("only admin can update other user info")
 		}
-		//if req.Email != nil {
-		//	return nil, errs.ErrNoPermission.Wrap("email can not be updated")
-		//}
 		if req.AreaCode != nil {
 			return nil, errs.ErrNoPermission.Wrap("areaCode can not be updated")
 		}
@@ -58,9 +56,8 @@ func (o *chatSvr) UpdateUserInfo(ctx context.Context, req *chat.UpdateUserInfoRe
 			return nil, errs.ErrNoPermission.Wrap("level can not be updated")
 		}
 	case constant.AdminUser:
-		if req.UserID == "" {
-			return nil, errs.ErrArgs.Wrap("user id is empty")
-		}
+	default:
+		return nil, errs.ErrNoPermission.Wrap("user type error")
 	}
 	update, err := ToDBAttributeUpdate(req)
 	if err != nil {
@@ -96,24 +93,10 @@ func (o *chatSvr) UpdateUserInfo(ctx context.Context, req *chat.UpdateUserInfoRe
 			}
 		}
 	}
-	updateOpenIM := func() error {
-		userReq := &user.UpdateUserInfoReq{UserInfo: &sdkws.UserInfo{UserID: req.UserID}}
-		if req.Nickname != nil {
-			userReq.UserInfo.Nickname = req.Nickname.Value
-		} else {
-			userReq.UserInfo.Nickname = attribute.Nickname
-		}
-		if req.FaceURL != nil {
-			userReq.UserInfo.FaceURL = req.FaceURL.Value
-		} else {
-			userReq.UserInfo.FaceURL = attribute.FaceURL
-		}
-		return o.OpenIM.UpdateUser(ctx, userReq)
-	}
-	if err := o.Database.UpdateUseInfo(ctx, req.UserID, update, updateOpenIM); err != nil {
+	if err := o.Database.UpdateUseInfo(ctx, req.UserID, update); err != nil {
 		return nil, err
 	}
-	return &chat.UpdateUserInfoResp{}, nil
+	return resp, nil
 }
 
 func (o *chatSvr) FindUserPublicInfo(ctx context.Context, req *chat.FindUserPublicInfoReq) (*chat.FindUserPublicInfoResp, error) {

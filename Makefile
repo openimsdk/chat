@@ -71,9 +71,8 @@ MAKEFLAGS += --no-print-directory
 endif
 
 # The OS must be linux when building docker images
-PLATFORMS ?= linux_amd64 linux_arm64
-# The OS can be linux/windows/darwin when building binaries
-# PLATFORMS ?= darwin_amd64 windows_amd64 linux_amd64 linux_arm64
+# !WARNING: linux_mips64 linux_mips64le
+PLATFORMS ?= linux_s390x darwin_amd64 windows_amd64 linux_amd64 linux_arm64 linux_ppc64le
 
 # Set a specific PLATFORM
 ifeq ($(origin PLATFORM), undefined)
@@ -156,7 +155,7 @@ EXCLUDE_TESTS=github.com/OpenIMSDK/chat/test
 
 ## all: Build all the necessary targets.
 .PHONY: all
-all: copyright-verify build # tidy lint cover
+all: copyright-verify tidy build start check #lint cover
 
 ## build: Build binaries by default.
 .PHONY: build
@@ -255,6 +254,24 @@ test:
 .PHONY: cover
 cover: test
 	@$(GO) test -cover
+
+## start: Start the chat all service.
+.PHONY: start
+start:
+	@echo "===========> Starting the service"
+	@$(ROOT_DIR)/scripts/start_all.sh
+
+## check: Check the chat all service.
+.PHONY: check
+check:
+	@echo "===========> Checking the service"
+	@$(ROOT_DIR)/scripts/check_all.sh
+
+## stop: Stop the chat all service.
+.PHONY: stop
+stop:
+	@echo "===========> Stopping the service"
+	@$(ROOT_DIR)/scripts/stop_all.sh
 
 ## docker-build: Build docker image with the manager.
 .PHONY: docker-build

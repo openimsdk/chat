@@ -18,11 +18,13 @@ import (
 	"context"
 	"crypto/md5"
 	"encoding/hex"
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/config"
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
-	"github.com/OpenIMSDK/chat/pkg/common/db/table/admin"
-	"gorm.io/gorm"
+	"github.com/OpenIMSDK/tools/log"
 	"time"
+
+	"github.com/OpenIMSDK/chat/pkg/common/config"
+	"github.com/OpenIMSDK/chat/pkg/common/db/table/admin"
+	"github.com/OpenIMSDK/tools/errs"
+	"gorm.io/gorm"
 )
 
 func NewAdmin(db *gorm.DB) *Admin {
@@ -54,24 +56,29 @@ func (o *Admin) InitAdmin(ctx context.Context) error {
 	if err := o.db.WithContext(ctx).Model(&admin.Admin{}).Count(&count).Error; err != nil {
 		return errs.Wrap(err)
 	}
-	if count > 0 || len(config.Config.Manager.UserID) == 0 {
+	if count > 0 {
+		log.ZInfo(ctx, "Admins are already registered in database", "admin count", count)
+		return nil
+	}
+	if len(config.Config.AdminList) == 0 {
+		log.ZInfo(ctx, "AdminList is empty", "adminList", config.Config.AdminList)
 		return nil
 	}
 	now := time.Now()
-	admins := make([]*admin.Admin, 0, len(config.Config.Manager.UserID))
-	for i, userID := range config.Config.Manager.UserID {
-		password := md5.Sum([]byte(userID))
+	admins := make([]*admin.Admin, 0, len(config.Config.AdminList))
+	for _, adminChat := range config.Config.AdminList {
+		password := md5.Sum([]byte(adminChat.AdminID))
 		table := admin.Admin{
-			Account:    userID,
-			UserID:     userID,
+			Account:    adminChat.AdminID,
+			UserID:     adminChat.AdminID,
 			Password:   hex.EncodeToString(password[:]),
 			Level:      100,
 			CreateTime: now,
 		}
-		if len(config.Config.Manager.Nickname) > i {
-			table.Nickname = config.Config.Manager.Nickname[i]
+		if adminChat.NickName != "" {
+			table.Nickname = adminChat.NickName
 		} else {
-			table.Nickname = userID
+			table.Nickname = adminChat.AdminID
 		}
 		admins = append(admins, &table)
 	}

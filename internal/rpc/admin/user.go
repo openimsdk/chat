@@ -16,15 +16,17 @@ package admin
 
 import (
 	"context"
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/log"
-	"github.com/OpenIMSDK/chat/pkg/common/constant"
 	"strings"
 	"time"
 
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/mcontext"
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/proto/wrapperspb"
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/utils"
+
+	"github.com/OpenIMSDK/chat/pkg/common/constant"
+	"github.com/OpenIMSDK/tools/log"
+
+	"github.com/OpenIMSDK/protocol/wrapperspb"
+	"github.com/OpenIMSDK/tools/errs"
+	"github.com/OpenIMSDK/tools/mcontext"
+	"github.com/OpenIMSDK/tools/utils"
 
 	"github.com/OpenIMSDK/chat/pkg/common/db/dbutil"
 	admin2 "github.com/OpenIMSDK/chat/pkg/common/db/table/admin"
@@ -35,10 +37,19 @@ import (
 
 func (o *adminServer) CancellationUser(ctx context.Context, req *admin.CancellationUserReq) (*admin.CancellationUserResp, error) {
 	defer log.ZDebug(ctx, "return")
-	if _, err := mctx.CheckAdmin(ctx); err != nil {
+	_, err := mctx.CheckAdmin(ctx)
+	if err != nil {
 		return nil, err
 	}
-	if err := o.OpenIM.ForceOffline(ctx, req.UserID); err != nil {
+	//imAdminID := config.GetIMAdmin(opUserID)
+	//IMtoken, err := o.CallerInterface.UserToken(ctx, imAdminID, constant2.AdminPlatformID)
+	//if err != nil {
+	//	return nil, err
+	//}
+	////ctx = context.WithValue(ctx, constant2.Token, IMtoken)
+	//
+	//err = o.CallerInterface.ForceOffLine(ctx, req.UserID, IMtoken)
+	if err != nil {
 		return nil, err
 	}
 	empty := wrapperspb.String("")
@@ -51,18 +62,17 @@ func (o *adminServer) CancellationUser(ctx context.Context, req *admin.Cancellat
 
 func (o *adminServer) BlockUser(ctx context.Context, req *admin.BlockUserReq) (*admin.BlockUserResp, error) {
 	defer log.ZDebug(ctx, "return")
-	if _, err := mctx.CheckAdmin(ctx); err != nil {
+	_, err := mctx.CheckAdmin(ctx)
+	if err != nil {
 		return nil, err
 	}
-	_, err := o.Database.GetBlockInfo(ctx, req.UserID)
+	_, err = o.Database.GetBlockInfo(ctx, req.UserID)
 	if err == nil {
 		return nil, errs.ErrArgs.Wrap("user already blocked")
 	} else if !dbutil.IsGormNotFound(err) {
 		return nil, err
 	}
-	if err := o.OpenIM.ForceOffline(ctx, req.UserID); err != nil {
-		return nil, err
-	}
+
 	t := &admin2.ForbiddenAccount{
 		UserID:         req.UserID,
 		Reason:         req.Reason,

@@ -16,18 +16,18 @@ package chat
 
 import (
 	"context"
-	"github.com/OpenIMSDK/chat/pkg/common/mctx"
 	"math/rand"
 	"strconv"
 	"strings"
 	"time"
 
-	constant2 "github.com/OpenIMSDK/Open-IM-Server/pkg/common/constant"
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/log"
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/mcontext"
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/proto/sdkws"
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/utils"
+	"github.com/OpenIMSDK/chat/pkg/common/mctx"
+	constant2 "github.com/OpenIMSDK/protocol/constant"
+
+	"github.com/OpenIMSDK/tools/errs"
+	"github.com/OpenIMSDK/tools/log"
+	"github.com/OpenIMSDK/tools/mcontext"
+	"github.com/OpenIMSDK/tools/utils"
 
 	"github.com/OpenIMSDK/chat/pkg/common/config"
 	"github.com/OpenIMSDK/chat/pkg/common/constant"
@@ -195,6 +195,7 @@ func (o *chatSvr) genVerifyCode() string {
 }
 
 func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (*chat.RegisterUserResp, error) {
+	resp := &chat.RegisterUserResp{}
 	defer log.ZDebug(ctx, "return")
 	ctx = mctx.WithAdminUser(ctx)
 	isAdmin, err := o.Admin.CheckNilOrAdmin(ctx)
@@ -238,7 +239,7 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 	if req.User.UserID == "" {
 		for i := 0; i < 20; i++ {
 			userID := o.genUserID()
-			_, err := o.Database.GetUser(ctx, req.User.UserID)
+			_, err := o.Database.GetUser(ctx, userID)
 			if err == nil {
 				continue
 			} else if dbutil.IsGormNotFound(err) {
@@ -316,15 +317,7 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 		AllowBeep:      constant.DefaultAllowBeep,
 		AllowAddFriend: constant.DefaultAllowAddFriend,
 	}
-	openIMRegister := func() error {
-		return o.OpenIM.UserRegister(ctx, &sdkws.UserInfo{
-			UserID:     req.User.UserID,
-			Nickname:   req.User.Nickname,
-			FaceURL:    req.User.FaceURL,
-			CreateTime: register.CreateTime.UnixMilli(),
-		})
-	}
-	if err := o.Database.RegisterUser(ctx, register, account, attribute, openIMRegister); err != nil {
+	if err := o.Database.RegisterUser(ctx, register, account, attribute); err != nil {
 		return nil, err
 	}
 	if usedInvitationCode {
@@ -332,37 +325,16 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 			log.ZError(ctx, "UseInvitationCode", err, "userID", req.User.UserID, "invitationCode", req.InvitationCode)
 		}
 	}
-	if userIDs, err := o.Admin.GetDefaultFriendUserID(ctx); err != nil {
-		log.ZError(ctx, "GetDefaultFriendUserID Failed", err, "userID", req.User.UserID)
-	} else if len(userIDs) > 0 {
-		if err := o.OpenIM.AddDefaultFriend(ctx, req.User.UserID, userIDs); err != nil {
-			log.ZError(ctx, "AddDefaultFriend Failed", err, "userID", req.User.UserID, "userIDs", userIDs)
-		}
-	}
-	if groupIDs, err := o.Admin.GetDefaultGroupID(ctx); err != nil {
-		log.ZError(ctx, "GetDefaultGroupID Failed", err, "userID", req.User.UserID)
-	} else if len(groupIDs) > 0 {
-		for _, groupID := range groupIDs {
-			if err := o.OpenIM.AddDefaultGroup(ctx, req.User.UserID, groupID); err != nil {
-				log.ZError(ctx, "GetDefaultGroupID Failed", err, "userID", req.User.UserID, "groupID", groupID)
-			}
-		}
-	}
-	resp := &chat.RegisterUserResp{UserID: req.User.UserID}
 	if req.AutoLogin {
-		openimToken, openIMErr := o.OpenIM.UserToken(ctx, req.User.UserID, req.Platform)
-		if err != nil {
-			log.ZError(ctx, "OpenIM UserToken Failed", err, "userID", req.User.UserID, "platform", req.Platform)
-		}
 		chatToken, adminErr := o.Admin.CreateToken(ctx, req.User.UserID, constant.NormalUser)
 		if err != nil {
 			log.ZError(ctx, "Admin CreateToken Failed", err, "userID", req.User.UserID, "platform", req.Platform)
 		}
-		if openIMErr == nil && adminErr == nil {
-			resp.ImToken = openimToken.Token
+		if adminErr == nil {
 			resp.ChatToken = chatToken.Token
 		}
 	}
+	resp.UserID = req.User.UserID
 	return resp, nil
 }
 
@@ -395,7 +367,7 @@ func (o *chatSvr) Login(ctx context.Context, req *chat.LoginReq) (*chat.LoginRes
 	}
 	var verifyCodeID *uint
 	if req.Password == "" {
-		id, err := o.verifyCode(ctx, o.verifyCodeJoin(req.VerifyCode, req.PhoneNumber), req.VerifyCode)
+		id, err := o.verifyCode(ctx, o.verifyCodeJoin(req.AreaCode, req.PhoneNumber), req.VerifyCode)
 		if err != nil {
 			return nil, err
 		}
@@ -410,10 +382,6 @@ func (o *chatSvr) Login(ctx context.Context, req *chat.LoginReq) (*chat.LoginRes
 		}
 	}
 	chatToken, err := o.Admin.CreateToken(ctx, attribute.UserID, constant.NormalUser)
-	if err != nil {
-		return nil, err
-	}
-	imToken, err := o.OpenIM.UserToken(ctx, attribute.UserID, req.Platform)
 	if err != nil {
 		return nil, err
 	}
@@ -433,7 +401,6 @@ func (o *chatSvr) Login(ctx context.Context, req *chat.LoginReq) (*chat.LoginRes
 		}
 	}
 	resp.UserID = attribute.UserID
-	resp.ImToken = imToken.Token
 	resp.ChatToken = chatToken.Token
 	return resp, nil
 }

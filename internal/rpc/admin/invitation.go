@@ -16,15 +16,15 @@ package admin
 
 import (
 	"context"
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/log"
 	"math/rand"
 	"strings"
 	"time"
 
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/utils"
+	"github.com/OpenIMSDK/tools/log"
 
-	"github.com/OpenIMSDK/chat/pkg/common/constant"
+	"github.com/OpenIMSDK/tools/errs"
+	"github.com/OpenIMSDK/tools/utils"
+
 	admin2 "github.com/OpenIMSDK/chat/pkg/common/db/table/admin"
 	"github.com/OpenIMSDK/chat/pkg/common/mctx"
 	"github.com/OpenIMSDK/chat/pkg/eerrs"
@@ -193,9 +193,6 @@ func (o *adminServer) SearchInvitationCode(ctx context.Context, req *admin.Searc
 	defer log.ZDebug(ctx, "return")
 	if _, err := mctx.CheckAdmin(ctx); err != nil {
 		return nil, err
-	}
-	if !utils.Contain(req.Status, constant.InvitationCodeUnused, constant.InvitationCodeUsed, constant.InvitationCodeAll) {
-		return nil, errs.ErrArgs.Wrap("state invalid")
 	}
 	total, list, err := o.Database.SearchInvitationRegister(ctx, req.Keyword, req.Status, req.UserIDs, req.Codes, req.Pagination.PageNumber, req.Pagination.ShowNumber)
 	if err != nil {

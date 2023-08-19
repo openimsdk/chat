@@ -18,42 +18,48 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	openIMConfig "github.com/OpenIMSDK/Open-IM-Server/pkg/common/config"
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/constant"
-	openKeeper "github.com/OpenIMSDK/Open-IM-Server/pkg/discoveryregistry/zookeeper"
-	"gopkg.in/yaml.v3"
 	"os"
 	"path/filepath"
 	"runtime"
 	"time"
+
+	"github.com/OpenIMSDK/protocol/constant"
+	openKeeper "github.com/OpenIMSDK/tools/discoveryregistry/zookeeper"
+	"github.com/OpenIMSDK/tools/utils"
+	"gopkg.in/yaml.v3"
 )
 
 var (
 	_, b, _, _ = runtime.Caller(0)
-	// Root folder of this project
+	// Root folder of this project.
 	Root = filepath.Join(filepath.Dir(b), "../../..")
 )
 
-func readConfig() ([]byte, error) {
-	cfgName := os.Getenv("CONFIG_NAME")
-	if len(cfgName) != 0 {
-		data, err := os.ReadFile(filepath.Join(cfgName, "config", "config.yaml"))
-		if err != nil {
-			data, err = os.ReadFile(filepath.Join(Root, "config", "config.yaml"))
-			if err != nil {
-				return nil, err
-			}
-		} else {
-			Root = cfgName
-		}
-		return data, nil
-	} else {
-		return os.ReadFile(fmt.Sprintf("../config/%s", "config.yaml"))
+func readConfig(configFile string) ([]byte, error) {
+	b, err := os.ReadFile(configFile)
+	if err != nil {
+		return nil, utils.Wrap(err, configFile)
 	}
+	return b, nil
+	// cfgName := os.Getenv("CONFIG_NAME")
+	// if len(cfgName) != 0 {
+	// 	data, err := os.ReadFile(filepath.Join(cfgName, "config", "config.yaml"))
+	// 	if err != nil {
+	// 		data, err = os.ReadFile(filepath.Join(Root, "config", "config.yaml"))
+	// 		if err != nil {
+	// 			return nil, err
+	// 		}
+	// 	} else {
+	// 		Root = cfgName
+	// 	}
+	// 	return data, nil
+	// } else {
+	// 	return os.ReadFile(fmt.Sprintf("../config/%s", "config.yaml"))
+	// }
 }
 
-func InitConfig() error {
-	data, err := readConfig()
+func InitConfig(configFile string) error {
+	data, err := readConfig(configFile)
 	if err != nil {
 		return fmt.Errorf("read loacl config file error: %w", err)
 	}
@@ -64,8 +70,9 @@ func InitConfig() error {
 		openKeeper.WithFreq(time.Hour), openKeeper.WithUserNameAndPassword(Config.Zookeeper.Username,
 			Config.Zookeeper.Password), openKeeper.WithRoundRobin(), openKeeper.WithTimeout(10), openKeeper.WithLogger(&zkLogger{}))
 	if err != nil {
-		return fmt.Errorf("conn zk error: %w", err)
+		return utils.Wrap(err, "conn zk error ")
 	}
+	defer zk.CloseZK()
 	var openIMConfigData []byte
 	for i := 0; i < 100; i++ {
 		var err error
@@ -85,33 +92,39 @@ func InitConfig() error {
 	if len(openIMConfigData) == 0 {
 		return errors.New("get zk config data failed")
 	}
-	if err := yaml.NewDecoder(bytes.NewReader(openIMConfigData)).Decode(&openIMConfig.Config); err != nil {
+	if err := yaml.NewDecoder(bytes.NewReader(openIMConfigData)).Decode(&imConfig); err != nil {
 		return fmt.Errorf("parse zk openIMConfig: %w", err)
 	}
-	configFieldCopy(&Config.Mysql.Address, openIMConfig.Config.Mysql.Address)
-	configFieldCopy(&Config.Mysql.Username, openIMConfig.Config.Mysql.Username)
-	configFieldCopy(&Config.Mysql.Password, openIMConfig.Config.Mysql.Password)
-	configFieldCopy(&Config.Mysql.Database, openIMConfig.Config.Mysql.Database)
-	configFieldCopy(&Config.Mysql.MaxOpenConn, openIMConfig.Config.Mysql.MaxOpenConn)
-	configFieldCopy(&Config.Mysql.MaxIdleConn, openIMConfig.Config.Mysql.MaxIdleConn)
-	configFieldCopy(&Config.Mysql.MaxLifeTime, openIMConfig.Config.Mysql.MaxLifeTime)
-	configFieldCopy(&Config.Mysql.LogLevel, openIMConfig.Config.Mysql.LogLevel)
-	configFieldCopy(&Config.Mysql.SlowThreshold, openIMConfig.Config.Mysql.SlowThreshold)
+	configFieldCopy(&Config.Mysql.Address, imConfig.Mysql.Address)
+	configFieldCopy(&Config.Mysql.Username, imConfig.Mysql.Username)
+	configFieldCopy(&Config.Mysql.Password, imConfig.Mysql.Password)
+	configFieldCopy(&Config.Mysql.Database, imConfig.Mysql.Database)
+	configFieldCopy(&Config.Mysql.MaxOpenConn, imConfig.Mysql.MaxOpenConn)
+	configFieldCopy(&Config.Mysql.MaxIdleConn, imConfig.Mysql.MaxIdleConn)
+	configFieldCopy(&Config.Mysql.MaxLifeTime, imConfig.Mysql.MaxLifeTime)
+	configFieldCopy(&Config.Mysql.LogLevel, imConfig.Mysql.LogLevel)
+	configFieldCopy(&Config.Mysql.SlowThreshold, imConfig.Mysql.SlowThreshold)
 
-	configFieldCopy(&Config.Log.StorageLocation, openIMConfig.Config.Log.StorageLocation)
-	configFieldCopy(&Config.Log.RotationTime, openIMConfig.Config.Log.RotationTime)
-	configFieldCopy(&Config.Log.RemainRotationCount, openIMConfig.Config.Log.RemainRotationCount)
-	configFieldCopy(&Config.Log.RemainLogLevel, openIMConfig.Config.Log.RemainLogLevel)
-	configFieldCopy(&Config.Log.IsStdout, openIMConfig.Config.Log.IsStdout)
-	configFieldCopy(&Config.Log.WithStack, openIMConfig.Config.Log.WithStack)
-	configFieldCopy(&Config.Log.IsJson, openIMConfig.Config.Log.IsJson)
+	configFieldCopy(&Config.Log.StorageLocation, imConfig.Log.StorageLocation)
+	configFieldCopy(&Config.Log.RotationTime, imConfig.Log.RotationTime)
+	configFieldCopy(&Config.Log.RemainRotationCount, imConfig.Log.RemainRotationCount)
+	configFieldCopy(&Config.Log.RemainLogLevel, imConfig.Log.RemainLogLevel)
+	configFieldCopy(&Config.Log.IsStdout, imConfig.Log.IsStdout)
+	configFieldCopy(&Config.Log.WithStack, imConfig.Log.WithStack)
+	configFieldCopy(&Config.Log.IsJson, imConfig.Log.IsJson)
 
-	configFieldCopy(&Config.Secret, openIMConfig.Config.Secret)
-	configFieldCopy(&Config.TokenPolicy.Expire, openIMConfig.Config.TokenPolicy.Expire)
+	configFieldCopy(&Config.Secret, imConfig.Secret)
+	configFieldCopy(&Config.TokenPolicy.Expire, imConfig.TokenPolicy.Expire)
+
+	// Redis
+	configFieldCopy(&Config.Redis.Address, imConfig.Redis.Address)
+	configFieldCopy(&Config.Redis.Password, imConfig.Redis.Password)
+	configFieldCopy(&Config.Redis.Username, imConfig.Redis.Username)
 
 	configData, err := yaml.Marshal(&Config)
+	fmt.Printf("debug: %s\nconfig:\n%s\n", time.Now(), string(configData))
 	if err != nil {
-		return err
+		return utils.Wrap(err, configFile)
 	}
 	fmt.Printf("%s\nconfig:\n%s\n", time.Now(), string(configData))
 
@@ -122,6 +135,19 @@ func configFieldCopy[T any](local **T, remote T) {
 	if *local == nil {
 		*local = &remote
 	}
+}
+
+func GetDefaultIMAdmin() string {
+	return Config.AdminList[0].ImAdminID
+}
+
+func GetIMAdmin(chatAdminID string) string {
+	for _, admin := range Config.AdminList {
+		if admin.AdminID == chatAdminID {
+			return admin.ImAdminID
+		}
+	}
+	return ""
 }
 
 type zkLogger struct{}

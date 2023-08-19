@@ -16,13 +16,14 @@ package admin
 
 import (
 	"context"
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/log"
 	"strings"
 	"time"
 
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/proto/sdkws"
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/utils"
+	"github.com/OpenIMSDK/tools/log"
+
+
+	"github.com/OpenIMSDK/tools/errs"
+	"github.com/OpenIMSDK/tools/utils"
 
 	admin2 "github.com/OpenIMSDK/chat/pkg/common/db/table/admin"
 	"github.com/OpenIMSDK/chat/pkg/common/mctx"
@@ -39,13 +40,6 @@ func (o *adminServer) AddDefaultGroup(ctx context.Context, req *admin.AddDefault
 	}
 	if utils.Duplicate(req.GroupIDs) {
 		return nil, errs.ErrArgs.Wrap("group ids is duplicate")
-	}
-	groups, err := o.OpenIM.FindGroup(ctx, req.GroupIDs)
-	if err != nil {
-		return nil, err
-	}
-	if ids := utils.Single(req.GroupIDs, utils.Slice(groups, func(group *sdkws.GroupInfo) string { return group.GroupID })); len(ids) > 0 {
-		return nil, errs.ErrGroupIDNotFound.Wrap(strings.Join(ids, ", "))
 	}
 	exists, err := o.Database.FindDefaultGroup(ctx, req.GroupIDs)
 	if err != nil {
@@ -121,19 +115,5 @@ func (o *adminServer) SearchDefaultGroup(ctx context.Context, req *admin.SearchD
 	if err != nil {
 		return nil, err
 	}
-	groupIDs := utils.Slice(infos, func(info *admin2.RegisterAddGroup) string { return info.GroupID })
-	groupMap, err := o.OpenIM.MapGroup(ctx, groupIDs)
-	if err != nil {
-		return nil, err
-	}
-	attributes := make([]*admin.GroupAttribute, 0, len(infos))
-	for _, info := range infos {
-		attribute := &admin.GroupAttribute{
-			GroupID:    info.GroupID,
-			CreateTime: info.CreateTime.UnixMilli(),
-			Group:      groupMap[info.GroupID],
-		}
-		attributes = append(attributes, attribute)
-	}
-	return &admin.SearchDefaultGroupResp{Total: total, Groups: attributes}, nil
+	return &admin.SearchDefaultGroupResp{Total: total, GroupIDs: utils.Slice(infos, func(info *admin2.RegisterAddGroup) string { return info.GroupID })}, nil
 }

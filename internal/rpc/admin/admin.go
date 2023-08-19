@@ -17,8 +17,9 @@ package admin
 import (
 	"context"
 
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/mcontext"
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/discoveryregistry"
+	"github.com/OpenIMSDK/chat/pkg/common/db/cache"
+	"github.com/OpenIMSDK/tools/discoveryregistry"
+	"github.com/OpenIMSDK/tools/mcontext"
 	"google.golang.org/grpc"
 
 	"github.com/OpenIMSDK/chat/pkg/common/config"
@@ -31,7 +32,6 @@ import (
 	"github.com/OpenIMSDK/chat/pkg/eerrs"
 	"github.com/OpenIMSDK/chat/pkg/proto/admin"
 	"github.com/OpenIMSDK/chat/pkg/rpclient/chat"
-	"github.com/OpenIMSDK/chat/pkg/rpclient/openim"
 )
 
 func Start(discov discoveryregistry.SvcDiscoveryRegistry, server *grpc.Server) error {
@@ -53,7 +53,11 @@ func Start(discov discoveryregistry.SvcDiscoveryRegistry, server *grpc.Server) e
 	if err := db.AutoMigrate(tables...); err != nil {
 		return err
 	}
-	if err := database.NewAdminDatabase(db).InitAdmin(context.Background()); err != nil {
+	rdb, err := cache.NewRedis()
+	if err != nil {
+		return err
+	}
+	if err := database.NewAdminDatabase(db, rdb).InitAdmin(context.Background()); err != nil {
 		return err
 	}
 	if err := discov.CreateRpcRootNodes([]string{config.Config.RpcRegisterName.OpenImAdminName, config.Config.RpcRegisterName.OpenImChatName}); err != nil {
@@ -61,9 +65,8 @@ func Start(discov discoveryregistry.SvcDiscoveryRegistry, server *grpc.Server) e
 	}
 
 	admin.RegisterAdminServer(server, &adminServer{
-		Database: database.NewAdminDatabase(db),
+		Database: database.NewAdminDatabase(db, rdb),
 		Chat:     chat.NewChatClient(discov),
-		OpenIM:   openim.NewOpenIMClient(discov),
 	})
 	return nil
 }
@@ -71,7 +74,6 @@ func Start(discov discoveryregistry.SvcDiscoveryRegistry, server *grpc.Server) e
 type adminServer struct {
 	Database database.AdminDatabaseInterface
 	Chat     *chat.ChatClient
-	OpenIM   *openim.OpenIMClient
 }
 
 func (o *adminServer) GetAdminInfo(ctx context.Context, req *admin.GetAdminInfoReq) (*admin.GetAdminInfoResp, error) {
@@ -128,18 +130,13 @@ func (o *adminServer) Login(ctx context.Context, req *admin.LoginReq) (*admin.Lo
 	if err != nil {
 		return nil, err
 	}
-	imToken, err := o.OpenIM.UserToken(ctx, a.UserID, 1)
-	if err != nil {
-		return nil, err
-	}
 	return &admin.LoginResp{
+		AdminUserID:  a.UserID,
 		AdminAccount: a.Account,
 		AdminToken:   adminToken.Token,
 		Nickname:     a.Nickname,
 		FaceURL:      a.FaceURL,
 		Level:        a.Level,
-		ImUserID:     a.UserID,
-		ImToken:      imToken.Token,
 	}, nil
 }
 

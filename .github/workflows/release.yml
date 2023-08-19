@@ -1,3 +1,17 @@
+# Copyright © 2023 OpenIM open source community. All rights reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 name: OpenIM chat release
 
 on:
@@ -14,16 +28,75 @@ permissions:
 jobs:
   goreleaser:
     runs-on: ubuntu-latest
+    env:
+      DOCKER_CLI_EXPERIMENTAL: "enabled"
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - run: git fetch --force --tags
+
+      - name: setup-snapcraft
+        # FIXME: the mkdirs are a hack for https://github.com/goreleaser/goreleaser/issues/1715
+        run: |
+          sudo apt-get update
+          sudo apt-get -yq --no-install-suggests --no-install-recommends install snapcraft
+          mkdir -p $HOME/.cache/snapcraft/download
+          mkdir -p $HOME/.cache/snapcraft/stage-packages
+
       - uses: actions/setup-go@v4
         with:
           go-version: stable
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Log in to AliYun Docker Hub
+        uses: docker/login-action@v2
+        with:
+          registry: registry.cn-hangzhou.aliyuncs.com
+          username: ${{ secrets.ALIREGISTRY_USERNAME }}
+          password: ${{ secrets.ALIREGISTRY_TOKEN }}
+
+      - name: set action env cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ./_output/dist/*.deb
+            ./_output/dist/*.rpm
+            ./_output/dist/*.apk
+          key: ${{ github.ref }}
+
+      - uses: sigstore/cosign-installer@v3.1.1
+      - uses: anchore/sbom-action/download-syft@v0.14.3
+      - uses: crazy-max/ghaction-upx@v2
+        with:
+          install-only: true
+      - uses: cachix/install-nix-action@v22
+        with:
+          github_access_token: ${{ secrets.GITHUB_TOKEN }}
+    #   - name: snapcraft-login
+    #     if: startsWith(github.ref, 'refs/tags/v')
+    #     run: snapcraft login --with <(echo "${{ secrets.SNAPCRAFT_TOKEN }}")
       # More assembly might be required: Docker logins, GPG, etc. It all depends
       # on your needs.
+
       - uses: goreleaser/goreleaser-action@v4
         with:
           # either 'goreleaser' (default) or 'goreleaser-pro':
@@ -32,6 +105,9 @@ jobs:
           args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.BOT_GITHUB_TOKEN }}
+          USERNAME: ${{ github.repository_owner }}
           # Your GoReleaser Pro key, if you are using the 'goreleaser-pro'
           # distribution:
           # GORELEASER_KEY: ${{ secrets.GORELEASER_KEY }}
+          FURY_TOKEN: ${{ secrets.FURY_TOKEN }}
+          

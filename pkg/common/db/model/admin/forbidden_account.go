@@ -17,8 +17,8 @@ package admin
 import (
 	"context"
 
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/db/ormutil"
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
+	"github.com/OpenIMSDK/tools/errs"
+	"github.com/OpenIMSDK/tools/ormutil"
 	"gorm.io/gorm"
 
 	"github.com/OpenIMSDK/chat/pkg/common/db/table/admin"
@@ -52,4 +52,12 @@ func (o *ForbiddenAccount) Find(ctx context.Context, userIDs []string) ([]*admin
 
 func (o *ForbiddenAccount) Search(ctx context.Context, keyword string, page int32, size int32) (uint32, []*admin.ForbiddenAccount, error) {
 	return ormutil.GormSearch[admin.ForbiddenAccount](o.db.WithContext(ctx), []string{"user_id", "reason", "operator_user_id"}, keyword, page, size)
+}
+
+func (o *ForbiddenAccount) FindAllIDs(ctx context.Context) ([]string, error) {
+	var userIDs []string
+	if err := o.db.WithContext(ctx).Model(&admin.ForbiddenAccount{}).Pluck("user_id", &userIDs).Error; err != nil {
+		return nil, errs.Wrap(err)
+	}
+	return userIDs, nil
 }

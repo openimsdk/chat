@@ -17,8 +17,8 @@ package chat
 import (
 	"context"
 
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/db/ormutil"
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
+	"github.com/OpenIMSDK/tools/errs"
+	"github.com/OpenIMSDK/tools/ormutil"
 	"gorm.io/gorm"
 
 	"github.com/OpenIMSDK/chat/pkg/common/db/table/chat"
@@ -77,14 +77,17 @@ func (o *Attribute) Take(ctx context.Context, userID string) (*chat.Attribute, e
 	return &a, errs.Wrap(o.db.WithContext(ctx).Where("user_id = ?", userID).Take(&a).Error)
 }
 
-func (o *Attribute) SearchNormalUser(ctx context.Context, keyword string, forbiddenIDs []string, genders []int32, page int32, size int32) (uint32, []*chat.Attribute, error) {
+func (o *Attribute) SearchNormalUser(ctx context.Context, keyword string, forbiddenIDs []string, gender int32, page int32, size int32) (uint32, []*chat.Attribute, error) {
 	db := o.db.WithContext(ctx)
-	if len(genders) > 0 {
-		if len(forbiddenIDs) == 0 {
-			db = db.Where("gender in ?", genders)
-		} else {
-			db = db.Where("gender in ? and user_id not in ?", genders, forbiddenIDs)
-		}
+	var genders []int32
+	if gender == 0 {
+		genders = append(genders, 0, 1, 2)
+	} else {
+		genders = append(genders, gender)
+	}
+	db = db.Where("gender in ?", genders)
+	if len(forbiddenIDs) > 0 {
+		db = db.Where("user_id not in ?", forbiddenIDs)
 	}
 	return ormutil.GormSearch[chat.Attribute](db, []string{"user_id", "account", "nickname", "phone_number"}, keyword, page, size)
 }

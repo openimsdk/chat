@@ -18,11 +18,20 @@ import (
 	"fmt"
 	"io"
 	"net"
+	"time"
 
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/a2r"
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/apiresp"
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/common/constant"
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
+	"github.com/OpenIMSDK/chat/pkg/common/apicall"
+	"github.com/OpenIMSDK/chat/pkg/common/apistruct"
+	constant2 "github.com/OpenIMSDK/chat/pkg/common/constant"
+	"github.com/OpenIMSDK/chat/pkg/common/mctx"
+	"github.com/OpenIMSDK/protocol/sdkws"
+	"github.com/OpenIMSDK/tools/checker"
+	"github.com/OpenIMSDK/tools/log"
+
+	"github.com/OpenIMSDK/protocol/constant"
+	"github.com/OpenIMSDK/tools/a2r"
+	"github.com/OpenIMSDK/tools/apiresp"
+	"github.com/OpenIMSDK/tools/errs"
 	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc"
 
@@ -32,13 +41,13 @@ import (
 )
 
 func NewChat(chatConn, adminConn grpc.ClientConnInterface) *ChatApi {
-
-	return &ChatApi{chatClient: chat.NewChatClient(chatConn), adminClient: admin.NewAdminClient(adminConn)}
+	return &ChatApi{chatClient: chat.NewChatClient(chatConn), adminClient: admin.NewAdminClient(adminConn), imApiCaller: apicall.NewCallerInterface()}
 }
 
 type ChatApi struct {
 	chatClient  chat.ChatClient
 	adminClient admin.AdminClient
+	imApiCaller apicall.CallerInterface
 }
 
 // ################## ACCOUNT ##################
@@ -68,9 +77,17 @@ func (o *ChatApi) VerifyCode(c *gin.Context) {
 }
 
 func (o *ChatApi) RegisterUser(c *gin.Context) {
-	var req chat.RegisterUserReq
+	var (
+		req  chat.RegisterUserReq
+		resp apistruct.UserRegisterResp
+	)
 	if err := c.BindJSON(&req); err != nil {
 		apiresp.GinError(c, err)
+		return
+	}
+	log.ZInfo(c, "registerUser", "req", &req)
+	if err := checker.Validate(&req); err != nil {
+		apiresp.GinError(c, err) // 参数校验失败
 		return
 	}
 	ip, err := o.getClientIP(c)
@@ -79,19 +96,59 @@ func (o *ChatApi) RegisterUser(c *gin.Context) {
 		return
 	}
 	req.Ip = ip
-	resp, err := o.chatClient.RegisterUser(c, &req)
+	respRegisterUser, err := o.chatClient.RegisterUser(c, &req)
 	if err != nil {
 		apiresp.GinError(c, err)
 		return
 	}
-	apiresp.GinSuccess(c, resp)
-	// a2r.Call(chat.ChatClient.RegisterUser, o.chatClient, c)
+	userInfo := &sdkws.UserInfo{
+		UserID:     respRegisterUser.UserID,
+		Nickname:   req.User.Nickname,
+		FaceURL:    req.User.FaceURL,
+		CreateTime: time.Now().UnixMilli(),
+	}
+	err = o.imApiCaller.RegisterUser(c, []*sdkws.UserInfo{userInfo})
+	if err != nil {
+		apiresp.GinError(c, err)
+		return
+	}
+	imToken, err := o.imApiCaller.ImAdminTokenWithDefaultAdmin(c)
+	if err != nil {
+		apiresp.GinError(c, err)
+		return
+	}
+	apiCtx := mctx.WithApiToken(c, imToken)
+	rpcCtx := mctx.WithAdminUser(c)
+	if resp, err := o.adminClient.FindDefaultFriend(rpcCtx, &admin.FindDefaultFriendReq{}); err == nil {
+		_ = o.imApiCaller.ImportFriend(apiCtx, respRegisterUser.UserID, resp.UserIDs)
+	}
+	if resp, err := o.adminClient.FindDefaultGroup(rpcCtx, &admin.FindDefaultGroupReq{}); err == nil {
+		_ = o.imApiCaller.InviteToGroup(apiCtx, respRegisterUser.UserID, resp.GroupIDs)
+	}
+	if req.AutoLogin {
+		resp.ImToken, err = o.imApiCaller.UserToken(c, respRegisterUser.UserID, req.Platform)
+		if err != nil {
+			apiresp.GinError(c, err)
+			return
+		}
+	}
+	resp.ChatToken = respRegisterUser.ChatToken
+	resp.UserID = respRegisterUser.UserID
+	log.ZInfo(c, "registerUser api", "resp", &resp)
+	apiresp.GinSuccess(c, &resp)
 }
 
 func (o *ChatApi) Login(c *gin.Context) {
-	var req chat.LoginReq
+	var (
+		req  chat.LoginReq
+		resp apistruct.LoginResp
+	)
 	if err := c.BindJSON(&req); err != nil {
 		apiresp.GinError(c, err)
+		return
+	}
+	if err := checker.Validate(&req); err != nil {
+		apiresp.GinError(c, err) // 参数校验失败
 		return
 	}
 	ip, err := o.getClientIP(c)
@@ -100,11 +157,19 @@ func (o *ChatApi) Login(c *gin.Context) {
 		return
 	}
 	req.Ip = ip
-	resp, err := o.chatClient.Login(c, &req)
+	resp1, err := o.chatClient.Login(c, &req)
 	if err != nil {
 		apiresp.GinError(c, err)
 		return
 	}
+	imToken, err := o.imApiCaller.UserToken(c, resp1.UserID, req.Platform)
+	if err != nil {
+		apiresp.GinError(c, err)
+		return
+	}
+	resp.ImToken = imToken
+	resp.UserID = resp1.UserID
+	resp.ChatToken = resp1.ChatToken
 	apiresp.GinSuccess(c, resp)
 }
 
@@ -119,7 +184,62 @@ func (o *ChatApi) ChangePassword(c *gin.Context) {
 // ################## USER ##################
 
 func (o *ChatApi) UpdateUserInfo(c *gin.Context) {
-	a2r.Call(chat.ChatClient.UpdateUserInfo, o.chatClient, c)
+	var (
+		req  chat.UpdateUserInfoReq
+		resp apistruct.UpdateUserInfoResp
+	)
+	if err := c.BindJSON(&req); err != nil {
+		apiresp.GinError(c, err)
+		return
+	}
+	log.ZInfo(c, "updateUserInfo", "req", &req)
+	if err := checker.Validate(&req); err != nil {
+		apiresp.GinError(c, err) // 参数校验失败
+		return
+	}
+	respUpdate, err := o.chatClient.UpdateUserInfo(c, &req)
+	if err != nil {
+		apiresp.GinError(c, err)
+		return
+	}
+	opUserType, err := mctx.GetUserType(c)
+	if err != nil {
+		apiresp.GinError(c, err)
+		return
+	}
+	var imToken string
+	if opUserType == constant2.NormalUser {
+		imToken, err = o.imApiCaller.ImAdminTokenWithDefaultAdmin(c)
+	} else if opUserType == constant2.AdminUser {
+		imToken, err = o.imApiCaller.UserToken(c, config.GetIMAdmin(mctx.GetOpUserID(c)), constant.AdminPlatformID)
+	} else {
+		apiresp.GinError(c, errs.ErrArgs.Wrap("opUserType unknown"))
+		return
+	}
+	if err != nil {
+		apiresp.GinError(c, err)
+		return
+	}
+	var (
+		nickName string
+		faceURL  string
+	)
+	if req.Nickname != nil {
+		nickName = req.Nickname.Value
+	} else {
+		nickName = respUpdate.NickName
+	}
+	if req.FaceURL != nil {
+		faceURL = req.FaceURL.Value
+	} else {
+		faceURL = respUpdate.FaceUrl
+	}
+	err = o.imApiCaller.UpdateUserInfo(mctx.WithApiToken(c, imToken), req.UserID, nickName, faceURL)
+	if err != nil {
+		apiresp.GinError(c, err)
+		return
+	}
+	apiresp.GinSuccess(c, resp)
 }
 
 func (o *ChatApi) FindUserPublicInfo(c *gin.Context) {
@@ -186,4 +306,12 @@ func (o *ChatApi) getClientIP(c *gin.Context) (string, error) {
 		return "", errs.ErrInternalServer.Wrap(fmt.Sprintf("parse proxy ip header %s failed", ip))
 	}
 	return ip, nil
+}
+
+func (o *ChatApi) UploadLogs(c *gin.Context) {
+	a2r.Call(chat.ChatClient.UploadLogs, o.chatClient, c)
+}
+
+func (o *ChatApi) DeleteLogs(c *gin.Context) {
+	a2r.Call(chat.ChatClient.DeleteLogs, o.chatClient, c)
 }

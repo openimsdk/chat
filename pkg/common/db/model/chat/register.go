@@ -16,8 +16,9 @@ package chat
 
 import (
 	"context"
+	"time"
 
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
+	"github.com/OpenIMSDK/tools/errs"
 	"gorm.io/gorm"
 
 	"github.com/OpenIMSDK/chat/pkg/common/db/table/chat"
@@ -37,4 +38,15 @@ func (o *Register) NewTx(tx any) chat.RegisterInterface {
 
 func (o *Register) Create(ctx context.Context, registers ...*chat.Register) error {
 	return errs.Wrap(o.db.WithContext(ctx).Create(registers).Error)
+}
+
+func (o *Register) CountTotal(ctx context.Context, before *time.Time) (count int64, err error) {
+	db := o.db.WithContext(ctx).Model(&chat.Register{})
+	if before != nil {
+		db.Where("create_time < ?", before)
+	}
+	if err := db.Count(&count).Error; err != nil {
+		return 0, errs.Wrap(err)
+	}
+	return count, nil
 }

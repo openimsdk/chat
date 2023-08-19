@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+
+
 # Copyright © 2023 OpenIM open source community. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,10 +15,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+#Include shell font styles and some basic information
+SCRIPTS_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+OPENIM_ROOT=$(dirname "${SCRIPTS_ROOT}")/..
 
-source ./style_info.cfg
-source ./path_info.cfg
-source ./function.sh
+#Include shell font styles and some basic information
+source $SCRIPTS_ROOT/style_info.sh
+source $SCRIPTS_ROOT/path_info.sh
+source $SCRIPTS_ROOT/function.sh
+
 service_port_name=(
  openImChatApiPort
  openImAdminApiPort
@@ -24,12 +31,13 @@ service_port_name=(
    openImAdminPort
    openImChatPort
 )
+
 switch=$(cat $config_path | grep demoswitch |awk -F '[:]' '{print $NF}')
 for i in ${service_port_name[*]}; do
   list=$(cat $config_path | grep -w ${i} | awk -F '[:]' '{print $NF}')
   list_to_string $list
   for j in ${ports_array}; do
-    port=$(ss -tunlp| grep open_im | awk '{print $5}' | grep -w ${j} | awk -F '[:]' '{print $NF}')
+    port=$(ps -ef |grep -E 'api|rpc|open_im' |awk '{print $10}'| grep -w ${j})
     if [[ ${port} -ne ${j} ]]; then
       echo -e ${YELLOW_PREFIX}${i}${COLOR_SUFFIX}${RED_PREFIX}" service does not start normally,not initiated port is "${COLOR_SUFFIX}${YELLOW_PREFIX}${j}${COLOR_SUFFIX}
       echo -e ${RED_PREFIX}"please check ../logs/openIM.log "${COLOR_SUFFIX}
@@ -39,4 +47,3 @@ for i in ${service_port_name[*]}; do
     fi
   done
 done
-

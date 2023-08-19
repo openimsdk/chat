@@ -15,12 +15,13 @@
 package tokenverify
 
 import (
-	"github.com/OpenIMSDK/Open-IM-Server/pkg/errs"
+	"time"
+
 	"github.com/OpenIMSDK/chat/pkg/common/config"
 	"github.com/OpenIMSDK/chat/pkg/common/constant"
 	utils "github.com/OpenIMSDK/open_utils"
+	"github.com/OpenIMSDK/tools/errs"
 	"github.com/golang-jwt/jwt/v4"
-	"time"
 )
 
 const (
@@ -29,8 +30,9 @@ const (
 )
 
 type claims struct {
-	UserID   string
-	UserType int32
+	UserID     string
+	UserType   int32
+	PlatformID int32
 	jwt.RegisteredClaims
 }
 
@@ -41,10 +43,11 @@ func buildClaims(userID string, userType int32, ttl int64) claims {
 		UserID:   userID,
 		UserType: userType,
 		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(now.Add(time.Duration(ttl*24) * time.Hour)), //Expiration time
-			IssuedAt:  jwt.NewNumericDate(now),                                        //Issuing time
-			NotBefore: jwt.NewNumericDate(before),                                     //Begin Effective time
-		}}
+			ExpiresAt: jwt.NewNumericDate(now.Add(time.Duration(ttl*24) * time.Hour)), // Expiration time
+			IssuedAt:  jwt.NewNumericDate(now),                                        // Issuing time
+			NotBefore: jwt.NewNumericDate(before),                                     // Begin Effective time
+		},
+	}
 }
 
 func CreateToken(UserID string, userType int32, ttl int64) (string, error) {
@@ -83,7 +86,11 @@ func getToken(t string) (string, int32, error) {
 			return "", 0, errs.ErrTokenNotValidYet.Wrap()
 		}
 	} else {
-		if claims, ok := token.Claims.(*claims); ok && token.Valid {
+		claims, ok := token.Claims.(*claims)
+		if claims.PlatformID != 0 {
+			return "", 0, errs.ErrTokenNotExist.Wrap()
+		}
+		if ok && token.Valid {
 			return claims.UserID, claims.UserType, nil
 		}
 		return "", 0, errs.ErrTokenNotValidYet.Wrap()

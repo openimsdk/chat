@@ -14,7 +14,7 @@
 
 package constant
 
-import "github.com/OpenIMSDK/Open-IM-Server/pkg/common/constant"
+import "github.com/OpenIMSDK/protocol/constant"
 
 const (
 	// verificationCode used for.
@@ -169,6 +169,10 @@ const (
 )
 
 const (
+	FinDAllUser    = 0
 	FindNormalUser = 1
-	FinDAllUser    = 2
 )
+
+const DefaultPlatform = 1
+
+const CtxApiToken = "api-token"

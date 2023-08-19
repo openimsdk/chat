@@ -62,7 +62,7 @@ log:
 #  isJson: false
 #  withStack: false
 
-#secret: "tuoyun"
+# secret: openIM123
 #tokenPolicy:
 #  expire: 86400
 
@@ -83,3 +83,22 @@ verifyCode:
 
 # 获取ip的header,没有配置直接获取远程地址
 #proxyHeader: "X-Forwarded-For"
+
+adminList:
+  - adminID: admin1
+    nickname: chat1
+    imAdmin: openIM123456
+  - adminID: admin2
+    nickname: chat2
+    imAdmin: openIM654321
+  - adminID: admin3
+    nickname: chat3
+    imAdmin: openIMAdmin
+
+
+openIMUrl: "http://127.0.0.1:10002"
+
+redis:
+  address: [ 127.0.0.1:16379 ]
+  username:
+  password: openIM123
