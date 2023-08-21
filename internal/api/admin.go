@@ -340,3 +340,7 @@ func (o *AdminApi) NewUserCount(c *gin.Context) {
 func (o *AdminApi) SearchLogs(c *gin.Context) {
 	a2r.Call(chat.ChatClient.SearchLogs, o.chatClient, c)
 }
+
+func (o *AdminApi) DeleteLogs(c *gin.Context) {
+	a2r.Call(chat.ChatClient.DeleteLogs, o.chatClient, c)
+}
