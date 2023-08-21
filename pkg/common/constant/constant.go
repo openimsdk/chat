@@ -160,7 +160,7 @@ const (
 
 const RpcCustomHeader = constant.RpcCustomHeader
 
-const NeedInvitationCodeRegisterConfigKey = "NeedInvitationCodeRegister"
+const NeedInvitationCodeRegisterConfigKey = "needInvitationCodeRegister"
 
 const (
 	DefaultAllowVibration = 1
