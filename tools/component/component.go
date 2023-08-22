@@ -5,6 +5,7 @@ import (
 	"github.com/OpenIMSDK/chat/pkg/common/config"
 	"github.com/OpenIMSDK/protocol/constant"
 	"github.com/OpenIMSDK/tools/errs"
+	"github.com/OpenIMSDK/tools/log"
 	"github.com/go-zookeeper/zk"
 	"gopkg.in/yaml.v3"
 	"os"
@@ -51,15 +52,14 @@ func ComponentCheck(cfgPath string, hide bool) {
 		}
 		path := "/" + config.Config.Zookeeper.Schema + "/" + constant.OpenIMCommonConfigKey
 		zkConfig, _, err := zkConn.Get(path)
-		fmt.Println("zk path: ", path)
 		if err != nil {
-			errorPrint(fmt.Sprintf("get zk config [%d] error: %v\n", i, err), hide)
+			errorPrint(fmt.Sprintf("! get zk config [%d] error: %v\n", i, err), hide)
 			continue
 		} else if len(zkConfig) == 0 {
-			errorPrint(fmt.Sprintf("get zk config [%d] data is empty\n", i), hide)
+			errorPrint(fmt.Sprintf("! get zk config [%d] data is empty\n", i), hide)
 			continue
 		}
-		successPrint(fmt.Sprint("Chat get config starts successfully"), hide)
+		successPrint(fmt.Sprint("! Chat get config successfully"), hide)
 		break
 	}
 }
@@ -78,7 +78,7 @@ func successPrint(s string, hide bool) {
 
 func newZkClient() (*zk.Conn, error) {
 	var c *zk.Conn
-	c, _, err := zk.Connect(config.Config.Zookeeper.ZkAddr, time.Second)
+	c, _, err := zk.Connect(config.Config.Zookeeper.ZkAddr, time.Second, zk.WithLogger(log.NewZkLogger()))
 	if err != nil {
 		return nil, errs.Wrap(err)
 	} else {
