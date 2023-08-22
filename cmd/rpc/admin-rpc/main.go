@@ -39,14 +39,17 @@ func main() {
 	flag.BoolVar(&hide, "hide", true, "hide the ComponentCheck result")
 
 	flag.Parse()
-	component.ComponentCheck(configFile, hide)
+	err := component.ComponentCheck(configFile, hide)
+	if err != nil {
+		return
+	}
 	if err := config.InitConfig(configFile); err != nil {
 		panic(err)
 	}
 	if err := log.InitFromConfig("chat.log", "admin-rpc", *config.Config.Log.RemainLogLevel, *config.Config.Log.IsStdout, *config.Config.Log.IsJson, *config.Config.Log.StorageLocation, *config.Config.Log.RemainRotationCount, *config.Config.Log.RotationTime); err != nil {
 		panic(err)
 	}
-	err := chatrpcstart.Start(rpcPort, config.Config.RpcRegisterName.OpenImAdminName, 0, admin.Start)
+	err = chatrpcstart.Start(rpcPort, config.Config.RpcRegisterName.OpenImAdminName, 0, admin.Start)
 	if err != nil {
 		panic(err)
 	}

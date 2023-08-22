@@ -50,8 +50,11 @@ func main() {
 
 	flag.Parse()
 
-	component.ComponentCheck(configFile, hide)
-	err := config.InitConfig(configFile)
+	err := component.ComponentCheck(configFile, hide)
+	if err != nil {
+		return
+	}
+	err = config.InitConfig(configFile)
 	if err != nil {
 		fmt.Println("err ", err.Error())
 		panic(err)

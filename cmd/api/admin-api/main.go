@@ -48,7 +48,10 @@ func main() {
 	flag.BoolVar(&hide, "hide", false, "hide the ComponentCheck result")
 
 	flag.Parse()
-	component.ComponentCheck(configFile, hide)
+	err := component.ComponentCheck(configFile, hide)
+	if err != nil {
+		return
+	}
 	if err := config.InitConfig(configFile); err != nil {
 		panic(err)
 	}
