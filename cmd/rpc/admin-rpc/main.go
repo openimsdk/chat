@@ -17,6 +17,7 @@ package main
 import (
 	"flag"
 	"github.com/OpenIMSDK/chat/pkg/common/chatrpcstart"
+	"github.com/OpenIMSDK/chat/tools/component"
 	"github.com/OpenIMSDK/tools/log"
 	"math/rand"
 	"time"
@@ -34,7 +35,11 @@ func main() {
 
 	flag.IntVar(&rpcPort, "port", 30200, "get rpc ServerPort from cmd")
 
+	var hide bool
+	flag.BoolVar(&hide, "hide", true, "hide the ComponentCheck result")
+
 	flag.Parse()
+	component.ComponentCheck(configFile, hide)
 	if err := config.InitConfig(configFile); err != nil {
 		panic(err)
 	}
