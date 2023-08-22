@@ -16,6 +16,7 @@ package main
 
 import (
 	"flag"
+	"github.com/OpenIMSDK/chat/tools/component"
 	"math/rand"
 	"net"
 	"strconv"
@@ -43,7 +44,14 @@ func main() {
 
 	flag.IntVar(&ginPort, "port", 10009, "get ginServerPort from cmd")
 
+	var hide bool
+	flag.BoolVar(&hide, "hide", false, "hide the ComponentCheck result")
+
 	flag.Parse()
+	err := component.ComponentCheck(configFile, hide)
+	if err != nil {
+		return
+	}
 	if err := config.InitConfig(configFile); err != nil {
 		panic(err)
 	}
