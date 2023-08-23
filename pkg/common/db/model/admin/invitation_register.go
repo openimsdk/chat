@@ -56,7 +56,7 @@ func (o *InvitationRegister) Take(ctx context.Context, code string) (*admin.Invi
 }
 
 func (o *InvitationRegister) Update(ctx context.Context, code string, data map[string]any) error {
-	return errs.Wrap(o.db.WithContext(ctx).Model(&admin.InvitationRegister{}).Where("code = ?", code).Updates(data).Error)
+	return errs.Wrap(o.db.WithContext(ctx).Model(&admin.InvitationRegister{}).Where("invitation_code = ?", code).Updates(data).Error)
 }
 
 func (o *InvitationRegister) Search(ctx context.Context, keyword string, state int32, userIDs []string, codes []string, page int32, size int32) (uint32, []*admin.InvitationRegister, error) {

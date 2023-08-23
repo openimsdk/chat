@@ -16,12 +16,12 @@ package chat
 
 import (
 	"context"
+	"github.com/OpenIMSDK/chat/pkg/common/mctx"
 	"math/rand"
 	"strconv"
 	"strings"
 	"time"
 
-	"github.com/OpenIMSDK/chat/pkg/common/mctx"
 	constant2 "github.com/OpenIMSDK/protocol/constant"
 
 	"github.com/OpenIMSDK/tools/errs"
@@ -197,8 +197,8 @@ func (o *chatSvr) genVerifyCode() string {
 func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (*chat.RegisterUserResp, error) {
 	resp := &chat.RegisterUserResp{}
 	defer log.ZDebug(ctx, "return")
-	ctx = mctx.WithAdminUser(ctx)
 	isAdmin, err := o.Admin.CheckNilOrAdmin(ctx)
+	ctx = mctx.WithAdminUser(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -236,6 +236,7 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 			return nil, err
 		}
 	}
+	log.ZDebug(ctx, "usedInvitationCode", usedInvitationCode)
 	if req.User.UserID == "" {
 		for i := 0; i < 20; i++ {
 			userID := o.genUserID()

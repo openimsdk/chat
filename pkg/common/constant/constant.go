@@ -142,9 +142,9 @@ const (
 )
 
 const (
-	InvitationCodeUnused = 0 // 全部
+	InvitationCodeAll    = 0 // 全部
 	InvitationCodeUsed   = 1 // 已使用
-	InvitationCodeAll    = 2 // 未使用
+	InvitationCodeUnused = 2 // 未使用
 )
 
 // 默认发现页面.
@@ -160,7 +160,7 @@ const (
 
 const RpcCustomHeader = constant.RpcCustomHeader
 
-const NeedInvitationCodeRegisterConfigKey = "NeedInvitationCodeRegister"
+const NeedInvitationCodeRegisterConfigKey = "needInvitationCodeRegister"
 
 const (
 	DefaultAllowVibration = 1
