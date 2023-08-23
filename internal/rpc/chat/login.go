@@ -359,7 +359,7 @@ func (o *chatSvr) Login(ctx context.Context, req *chat.LoginReq) (*chat.LoginRes
 	}
 	if err != nil {
 		if o.Database.IsNotFound(err) {
-			return nil, errs.ErrUserIDNotFound.Wrap("user unregistered")
+			return nil, eerrs.ErrAccountNotFound.Wrap("user unregistered")
 		}
 		return nil, err
 	}
