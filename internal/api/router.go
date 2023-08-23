@@ -56,7 +56,6 @@ func NewChatRoute(router gin.IRouter, discov discoveryregistry.SvcDiscoveryRegis
 
 	logs := router.Group("/logs", mw.CheckToken)
 	logs.POST("/upload", chat.UploadLogs)
-	logs.POST("/delete", chat.DeleteLogs)
 }
 
 func NewAdminRoute(router gin.IRouter, discov discoveryregistry.SvcDiscoveryRegistry) {
@@ -128,4 +127,5 @@ func NewAdminRoute(router gin.IRouter, discov discoveryregistry.SvcDiscoveryRegi
 
 	logs := router.Group("/logs", mw.CheckAdmin)
 	logs.POST("/search", admin.SearchLogs)
+	logs.POST("/delete", admin.DeleteLogs)
 }
