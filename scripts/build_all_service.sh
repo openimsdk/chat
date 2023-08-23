@@ -41,19 +41,10 @@ echo -e "${BOLD_PREFIX}_________________________________________________________
 
 bin_dir="$BIN_DIR"
 logs_dir="$OPENIM_ROOT/logs"
-sdk_db_dir="$OPENIM_ROOT/db/sdk/"
 
 echo "==> bin_dir=$bin_dir"
 echo "==> logs_dir=$logs_dir"
-echo "==> sdk_db_dir=$sdk_db_dir"
 
-# Automatically created when there is no bin, logs folder
-if [ ! -d $logs_dir ]; then
-  mkdir -p $logs_dir
-fi
-if [ ! -d $sdk_db_dir ]; then
-  mkdir -p $sdk_db_dir
-fi
 
 cd $SCRIPTS_ROOT/..
 

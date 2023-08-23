@@ -36,14 +36,10 @@ RUN make clean
 RUN make build
 
 # Build the runtime stage
-FROM ghcr.io/openim-sigs/openim-bash-image:latest
+FROM ghcr.io/openim-sigs/openim-ubuntu-image:latest
 
 WORKDIR ${CHAT_WORKDIR}
 
-COPY --from=builder ${CHAT_WORKDIR}/_output/bin/platforms /openim/openim-chat/_output/bin/platforms
-COPY --from=builder ${OPENIM_CHAT_CMDDIR} /openim/openim-chat/scripts
-COPY --from=builder ${OPENIM_CHAT_CONFIG_NAME} /openim/openim-chat/config/config.yaml
+COPY --from=builder $OPENIM_CHAT_BINDIR/platforms /openim/openim-chat/_output/bin/platforms
 
-VOLUME ["/openim/openim-chat/_output","/openim/openim-chat/logs","/openim/openim-chat/config","/openim/openim-chat/scripts"]
-
-CMD ["bash","-c", "${OPENIM_CHAT_CMDDIR}/docker_start_all.sh"]
+CMD ["/openim/openim-chat/scripts/docker_start_all.sh"]
