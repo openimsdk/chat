@@ -98,4 +98,4 @@ for ((i = 0; i < ${#service_filenames[*]}; i++)); do
   done
 done
 
-sleep infinity
+tail -f ${logs_dir}/openIM.log
