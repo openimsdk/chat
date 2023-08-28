@@ -99,6 +99,6 @@ adminList:
 openIMUrl: "http://127.0.0.1:10002"
 
 redis:
-  address: [ 127.0.0.1:16379 ]
-  username:
-  password: openIM123
+  # address: [ 127.0.0.1:16379 ]
+  # username:
+  # password: openIM123
