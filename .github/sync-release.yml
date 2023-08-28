@@ -16,11 +16,11 @@
 # Synchronization for the.github repository
 openim-sigs/openim-docker:
   - source: ./config
-    dest: ./openim-chat/main/config
+    dest: ./openim-chat/release/config
     replace: true
   - source: ./docs
-    dest: ./openim-chat/main/docs
+    dest: ./openim-chat/release/docs
     replace: true
   - source: ./scripts
-    dest: ./openim-chat/main/scripts
+    dest: ./openim-chat/release/scripts
     replace: true
