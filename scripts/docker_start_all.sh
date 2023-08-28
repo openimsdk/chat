@@ -98,6 +98,7 @@ for ((i = 0; i < ${#service_filenames[*]}; i++)); do
   done
 done
 
+sleep 5
 ${OPENIM_ROOT}/scripts/check_all.sh
 
 tail -f ${logs_dir}/openIM.log
