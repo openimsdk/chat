@@ -26,9 +26,10 @@ if [ "$1" == "--print-screen" ]; then
     PRINT_SCREEN=1
 fi
 
+mkdir -p ${SCRIPTS_ROOT}/../logs
 # 如果没有设置 PRINT_SCREEN 标记，那么进行日志重定向
 if [ -z "$PRINT_SCREEN" ]; then
-    exec > ${OPENIM_ROOT}/logs/openIM.log 2>&1
+    exec > ${SCRIPTS_ROOT}/../logs/openIM.log 2>&1
 fi
 
 #Include shell font styles and some basic information
