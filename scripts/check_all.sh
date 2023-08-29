@@ -19,6 +19,10 @@
 SCRIPTS_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 OPENIM_ROOT=$(dirname "${SCRIPTS_ROOT}")/..
 
+DATA="date '+%H:%M:%S'"
+echo "# Start Chat check_all.sh ${DATA}"
+exec > ${OPENIM_ROOT}/logs/openIM.log 2>&1
+
 #Include shell font styles and some basic information
 source $SCRIPTS_ROOT/style_info.sh
 source $SCRIPTS_ROOT/path_info.sh
