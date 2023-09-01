@@ -100,12 +100,13 @@ func (o *AdminApi) AdminUpdateInfo(c *gin.Context) {
 		return
 	}
 	apiresp.GinSuccess(c, nil)
-	imToken, err := o.imApiCaller.ImAdminTokenWithDefaultAdmin(c)
+	imAdminUserID := config.GetIMAdmin(resp.UserID)
+	imToken, err := o.imApiCaller.UserToken(c, imAdminUserID, constant.AdminPlatformID)
 	if err != nil {
 		log.ZError(c, "AdminUpdateInfo ImAdminTokenWithDefaultAdmin", err)
 		return
 	}
-	if err := o.imApiCaller.UpdateUserInfo(mctx.WithApiToken(c, imToken), resp.UserID, resp.Nickname, resp.FaceURL); err != nil {
+	if err := o.imApiCaller.UpdateUserInfo(mctx.WithApiToken(c, imToken), imAdminUserID, resp.Nickname, resp.FaceURL); err != nil {
 		log.ZError(c, "AdminUpdateInfo UpdateUserInfo", err, "userID", resp.UserID, "nickName", resp.Nickname, "faceURL", resp.FaceURL)
 	}
 }
