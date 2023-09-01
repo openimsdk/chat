@@ -15,9 +15,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-#Include shell font styles and some basic information
 SCRIPTS_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 OPENIM_ROOT=$(dirname "${SCRIPTS_ROOT}")/..
+
+DATA="$(date +%H:%M:%S)"
+echo "# Start Chat check_all.sh ${DATA}"
+
+# 检查第一个参数是否为 --print-screen
+if [ "$1" == "--print-screen" ]; then
+    PRINT_SCREEN=1
+fi
+
+mkdir -p ${SCRIPTS_ROOT}/../logs
+# 如果没有设置 PRINT_SCREEN 标记，那么进行日志重定向
+if [ -z "$PRINT_SCREEN" ]; then
+    exec > ${SCRIPTS_ROOT}/../logs/openIM.log 2>&1
+fi
 
 #Include shell font styles and some basic information
 source $SCRIPTS_ROOT/style_info.sh
