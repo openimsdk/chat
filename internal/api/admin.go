@@ -85,7 +85,29 @@ func (o *AdminApi) ResetUserPassword(c *gin.Context) {
 }
 
 func (o *AdminApi) AdminUpdateInfo(c *gin.Context) {
-	a2r.Call(admin.AdminClient.AdminUpdateInfo, o.adminClient, c)
+	var req admin.AdminUpdateInfoReq
+	if err := c.BindJSON(&req); err != nil {
+		apiresp.GinError(c, err)
+		return
+	}
+	if err := checker.Validate(&req); err != nil {
+		apiresp.GinError(c, err) // 参数校验失败
+		return
+	}
+	resp, err := o.adminClient.AdminUpdateInfo(c, &req)
+	if err != nil {
+		apiresp.GinError(c, err)
+		return
+	}
+	apiresp.GinSuccess(c, nil)
+	imToken, err := o.imApiCaller.ImAdminTokenWithDefaultAdmin(c)
+	if err != nil {
+		log.ZError(c, "AdminUpdateInfo ImAdminTokenWithDefaultAdmin", err)
+		return
+	}
+	if err := o.imApiCaller.UpdateUserInfo(mctx.WithApiToken(c, imToken), resp.UserID, resp.Nickname, resp.FaceURL); err != nil {
+		log.ZError(c, "AdminUpdateInfo UpdateUserInfo", err, "userID", resp.UserID, "nickName", resp.Nickname, "faceURL", resp.FaceURL)
+	}
 }
 
 func (o *AdminApi) AdminInfo(c *gin.Context) {

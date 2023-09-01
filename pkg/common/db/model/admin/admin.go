@@ -70,7 +70,7 @@ func (o *Admin) InitAdmin(ctx context.Context) error {
 		password := md5.Sum([]byte(adminChat.AdminID))
 		table := admin.Admin{
 			Account:    adminChat.AdminID,
-			UserID:     adminChat.AdminID,
+			UserID:     adminChat.ImAdminID,
 			Password:   hex.EncodeToString(password[:]),
 			Level:      100,
 			CreateTime: now,

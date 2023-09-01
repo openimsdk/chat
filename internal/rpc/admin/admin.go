@@ -105,14 +105,25 @@ func (o *adminServer) AdminUpdateInfo(ctx context.Context, req *admin.AdminUpdat
 	if err != nil {
 		return nil, err
 	}
-	_, err = o.Database.GetAdminUserID(ctx, mcontext.GetOpUserID(ctx))
+	info, err := o.Database.GetAdminUserID(ctx, mcontext.GetOpUserID(ctx))
 	if err != nil {
 		return nil, err
 	}
 	if err := o.Database.UpdateAdmin(ctx, userID, update); err != nil {
 		return nil, err
 	}
-	return &admin.AdminUpdateInfoResp{}, nil
+	resp := &admin.AdminUpdateInfoResp{UserID: info.UserID}
+	if req.Nickname == nil {
+		resp.Nickname = info.Nickname
+	} else {
+		resp.Nickname = req.Nickname.Value
+	}
+	if req.FaceURL == nil {
+		resp.Nickname = info.FaceURL
+	} else {
+		resp.FaceURL = req.FaceURL.Value
+	}
+	return resp, nil
 }
 
 func (o *adminServer) Login(ctx context.Context, req *admin.LoginReq) (*admin.LoginResp, error) {

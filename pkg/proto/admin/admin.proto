@@ -31,7 +31,7 @@ message LoginResp {
   string nickname = 3;
   string faceURL = 4;
   int32 level = 5;
-  string adminUserID=6;
+  string adminUserID = 6;
 }
 
 message AdminUpdateInfoReq {
@@ -42,7 +42,11 @@ message AdminUpdateInfoReq {
   OpenIMServer.protobuf.Int32Value level = 6;
 }
 
-message AdminUpdateInfoResp {}
+message AdminUpdateInfoResp {
+  string userID = 1;
+  string nickname = 2;
+  string faceURL = 3;
+}
 
 message ChangePasswordReq  {
   string password = 1;
@@ -459,11 +463,11 @@ message GetClientConfigResp {
 }
 
 message GetUserTokenReq{
-  string userID=1;
+  string userID = 1;
 }
 
 message GetUserTokenResp{
-  map<string,int32> tokensMap=1;
+  map<string, int32> tokensMap = 1;
 }
 
 service admin {
