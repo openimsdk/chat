@@ -143,6 +143,11 @@ func GetDefaultIMAdmin() string {
 
 func GetIMAdmin(chatAdminID string) string {
 	for _, admin := range Config.AdminList {
+		if admin.ImAdminID == chatAdminID {
+			return admin.ImAdminID
+		}
+	}
+	for _, admin := range Config.AdminList {
 		if admin.AdminID == chatAdminID {
 			return admin.ImAdminID
 		}
