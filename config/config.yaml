@@ -16,7 +16,7 @@
 zookeeper:
   schema: openim
   zkAddr:
-    - 127.0.0.1:2181
+    - 127.0.0.1:12181
   username: ""
   password: ""
 
