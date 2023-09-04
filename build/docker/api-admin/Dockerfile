@@ -35,9 +35,7 @@ RUN go mod download
 COPY . .
 
 RUN make clean
-RUN make build BINS=api
-
-RUN rm -rf ./_output/bin/platforms/$(go env GOOS)/$(go env GOARCH)/chat-api
+RUN make build BINS=admin-api
 
 FROM ghcr.io/openim-sigs/openim-bash-image:latest
 
@@ -47,6 +45,8 @@ COPY --from=builder ${OPENIM_CHAT_BINDIR}/platforms /openim/openim-chat/_output/
 COPY --from=builder ${OPENIM_CHAT_CONFIG_NAME} /openim/openim-chat/config/config.yaml
 
 ENV PORT=10009
+EXPOSE 10009
 
-EXPOSE ${PORT}
-CMD ["bash","-c","${OPENIM_CHAT_BINDIR}/platforms/$(get_os)/$(get_arch)/admin-api --port ${PORT} --config_folder_path ${OPENIM_CHAT_CONFIG_NAME}"]
+RUN mv ${OPENIM_CHAT_BINDIR}/platforms/$(get_os)/$(get_arch)/admin-api /usr/bin/admin-api
+
+ENTRYPOINT ["bash", "-c", "admin-api  --port $PORT -c $OPENIM_CHAT_CONFIG_NAME"]

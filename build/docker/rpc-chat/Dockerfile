@@ -32,7 +32,7 @@ RUN go mod download
 COPY . .
 
 RUN make clean
-RUN make build BINS=rpc
+RUN make build BINS=chat-rpc
 
 RUN rm -rf ./_output/bin/platforms/$(go env GOOS)/$(go env GOARCH)/admin-rpc
 
@@ -44,6 +44,8 @@ COPY --from=builder ${OPENIM_CHAT_BINDIR}/platforms /openim/openim-chat/_output/
 COPY --from=builder ${OPENIM_CHAT_CONFIG_NAME} /openim/openim-chat/config/config.yaml
 
 ENV PORT=30300
+EXPOSE 30300
 
-EXPOSE ${PORT}
-CMD ["bash", "-c","${OPENIM_CHAT_BINDIR}/platforms/$(get_os)/$(get_arch)/chat-rpc --port ${PORT} --config_folder_path ${OPENIM_CHAT_CONFIG_NAME}"]
+RUN mv ${OPENIM_CHAT_BINDIR}/platforms/$(get_os)/$(get_arch)/chat-rpc /usr/bin/chat-rpc
+
+ENTRYPOINT ["bash", "-c", "chat-rpc --port $PORT -c $OPENIM_CHAT_CONFIG_NAME"]
