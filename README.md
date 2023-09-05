@@ -30,8 +30,8 @@ sudo docker compose up -d
 ```
 
 Installing Chat
-```
-make install
+```bash
+$ make install
 ```
 
 ## 🛫 Quick start 
@@ -44,7 +44,17 @@ make install
 > We need to run the backend server first
 
 ```bash
-make build
+$ make build
+
+# OR build Specifying binary
+$ make build BINS=admin-api
+
+# OR build multiarch
+$ make build-multiarch
+$ make build-multiarch BINS="admin-api"
+
+# OR use scripts build source code
+$ ./scripts/build_all.sh
 ```
 
 ### 📖 Contributors get up to speed
@@ -82,25 +92,31 @@ Targets:
 > It's highly recommended that you run `make all` before committing your code. 🚀
 
 ```bash
-make all
+$ make all
 ```
 
 ### Chat Start
 
 ```bash
-./scripts/start_all.sh
+$ make start_all
+# OR use scripts start
+$ ./scripts/start_all.sh
 ```
 
 ### Chat Detection
 
 ```bash
-./scripts/check_all.sh
- ```
+$ make check
+# OR use scripts check
+$ ./scripts/check_all.sh
+```
 
 ### Chat Stop
 
 ```bash
-./scripts/stop_all.sh
+$ make stop
+# OR use scripts stop
+$ ./scripts/stop_all.sh
 ```
 
 ## Contributing
