@@ -19,7 +19,7 @@ SCRIPTS_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 OPENIM_ROOT=$(dirname "${SCRIPTS_ROOT}")/..
 
 DATA="$(date +%H:%M:%S)"
-echo "# Start Chat check_all.sh ${DATA}, For local deployments, use `./check_all.sh --print-screen`"
+echo "# Start Chat check_all.sh ${DATA}, For local deployments, use ./check_all.sh --print-screen"
 
 # 检查第一个参数是否为 --print-screen
 if [ "$1" == "--print-screen" ]; then
