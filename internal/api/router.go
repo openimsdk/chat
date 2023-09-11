@@ -48,6 +48,8 @@ func NewChatRoute(router gin.IRouter, discov discoveryregistry.SvcDiscoveryRegis
 	user.POST("/search/full", chat.SearchUserFullInfo)     // 搜索用户公开信息
 	user.POST("/search/public", chat.SearchUserPublicInfo) // 搜索用户所有信息
 
+	router.POST("/friend/search", mw.CheckToken, chat.SearchFriend)
+
 	router.Group("/applet").POST("/find", mw.CheckToken, chat.FindApplet) // 小程序列表
 
 	router.Group("/client_config").POST("/get", chat.GetClientConfig) // 获取客户端初始化配置

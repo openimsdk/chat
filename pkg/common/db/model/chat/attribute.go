@@ -91,3 +91,10 @@ func (o *Attribute) SearchNormalUser(ctx context.Context, keyword string, forbid
 	}
 	return ormutil.GormSearch[chat.Attribute](db, []string{"user_id", "account", "nickname", "phone_number"}, keyword, page, size)
 }
+
+func (o *Attribute) SearchUser(ctx context.Context, keyword string, userIDs []string, genders []int32, pageNumber int32, showNumber int32) (uint32, []*chat.Attribute, error) {
+	db := o.db.WithContext(ctx)
+	ormutil.GormIn(&db, "user_id", userIDs)
+	ormutil.GormIn(&db, "gender", genders)
+	return ormutil.GormSearch[chat.Attribute](db, []string{"user_id", "nickname", "phone_number"}, keyword, pageNumber, showNumber)
+}

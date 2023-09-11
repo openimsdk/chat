@@ -36,4 +36,5 @@ var (
 	forceOffLine      = NewApiCaller[auth.ForceLogoutReq, auth.ForceLogoutResp]("/auth/force_logout", imApi)
 	getGroupsInfo     = NewApiCaller[group.GetGroupsInfoReq, group.GetGroupsInfoResp]("/group/get_groups_info", imApi)
 	registerUserCount = NewApiCaller[user.UserRegisterCountReq, user.UserRegisterCountResp]("/statistics/user/register", imApi)
+	friendUserIDs     = NewApiCaller[friend.GetFriendIDsReq, friend.GetFriendIDsResp]("/friend/get_friend_id", imApi)
 )

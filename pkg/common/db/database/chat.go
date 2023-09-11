@@ -38,6 +38,7 @@ type ChatDatabaseInterface interface {
 	TakeAttributeByAccount(ctx context.Context, account string) (*table.Attribute, error)
 	TakeAttributeByUserID(ctx context.Context, userID string) (*table.Attribute, error)
 	Search(ctx context.Context, normalUser int32, keyword string, gender int32, pageNumber int32, showNumber int32) (uint32, []*table.Attribute, error)
+	SearchUser(ctx context.Context, keyword string, userIDs []string, genders []int32, pageNumber int32, showNumber int32) (uint32, []*table.Attribute, error)
 	CountVerifyCodeRange(ctx context.Context, account string, start time.Time, end time.Time) (uint32, error)
 	AddVerifyCode(ctx context.Context, verifyCode *table.VerifyCode, fn func() error) error
 	UpdateVerifyCodeIncrCount(ctx context.Context, id uint) error
@@ -152,6 +153,10 @@ func (o *ChatDatabase) Search(ctx context.Context, normalUser int32, keyword str
 		return 0, nil, err
 	}
 	return total, totalUser, nil
+}
+
+func (o *ChatDatabase) SearchUser(ctx context.Context, keyword string, userIDs []string, genders []int32, pageNumber int32, showNumber int32) (uint32, []*table.Attribute, error) {
+	return o.attribute.SearchUser(ctx, keyword, userIDs, genders, pageNumber, showNumber)
 }
 
 func (o *ChatDatabase) CountVerifyCodeRange(ctx context.Context, account string, start time.Time, end time.Time) (uint32, error) {

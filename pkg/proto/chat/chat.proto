@@ -47,8 +47,8 @@ message UpdateUserInfoReq{
 }
 
 message UpdateUserInfoResp{
-  string faceUrl=1;
-  string nickName=2;
+  string faceUrl = 1;
+  string nickName = 2;
 }
 
 message FindUserPublicInfoReq{
@@ -241,48 +241,60 @@ message SearchUserFullInfoResp{
 }
 
 message UserLoginCountReq{
-  int64 start =1;
-  int64 end=2;
+  int64 start = 1;
+  int64 end = 2;
 }
 
 message UserLoginCountResp{
-  int64 loginCount=1;
-  int64 unloginCount=2;
-  map<string,int64>Count=3;
+  int64 loginCount = 1;
+  int64 unloginCount = 2;
+  map<string, int64>Count = 3;
 }
 
 message fileURL{
-  string filename=1;
-  string URL=2;
+  string filename = 1;
+  string URL = 2;
 }
 message UploadLogsReq{
-  int32 platform=1;
-  repeated fileURL fileURLs=2;
-  string systemType=3;
-  string version=5;
-  string ex=4;
+  int32 platform = 1;
+  repeated fileURL fileURLs = 2;
+  string systemType = 3;
+  string version = 5;
+  string ex = 4;
 }
 
 message UploadLogsResp{
 }
 
 message DeleteLogsReq{
-  repeated string logIDs=1;
+  repeated string logIDs = 1;
 }
 
 message DeleteLogsResp{
 }
 
 message SearchLogsReq{
-  string keyword=1;
-  int64 startTime=2;
-  int64 endTime=3;
+  string keyword = 1;
+  int64 startTime = 2;
+  int64 endTime = 3;
   OpenIMServer.sdkws.RequestPagination pagination = 4;
 }
 
 message SearchLogsResp{
-  repeated OpenIMChat.common.LogInfo LogsInfos=1;
-  uint32 total=2;
+  repeated OpenIMChat.common.LogInfo LogsInfos = 1;
+  uint32 total = 2;
+}
+
+message SearchUserInfoReq{
+  string keyword = 1;
+  OpenIMServer.sdkws.RequestPagination pagination = 2;
+  repeated int32 genders = 3;
+  repeated string userIDs = 4;
+}
+
+message SearchUserInfoResp {
+  uint32 total = 1;
+  repeated OpenIMChat.common.UserFullInfo users = 2;
 }
 
 service chat {
@@ -316,4 +328,6 @@ service chat {
   rpc UploadLogs(UploadLogsReq) returns (UploadLogsResp);
   rpc DeleteLogs(DeleteLogsReq) returns (DeleteLogsResp);
   rpc SearchLogs(SearchLogsReq) returns (SearchLogsResp);
+
+  rpc SearchUserInfo(SearchUserInfoReq)returns(SearchUserInfoResp);
 }

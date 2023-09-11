@@ -37,6 +37,7 @@ type CallerInterface interface {
 	RegisterUser(ctx context.Context, users []*sdkws.UserInfo) error
 	FindGroupInfo(ctx context.Context, groupIDs []string) ([]*sdkws.GroupInfo, error)
 	UserRegisterCount(ctx context.Context, start int64, end int64) (map[string]int64, int64, error)
+	FriendUserIDs(ctx context.Context, userID string) ([]string, error)
 }
 
 type Caller struct{}
@@ -130,4 +131,12 @@ func (c *Caller) UserRegisterCount(ctx context.Context, start int64, end int64) 
 		return nil, 0, err
 	}
 	return resp.Count, resp.Total, nil
+}
+
+func (c *Caller) FriendUserIDs(ctx context.Context, userID string) ([]string, error) {
+	resp, err := friendUserIDs.Call(ctx, &friend.GetFriendIDsReq{UserID: userID})
+	if err != nil {
+		return nil, err
+	}
+	return resp.FriendIDs, nil
 }

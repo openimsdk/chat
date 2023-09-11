@@ -269,3 +269,16 @@ func regexMatch(pattern string, target string) error {
 	}
 	return nil
 }
+
+func (x *SearchUserInfoReq) Check() error {
+	if x.Pagination == nil {
+		return errs.ErrArgs.Wrap("Pagination is nil")
+	}
+	if x.Pagination.PageNumber < 1 {
+		return errs.ErrArgs.Wrap("pageNumber is invalid")
+	}
+	if x.Pagination.ShowNumber < 1 {
+		return errs.ErrArgs.Wrap("showNumber is invalid")
+	}
+	return nil
+}
