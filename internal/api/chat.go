@@ -311,3 +311,30 @@ func (o *ChatApi) getClientIP(c *gin.Context) (string, error) {
 func (o *ChatApi) UploadLogs(c *gin.Context) {
 	a2r.Call(chat.ChatClient.UploadLogs, o.chatClient, c)
 }
+
+func (o *ChatApi) SearchFriend(c *gin.Context) {
+	var req struct {
+		UserID string `json:"userID"`
+		chat.SearchUserInfoReq
+	}
+	if err := c.BindJSON(&req); err != nil {
+		apiresp.GinError(c, err)
+		return
+	}
+	userIDs, err := o.imApiCaller.FriendUserIDs(c, req.UserID)
+	if err != nil {
+		apiresp.GinError(c, err)
+		return
+	}
+	if len(userIDs) == 0 {
+		apiresp.GinSuccess(c, &chat.SearchUserInfoResp{})
+		return
+	}
+	req.SearchUserInfoReq.UserIDs = userIDs
+	resp, err := o.chatClient.SearchUserInfo(c, &req.SearchUserInfoReq)
+	if err != nil {
+		apiresp.GinError(c, err)
+		return
+	}
+	apiresp.GinSuccess(c, resp)
+}

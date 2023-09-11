@@ -194,3 +194,17 @@ func (o *chatSvr) FindAccountUser(ctx context.Context, req *chat.FindAccountUser
 	}
 	return &chat.FindAccountUserResp{AccountUserMap: accountUserMap}, nil
 }
+
+func (o *chatSvr) SearchUserInfo(ctx context.Context, req *chat.SearchUserInfoReq) (*chat.SearchUserInfoResp, error) {
+	if _, _, err := mctx.Check(ctx); err != nil {
+		return nil, err
+	}
+	total, list, err := o.Database.SearchUser(ctx, req.Keyword, req.UserIDs, req.Genders, req.Pagination.PageNumber, req.Pagination.ShowNumber)
+	if err != nil {
+		return nil, err
+	}
+	return &chat.SearchUserInfoResp{
+		Total: total,
+		Users: DbToPbUserFullInfos(list),
+	}, nil
+}
