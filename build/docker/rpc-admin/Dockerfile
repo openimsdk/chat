@@ -32,9 +32,7 @@ RUN go mod download
 COPY . .
 
 RUN make clean
-RUN make build BINS=rpc
-
-RUN rm -rf ./_output/bin/platforms/$(go env GOOS)/$(go env GOARCH)/chat-rpc
+RUN make build BINS=admin-rpc
 
 FROM ghcr.io/openim-sigs/openim-bash-image:latest
 
@@ -43,7 +41,12 @@ WORKDIR ${CHAT_WORKDIR}
 COPY --from=builder ${OPENIM_CHAT_BINDIR}/platforms /openim/openim-chat/_output/bin/platforms
 COPY --from=builder ${OPENIM_CHAT_CONFIG_NAME} /openim/openim-chat/config/config.yaml
 
-ENV PORT=30200
 
-EXPOSE ${PORT}
 CMD ["bash", "-c", "${OPENIM_CHAT_BINDIR}/platforms/$(get_os)/$(get_arch)/admin-rpc --port ${PORT} --config_folder_path ${OPENIM_CHAT_CONFIG_NAME}"]
+
+ENV PORT=30200
+EXPOSE 30200
+
+RUN mv ${OPENIM_CHAT_BINDIR}/platforms/$(get_os)/$(get_arch)/admin-rpc /usr/bin/admin-rpc
+
+ENTRYPOINT ["bash", "-c", "admin-rpc --port $PORT -c $OPENIM_CHAT_CONFIG_NAME"]
