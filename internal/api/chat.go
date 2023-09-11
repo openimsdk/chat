@@ -321,6 +321,9 @@ func (o *ChatApi) SearchFriend(c *gin.Context) {
 		apiresp.GinError(c, err)
 		return
 	}
+	if req.UserID == "" {
+		req.UserID = mctx.GetOpUserID(c)
+	}
 	imToken, err := o.imApiCaller.ImAdminTokenWithDefaultAdmin(c)
 	if err != nil {
 		apiresp.GinError(c, err)
