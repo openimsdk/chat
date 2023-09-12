@@ -19,21 +19,21 @@ GO=go
 .DEFAULT_GOAL := help
 
 # include the common makefile
-COMMON_SELF_DIR := (dir (dir (lastword $(MAKEFILE_LIST)))
+COMMON_SELF_DIR := $(dir $(lastword $(MAKEFILE_LIST)))
 # ROOT_DIR: root directory of the code base
 ifeq ($(origin ROOT_DIR),undefined)
-ROOT_DIR := (abspath (abspath (shell cd $(COMMON_SELF_DIR)/. && pwd -P))
+ROOT_DIR := $(abspath $(shell cd $(COMMON_SELF_DIR)/. && pwd -P))
 endif
 # OUTPUT_DIR: The directory where the build output is stored.
 ifeq ($(origin OUTPUT_DIR),undefined)
 OUTPUT_DIR := $(ROOT_DIR)/_output
-(shell mkdir -p (shell mkdir -p (OUTPUT_DIR))
+$(shell mkdir -p $(OUTPUT_DIR))
 endif
 
 # BIN_DIR: The directory where the build output is stored.
 ifeq ($(origin BIN_DIR),undefined)
 BIN_DIR := $(OUTPUT_DIR)/bin
-(shell mkdir -p (shell mkdir -p (BIN_DIR))
+$(shell mkdir -p $(BIN_DIR))
 endif
 
 ifeq ($(origin TOOLS_DIR),undefined)
