@@ -259,7 +259,7 @@ start:
 .PHONY: check
 check:
 	@echo "===========> Checking the service"
-	@$(ROOT_DIR)/scripts/check_all.sh
+	@$(ROOT_DIR)/scripts/check_all.sh --print-screen
 
 ## stop: Stop the chat all service.
 .PHONY: stop
