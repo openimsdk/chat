@@ -108,7 +108,7 @@ $ ./scripts/start_all.sh
 ```bash
 $ make check
 # OR use scripts check
-$ ./scripts/check_all.sh
+$ ./scripts/check_all.sh --print-screen
 ```
 
 ### Chat Stop
