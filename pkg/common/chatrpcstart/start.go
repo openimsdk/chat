@@ -46,7 +46,7 @@ func Start(rpcPort int, rpcRegisterName string, prometheusPort int, rpcFn func(c
 	zkClient.AddOption(chatMw.AddUserType(), mw.GrpcClient(), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	registerIP, err := network.GetRpcRegisterIP(config.Config.Rpc.RegisterIP)
 	if err != nil {
-		return err
+		return utils.Wrap1(err)
 	}
 	srv := grpc.NewServer(append(options, mw.GrpcServer())...)
 	defer srv.GracefulStop()
@@ -60,7 +60,7 @@ func Start(rpcPort int, rpcRegisterName string, prometheusPort int, rpcFn func(c
 	}
 	listener, err := net.Listen("tcp", net.JoinHostPort(network.GetListenIP(config.Config.Rpc.ListenIP), strconv.Itoa(rpcPort)))
 	if err != nil {
-		return err
+		return utils.Wrap1(err)
 	}
 	defer listener.Close()
 	return utils.Wrap1(srv.Serve(listener))
