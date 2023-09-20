@@ -62,7 +62,7 @@ func (o *chatSvr) SendVerifyCode(ctx context.Context, req *chat.SendVerifyCodeRe
 		}
 		_, err := o.Database.TakeAttributeByPhone(ctx, req.AreaCode, req.PhoneNumber)
 		if err == nil {
-			return nil, errs.ErrArgs.Wrap("phone already register")
+			return nil, eerrs.ErrPhoneAlreadyRegister.Wrap("phone already register")
 		} else if !o.Database.IsNotFound(err) {
 			return nil, err
 		}
