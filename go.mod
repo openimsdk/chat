@@ -12,7 +12,7 @@ require (
 	github.com/jinzhu/copier v0.3.5 // indirect
 	github.com/lestrrat-go/file-rotatelogs v2.4.0+incompatible // indirect
 	github.com/pkg/errors v0.9.1
-	google.golang.org/grpc v1.58.0
+	google.golang.org/grpc v1.58.1
 	google.golang.org/protobuf v1.31.0
 	gopkg.in/yaml.v3 v3.0.1
 	gorm.io/driver/mysql v1.5.1
@@ -27,10 +27,10 @@ require (
 )
 
 require (
-	github.com/OpenIMSDK/protocol v0.0.21
+	github.com/OpenIMSDK/protocol v0.0.24
 	github.com/OpenIMSDK/tools v0.0.14
 	github.com/go-zookeeper/zk v1.0.3
-	github.com/redis/go-redis/v9 v9.1.0
+	github.com/redis/go-redis/v9 v9.2.0
 )
 
 require (
