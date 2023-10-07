@@ -46,6 +46,9 @@ func main() {
 	if err := config.InitConfig(configFile); err != nil {
 		panic(err)
 	}
+	if config.Config.Envs.Discovery == "k8s" {
+		rpcPort = 80
+	}
 	if err := log.InitFromConfig("chat.log", "admin-rpc", *config.Config.Log.RemainLogLevel, *config.Config.Log.IsStdout, *config.Config.Log.IsJson, *config.Config.Log.StorageLocation, *config.Config.Log.RemainRotationCount, *config.Config.Log.RotationTime); err != nil {
 		panic(err)
 	}

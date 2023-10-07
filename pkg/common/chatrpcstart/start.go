@@ -16,32 +16,33 @@ package chatrpcstart
 
 import (
 	"fmt"
-	"net"
-	"strconv"
-	"time"
-
 	"github.com/OpenIMSDK/chat/pkg/common/config"
 	chatMw "github.com/OpenIMSDK/chat/pkg/common/mw"
+	"github.com/OpenIMSDK/chat/pkg/discovery_register"
 	"github.com/OpenIMSDK/tools/discoveryregistry"
-	openKeeper "github.com/OpenIMSDK/tools/discoveryregistry/zookeeper"
 	"github.com/OpenIMSDK/tools/errs"
-	"github.com/OpenIMSDK/tools/log"
 	"github.com/OpenIMSDK/tools/mw"
 	"github.com/OpenIMSDK/tools/network"
 	"github.com/OpenIMSDK/tools/utils"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+	"net"
+	"strconv"
 )
 
 func Start(rpcPort int, rpcRegisterName string, prometheusPort int, rpcFn func(client discoveryregistry.SvcDiscoveryRegistry, server *grpc.Server) error, options ...grpc.ServerOption) error {
 	fmt.Println("start", rpcRegisterName, "server, port: ", rpcPort, "prometheusPort:", prometheusPort, ", OpenIM version: ", config.Version)
 
-	zkClient, err := openKeeper.NewClient(config.Config.Zookeeper.ZkAddr, config.Config.Zookeeper.Schema,
-		openKeeper.WithFreq(time.Hour), openKeeper.WithUserNameAndPassword(config.Config.Zookeeper.Username,
-			config.Config.Zookeeper.Password), openKeeper.WithRoundRobin(), openKeeper.WithTimeout(10), openKeeper.WithLogger(log.NewZkLogger()))
+	var zkClient discoveryregistry.SvcDiscoveryRegistry
+	zkClient, err := discovery_register.NewDiscoveryRegister(config.Config.Envs.Discovery)
+	/*
+		zkClient, err := openKeeper.NewClient(config.Config.Zookeeper.ZkAddr, config.Config.Zookeeper.Schema,
+			openKeeper.WithFreq(time.Hour), openKeeper.WithUserNameAndPassword(config.Config.Zookeeper.Username,
+				config.Config.Zookeeper.Password), openKeeper.WithRoundRobin(), openKeeper.WithTimeout(10), openKeeper.WithLogger(log.NewZkLogger()))*/
 	if err != nil {
 		return errs.Wrap(err)
 	}
+	
 	defer zkClient.Close()
 	zkClient.AddOption(chatMw.AddUserType(), mw.GrpcClient(), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	registerIP, err := network.GetRpcRegisterIP(config.Config.Rpc.RegisterIP)

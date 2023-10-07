@@ -20,6 +20,9 @@ import _ "embed"
 var Version string
 
 var Config struct {
+	Envs struct {
+		Discovery string `yaml:"discovery"`
+	}
 	Zookeeper struct {
 		Schema   string   `yaml:"schema"`
 		ZkAddr   []string `yaml:"zkAddr"`
