@@ -79,7 +79,7 @@ func InitConfig(configFile string) error {
 			var err error
 			configData, err := zk.GetConfFromRegistry(constant.OpenIMCommonConfigKey)
 			if err != nil {
-				fmt.Printf("get zk config [%d] error: %v\n", i, err)
+				fmt.Printf("get zk config [%d] error: %v\n;envs.descoery=%s", i, err, Config.Envs.Discovery)
 				time.Sleep(time.Second)
 				continue
 			}
