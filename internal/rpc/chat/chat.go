@@ -22,6 +22,7 @@ import (
 	"github.com/OpenIMSDK/chat/pkg/common/db/database"
 	chat2 "github.com/OpenIMSDK/chat/pkg/common/db/table/chat"
 	"github.com/OpenIMSDK/chat/pkg/common/dbconn"
+	"github.com/OpenIMSDK/chat/pkg/email"
 	"github.com/OpenIMSDK/chat/pkg/proto/chat"
 	chatClient "github.com/OpenIMSDK/chat/pkg/rpclient/chat"
 	"github.com/OpenIMSDK/chat/pkg/sms"
@@ -47,6 +48,10 @@ func Start(discov discoveryregistry.SvcDiscoveryRegistry, server *grpc.Server) e
 	if err != nil {
 		return err
 	}
+	email, err := email.NewMail()
+	if err != nil {
+		return err
+	}
 	if err := discov.CreateRpcRootNodes([]string{config.Config.RpcRegisterName.OpenImAdminName, config.Config.RpcRegisterName.OpenImChatName}); err != nil {
 		panic(err)
 	}
@@ -54,6 +59,7 @@ func Start(discov discoveryregistry.SvcDiscoveryRegistry, server *grpc.Server) e
 		Database: database.NewChatDatabase(db),
 		Admin:    chatClient.NewAdminClient(discov),
 		SMS:      s,
+		Mail:     email,
 	})
 	return nil
 }
@@ -62,4 +68,5 @@ type chatSvr struct {
 	Database database.ChatDatabaseInterface
 	Admin    *chatClient.AdminClient
 	SMS      sms.SMS
+	Mail     email.Mail
 }
