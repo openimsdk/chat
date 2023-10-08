@@ -51,6 +51,7 @@ type AttributeInterface interface {
 	FindAccount(ctx context.Context, accounts []string) ([]*Attribute, error)
 	Search(ctx context.Context, keyword string, genders []int32, page int32, size int32) (uint32, []*Attribute, error)
 	TakePhone(ctx context.Context, areaCode string, phoneNumber string) (*Attribute, error)
+	TakeEmail(ctx context.Context, email string) (*Attribute, error)
 	TakeAccount(ctx context.Context, account string) (*Attribute, error)
 	Take(ctx context.Context, userID string) (*Attribute, error)
 	SearchNormalUser(ctx context.Context, keyword string, forbiddenID []string, gender int32, page int32, size int32) (uint32, []*Attribute, error)
