@@ -44,8 +44,8 @@ config:
     openImAdminPort: [ 80 ]
     openImChatPort: [ 80 ]
   rpcRegisterName:
-    openImAdminName: openimchat-admin-rpc
-    openImChatName: openimchat-chat-rpc
+    openImAdminName: openimchat-admin-rpc:80
+    openImChatName: openimchat-chat-rpc:80
 
   # 没有配置表示和OpenIM一致
   mysql:
@@ -104,7 +104,7 @@ config:
       imAdmin: openIMAdmin
 
 
-  openIMUrl: "openimserver-openim-api"
+  openIMUrl: "http://openimserver-openim-api"
 
   redis:
     address: [ im-redis-master:6379 ]
