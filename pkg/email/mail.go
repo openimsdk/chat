@@ -30,7 +30,7 @@ func NewMail() (Mail, error) {
 		config.Config.VerifyCode.Mail.SmtpPort,
 		config.Config.VerifyCode.Mail.SenderMail,
 		config.Config.VerifyCode.Mail.SenderAuthorizationCode)
-	return &qq{dail: dail}, nil
+	return &mail{dail: dail}, nil
 }
 
 type Mail interface {
@@ -38,15 +38,15 @@ type Mail interface {
 	SendMail(ctx context.Context, mail string, verifyCode string) error
 }
 
-type qq struct {
+type mail struct {
 	dail *gomail.Dialer
 }
 
-func (a *qq) Name() string {
+func (a *mail) Name() string {
 	return "mail"
 }
 
-func (a *qq) SendMail(ctx context.Context, mail string, verifyCode string) error {
+func (a *mail) SendMail(ctx context.Context, mail string, verifyCode string) error {
 	m := gomail.NewMessage()
 	m.SetHeader(`From`, config.Config.VerifyCode.Mail.SenderMail)
 	m.SetHeader(`To`, []string{mail}...)
