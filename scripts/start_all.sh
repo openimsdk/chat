@@ -91,6 +91,12 @@ for ((i = 0; i < ${#service_filename[*]}; i++)); do
 
   #Start related rpc services based on the number of ports
   for ((j = 0; j < ${#service_ports[*]}; j++)); do
+    if [ ! -e "${service_filename[$i]}" ]; then
+      echo -e  ${RED_PREFIX}"Error: ${service_filename[$i]} does not exist,Start fail!"${COLOR_SUFFIX}
+      echo "You may need to execute the build_all_service.sh script or use make build to compile the service"
+      exit -1
+    fi
+    echo "$bin_dir/${service_filename[$i]}"
     #Start the service in the background
     cmd="$bin_dir/${service_filename[$i]} -port ${service_ports[$j]} --config_folder_path ${config_path}"
     if [ $i -eq 0 -o $i -eq 1 ]; then
