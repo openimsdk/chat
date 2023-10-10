@@ -89,8 +89,14 @@ for ((i = 0; i < ${#service_filename[*]}; i++)); do
   list_to_string ${portList}
   service_ports=($ports_array)
 
+
   #Start related rpc services based on the number of ports
   for ((j = 0; j < ${#service_ports[*]}; j++)); do
+    if [ ! -e "$bin_dir/${service_filename[$i]}" ]; then
+      echo -e  ${RED_PREFIX}"Error: ${service_filename[$i]} does not exist,Start fail!"${COLOR_SUFFIX}
+      echo "start build these binary"
+      "./build_all_service.sh"
+    fi
     #Start the service in the background
     cmd="$bin_dir/${service_filename[$i]} -port ${service_ports[$j]} --config_folder_path ${config_path}"
     if [ $i -eq 0 -o $i -eq 1 ]; then
