@@ -15,6 +15,7 @@
 package config
 
 func init() {
+    func init() {
     var imConfig struct {
 	Mysql struct {
 		Address       []string `yaml:"address"`
