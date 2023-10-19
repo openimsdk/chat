@@ -23,7 +23,7 @@ import (
 	"time"
 
 	"github.com/OpenIMSDK/chat/internal/rpc/admin"
-	"github.com/OpenIMSDK/chat/pkg/common/config"
+	"github.com/OpenIMSDK/chat/pkg/common/config_fixed"
 )
 
 func main() {
