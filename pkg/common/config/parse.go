@@ -35,7 +35,11 @@ var (
 	Root = filepath.Join(filepath.Dir(b), "../../..")
 )
 
-func readConfig(configFile string) ([]byte, error) {
+// Added variable declarations inside the function body
+func InitConfig(configFile string) error {
+	_, b, _, _ := runtime.Caller(0)
+	// Root folder of this project.
+	Root := filepath.Join(filepath.Dir(b), "../../..")
 	b, err := os.ReadFile(configFile)
 	if err != nil {
 		return nil, utils.Wrap(err, configFile)
