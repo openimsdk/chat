@@ -26,7 +26,7 @@ import (
 	mw2 "github.com/OpenIMSDK/chat/pkg/common/mw"
 
 	"github.com/OpenIMSDK/chat/internal/api"
-	"github.com/OpenIMSDK/chat/pkg/common/config"
+	"github.com/OpenIMSDK/chat/pkg/common/config_fixed"
 	openKeeper "github.com/OpenIMSDK/tools/discoveryregistry/zookeeper"
 	"github.com/OpenIMSDK/tools/log"
 	"github.com/OpenIMSDK/tools/mw"
