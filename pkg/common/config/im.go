@@ -14,7 +14,8 @@
 
 package config
 
-var imConfig struct {
+func init() {
+    var imConfig struct {
 	Mysql struct {
 		Address       []string `yaml:"address"`
 		Username      string   `yaml:"username"`
