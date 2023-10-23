@@ -18,8 +18,8 @@ import (
 	"context"
 	"crypto/md5"
 	"encoding/hex"
-	"time"
 	"github.com/OpenIMSDK/tools/log"
+	"time"
 
 	"github.com/OpenIMSDK/chat/pkg/common/config"
 	"github.com/OpenIMSDK/chat/pkg/common/db/table/admin"

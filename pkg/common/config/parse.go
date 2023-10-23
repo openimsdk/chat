@@ -18,12 +18,13 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"github.com/OpenIMSDK/protocol/constant"
-	openKeeper "github.com/OpenIMSDK/tools/discoveryregistry/zookeeper"
 	"os"
 	"path/filepath"
 	"runtime"
 	"time"
+
+	"github.com/OpenIMSDK/protocol/constant"
+	openKeeper "github.com/OpenIMSDK/tools/discoveryregistry/zookeeper"
 
 	"github.com/OpenIMSDK/tools/utils"
 	"gopkg.in/yaml.v3"

@@ -16,8 +16,8 @@ package chat
 
 import (
 	"context"
-	"time"
 	"github.com/OpenIMSDK/tools/errs"
+	"time"
 
 	"gorm.io/gorm"
 
