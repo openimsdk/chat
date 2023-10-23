@@ -16,11 +16,12 @@ package main
 
 import (
 	"flag"
+	"math/rand"
+	"time"
+
 	"github.com/OpenIMSDK/chat/pkg/common/chatrpcstart"
 	"github.com/OpenIMSDK/chat/tools/component"
 	"github.com/OpenIMSDK/tools/log"
-	"math/rand"
-	"time"
 
 	"github.com/OpenIMSDK/chat/internal/rpc/admin"
 	"github.com/OpenIMSDK/chat/pkg/common/config"

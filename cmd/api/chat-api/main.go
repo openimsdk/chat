@@ -25,6 +25,8 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/OpenIMSDK/chat/tools/component"
+
 	mw2 "github.com/OpenIMSDK/chat/pkg/common/mw"
 
 	"github.com/OpenIMSDK/chat/internal/api"

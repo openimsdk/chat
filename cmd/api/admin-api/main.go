@@ -16,13 +16,14 @@ package main
 
 import (
 	"flag"
-	"github.com/OpenIMSDK/chat/pkg/discovery_register"
-	"github.com/OpenIMSDK/chat/tools/component"
-	"github.com/OpenIMSDK/tools/discoveryregistry"
 	"math/rand"
 	"net"
 	"strconv"
 	"time"
+
+	"github.com/OpenIMSDK/chat/pkg/discovery_register"
+	"github.com/OpenIMSDK/chat/tools/component"
+	"github.com/OpenIMSDK/tools/discoveryregistry"
 
 	mw2 "github.com/OpenIMSDK/chat/pkg/common/mw"
 

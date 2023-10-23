@@ -20,8 +20,6 @@ import (
 	"time"
 
 	"github.com/OpenIMSDK/tools/log"
-
-
 	"github.com/OpenIMSDK/tools/errs"
 	"github.com/OpenIMSDK/tools/utils"
 

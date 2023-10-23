@@ -2,6 +2,9 @@ package component
 
 import (
 	"fmt"
+	"os"
+	"time"
+
 	"github.com/OpenIMSDK/chat/pkg/common/config"
 	"github.com/OpenIMSDK/protocol/constant"
 	"github.com/OpenIMSDK/tools/errs"
@@ -9,8 +12,6 @@ import (
 	"github.com/go-zookeeper/zk"
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v3"
-	"os"
-	"time"
 )
 
 func initCfg(cfgPath string) error {
