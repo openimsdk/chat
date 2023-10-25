@@ -16,7 +16,8 @@ package apicall
 
 import (
 	"context"
-	"fmt"
+	"sync"
+	"time"
 
 	"github.com/OpenIMSDK/chat/pkg/common/config"
 	"github.com/OpenIMSDK/protocol/auth"
@@ -40,7 +41,11 @@ type CallerInterface interface {
 	FriendUserIDs(ctx context.Context, userID string) ([]string, error)
 }
 
-type Caller struct{}
+type Caller struct {
+	token   string
+	timeout time.Time
+	lock    sync.Mutex
+}
 
 func NewCallerInterface() CallerInterface {
 	return &Caller{}
@@ -58,11 +63,20 @@ func (c *Caller) ImportFriend(ctx context.Context, ownerUserID string, friendUse
 }
 
 func (c *Caller) ImAdminTokenWithDefaultAdmin(ctx context.Context) (string, error) {
-	return c.UserToken(ctx, config.GetDefaultIMAdmin(), constant.AdminPlatformID)
+	c.lock.Lock()
+	defer c.lock.Unlock()
+	if c.token == "" || c.timeout.Before(time.Now()) {
+		token, err := c.UserToken(ctx, config.GetDefaultIMAdmin(), constant.AdminPlatformID)
+		if err != nil {
+			return "", err
+		}
+		c.token = token
+		c.timeout = time.Now().Add(time.Minute * 5)
+	}
+	return c.token, nil
 }
 
 func (c *Caller) UserToken(ctx context.Context, userID string, platformID int32) (string, error) {
-	fmt.Println(*config.Config.Secret)
 	resp, err := userToken.Call(ctx, &auth.UserTokenReq{
 		Secret:     *config.Config.Secret,
 		PlatformID: platformID,
