@@ -69,10 +69,9 @@ func (a caller[Req, Resp]) Call(ctx context.Context, req *Req) (*Resp, error) {
 
 func (a caller[Req, Resp]) call(ctx context.Context, req *Req) (*Resp, error) {
 	url := a.prefix() + a.api
-	start := time.Now()
-	defer func() {
-		log.ZDebug(ctx, "call caller", "api", a.api, "cost", time.Since(start))
-	}()
+	defer func(start time.Time) {
+		log.ZDebug(ctx, "api call caller time", "api", a.api, "cost", time.Since(start).String())
+	}(time.Now())
 	log.ZInfo(ctx, "caller req", "addr", url, "req", req)
 	reqBody, err := json.Marshal(req)
 	if err != nil {
