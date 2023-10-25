@@ -28,6 +28,7 @@ import (
 	"github.com/OpenIMSDK/chat/tools/component"
 
 	mw2 "github.com/OpenIMSDK/chat/pkg/common/mw"
+	"github.com/OpenIMSDK/chat/pkg/common/version"
 
 	"github.com/OpenIMSDK/chat/internal/api"
 	"github.com/OpenIMSDK/chat/pkg/common/config"
@@ -39,10 +40,15 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+var rng *rand.Rand
+
+func init() {
+	rng = rand.New(rand.NewSource(time.Now().UnixNano()))
+}
+
 func main() {
-	rand.Seed(time.Now().UnixNano())
 	var configFile string
-	flag.StringVar(&configFile, "config_folder_path", "../config/config.yaml", "Config full path:")
+	flag.StringVar(&configFile, "config_folder_path", "../../../../../config/config.yaml", "Config full path:")
 
 	// defaultPorts := config.Config.ChatApi.GinPort
 	var ginPort int
@@ -50,6 +56,24 @@ func main() {
 
 	var hide bool
 	flag.BoolVar(&hide, "hide", true, "hide the ComponentCheck result")
+
+	// Version flag
+	var showVersion bool
+	flag.BoolVar(&showVersion, "version", false, "show version and exit")
+
+	flag.Parse()
+
+	// Check if the version flag was set
+	if showVersion {
+		ver := version.Get()
+		fmt.Println("Version:", ver.GitVersion)
+		fmt.Println("Git Commit:", ver.GitCommit)
+		fmt.Println("Build Date:", ver.BuildDate)
+		fmt.Println("Go Version:", ver.GoVersion)
+		fmt.Println("Compiler:", ver.Compiler)
+		fmt.Println("Platform:", ver.Platform)
+		return
+	}
 
 	flag.Parse()
 

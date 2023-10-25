@@ -17,8 +17,9 @@ package sms
 import (
 	"context"
 	"fmt"
-	"github.com/OpenIMSDK/chat/pkg/common/config"
 	"strings"
+
+	"github.com/OpenIMSDK/chat/pkg/common/config"
 )
 
 func New() (SMS, error) {

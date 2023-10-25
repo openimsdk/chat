@@ -16,6 +16,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"math/rand"
 	"net"
 	"strconv"
@@ -26,6 +27,7 @@ import (
 	"github.com/OpenIMSDK/tools/discoveryregistry"
 
 	mw2 "github.com/OpenIMSDK/chat/pkg/common/mw"
+	"github.com/OpenIMSDK/chat/pkg/common/version"
 
 	"github.com/OpenIMSDK/chat/internal/api"
 	"github.com/OpenIMSDK/chat/pkg/common/config"
@@ -40,7 +42,7 @@ import (
 func main() {
 	rand.Seed(time.Now().UnixNano())
 	var configFile string
-	flag.StringVar(&configFile, "config_folder_path", "../config/config.yaml", "Config full path")
+	flag.StringVar(&configFile, "config_folder_path", "../../../../../config/config.yaml", "Config full path")
 
 	var ginPort int
 
@@ -48,6 +50,24 @@ func main() {
 
 	var hide bool
 	flag.BoolVar(&hide, "hide", false, "hide the ComponentCheck result")
+
+	// Version flag
+	var showVersion bool
+	flag.BoolVar(&showVersion, "version", false, "show version and exit")
+
+	flag.Parse()
+
+	// Check if the version flag was set
+	if showVersion {
+		ver := version.Get()
+		fmt.Println("Version:", ver.GitVersion)
+		fmt.Println("Git Commit:", ver.GitCommit)
+		fmt.Println("Build Date:", ver.BuildDate)
+		fmt.Println("Go Version:", ver.GoVersion)
+		fmt.Println("Compiler:", ver.Compiler)
+		fmt.Println("Platform:", ver.Platform)
+		return
+	}
 
 	flag.Parse()
 	err := component.ComponentCheck(configFile, hide)

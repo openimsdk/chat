@@ -232,7 +232,7 @@ changelog:
 #       - "--platform=linux/amd64"
 #     goos: linux
 #     goarch: amd64
-#     dockerfile: ./build/docker/api-chat/Dockerfile
+#     dockerfile: ./build.images/api-chat/Dockerfile
 #     use: buildx
 
 #   - image_templates:
@@ -254,7 +254,7 @@ changelog:
 #       - "--platform=linux/arm64"
 #     goos: linux
 #     goarch: arm64
-#     dockerfile: ./build/docker/api-chat/Dockerfile
+#     dockerfile: ./build.images/api-chat/Dockerfile
 #     use: buildx
 
 #   - image_templates:
@@ -276,7 +276,7 @@ changelog:
 #       - "--platform=linux/amd64"
 #     goos: linux
 #     goarch: amd64
-#     dockerfile: ./build/docker/api-admin/Dockerfile
+#     dockerfile: ./build.images/api-admin/Dockerfile
 #     use: buildx
 
 #   - image_templates:
@@ -298,7 +298,7 @@ changelog:
 #       - "--platform=linux/arm64"
 #     goos: linux
 #     goarch: arm64
-#     dockerfile: ./build/docker/api-admin/Dockerfile
+#     dockerfile: ./build.images/api-admin/Dockerfile
 #     use: buildx
 
 # docker_manifests:

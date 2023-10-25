@@ -33,31 +33,37 @@ import (
 var (
 	_, b, _, _ = runtime.Caller(0)
 	// Root folder of this project.
-	Root = filepath.Join(filepath.Dir(b), "../../..")
+	Root = filepath.Join(filepath.Dir(b), "../..")
 )
 
 func readConfig(configFile string) ([]byte, error) {
-	b, err := os.ReadFile(configFile)
+	// First, check the configFile argument
+	if configFile != "" {
+		b, err := os.ReadFile(configFile)
+		if err == nil { // File exists and was read successfully
+			return b, nil
+		}
+	}
+
+	// Second, check for OPENIMCHATCONFIG environment variable
+	envConfigPath := os.Getenv("OPENIMCHATCONFIG")
+	if envConfigPath != "" {
+		b, err := os.ReadFile(envConfigPath)
+		if err == nil { // File exists and was read successfully
+			return b, nil
+		}
+		// Again, if there was an error, you can either log it or ignore.
+	}
+
+	// If neither configFile nor environment variable provided a valid path, use default path
+	defaultConfigPath := filepath.Join(Root, "config", "config.yaml")
+	b, err := os.ReadFile(defaultConfigPath)
 	if err != nil {
-		return nil, utils.Wrap(err, configFile)
+		return nil, utils.Wrap(err, defaultConfigPath)
 	}
 	return b, nil
-	// cfgName := os.Getenv("CONFIG_NAME")
-	// if len(cfgName) != 0 {
-	// 	data, err := os.ReadFile(filepath.Join(cfgName, "config", "config.yaml"))
-	// 	if err != nil {
-	// 		data, err = os.ReadFile(filepath.Join(Root, "config", "config.yaml"))
-	// 		if err != nil {
-	// 			return nil, err
-	// 		}
-	// 	} else {
-	// 		Root = cfgName
-	// 	}
-	// 	return data, nil
-	// } else {
-	// 	return os.ReadFile(fmt.Sprintf("../config/%s", "config.yaml"))
-	// }
 }
+
 
 func InitConfig(configFile string) error {
 	data, err := readConfig(configFile)
@@ -74,7 +80,7 @@ func InitConfig(configFile string) error {
 		if err != nil {
 			return utils.Wrap(err, "conn zk error ")
 		}
-		defer zk.CloseZK()
+		defer zk.Close()
 		var openIMConfigData []byte
 		for i := 0; i < 100; i++ {
 			var err error
