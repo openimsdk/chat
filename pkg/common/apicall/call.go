@@ -21,6 +21,7 @@ import (
 	"errors"
 	"io"
 	"net/http"
+	"time"
 
 	"github.com/OpenIMSDK/chat/pkg/common/constant"
 	constant2 "github.com/OpenIMSDK/protocol/constant"
@@ -34,6 +35,10 @@ type baseApiResponse[T any] struct {
 	ErrMsg  string `json:"errMsg"`
 	ErrDlt  string `json:"errDlt"`
 	Data    *T     `json:"data"`
+}
+
+var client = &http.Client{
+	Timeout: time.Second * 20,
 }
 
 type ApiCaller[Req, Resp any] interface {
@@ -64,6 +69,10 @@ func (a caller[Req, Resp]) Call(ctx context.Context, req *Req) (*Resp, error) {
 
 func (a caller[Req, Resp]) call(ctx context.Context, req *Req) (*Resp, error) {
 	url := a.prefix() + a.api
+	start := time.Now()
+	defer func() {
+		log.ZDebug(ctx, "call caller", "api", a.api, "cost", time.Since(start))
+	}()
 	log.ZInfo(ctx, "caller req", "addr", url, "req", req)
 	reqBody, err := json.Marshal(req)
 	if err != nil {
@@ -79,7 +88,7 @@ func (a caller[Req, Resp]) call(ctx context.Context, req *Req) (*Resp, error) {
 		request.Header.Set(constant2.Token, token)
 		log.ZDebug(ctx, "req token", "token", token)
 	}
-	response, err := http.DefaultClient.Do(request)
+	response, err := client.Do(request)
 	if err != nil {
 		return nil, err
 	}
