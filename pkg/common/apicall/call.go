@@ -38,7 +38,7 @@ type baseApiResponse[T any] struct {
 }
 
 var client = &http.Client{
-	Timeout: time.Second * 20,
+	Timeout: time.Second * 10,
 }
 
 type ApiCaller[Req, Resp any] interface {
