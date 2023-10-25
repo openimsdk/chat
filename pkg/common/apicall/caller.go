@@ -16,6 +16,7 @@ package apicall
 
 import (
 	"context"
+	"github.com/OpenIMSDK/tools/log"
 	"sync"
 	"time"
 
@@ -66,10 +67,13 @@ func (c *Caller) ImAdminTokenWithDefaultAdmin(ctx context.Context) (string, erro
 	c.lock.Lock()
 	defer c.lock.Unlock()
 	if c.token == "" || c.timeout.Before(time.Now()) {
+		userID := config.GetDefaultIMAdmin()
 		token, err := c.UserToken(ctx, config.GetDefaultIMAdmin(), constant.AdminPlatformID)
 		if err != nil {
+			log.ZError(ctx, "get im admin token", err, "userID", userID)
 			return "", err
 		}
+		log.ZDebug(ctx, "get im admin token", "userID", userID)
 		c.token = token
 		c.timeout = time.Now().Add(time.Minute * 5)
 	}
