@@ -28,7 +28,7 @@ require (
 
 require (
 	github.com/OpenIMSDK/protocol v0.0.21
-	github.com/OpenIMSDK/tools v0.0.14
+	github.com/OpenIMSDK/tools v0.0.15
 	github.com/go-zookeeper/zk v1.0.3
 	github.com/redis/go-redis/v9 v9.1.0
 )
