@@ -72,7 +72,7 @@ func InitConfig(configFile string) error {
 	if err != nil {
 		return utils.Wrap(err, "conn zk error ")
 	}
-	defer zk.CloseZK()
+	defer zk.Close()
 	var openIMConfigData []byte
 	for i := 0; i < 100; i++ {
 		var err error
