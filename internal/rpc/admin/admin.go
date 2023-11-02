@@ -64,9 +64,8 @@ func Start(discov discoveryregistry.SvcDiscoveryRegistry, server *grpc.Server) e
 		panic(err)
 	}
 
-	admin.RegisterAdminServer(server, &adminServer{
-		Database: database.NewAdminDatabase(db, rdb),
-		Chat:     chat.NewChatClient(discov),
+	admin.RegisterAdminServer(server, &adminServer{Database: database.NewAdminDatabase(db, rdb),
+		Chat: chat.NewChatClient(discov),
 	})
 	return nil
 }
