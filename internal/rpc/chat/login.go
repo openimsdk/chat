@@ -16,11 +16,12 @@ package chat
 
 import (
 	"context"
-	"github.com/OpenIMSDK/chat/pkg/common/mctx"
 	"math/rand"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/OpenIMSDK/chat/pkg/common/mctx"
 
 	constant2 "github.com/OpenIMSDK/protocol/constant"
 
@@ -57,14 +58,26 @@ func (o *chatSvr) SendVerifyCode(ctx context.Context, req *chat.SendVerifyCodeRe
 		if _, err := strconv.ParseUint(req.AreaCode[1:], 10, 64); err != nil {
 			return nil, errs.ErrArgs.Wrap("area code must be number")
 		}
-		if _, err := strconv.ParseUint(req.PhoneNumber, 10, 64); err != nil {
-			return nil, errs.ErrArgs.Wrap("phone number must be number")
-		}
-		_, err := o.Database.TakeAttributeByPhone(ctx, req.AreaCode, req.PhoneNumber)
-		if err == nil {
-			return nil, eerrs.ErrPhoneAlreadyRegister.Wrap("phone already register")
-		} else if !o.Database.IsNotFound(err) {
-			return nil, err
+		if req.PhoneNumber != "" {
+			if _, err := strconv.ParseUint(req.PhoneNumber, 10, 64); err != nil {
+				return nil, errs.ErrArgs.Wrap("phone number must be number")
+			}
+			_, err := o.Database.TakeAttributeByPhone(ctx, req.AreaCode, req.PhoneNumber)
+			if err == nil {
+				return nil, eerrs.ErrPhoneAlreadyRegister.Wrap("phone already register")
+			} else if !o.Database.IsNotFound(err) {
+				return nil, err
+			}
+		} else {
+			if err := chat.EmailCheck(req.Email); err != nil {
+				return nil, errs.ErrArgs.Wrap("email must be right")
+			}
+			_, err := o.Database.TakeAttributeByEmail(ctx, req.Email)
+			if err == nil {
+				return nil, eerrs.ErrPhoneAlreadyRegister.Wrap("phone already register")
+			} else if !o.Database.IsNotFound(err) {
+				return nil, err
+			}
 		}
 		conf, err := o.Admin.GetConfig(ctx)
 		if err != nil {
@@ -106,15 +119,30 @@ func (o *chatSvr) SendVerifyCode(ctx context.Context, req *chat.SendVerifyCodeRe
 	if verifyCode.MaxCount < int(count) {
 		return nil, eerrs.ErrVerifyCodeSendFrequently.Wrap()
 	}
+	var account string
+	var isEmail bool
+	if req.PhoneNumber != "" {
+		account = o.verifyCodeJoin(req.AreaCode, req.PhoneNumber)
+	} else {
+		isEmail = true
+		account = req.Email
+	}
 	t := &chat2.VerifyCode{
-		Account:    o.verifyCodeJoin(req.AreaCode, req.PhoneNumber),
+		Account:    account,
 		Code:       o.genVerifyCode(),
 		Duration:   uint(config.Config.VerifyCode.ValidTime),
 		CreateTime: time.Now(),
 	}
-	err = o.Database.AddVerifyCode(ctx, t, func() error {
-		return o.SMS.SendCode(ctx, req.AreaCode, req.PhoneNumber, t.Code)
-	})
+	if !isEmail {
+		err = o.Database.AddVerifyCode(ctx, t, func() error {
+			return o.SMS.SendCode(ctx, req.AreaCode, req.PhoneNumber, t.Code)
+		})
+	} else {
+		// 发送邮件验证码
+		err = o.Database.AddVerifyCode(ctx, t, func() error {
+			return o.Mail.SendMail(ctx, req.Email, t.Code)
+		})
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -163,7 +191,13 @@ func (o *chatSvr) verifyCode(ctx context.Context, account string, verifyCode str
 
 func (o *chatSvr) VerifyCode(ctx context.Context, req *chat.VerifyCodeReq) (*chat.VerifyCodeResp, error) {
 	defer log.ZDebug(ctx, "return")
-	if _, err := o.verifyCode(ctx, o.verifyCodeJoin(req.AreaCode, req.PhoneNumber), req.VerifyCode); err != nil {
+	var account string
+	if req.PhoneNumber != "" {
+		account = o.verifyCodeJoin(req.AreaCode, req.PhoneNumber)
+	} else {
+		account = req.Email
+	}
+	if _, err := o.verifyCode(ctx, account, req.VerifyCode); err != nil {
 		return nil, err
 	}
 	return &chat.VerifyCodeResp{}, nil

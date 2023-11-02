@@ -17,11 +17,13 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/OpenIMSDK/chat/tools/component"
+
 	"math/rand"
 	"net"
 	"strconv"
 	"time"
+
+	"github.com/OpenIMSDK/chat/tools/component"
 
 	mw2 "github.com/OpenIMSDK/chat/pkg/common/mw"
 
