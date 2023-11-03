@@ -23,7 +23,7 @@ func TestEmail(T *testing.T) {
 		{
 			name: "success send email",
 			ctx:  context.Background(),
-			mail: "lmf91248@gmail.com",
+			mail: "test@gmail.com",
 			code: "5555",
 			want: errors.New("nil"),
 		},
