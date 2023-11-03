@@ -82,8 +82,8 @@ verifyCode:
     verificationCodeTemplateCode: ""
   mail: # 根据对应的发件邮箱更改 sendMail、senderAuthorizationCode、smtpAddr、smtpPort 即可
     title: ""
-    senderMail: "" # 发送者
-    senderAuthorizationCode: "" # 授权码
+    senderMail: "2198702716@qq.com" # 发送者
+    senderAuthorizationCode: "lvxhehnmlcfrebab" # 授权码
     smtpAddr: "smtp.qq.com"  # smtp 服务器地址
     smtpPort: 25   # smtp 服务器邮件发送端口
   testDepartMentID: 001
