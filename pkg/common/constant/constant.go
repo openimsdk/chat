@@ -16,6 +16,15 @@ package constant
 
 import "github.com/OpenIMSDK/protocol/constant"
 
+// config path
+const (
+	ConfigPath1 = "../config/config.yaml"
+	ConfigPath2 = "../../../../../config/config.yaml"
+
+	OpenIMConfig = "OpenIMConfig" // 环境变量
+	Default      = "../../../config/config.yaml"
+)
+
 const (
 	// verificationCode used for.
 	VerificationCodeForRegister      = 1 // 注册

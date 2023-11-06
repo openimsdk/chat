@@ -48,7 +48,8 @@ func init() {
 
 func main() {
 	var configFile string
-	flag.StringVar(&configFile, "config_folder_path", "../../../../../config/config.yaml", "Config full path:")
+	//flag.StringVar(&configFile, "config_folder_path", "../../../../../config/config.yaml", "Config full path:")
+	flag.StringVar(&configFile, "config_folder_path", "config/config.yaml", "Config full path")
 
 	// defaultPorts := config.Config.ChatApi.GinPort
 	var ginPort int

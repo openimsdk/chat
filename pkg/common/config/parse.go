@@ -17,12 +17,14 @@ package config
 import (
 	"bytes"
 	"errors"
+	"flag"
 	"fmt"
 	"os"
 	"path/filepath"
 	"runtime"
 	"time"
 
+	Constant "github.com/OpenIMSDK/chat/pkg/common/constant"
 	"github.com/OpenIMSDK/protocol/constant"
 	openKeeper "github.com/OpenIMSDK/tools/discoveryregistry/zookeeper"
 
@@ -37,33 +39,39 @@ var (
 )
 
 func readConfig(configFile string) ([]byte, error) {
-	// First, check the configFile argument
-	if configFile != "" {
-		b, err := os.ReadFile(configFile)
-		if err == nil { // File exists and was read successfully
-			return b, nil
-		}
-	}
-
-	// Second, check for OPENIMCHATCONFIG environment variable
-	envConfigPath := os.Getenv("OPENIMCHATCONFIG")
-	if envConfigPath != "" {
-		b, err := os.ReadFile(envConfigPath)
-		if err == nil { // File exists and was read successfully
-			return b, nil
-		}
-		// Again, if there was an error, you can either log it or ignore.
-	}
-
-	// If neither configFile nor environment variable provided a valid path, use default path
-	defaultConfigPath := filepath.Join(Root, "config", "config.yaml")
-	b, err := os.ReadFile(defaultConfigPath)
-	if err != nil {
-		return nil, utils.Wrap(err, defaultConfigPath)
+	b, err := os.ReadFile(configFile)
+	if err != nil { // File exists and was read successfully
+		return nil, utils.Wrap(err, configFile)
 	}
 	return b, nil
-}
 
+	//	//First, check the configFile argument
+	//	if configFile != "" {
+	//		b, err := os.ReadFile(configFile)
+	//		if err == nil { // File exists and was read successfully
+	//			fmt.Println("这里aaaaaaaa")
+	//			return b, nil
+	//		}
+	//	}
+	//
+	//	// Second, check for OPENIMCHATCONFIG environment variable
+	//	envConfigPath := os.Getenv("OPENIMCHATCONFIG")
+	//	if envConfigPath != "" {
+	//		b, err := os.ReadFile(envConfigPath)
+	//		if err == nil { // File exists and was read successfully
+	//			return b, nil
+	//		}
+	//		// Again, if there was an error, you can either log it or ignore.
+	//	}
+	//
+	//	// If neither configFile nor environment variable provided a valid path, use default path
+	//	defaultConfigPath := filepath.Join(Root, "config", "config.yaml")
+	//	b, err := os.ReadFile(defaultConfigPath)
+	//	if err != nil {
+	//		return nil, utils.Wrap(err, defaultConfigPath)
+	//	}
+	//	return b, nil
+}
 
 func InitConfig(configFile string) error {
 	data, err := readConfig(configFile)
@@ -103,6 +111,7 @@ func InitConfig(configFile string) error {
 		if err := yaml.NewDecoder(bytes.NewReader(openIMConfigData)).Decode(&imConfig); err != nil {
 			return fmt.Errorf("parse zk openIMConfig: %w", err)
 		}
+		// 这里可以优化，可将其优化为结构体层面的赋值
 		configFieldCopy(&Config.Mysql.Address, imConfig.Mysql.Address)
 		configFieldCopy(&Config.Mysql.Username, imConfig.Mysql.Username)
 		configFieldCopy(&Config.Mysql.Password, imConfig.Mysql.Password)
@@ -168,4 +177,60 @@ type zkLogger struct{}
 
 func (l *zkLogger) Printf(format string, a ...interface{}) {
 	fmt.Printf("zk get config %s\n", fmt.Sprintf(format, a...))
+}
+
+func checkFileExists(filePath string) bool {
+	info, err := os.Stat(filePath)
+	if os.IsNotExist(err) {
+		return false
+	}
+	return !info.IsDir()
+}
+
+func findConfigFile(paths []string) (string, error) {
+	for _, path := range paths {
+		if checkFileExists(path) {
+			return path, nil
+		}
+	}
+	return "", fmt.Errorf("configPath not found")
+}
+
+func CreateCatalogPath() []string {
+
+	return []string{Constant.ConfigPath1, Constant.ConfigPath2}
+}
+
+func FindConfigPath() (string, error) {
+	var configFile string
+	path := make([]string, 10)
+	flag.StringVar(&configFile, "config_folder_path", "", "Config full path")
+	flag.Parse()
+	// First, check the configFile argument
+	if configFile != "" {
+		if _, err := findConfigFile([]string{configFile}); err != nil {
+			return "", errors.New("the configFile argument path is error")
+		}
+		return configFile, nil
+	}
+
+	// Second, check for OPENIMCONFIG environment variable
+	envConfigPath := os.Getenv(Constant.OpenIMConfig)
+	fmt.Println("Env")
+	if envConfigPath != "" {
+		if _, err := findConfigFile([]string{envConfigPath}); err != nil {
+			return "", errors.New("the environment path config path is error")
+		}
+		return envConfigPath, nil
+	}
+
+	// Third, check the catalog to find the config.yaml
+	path = CreateCatalogPath()
+	pathFind, err := findConfigFile(path)
+	if err == nil {
+		return pathFind, nil
+	}
+
+	// Forth, use the Default path.
+	return Constant.Default, nil
 }

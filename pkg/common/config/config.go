@@ -22,7 +22,7 @@ var Version string
 var Config struct {
 	Envs struct {
 		Discovery string `yaml:"discovery"`
-	}
+	} `yaml:"envs"`
 	Zookeeper struct {
 		Schema   string   `yaml:"schema"`
 		ZkAddr   []string `yaml:"zkAddr"`

@@ -294,7 +294,11 @@ start:
 .PHONY: check
 check:
 	@echo "===========> Checking the service"
+<<<<<<< HEAD
 	@$(ROOT_DIR)/scripts/check_all.sh --print-screen
+=======
+	@$(ROOT_DIR)/scripts/check_all.sh
+>>>>>>> 238f261aecaa1fe1a93f79f6f9632a5eb75e7dad
 
 ## stop: Stop the chat all service.
 .PHONY: stop
@@ -302,6 +306,7 @@ stop:
 	@echo "===========> Stopping the service"
 	@$(ROOT_DIR)/scripts/stop_all.sh
 
+<<<<<<< HEAD
 ## restart: Restart openim chat
 .PHONY: restart
 restart: clean stop build start check
@@ -327,6 +332,12 @@ image.build.%: go.build.%
 	fi
 	@rm -rf $(TMP_DIR)/$(IMAGE)
 
+=======
+## docker-build: Build docker image with the manager.
+.PHONY: docker-build
+docker-build:
+	docker build -t ${IMG} .
+>>>>>>> 238f261aecaa1fe1a93f79f6f9632a5eb75e7dad
 
 ## docker-push: Push docker image with the manager.
 .PHONY: docker-push

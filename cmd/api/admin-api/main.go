@@ -17,12 +17,12 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/OpenIMSDK/chat/pkg/discovery_register"
 	"math/rand"
 	"net"
 	"strconv"
 	"time"
 
-	"github.com/OpenIMSDK/chat/pkg/discovery_register"
 	"github.com/OpenIMSDK/chat/tools/component"
 	"github.com/OpenIMSDK/tools/discoveryregistry"
 
@@ -41,8 +41,14 @@ import (
 
 func main() {
 	rand.Seed(time.Now().UnixNano())
-	var configFile string
-	flag.StringVar(&configFile, "config_folder_path", "../../../../../config/config.yaml", "Config full path")
+
+	configFile, err := config.FindConfigPath()
+	if err != nil {
+		panic(err)
+	}
+
+	//var configFile string
+	//flag.StringVar(&configFile, "config_folder_path", "../../config/config.yaml", "Config full path")
 
 	var ginPort int
 
@@ -68,9 +74,8 @@ func main() {
 		fmt.Println("Platform:", ver.Platform)
 		return
 	}
-
 	flag.Parse()
-	err := component.ComponentCheck(configFile, hide)
+	err = component.ComponentCheck(configFile, hide)
 	if err != nil {
 		return
 	}
@@ -85,10 +90,8 @@ func main() {
 	}
 	var zk discoveryregistry.SvcDiscoveryRegistry
 	zk, err = discovery_register.NewDiscoveryRegister(config.Config.Envs.Discovery)
-	/*
-		zk, err := openKeeper.NewClient(config.Config.Zookeeper.ZkAddr, config.Config.Zookeeper.Schema,
-			openKeeper.WithFreq(time.Hour), openKeeper.WithUserNameAndPassword(config.Config.Zookeeper.Username,
-				config.Config.Zookeeper.Password), openKeeper.WithRoundRobin(), openKeeper.WithTimeout(10), openKeeper.WithLogger(log.NewZkLogger()))*/
+	//zk, err = openKeeper.NewClient(config.Config.Zookeeper.ZkAddr, config.Config.Zookeeper.Schema,
+	//		openKeeper.WithFreq(time.Hour), openKeeper.WithUserNameAndPassword(config.Config.Zookeeper.Username, config.Config.Zookeeper.Password), openKeeper.WithRoundRobin(), openKeeper.WithTimeout(10), openKeeper.WithLogger(log.NewZkLogger()))
 	if err != nil {
 		panic(err)
 	}

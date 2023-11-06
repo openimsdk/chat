@@ -30,6 +30,7 @@ service_port_name=(
    openImChatPort
 )
 
+<<<<<<< HEAD
 for i in ${service_port_name[*]}; do
   list=$(cat $OPENIM_ROOT/config/config.yaml | grep -w ${i} | awk -F '[:]' '{print $NF}')
   list_to_string $list
@@ -44,4 +45,17 @@ for i in ${service_port_name[*]}; do
         echo -e "${SKY_BLUE_PREFIX}service:$i was killed ${COLOR_SUFFIX}"
       fi
   done
+=======
+for i in ${service_names[*]}; do
+  #Check whether the service exists
+  name="ps -aux |grep -w $i |grep -v grep"
+  count="${name}| wc -l"
+  if [ $(eval ${count}) -gt 0 ]; then
+    pid="${name}| awk '{print \$2}'"
+    echo -e "${SKY_BLUE_PREFIX}Killing service:$i pid:$(eval $pid)${COLOR_SUFFIX}"
+    #kill the service that existed
+    kill -9 $(eval $pid)
+    echo -e "${SKY_BLUE_PREFIX}service:$i was killed ${COLOR_SUFFIX}"
+  fi
+>>>>>>> 238f261aecaa1fe1a93f79f6f9632a5eb75e7dad
 done
