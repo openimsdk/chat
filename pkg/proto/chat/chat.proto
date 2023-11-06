@@ -86,6 +86,7 @@ message SendVerifyCodeReq {
   int32 platform = 5;
   string areaCode = 6;
   string phoneNumber = 7;
+  string email= 8;
 }
 
 message SendVerifyCodeResp {
@@ -95,6 +96,7 @@ message VerifyCodeReq {
   string areaCode = 1;
   string phoneNumber = 2;
   string verifyCode = 3;
+  string email = 4;
 }
 
 message VerifyCodeResp {
