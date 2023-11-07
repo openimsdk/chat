@@ -67,6 +67,11 @@ func (o *Attribute) TakePhone(ctx context.Context, areaCode string, phoneNumber 
 	return &a, errs.Wrap(o.db.WithContext(ctx).Where("area_code = ? and phone_number = ?", areaCode, phoneNumber).First(&a).Error)
 }
 
+func (o *Attribute) TakeEmail(ctx context.Context, email string) (*chat.Attribute, error) {
+	var a chat.Attribute
+	return &a, errs.Wrap(o.db.WithContext(ctx).Where("email = ?", email).First(&a).Error)
+}
+
 func (o *Attribute) TakeAccount(ctx context.Context, account string) (*chat.Attribute, error) {
 	var a chat.Attribute
 	return &a, errs.Wrap(o.db.WithContext(ctx).Where("account = ?", account).Take(&a).Error)
