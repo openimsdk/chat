@@ -52,7 +52,7 @@ jobs:
         git clone -b release-v3.3 https://github.com/OpenIMSDK/Open-IM-Server.git openim && export openim=$(pwd)/openim && cd $openim
         curl -o docker-compose.yaml https://gist.githubusercontent.com/cubxxw/b1d5cbd2edfa23fee911118aa3e8249e/raw/openim-chat.sh
         sudo docker compose up -d
-        sudo sleep 60
+        sudo sleep 30
         sudo chmod +x ./scripts/stop_all.sh
         sudo ./scripts/stop_all.sh
 
@@ -82,6 +82,7 @@ jobs:
 
     - name: Check all services
       run: |
+        sudo sleep 15
         sudo make check
       shell: bash
 
