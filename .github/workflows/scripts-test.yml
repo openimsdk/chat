@@ -82,7 +82,7 @@ jobs:
 
     - name: Check all services
       run: |
-        sudo sleep 15
+        sudo sleep 60
         sudo make check
       shell: bash
 
