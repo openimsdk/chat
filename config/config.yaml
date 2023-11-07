@@ -53,7 +53,7 @@ mysql:
   #  maxLifeTime: 60                         #连接可以重复使用的最长时间（秒）
   #  logLevel: 4                             #日志级别 1=slient 2=error 3=warn 4=info
   #  slowThreshold: 500                      #慢语句阈值 （毫秒）
-  database: openim_enterprise
+  #  database: openim_enterprise
 
 # 没有配置表示和OpenIM一致
 log:

@@ -201,11 +201,9 @@ func CreateCatalogPath() []string {
 	return []string{Constant.ConfigPath1, Constant.ConfigPath2}
 }
 
-func FindConfigPath() (string, error) {
-	var configFile string
+func findConfigPath(configFile string) (string, error) {
 	path := make([]string, 10)
-	flag.StringVar(&configFile, "config_folder_path", "", "Config full path")
-	flag.Parse()
+
 	// First, check the configFile argument
 	if configFile != "" {
 		if _, err := findConfigFile([]string{configFile}); err != nil {
@@ -216,7 +214,6 @@ func FindConfigPath() (string, error) {
 
 	// Second, check for OPENIMCONFIG environment variable
 	envConfigPath := os.Getenv(Constant.OpenIMConfig)
-	fmt.Println("Env")
 	if envConfigPath != "" {
 		if _, err := findConfigFile([]string{envConfigPath}); err != nil {
 			return "", errors.New("the environment path config path is error")
@@ -233,4 +230,27 @@ func FindConfigPath() (string, error) {
 
 	// Forth, use the Default path.
 	return Constant.Default, nil
+}
+
+func FlagParse() (string, int, bool, bool, error) {
+	var configFile string
+	flag.StringVar(&configFile, "config_folder_path", "", "Config full path")
+
+	var ginPort int
+	flag.IntVar(&ginPort, "port", 10009, "get ginServerPort from cmd")
+
+	var hide bool
+	flag.BoolVar(&hide, "hide", false, "hide the ComponentCheck result")
+
+	// Version flag
+	var showVersion bool
+	flag.BoolVar(&showVersion, "version", false, "show version and exit")
+
+	flag.Parse()
+
+	configFile, err := findConfigPath(configFile)
+	if err != nil {
+		return "", 0, false, false, err
+	}
+	return configFile, ginPort, hide, showVersion, nil
 }

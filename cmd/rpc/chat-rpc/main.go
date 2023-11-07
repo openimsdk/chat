@@ -1,7 +1,6 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"math/rand"
 	"time"
@@ -17,22 +16,10 @@ import (
 
 func main() {
 	rand.Seed(time.Now().UnixNano())
-
-	var configFile string
-	//flag.StringVar(&configFile, "config_folder_path", "../../../../../config/config.yaml", "Config full path")
-	flag.StringVar(&configFile, "config_folder_path", "config/config.yaml", "Config full path")
-
-	var rpcPort int
-	flag.IntVar(&rpcPort, "port", 30300, "get rpc ServerPort from cmd")
-
-	var hide bool
-	flag.BoolVar(&hide, "hide", true, "hide the ComponentCheck result")
-
-	// Version flag
-	var showVersion bool
-	flag.BoolVar(&showVersion, "version", false, "show version and exit")
-
-	flag.Parse()
+	configFile, rpcPort, hide, showVersion, err := config.FlagParse()
+	if err != nil {
+		panic(err)
+	}
 
 	// Check if the version flag was set
 	if showVersion {
@@ -46,7 +33,7 @@ func main() {
 		return
 	}
 
-	err := component.ComponentCheck(configFile, hide)
+	err = component.ComponentCheck(configFile, hide)
 	if err != nil {
 		return
 	}

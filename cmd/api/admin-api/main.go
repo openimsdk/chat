@@ -15,7 +15,6 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"github.com/OpenIMSDK/chat/pkg/discovery_register"
 	"math/rand"
@@ -41,27 +40,10 @@ import (
 
 func main() {
 	rand.Seed(time.Now().UnixNano())
-
-	configFile, err := config.FindConfigPath()
+	configFile, ginPort, hide, showVersion, err := config.FlagParse()
 	if err != nil {
 		panic(err)
 	}
-
-	//var configFile string
-	//flag.StringVar(&configFile, "config_folder_path", "../../config/config.yaml", "Config full path")
-
-	var ginPort int
-
-	flag.IntVar(&ginPort, "port", 10009, "get ginServerPort from cmd")
-
-	var hide bool
-	flag.BoolVar(&hide, "hide", false, "hide the ComponentCheck result")
-
-	// Version flag
-	var showVersion bool
-	flag.BoolVar(&showVersion, "version", false, "show version and exit")
-
-	flag.Parse()
 
 	// Check if the version flag was set
 	if showVersion {
@@ -74,7 +56,7 @@ func main() {
 		fmt.Println("Platform:", ver.Platform)
 		return
 	}
-	flag.Parse()
+
 	err = component.ComponentCheck(configFile, hide)
 	if err != nil {
 		return

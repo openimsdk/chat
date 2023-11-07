@@ -47,22 +47,11 @@ func init() {
 }
 
 func main() {
-	var configFile string
-	//flag.StringVar(&configFile, "config_folder_path", "../../../../../config/config.yaml", "Config full path:")
-	flag.StringVar(&configFile, "config_folder_path", "config/config.yaml", "Config full path")
 
-	// defaultPorts := config.Config.ChatApi.GinPort
-	var ginPort int
-	flag.IntVar(&ginPort, "port", 10008, "get ginServerPort from cmd")
-
-	var hide bool
-	flag.BoolVar(&hide, "hide", true, "hide the ComponentCheck result")
-
-	// Version flag
-	var showVersion bool
-	flag.BoolVar(&showVersion, "version", false, "show version and exit")
-
-	flag.Parse()
+	configFile, ginPort, hide, showVersion, err := config.FlagParse()
+	if err != nil {
+		panic(err)
+	}
 
 	// Check if the version flag was set
 	if showVersion {
@@ -78,7 +67,7 @@ func main() {
 
 	flag.Parse()
 
-	err := component.ComponentCheck(configFile, hide)
+	err = component.ComponentCheck(configFile, hide)
 	if err != nil {
 		return
 	}

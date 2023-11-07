@@ -21,15 +21,15 @@ const (
 	ConfigPath1 = "../config/config.yaml"
 	ConfigPath2 = "../../../../../config/config.yaml"
 
-	OpenIMConfig = "OpenIMConfig" // 环境变量
+	OpenIMConfig = "OpenIMConfig" // environment variables
 	Default      = "../../../config/config.yaml"
 )
 
 const (
 	// verificationCode used for.
-	VerificationCodeForRegister      = 1 // 注册
-	VerificationCodeForResetPassword = 2 // 重置密码
-	VerificationCodeForLogin         = 3 // 登录
+	VerificationCodeForRegister      = 1 // Register
+	VerificationCodeForResetPassword = 2 // Reset password
+	VerificationCodeForLogin         = 3 // Login
 
 	VerificationCodeForRegisterSuffix = "_forRegister"
 	VerificationCodeForResetSuffix    = "_forReset"
@@ -65,8 +65,8 @@ const (
 
 // AddFriendCtrl.
 const (
-	OrdinaryUserAddFriendEnable  = 1  // 允许普通用户添加好友
-	OrdinaryUserAddFriendDisable = -1 // 不允许普通用户添加好友
+	OrdinaryUserAddFriendEnable  = 1  // Allow ordinary users to add friends
+	OrdinaryUserAddFriendDisable = -1 // Do not allow ordinary users to add friends
 )
 
 // minioUpload.
@@ -83,15 +83,15 @@ const (
 )
 
 const (
-	ScreenInvitationRegisterAll     = 0 // 全部
-	ScreenInvitationRegisterUsed    = 1 // 已使用
-	ScreenInvitationRegisterNotUsed = 2 // 未使用
+	ScreenInvitationRegisterAll     = 0 // All
+	ScreenInvitationRegisterUsed    = 1 // Used
+	ScreenInvitationRegisterNotUsed = 2 // Unused
 )
 
 // 1 block; 2 unblock.
 const (
-	UserBlock   = 1 // 封号
-	UserUnblock = 2 // 解封
+	UserBlock   = 1 // Account ban
+	UserUnblock = 2 // Unban
 )
 
 const (
@@ -125,14 +125,14 @@ const (
 )
 
 const (
-	NotNeedInvitationCodeRegister = 0 // 不需要邀请码
-	NeedInvitationCodeRegister    = 1 // 需要邀请码
+	NotNeedInvitationCodeRegister = 0 // No invitation code required
+	NeedInvitationCodeRegister    = 1 // Invitation code required
 )
 
-// 小程序.
+// mini-app
 const (
-	StatusOnShelf = 1 // 上架
-	StatusUnShelf = 2 // 下架
+	StatusOnShelf = 1 // OnShelf
+	StatusUnShelf = 2 // UnShelf
 )
 
 const (
@@ -141,22 +141,22 @@ const (
 )
 
 const (
-	LimitNil             = 0 // 无
-	LimitEmpty           = 1 // 都不限制
-	LimitOnlyLoginIP     = 2 // 仅限制登录
-	LimitOnlyRegisterIP  = 3 // 仅限制注册
-	LimitLoginIP         = 4 // 限制登录
-	LimitRegisterIP      = 5 // 限制注册
-	LimitLoginRegisterIP = 6 // 限制登录注册
+	LimitNil             = 0 // None
+	LimitEmpty           = 1 // Neither are restricted
+	LimitOnlyLoginIP     = 2 // Only login is restricted
+	LimitOnlyRegisterIP  = 3 // Only registration is restricted
+	LimitLoginIP         = 4 // Restrict login
+	LimitRegisterIP      = 5 // Restrict registration
+	LimitLoginRegisterIP = 6 // Restrict both login and registration
 )
 
 const (
-	InvitationCodeAll    = 0 // 全部
-	InvitationCodeUsed   = 1 // 已使用
-	InvitationCodeUnused = 2 // 未使用
+	InvitationCodeAll    = 0 // All
+	InvitationCodeUsed   = 1 // Used
+	InvitationCodeUnused = 2 // Unused
 )
 
-// 默认发现页面.
+// Default discovery page
 const DefaultDiscoverPageURL = "https://doc.rentsoft.cn/#/"
 
 // const OperationID = "operationID"

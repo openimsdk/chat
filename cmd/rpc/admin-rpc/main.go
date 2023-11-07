@@ -32,23 +32,10 @@ import (
 func main() {
 	rand.Seed(time.Now().UnixNano())
 
-	configFile, err := config.FindConfigPath()
+	configFile, rpcPort, hide, showVersion, err := config.FlagParse()
 	if err != nil {
 		panic(err)
 	}
-
-	var rpcPort int
-
-	flag.IntVar(&rpcPort, "port", 30200, "get rpc ServerPort from cmd")
-
-	var hide bool
-	flag.BoolVar(&hide, "hide", true, "hide the ComponentCheck result")
-
-	// Version flag
-	var showVersion bool
-	flag.BoolVar(&showVersion, "version", false, "show version and exit")
-
-	flag.Parse()
 
 	// Check if the version flag was set
 	if showVersion {
