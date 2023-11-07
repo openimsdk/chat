@@ -82,7 +82,7 @@ jobs:
 
     - name: Check all services
       run: |
-        sudo ./scripts/check_all.sh
+        sudo make check
       shell: bash
 
     - name: Print openIM.log
