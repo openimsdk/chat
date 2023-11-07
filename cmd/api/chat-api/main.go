@@ -17,19 +17,21 @@ package main
 import (
 	"flag"
 	"fmt"
-
 	"math/rand"
 	"net"
 	"strconv"
 	"time"
 
+	"github.com/OpenIMSDK/chat/pkg/discovery_register"
+	"github.com/OpenIMSDK/tools/discoveryregistry"
+
 	"github.com/OpenIMSDK/chat/tools/component"
 
 	mw2 "github.com/OpenIMSDK/chat/pkg/common/mw"
+	"github.com/OpenIMSDK/chat/pkg/common/version"
 
 	"github.com/OpenIMSDK/chat/internal/api"
 	"github.com/OpenIMSDK/chat/pkg/common/config"
-	openKeeper "github.com/OpenIMSDK/tools/discoveryregistry/zookeeper"
 	"github.com/OpenIMSDK/tools/log"
 	"github.com/OpenIMSDK/tools/mw"
 	"google.golang.org/grpc"
@@ -38,21 +40,34 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+var rng *rand.Rand
+
+func init() {
+	rng = rand.New(rand.NewSource(time.Now().UnixNano()))
+}
+
 func main() {
-	rand.Seed(time.Now().UnixNano())
-	var configFile string
-	flag.StringVar(&configFile, "config_folder_path", "../config/config.yaml", "Config full path:")
 
-	// defaultPorts := config.Config.ChatApi.GinPort
-	var ginPort int
-	flag.IntVar(&ginPort, "port", 10008, "get ginServerPort from cmd")
+	configFile, ginPort, hide, showVersion, err := config.FlagParse()
+	if err != nil {
+		panic(err)
+	}
 
-	var hide bool
-	flag.BoolVar(&hide, "hide", true, "hide the ComponentCheck result")
+	// Check if the version flag was set
+	if showVersion {
+		ver := version.Get()
+		fmt.Println("Version:", ver.GitVersion)
+		fmt.Println("Git Commit:", ver.GitCommit)
+		fmt.Println("Build Date:", ver.BuildDate)
+		fmt.Println("Go Version:", ver.GoVersion)
+		fmt.Println("Compiler:", ver.Compiler)
+		fmt.Println("Platform:", ver.Platform)
+		return
+	}
 
 	flag.Parse()
 
-	err := component.ComponentCheck(configFile, hide)
+	err = component.ComponentCheck(configFile, hide)
 	if err != nil {
 		return
 	}
@@ -64,9 +79,14 @@ func main() {
 	if err := log.InitFromConfig("chat.log", "chat-api", *config.Config.Log.RemainLogLevel, *config.Config.Log.IsStdout, *config.Config.Log.IsJson, *config.Config.Log.StorageLocation, *config.Config.Log.RemainRotationCount, *config.Config.Log.RotationTime); err != nil {
 		panic(err)
 	}
-	zk, err := openKeeper.NewClient(config.Config.Zookeeper.ZkAddr, config.Config.Zookeeper.Schema,
-		openKeeper.WithFreq(time.Hour), openKeeper.WithUserNameAndPassword(config.Config.Zookeeper.Username,
-			config.Config.Zookeeper.Password), openKeeper.WithRoundRobin(), openKeeper.WithTimeout(10), openKeeper.WithLogger(log.NewZkLogger()))
+	if config.Config.Envs.Discovery == "k8s" {
+		ginPort = 80
+	}
+	var zk discoveryregistry.SvcDiscoveryRegistry
+	zk, err = discovery_register.NewDiscoveryRegister(config.Config.Envs.Discovery)
+	/*zk, err := openKeeper.NewClient(config.Config.Zookeeper.ZkAddr, config.Config.Zookeeper.Schema,
+	openKeeper.WithFreq(time.Hour), openKeeper.WithUserNameAndPassword(config.Config.Zookeeper.Username,
+		config.Config.Zookeeper.Password), openKeeper.WithRoundRobin(), openKeeper.WithTimeout(10), openKeeper.WithLogger(log.NewZkLogger()))*/
 	if err != nil {
 		panic(err)
 	}

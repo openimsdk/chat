@@ -12,7 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# OpenIM base image: https://github.com/openim-sigs/openim-base-image
+
 # Set go mod installation source and proxy
+
 ARG GOARCH
 ARG GOOS
 
@@ -31,22 +34,15 @@ RUN go mod download
 
 COPY . .
 
-RUN make clean
-RUN make build BINS=admin-rpc
+RUN make build BINS=chat-rpc
+
+RUN cp /openim/openim-chat/_output/bin/platforms/$(go env GOOS)/$(go env GOARCH)/chat-rpc /usr/bin/chat-rpc
+
 
 FROM ghcr.io/openim-sigs/openim-bash-image:latest
 
 WORKDIR ${CHAT_WORKDIR}
 
-COPY --from=builder ${OPENIM_CHAT_BINDIR}/platforms /openim/openim-chat/_output/bin/platforms
-COPY --from=builder ${OPENIM_CHAT_CONFIG_NAME} /openim/openim-chat/config/config.yaml
+COPY --from=builder /usr/bin/chat-rpc ./bin/chat-rpc
 
-
-CMD ["bash", "-c", "${OPENIM_CHAT_BINDIR}/platforms/$(get_os)/$(get_arch)/admin-rpc --port ${PORT} --config_folder_path ${OPENIM_CHAT_CONFIG_NAME}"]
-
-ENV PORT=30200
-EXPOSE 30200
-
-RUN mv ${OPENIM_CHAT_BINDIR}/platforms/$(get_os)/$(get_arch)/admin-rpc /usr/bin/admin-rpc
-
-ENTRYPOINT ["bash", "-c", "admin-rpc --port $PORT -c $OPENIM_CHAT_CONFIG_NAME"]
+ENTRYPOINT ["./bin/chat-rpc"]

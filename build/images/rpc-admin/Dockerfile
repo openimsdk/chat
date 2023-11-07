@@ -34,19 +34,15 @@ RUN go mod download
 
 COPY . .
 
-RUN make clean
-RUN make build BINS=admin-api
+RUN make build BINS=admin-rpc
+
+RUN cp /openim/openim-chat/_output/bin/platforms/$(go env GOOS)/$(go env GOARCH)/admin-rpc /usr/bin/admin-rpc
+
 
 FROM ghcr.io/openim-sigs/openim-bash-image:latest
 
 WORKDIR ${CHAT_WORKDIR}
 
-COPY --from=builder ${OPENIM_CHAT_BINDIR}/platforms /openim/openim-chat/_output/bin/platforms
-COPY --from=builder ${OPENIM_CHAT_CONFIG_NAME} /openim/openim-chat/config/config.yaml
+COPY --from=builder /usr/bin/admin-rpc ./bin/admin-rpc
 
-ENV PORT=10009
-EXPOSE 10009
-
-RUN mv ${OPENIM_CHAT_BINDIR}/platforms/$(get_os)/$(get_arch)/admin-api /usr/bin/admin-api
-
-ENTRYPOINT ["bash", "-c", "admin-api  --port $PORT -c $OPENIM_CHAT_CONFIG_NAME"]
+ENTRYPOINT ["./bin/admin-rpc"]

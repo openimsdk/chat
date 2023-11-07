@@ -7,7 +7,9 @@
 # get the repo root and output path
 ROOT_PACKAGE=github.com/OpenIM/chat
 OUT_DIR=$(REPO_ROOT)/_output
+VERSION_PACKAGE=github.com/OpenIMSDK/chat/pkg/common/version
 # ==============================================================================
+
 
 # define the default goal
 #
@@ -114,16 +116,17 @@ SPACE +=
 # ==============================================================================
 # Build definition
 
-GO_SUPPORTED_VERSIONS ?= 1.18|1.19|1.20|1.21
-GO_LDFLAGS += -X $(VERSION_PACKAGE).GitVersion=$(VERSION) \
-	-X $(VERSION_PACKAGE).GitCommit=$(GIT_COMMIT) \
-	-X $(VERSION_PACKAGE).GitTreeState=$(GIT_TREE_STATE) \
-	-X $(VERSION_PACKAGE).BuildDate=$(shell date -u +'%Y-%m-%dT%H:%M:%SZ')
-ifneq ($(DLV),)
+GO_SUPPORTED_VERSIONS ?= 1.19|1.20|1.21|1.22
+GO_LDFLAGS += -X $(VERSION_PACKAGE).gitVersion=$(VERSION) \
+	-X $(VERSION_PACKAGE).gitCommit=$(GIT_COMMIT) \
+	-X $(VERSION_PACKAGE).gitTreeState=$(GIT_TREE_STATE) \
+	-X $(VERSION_PACKAGE).buildDate=$(shell date +%FT%T%z) \
+	-s -w
+ifneq ($(DEBUG),)
 	GO_BUILD_FLAGS += -gcflags "all=-N -l"
 	LDFLAGS = ""
 endif
-GO_BUILD_FLAGS += -ldflags "$(GO_LDFLAGS)"
+GO_BUILD_FLAGS += -tags "containers_image_openpgp netgo exclude_graphdriver_devicemapper static osusergo exclude_graphdriver_btrfs" -trimpath -ldflags "$(GO_LDFLAGS)"
 
 ifeq ($(GOOS),windows)
 	GO_OUT_EXT := .exe
@@ -149,6 +152,39 @@ ifeq (${BINS},)
 endif
 
 EXCLUDE_TESTS=github.com/OpenIMSDK/chat/test
+
+# ==============================================================================
+# Docker build definition
+# Image and Deployment
+#
+DOCKER := docker
+
+# read: https://github.com/openimsdk/open-im-server/blob/main/docs/conversions/images.md
+REGISTRY_PREFIX ?= registry.cn-hangzhou.aliyuncs.com/openimsdk #ghcr.io/openimsdk
+
+BASE_IMAGE ?= ghcr.io/openim-sigs/openim-bash-image
+
+IMAGE_PLAT ?= $(subst $(SPACE),$(COMMA),$(subst _,/,$(PLATFORMS)))
+
+EXTRA_ARGS ?= --no-cache
+_DOCKER_BUILD_EXTRA_ARGS :=
+
+ifdef HTTP_PROXY
+_DOCKER_BUILD_EXTRA_ARGS += --build-arg HTTP_PROXY=${HTTP_PROXY}
+endif
+
+ifneq ($(EXTRA_ARGS), )
+_DOCKER_BUILD_EXTRA_ARGS += $(EXTRA_ARGS)
+endif
+
+# Determine image files by looking into build/images/*/Dockerfile
+IMAGES_DIR ?= $(wildcard ${ROOT_DIR}/build/images/*)
+# Determine images names by stripping out the dir names, and filter out the undesired directories
+IMAGES ?= $(filter-out Dockerfile, $(foreach image,${IMAGES_DIR},$(notdir ${image})))
+
+ifeq (${IMAGES},)
+  $(error Could not determine IMAGES, set ROOT_DIR or run in source dir)
+endif
 
 # ==============================================================================
 # Build
@@ -187,7 +223,6 @@ go.build.%:
 	@mkdir -p $(BIN_DIR)/platforms/$(OS)/$(ARCH)
 	@cd $(ROOT_DIR)/cmd/*/$(COMMAND) && CGO_ENABLED=0 GOOS=$(OS) GOARCH=$(ARCH) $(GO) build $(GO_BUILD_FLAGS) -o \
 		$(BIN_DIR)/platforms/$(OS)/$(ARCH)/$(COMMAND)$(GO_OUT_EXT) .
-
 
 ## build-multiarch: Build binaries for multiple platforms.
 .PHONY: build-multiarch
@@ -266,6 +301,31 @@ check:
 stop:
 	@echo "===========> Stopping the service"
 	@$(ROOT_DIR)/scripts/stop_all.sh
+
+## restart: Restart openim chat
+.PHONY: restart
+restart: clean stop build start check
+
+## image.build.%: Build docker image for a specific platform
+.PHONY: image.build.%
+image.build.%: go.build.%
+	$(eval IMAGE := $(COMMAND))
+	$(eval IMAGE_PLAT := $(subst _,/,$(PLATFORM)))
+	$(eval ARCH := $(word 2,$(subst _, ,$(PLATFORM))))
+	@echo "===========> Building docker image $(IMAGE) $(VERSION) for $(IMAGE_PLAT)"
+	@mkdir -p $(TMP_DIR)/$(IMAGE)/$(PLATFORM)
+	@cat $(ROOT_DIR)/build/images/Dockerfile\
+		| sed "s#BASE_IMAGE#$(BASE_IMAGE)#g" \
+		| sed "s#BINARY_NAME#$(IMAGE)#g" >$(TMP_DIR)/$(IMAGE)/Dockerfile
+	@cp $(BIN_DIR)/platforms/$(IMAGE_PLAT)/$(IMAGE) $(TMP_DIR)/$(IMAGE)
+	$(eval BUILD_SUFFIX := $(_DOCKER_BUILD_EXTRA_ARGS) --pull -t $(REGISTRY_PREFIX)/$(IMAGE)-$(ARCH):$(VERSION) $(TMP_DIR)/$(IMAGE))
+	@if [ $(shell $(GO) env GOARCH) != $(ARCH) ] ; then \
+		$(MAKE) image.daemon.verify ;\
+		$(DOCKER) build --platform $(IMAGE_PLAT) $(BUILD_SUFFIX) ; \
+	else \
+		$(DOCKER) build $(BUILD_SUFFIX) ; \
+	fi
+	@rm -rf $(TMP_DIR)/$(IMAGE)
 
 ## docker-build: Build docker image with the manager.
 .PHONY: docker-build
