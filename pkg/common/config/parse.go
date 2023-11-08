@@ -207,9 +207,9 @@ func CreateCatalogPath(path string) []string {
 	path2 = filepath.Dir(path2)
 	// the parent is _output
 	pa2 := filepath.Join(path2, Constant.ConfigPath)
-	//path3 := filepath.Dir(path2)
-	//// the parent is project(default)
-	//pa3 := filepath.Join(path3, Constant.ConfigPath)
+	path3 := filepath.Dir(path2)
+	// the parent is project(default)
+	pa3 := filepath.Join(path3, Constant.ConfigPath)
 
 	return []string{pa1, pa2}
 
