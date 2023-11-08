@@ -211,7 +211,7 @@ func CreateCatalogPath(path string) []string {
 	// the parent is project(default)
 	pa3 := filepath.Join(path3, Constant.ConfigPath)
 
-	return []string{pa1, pa2}
+	return []string{pa1, pa2,pa3}
 
 
 }
