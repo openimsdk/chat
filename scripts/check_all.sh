@@ -47,16 +47,35 @@ service_port_name=(
 
 switch=$(cat $config_path | grep demoswitch |awk -F '[:]' '{print $NF}')
 for i in ${service_port_name[*]}; do
-  list=$(cat $config_path | grep -w ${i} | awk -F '[:]' '{print $NF}')
-  list_to_string $list
-  for j in ${ports_array}; do
-    port=$(ps -ef |grep -E 'api|rpc|open_im' |awk '{print $10}'| grep -w ${j})
-    if [[ ${port} -ne ${j} ]]; then
-      echo -e ${YELLOW_PREFIX}${i}${COLOR_SUFFIX}${RED_PREFIX}" service does not start normally,not initiated port is "${COLOR_SUFFIX}${YELLOW_PREFIX}${j}${COLOR_SUFFIX}
-      echo -e ${RED_PREFIX}"please check ../logs/openIM.log "${COLOR_SUFFIX}
+  case $i in
+    "openImChatApiPort")
+      new_service_name="chat-api"
+      new_service_port="10008"
+      ;;
+    "openImAdminApiPort")
+      new_service_name="admin-rpc"
+      new_service_port="30200"
+      ;;
+    "openImAdminPort")
+      new_service_name="chat-rpc"
+      new_service_port="30300"
+      ;;
+    "openImChatPort")
+      new_service_name="admin-api"
+      new_service_port="10009"
+      ;;
+    *)
+      echo "Invalid service name: $i"
       exit -1
-    else
-      echo -e ${j}${GREEN_PREFIX}" port has been listening,belongs service is "${i}${COLOR_SUFFIX}
-    fi
-  done
+      ;;
+  esac
+
+  port=$(ss -tunlp | grep "$new_service_name" | awk '{print $5}' | awk -F '[:]' '{print $NF}')
+  if [[ "$port" != "$new_service_port" ]]; then
+    echo -e "${YELLOW_PREFIX}${i}${COLOR_SUFFIX}${RED_PREFIX} service does not start normally, not initiated port is ${COLOR_SUFFIX}${YELLOW_PREFIX}${new_service_port}${COLOR_SUFFIX}"
+    echo -e "${RED_PREFIX}please check ${SCRIPTS_ROOT}/../logs/openIM.log ${COLOR_SUFFIX}"
+    exit -1
+  else
+    echo -e "${new_service_port}${GREEN_PREFIX} port has been listening, belongs service is ${i}${COLOR_SUFFIX}"
+  fi
 done

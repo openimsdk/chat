@@ -3,6 +3,9 @@ package chat
 import (
 	"context"
 	"fmt"
+	"math/rand"
+	"time"
+
 	"github.com/OpenIMSDK/chat/pkg/common/constant"
 	table "github.com/OpenIMSDK/chat/pkg/common/db/table/chat"
 	"github.com/OpenIMSDK/chat/pkg/common/mctx"
@@ -11,8 +14,6 @@ import (
 	"github.com/OpenIMSDK/tools/mw/specialerror"
 	utils2 "github.com/OpenIMSDK/tools/utils"
 	"gorm.io/gorm/utils"
-	"math/rand"
-	"time"
 )
 
 func (o *chatSvr) genLogID() string {

@@ -54,7 +54,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: .
-          file: ./build/docker/api-admin/Dockerfile
+          file: ./build/images/api-admin/Dockerfile
           platforms: linux/amd64,linux/arm64
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta1.outputs.tags }}
@@ -70,7 +70,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: .
-          file: ./build/docker/api-chat/Dockerfile
+          file: ./build/images/api-chat/Dockerfile
           platforms: linux/amd64,linux/arm64
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta2.outputs.tags }}
@@ -86,7 +86,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: .
-          file: ./build/docker/rpc-admin/Dockerfile
+          file: ./build/images/rpc-admin/Dockerfile
           platforms: linux/amd64,linux/arm64
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta3.outputs.tags }}
@@ -102,7 +102,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: .
-          file: ./build/docker/rpc-chat/Dockerfile
+          file: ./build/images/rpc-chat/Dockerfile
           platforms: linux/amd64,linux/arm64
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta4.outputs.tags }}

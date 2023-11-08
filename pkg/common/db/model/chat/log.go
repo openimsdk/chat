@@ -2,11 +2,12 @@ package chat
 
 import (
 	"context"
+	"time"
+
 	"github.com/OpenIMSDK/chat/pkg/common/db/table/chat"
 	"github.com/OpenIMSDK/tools/errs"
 	"github.com/OpenIMSDK/tools/ormutil"
 	"gorm.io/gorm"
-	"time"
 )
 
 type Logs struct {
@@ -39,6 +40,7 @@ func (l *Logs) Get(ctx context.Context, logIDs []string, userID string) ([]*chat
 	}
 	return logs, errs.Wrap(l.db.WithContext(ctx).Where("log_id in ? and user_id=?", logIDs, userID).Find(&logs).Error)
 }
+
 func NewLogs(db *gorm.DB) chat.LogInterface {
 	return &Logs{db: db}
 }
