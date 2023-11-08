@@ -196,18 +196,23 @@ func findConfigFile(paths []string) (string, error) {
 	return "", fmt.Errorf("configPath not found")
 }
 
-func CreateCatalogPath(path string, p string) []string {
-	path1 := filepath.Join(path, Constant.ConfigPath)
-	parentDir := filepath.Dir(p)
+func CreateCatalogPath(path string) []string {
 
-	path2 := filepath.Join(parentDir, Constant.ConfigPath)
-	parentDir = filepath.Dir(parentDir)
-	parentDir = filepath.Dir(parentDir)
-	parentDir = filepath.Dir(parentDir)
-	parentDir = filepath.Dir(parentDir)
-	path3 := filepath.Join(parentDir, Constant.ConfigPath)
+	path1 := filepath.Dir(path)
+	path1 = filepath.Dir(path1)
+	// the parent of  binary file
+	path2 := filepath.Join(path1, Constant.ConfigPath)
+	path2 = filepath.Dir(path1)
+	path2 = filepath.Dir(path2)
+	path2 = filepath.Dir(path2)
+	// the parent is _output
+	path3 := filepath.Join(path2, Constant.ConfigPath)
+	path2 = filepath.Dir(path2)
+	// the parent is project(default)
+	path4 := filepath.Join(path2, Constant.ConfigPath)
 
-	return []string{path1, path2, path3}
+	return []string{path1, path3, path4}
+
 }
 
 func findConfigPath(configFile string) (string, error) {
@@ -232,24 +237,20 @@ func findConfigPath(configFile string) (string, error) {
 		return envConfigPath, nil
 	}
 	// Third, check the catalog to find the config.yaml
-	pa, err := os.Getwd()
-	if err != nil {
-		return "", err
-	}
 
 	p1, err := os.Executable()
 	if err != nil {
 		return "", err
 	}
 
-	path = CreateCatalogPath(pa, p1)
+	path = CreateCatalogPath(p1)
 	pathFind, err := findConfigFile(path)
-	if err == nil {
-		return pathFind, nil
+	if err != nil {
+		return "", nil
 	}
 
 	// Forth, use the Default path.
-	return Constant.Default, nil
+	return pathFind, nil
 }
 
 func FlagParse() (string, int, bool, bool, error) {
