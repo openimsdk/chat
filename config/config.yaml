@@ -13,6 +13,9 @@
 # limitations under the License.
 
 # 需要先启动OpenIMServer
+envs:
+  discovery: "zookeeper"
+
 zookeeper:
   schema: openim
   zkAddr:
@@ -50,7 +53,7 @@ mysql:
   #  maxLifeTime: 60                         #连接可以重复使用的最长时间（秒）
   #  logLevel: 4                             #日志级别 1=slient 2=error 3=warn 4=info
   #  slowThreshold: 500                      #慢语句阈值 （毫秒）
-  database: openim_enterprise
+  #  database: openim_enterprise
 
 # 没有配置表示和OpenIM一致
 log:
@@ -80,6 +83,15 @@ verifyCode:
     accessKeySecret: ""
     signName: ""
     verificationCodeTemplateCode: ""
+  mail: # 根据对应的发件邮箱更改 sendMail、senderAuthorizationCode、smtpAddr、smtpPort 即可
+    title: ""
+    senderMail: "" # 发送者
+    senderAuthorizationCode: "" # 授权码
+    smtpAddr: "smtp.qq.com"  # smtp 服务器地址
+    smtpPort: 25   # smtp 服务器邮件发送端口
+  testDepartMentID: 001
+  imAPIURL: http://127.0.0.1:10002
+
 
 # 获取ip的header,没有配置直接获取远程地址
 #proxyHeader: "X-Forwarded-For"

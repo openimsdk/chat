@@ -16,9 +16,10 @@ package chat
 
 import (
 	"context"
+	"time"
+
 	"github.com/OpenIMSDK/chat/pkg/proto/chat"
 	"github.com/OpenIMSDK/tools/errs"
-	"time"
 )
 
 func (o *chatSvr) UserLoginCount(ctx context.Context, req *chat.UserLoginCountReq) (*chat.UserLoginCountResp, error) {

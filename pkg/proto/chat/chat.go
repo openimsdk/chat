@@ -15,9 +15,10 @@
 package chat
 
 import (
-	"github.com/OpenIMSDK/tools/utils"
 	"regexp"
 	"strconv"
+
+	"github.com/OpenIMSDK/tools/utils"
 
 	"github.com/OpenIMSDK/chat/pkg/common/constant"
 	constant2 "github.com/OpenIMSDK/protocol/constant"
@@ -221,6 +222,7 @@ func (x *UploadLogsReq) Check() error {
 	}
 	return nil
 }
+
 func (x *SearchLogsReq) Check() error {
 	if x.Pagination == nil {
 		return errs.ErrArgs.Wrap("Pagination is empty")

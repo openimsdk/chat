@@ -1,50 +1,47 @@
-// Copyright © 2023 OpenIM open source community. All rights reserved.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
 package main
 
 import (
-	"flag"
-	"github.com/OpenIMSDK/chat/pkg/common/chatrpcstart"
-	"github.com/OpenIMSDK/chat/tools/component"
-	"github.com/OpenIMSDK/tools/log"
+	"fmt"
 	"math/rand"
 	"time"
 
+	"github.com/OpenIMSDK/chat/pkg/common/chatrpcstart"
+	"github.com/OpenIMSDK/chat/tools/component"
+	"github.com/OpenIMSDK/tools/log"
+
 	"github.com/OpenIMSDK/chat/internal/rpc/chat"
 	"github.com/OpenIMSDK/chat/pkg/common/config"
+	"github.com/OpenIMSDK/chat/pkg/common/version"
 )
 
 func main() {
 	rand.Seed(time.Now().UnixNano())
-	var configFile string
-	flag.StringVar(&configFile, "config_folder_path", "../config/config.yaml", "Config full path")
+	configFile, rpcPort, hide, showVersion, err := config.FlagParse()
+	if err != nil {
+		panic(err)
+	}
 
-	var rpcPort int
+	// Check if the version flag was set
+	if showVersion {
+		ver := version.Get()
+		fmt.Println("Version:", ver.GitVersion)
+		fmt.Println("Git Commit:", ver.GitCommit)
+		fmt.Println("Build Date:", ver.BuildDate)
+		fmt.Println("Go Version:", ver.GoVersion)
+		fmt.Println("Compiler:", ver.Compiler)
+		fmt.Println("Platform:", ver.Platform)
+		return
+	}
 
-	flag.IntVar(&rpcPort, "port", 30300, "get rpc ServerPort from cmd")
-
-	var hide bool
-	flag.BoolVar(&hide, "hide", true, "hide the ComponentCheck result")
-
-	flag.Parse()
-	err := component.ComponentCheck(configFile, hide)
+	err = component.ComponentCheck(configFile, hide)
 	if err != nil {
 		return
 	}
 	if err := config.InitConfig(configFile); err != nil {
 		panic(err)
+	}
+	if config.Config.Envs.Discovery == "k8s" {
+		rpcPort = 80
 	}
 	if err := log.InitFromConfig("chat.log", "chat-rpc", *config.Config.Log.RemainLogLevel, *config.Config.Log.IsStdout, *config.Config.Log.IsJson, *config.Config.Log.StorageLocation, *config.Config.Log.RemainRotationCount, *config.Config.Log.RotationTime); err != nil {
 		panic(err)
