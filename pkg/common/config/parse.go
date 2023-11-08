@@ -245,12 +245,12 @@ func findConfigPath(configFile string) (string, error) {
 
 	path = CreateCatalogPath(p1)
 	pathFind, err := findConfigFile(path)
-	if err != nil {
-		return "", nil
+	if err == nil {
+		return pathFind, nil
 	}
 
 	// Forth, use the Default path.
-	return pathFind, nil
+	return Constant.ConfigPath, nil
 }
 
 func FlagParse() (string, int, bool, bool, error) {
