@@ -201,17 +201,18 @@ func CreateCatalogPath(path string) []string {
 	path1 := filepath.Dir(path)
 	path1 = filepath.Dir(path1)
 	// the parent of  binary file
-	path2 := filepath.Join(path1, Constant.ConfigPath)
-	path2 = filepath.Dir(path1)
+	pa1 := filepath.Join(path1, Constant.ConfigPath)
+	path2 := filepath.Dir(path1)
 	path2 = filepath.Dir(path2)
 	path2 = filepath.Dir(path2)
 	// the parent is _output
-	path3 := filepath.Join(path2, Constant.ConfigPath)
-	path2 = filepath.Dir(path2)
-	// the parent is project(default)
-	path4 := filepath.Join(path2, Constant.ConfigPath)
+	pa2 := filepath.Join(path2, Constant.ConfigPath)
+	//path3 := filepath.Dir(path2)
+	//// the parent is project(default)
+	//pa3 := filepath.Join(path3, Constant.ConfigPath)
 
-	return []string{path1, path3, path4}
+	return []string{pa1, pa2}
+
 
 }
 
@@ -250,7 +251,7 @@ func findConfigPath(configFile string) (string, error) {
 	}
 
 	// Forth, use the Default path.
-	return Constant.ConfigPath, nil
+	return "", errors.New("the config.yaml path not found")
 }
 
 func FlagParse() (string, int, bool, bool, error) {
