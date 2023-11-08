@@ -18,11 +18,9 @@ import "github.com/OpenIMSDK/protocol/constant"
 
 // config path
 const (
-	ConfigPath1 = "../config/config.yaml"
-	ConfigPath2 = "../../../../../config/config.yaml"
+	ConfigPath = "/config/config.yaml"
 
 	OpenIMConfig = "OpenIMConfig" // environment variables
-	Default      = "../../../config/config.yaml"
 )
 
 const (
