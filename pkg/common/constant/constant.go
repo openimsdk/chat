@@ -21,7 +21,6 @@ const (
 	ConfigPath = "/config/config.yaml"
 
 	OpenIMConfig = "OpenIMConfig" // environment variables
-	Default      = "../../../config/config.yaml"
 )
 
 const (

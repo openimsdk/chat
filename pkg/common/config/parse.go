@@ -229,7 +229,7 @@ func findConfigPath(configFile string) (string, error) {
 
 	// Second, check for OPENIMCONFIG environment variable
 	//envConfigPath := os.Getenv(Constant.OpenIMConfig)
-	envConfigPath := os.Getenv("aaa")
+	envConfigPath := os.Getenv(Constant.OpenIMConfig)
 	if envConfigPath != "" {
 		if _, err := findConfigFile([]string{envConfigPath}); err != nil {
 			return "", errors.New("the environment path config path is error")
