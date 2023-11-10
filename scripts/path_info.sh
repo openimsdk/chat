@@ -42,6 +42,7 @@ declare -A supported_architectures=(
     ["windows-amd64"]="_output/bin/platforms/windows/amd64"
     ["linux-x86_64"]="_output/bin/platforms/linux/amd64"  # Alias for linux-amd64
     ["darwin-x86_64"]="_output/bin/platforms/darwin/amd64"  # Alias for darwin-amd64
+    ["linux-aarch64"]="_output/bin/platforms/linux/arm64"  # Alias for linux-arm64
 )
 
 # Check if the architecture and version are supported
