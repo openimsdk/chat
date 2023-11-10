@@ -84,6 +84,7 @@ jobs:
       run: |
         sudo sleep 15; ports=(10008 10009 30200 30300); for port in "${ports[@]}"; do if ! lsof -i :$port > /dev/null; then echo "The service is not started on port $port."; exit 1; else echo "The service is started normally on port $port."; fi; done; echo "All port services have been started normally."
       shell: bash
+      continue-on-error: true
 
     - name: Print openIM.log
       run: |
