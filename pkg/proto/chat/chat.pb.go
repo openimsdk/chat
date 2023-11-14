@@ -1173,6 +1173,7 @@ type LoginReq struct {
 	Platform    int32  `protobuf:"varint,6,opt,name=platform,proto3" json:"platform,omitempty"`
 	DeviceID    string `protobuf:"bytes,7,opt,name=deviceID,proto3" json:"deviceID,omitempty"`
 	Ip          string `protobuf:"bytes,8,opt,name=ip,proto3" json:"ip,omitempty"`
+	Email       string `protobuf:"bytes,9,opt,name=email,proto3" json:"email,omitempty"`
 }
 
 func (x *LoginReq) Reset() {
@@ -1327,6 +1328,7 @@ type ResetPasswordReq struct {
 	PhoneNumber string `protobuf:"bytes,2,opt,name=phoneNumber,proto3" json:"phoneNumber,omitempty"`
 	VerifyCode  string `protobuf:"bytes,3,opt,name=verifyCode,proto3" json:"verifyCode,omitempty"`
 	Password    string `protobuf:"bytes,4,opt,name=password,proto3" json:"password,omitempty"`
+	Email    string `protobuf:"bytes,5,opt,name=email,proto3" json:"email,omitempty"`
 }
 
 func (x *ResetPasswordReq) Reset() {

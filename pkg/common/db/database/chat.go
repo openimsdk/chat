@@ -50,6 +50,7 @@ type ChatDatabaseInterface interface {
 	GetAttribute(ctx context.Context, userID string) (*table.Attribute, error)
 	GetAttributeByAccount(ctx context.Context, account string) (*table.Attribute, error)
 	GetAttributeByPhone(ctx context.Context, areaCode string, phoneNumber string) (*table.Attribute, error)
+	GetAttributeByEmail(ctx context.Context, email string) (*table.Attribute, error)
 	LoginRecord(ctx context.Context, record *table.UserLoginRecord, verifyCodeID *uint) error
 	UpdatePassword(ctx context.Context, userID string, password string) error
 	UpdatePasswordAndDeleteVerifyCode(ctx context.Context, userID string, password string, code uint) error
@@ -222,7 +223,9 @@ func (o *ChatDatabase) GetAttributeByAccount(ctx context.Context, account string
 func (o *ChatDatabase) GetAttributeByPhone(ctx context.Context, areaCode string, phoneNumber string) (*table.Attribute, error) {
 	return o.attribute.TakePhone(ctx, areaCode, phoneNumber)
 }
-
+func (o *ChatDatabase) GetAttributeByEmail(ctx context.Context, email string) (*table.Attribute, error) {
+	return o.attribute.TakeEmail(ctx, email)
+}
 func (o *ChatDatabase) LoginRecord(ctx context.Context, record *table.UserLoginRecord, verifyCodeID *uint) error {
 	return o.tx.Transaction(func(tx any) error {
 		if err := o.userLoginRecord.NewTx(tx).Create(ctx, record); err != nil {

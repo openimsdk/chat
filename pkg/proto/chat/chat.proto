@@ -139,6 +139,7 @@ message LoginReq {
   int32 platform = 6;
   string deviceID = 7;
   string ip = 8;
+  string email = 9;
 }
 
 message LoginResp {
@@ -151,6 +152,7 @@ message ResetPasswordReq {
   string phoneNumber = 2;
   string verifyCode = 3;
   string password = 4;
+  string email = 5;
 }
 
 message ResetPasswordResp {

@@ -388,8 +388,10 @@ func (o *chatSvr) Login(ctx context.Context, req *chat.LoginReq) (*chat.LoginRes
 			return nil, errs.ErrArgs.Wrap("area code must start with +")
 		}
 		attribute, err = o.Database.GetAttributeByPhone(ctx, req.AreaCode, req.PhoneNumber)
+	} else if req.Email != "" {
+		attribute, err = o.Database.GetAttributeByEmail(ctx, req.Email)
 	} else {
-		err = errs.ErrArgs.Wrap("account or phone number must be set")
+		err = errs.ErrArgs.Wrap("account or phone number or email must be set")
 	}
 	if err != nil {
 		if o.Database.IsNotFound(err) {
