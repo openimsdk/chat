@@ -242,8 +242,8 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 	if (req.User.AreaCode == "" && req.User.PhoneNumber != "") || (req.User.AreaCode != "" && req.User.PhoneNumber == "") {
 		return nil, errs.ErrArgs.Wrap("area code or phone number error")
 	}
-	if req.User.PhoneNumber == "" && req.User.Account == "" {
-		return nil, errs.ErrArgs.Wrap("phone number and account is empty")
+	if req.User.PhoneNumber == "" && req.User.Account == "" && req.User.Email == "" {
+		return nil, errs.ErrArgs.Wrap("phone number, account, and email is empty")
 	}
 	var usedInvitationCode bool
 	if !isAdmin {
@@ -316,6 +316,14 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 		_, err := o.Database.TakeAttributeByAccount(ctx, req.User.Account)
 		if err == nil {
 			return nil, eerrs.ErrAccountAlreadyRegister.Wrap()
+		} else if !o.Database.IsNotFound(err) {
+			return nil, err
+		}
+	}
+	if req.User.Email != "" {
+		_, err := o.Database.TakeAttributeByEmail(ctx, req.User.Email)
+		if err == nil {
+			return nil, eerrs.ErrEmailAlreadyRegister.Wrap()
 		} else if !o.Database.IsNotFound(err) {
 			return nil, err
 		}
