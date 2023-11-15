@@ -1263,6 +1263,12 @@ func (x *LoginReq) GetIp() string {
 	}
 	return ""
 }
+func (x *LoginReq) GetEmail() string {
+	if x != nil {
+		return x.Email
+	}
+	return ""
+}
 
 type LoginResp struct {
 	state         protoimpl.MessageState
