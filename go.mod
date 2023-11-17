@@ -8,15 +8,15 @@ require (
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/golang/protobuf v1.5.3 // indirect
-	github.com/google/uuid v1.3.1
+	github.com/google/uuid v1.4.0
 	github.com/jinzhu/copier v0.3.5 // indirect
 	github.com/lestrrat-go/file-rotatelogs v2.4.0+incompatible // indirect
 	github.com/pkg/errors v0.9.1
-	google.golang.org/grpc v1.58.0
+	google.golang.org/grpc v1.59.0
 	google.golang.org/protobuf v1.31.0
 	gopkg.in/yaml.v3 v3.0.1
-	gorm.io/driver/mysql v1.5.1
-	gorm.io/gorm v1.25.4
+	gorm.io/driver/mysql v1.5.2
+	gorm.io/gorm v1.25.5
 )
 
 require (
@@ -27,12 +27,10 @@ require (
 )
 
 require (
-	github.com/OpenIMSDK/protocol v0.0.21
-	github.com/OpenIMSDK/tools v0.0.15
+	github.com/OpenIMSDK/protocol v0.0.31
+	github.com/OpenIMSDK/tools v0.0.17
 	github.com/go-zookeeper/zk v1.0.3
-	github.com/gosuri/uitable v0.0.4
-	github.com/redis/go-redis/v9 v9.1.0
-	github.com/spf13/pflag v1.0.5
+	github.com/redis/go-redis/v9 v9.3.0
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
 )
 
@@ -50,7 +48,6 @@ require (
 	github.com/chenzhuoyu/base64x v0.0.0-20221115062448-fe3a3abad311 // indirect
 	github.com/clbanning/mxj/v2 v2.5.6 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
-	github.com/fatih/color v1.15.0 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.2 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
@@ -66,15 +63,12 @@ require (
 	github.com/kr/pretty v0.3.1 // indirect
 	github.com/leodido/go-urn v1.2.4 // indirect
 	github.com/lestrrat-go/strftime v1.0.6 // indirect
-	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.19 // indirect
-	github.com/mattn/go-runewidth v0.0.15 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/montanaflynn/stats v0.0.0-20171201202039-1bf9dbcd8cbe // indirect
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.8 // indirect
-	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/tjfoc/gmsm v1.3.2 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.2.11 // indirect
@@ -87,13 +81,13 @@ require (
 	go.uber.org/multierr v1.7.0 // indirect
 	go.uber.org/zap v1.24.0 // indirect
 	golang.org/x/arch v0.3.0 // indirect
-	golang.org/x/crypto v0.11.0 // indirect
+	golang.org/x/crypto v0.12.0 // indirect
 	golang.org/x/image v0.9.0 // indirect
-	golang.org/x/net v0.12.0 // indirect
+	golang.org/x/net v0.14.0 // indirect
 	golang.org/x/sync v0.3.0 // indirect
-	golang.org/x/sys v0.10.0 // indirect
-	golang.org/x/text v0.11.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20230711160842-782d3b101e98 // indirect
+	golang.org/x/sys v0.11.0 // indirect
+	golang.org/x/text v0.12.0 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20230822172742-b8732ec3820d // indirect
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
