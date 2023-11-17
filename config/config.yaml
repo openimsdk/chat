@@ -76,7 +76,7 @@ verifyCode:
   maxCount: 10 # 单位时间内最大获取次数
   superCode: "666666" # 超级验证码(只有use为空时使用)
   len: 6 # 验证码长度
-  use: "" # 使用的验证码服务(use: "ali")
+  use: "ali" # 使用的验证码服务(use: "ali")
   ali:
     endpoint: "dysmsapi.aliyuncs.com"
     accessKeyId: ""
@@ -88,7 +88,7 @@ verifyCode:
     senderMail: "" # 发送者
     senderAuthorizationCode: "" # 授权码
     smtpAddr: "smtp.qq.com"  # smtp 服务器地址
-    smtpPort: 25   # smtp 服务器邮件发送端口
+    smtpPort: 465   # smtp 服务器邮件发送端口
   testDepartMentID: 001
   imAPIURL: http://127.0.0.1:10002
 
