@@ -196,9 +196,24 @@ func findConfigFile(paths []string) (string, error) {
 	return "", fmt.Errorf("configPath not found")
 }
 
-func CreateCatalogPath() []string {
+func CreateCatalogPath(path string) []string {
 
-	return []string{Constant.ConfigPath1, Constant.ConfigPath2}
+	path1 := filepath.Dir(path)
+	path1 = filepath.Dir(path1)
+	// the parent of  binary file
+	pa1 := filepath.Join(path1, Constant.ConfigPath)
+	path2 := filepath.Dir(path1)
+	path2 = filepath.Dir(path2)
+	path2 = filepath.Dir(path2)
+	// the parent is _output
+	pa2 := filepath.Join(path2, Constant.ConfigPath)
+	path3 := filepath.Dir(path2)
+	// the parent is project(default)
+	pa3 := filepath.Join(path3, Constant.ConfigPath)
+
+	return []string{pa1, pa2,pa3}
+
+
 }
 
 func findConfigPath(configFile string) (string, error) {
@@ -209,10 +224,12 @@ func findConfigPath(configFile string) (string, error) {
 		if _, err := findConfigFile([]string{configFile}); err != nil {
 			return "", errors.New("the configFile argument path is error")
 		}
+		fmt.Println("configfile:", configFile)
 		return configFile, nil
 	}
 
 	// Second, check for OPENIMCONFIG environment variable
+	//envConfigPath := os.Getenv(Constant.OpenIMConfig)
 	envConfigPath := os.Getenv(Constant.OpenIMConfig)
 	if envConfigPath != "" {
 		if _, err := findConfigFile([]string{envConfigPath}); err != nil {
@@ -220,16 +237,21 @@ func findConfigPath(configFile string) (string, error) {
 		}
 		return envConfigPath, nil
 	}
-
 	// Third, check the catalog to find the config.yaml
-	path = CreateCatalogPath()
+
+	p1, err := os.Executable()
+	if err != nil {
+		return "", err
+	}
+
+	path = CreateCatalogPath(p1)
 	pathFind, err := findConfigFile(path)
 	if err == nil {
 		return pathFind, nil
 	}
 
 	// Forth, use the Default path.
-	return Constant.Default, nil
+	return "", errors.New("the config.yaml path not found")
 }
 
 func FlagParse() (string, int, bool, bool, error) {
