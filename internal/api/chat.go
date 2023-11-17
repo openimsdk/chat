@@ -53,7 +53,7 @@ type ChatApi struct {
 // ################## ACCOUNT ##################
 
 func (o *ChatApi) SendVerifyCode(c *gin.Context) {
-	var req chat.SendVerifyCodeReq
+	req := chat.SendVerifyCodeReq{}
 	if err := c.BindJSON(&req); err != nil {
 		apiresp.GinError(c, err)
 		return

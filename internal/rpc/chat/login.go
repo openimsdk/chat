@@ -44,21 +44,21 @@ func (o *chatSvr) verifyCodeJoin(areaCode, phoneNumber string) string {
 
 func (o *chatSvr) SendVerifyCode(ctx context.Context, req *chat.SendVerifyCodeReq) (*chat.SendVerifyCodeResp, error) {
 	defer log.ZDebug(ctx, "return")
-	switch req.UsedFor {
+	switch int(req.UsedFor) {
 	case constant.VerificationCodeForRegister:
 		if err := o.Admin.CheckRegister(ctx, req.Ip); err != nil {
 			return nil, err
 		}
-		if req.AreaCode == "" || req.PhoneNumber == "" {
-			return nil, errs.ErrArgs.Wrap("area code or phone number is empty")
-		}
-		if req.AreaCode[0] != '+' {
-			return nil, errs.ErrArgs.Wrap("area code must start with +")
-		}
-		if _, err := strconv.ParseUint(req.AreaCode[1:], 10, 64); err != nil {
-			return nil, errs.ErrArgs.Wrap("area code must be number")
-		}
-		if req.PhoneNumber != "" {
+		if req.Email == "" {
+			if req.AreaCode == "" || req.PhoneNumber == "" {
+				return nil, errs.ErrArgs.Wrap("area code or phone number is empty")
+			}
+			if req.AreaCode[0] != '+' {
+				return nil, errs.ErrArgs.Wrap("area code must start with +")
+			}
+			if _, err := strconv.ParseUint(req.AreaCode[1:], 10, 64); err != nil {
+				return nil, errs.ErrArgs.Wrap("area code must be number")
+			}
 			if _, err := strconv.ParseUint(req.PhoneNumber, 10, 64); err != nil {
 				return nil, errs.ErrArgs.Wrap("phone number must be number")
 			}
@@ -101,6 +101,15 @@ func (o *chatSvr) SendVerifyCode(ctx context.Context, req *chat.SendVerifyCodeRe
 	default:
 		return nil, errs.ErrArgs.Wrap("used unknown")
 	}
+	var account string
+	var isEmail bool
+	if req.Email == "" {
+		account = o.verifyCodeJoin(req.AreaCode, req.PhoneNumber)
+	} else {
+		isEmail = true
+		account = req.Email
+	}
+
 	verifyCode := config.Config.VerifyCode
 	if verifyCode.UintTime == 0 || verifyCode.MaxCount == 0 {
 		return nil, errs.ErrNoPermission.Wrap("verify code disabled")
@@ -112,21 +121,21 @@ func (o *chatSvr) SendVerifyCode(ctx context.Context, req *chat.SendVerifyCodeRe
 		return &chat.SendVerifyCodeResp{}, nil
 	}
 	now := time.Now()
-	count, err := o.Database.CountVerifyCodeRange(ctx, o.verifyCodeJoin(req.AreaCode, req.PhoneNumber), now.Add(-time.Duration(verifyCode.UintTime)*time.Second), now)
-	if err != nil {
-		return nil, err
+
+	var count uint32
+	var err error
+	if !isEmail {
+		count, err = o.Database.CountVerifyCodeRange(ctx, o.verifyCodeJoin(req.AreaCode, req.PhoneNumber), now.Add(-time.Duration(verifyCode.UintTime)*time.Second), now)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		count, err = o.Database.CountVerifyCodeRange(ctx, req.Email, now.Add(-time.Duration(verifyCode.UintTime)*time.Second), now)
 	}
 	if verifyCode.MaxCount < int(count) {
 		return nil, eerrs.ErrVerifyCodeSendFrequently.Wrap()
 	}
-	var account string
-	var isEmail bool
-	if req.PhoneNumber != "" {
-		account = o.verifyCodeJoin(req.AreaCode, req.PhoneNumber)
-	} else {
-		isEmail = true
-		account = req.Email
-	}
+
 	t := &chat2.VerifyCode{
 		Account:    account,
 		Code:       o.genVerifyCode(),
@@ -146,6 +155,7 @@ func (o *chatSvr) SendVerifyCode(ctx context.Context, req *chat.SendVerifyCodeRe
 	if err != nil {
 		return nil, err
 	}
+	defer log.ZDebug(ctx, "last", "email", req.Email, "account", account, "isEmail", isEmail)
 	return &chat.SendVerifyCodeResp{}, nil
 }
 
