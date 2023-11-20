@@ -17,10 +17,8 @@ package email
 import (
 	"context"
 	"fmt"
-
 	"github.com/OpenIMSDK/chat/pkg/common/config"
 	"github.com/OpenIMSDK/tools/errs"
-
 	"gopkg.in/gomail.v2"
 )
 
@@ -30,7 +28,7 @@ func NewMail() (Mail, error) {
 		config.Config.VerifyCode.Mail.SmtpPort,
 		config.Config.VerifyCode.Mail.SenderMail,
 		config.Config.VerifyCode.Mail.SenderAuthorizationCode)
-	
+
 	return &mail{dail: dail}, nil
 }
 
