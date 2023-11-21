@@ -25,13 +25,15 @@ git clone https://github.com/OpenIMSDK/chat openim-chat && export openim-chat=$(
 If you wish to deploy chat, then you should first install and deploy OpenIM, this [Open-IM-Server repository](https://github.com/OpenIMSDK/Open-IM-Server)
 
 ```bash
-git clone -b release-v3.1 https://github.com/OpenIMSDK/Open-IM-Server.git openim && export openim=$(pwd)/openim && cd $openim
+git clone -b release-v3.4 https://github.com/OpenIMSDK/Open-IM-Server.git openim && export openim=$(pwd)/openim && cd $openim
 sudo docker compose up -d
 ```
 
 Installing Chat
 ```bash
-$ make install
+$ make build
+$ make start
+$ make check
 ```
 
 ## 🛫 Quick start 
