@@ -54,7 +54,7 @@ func (o *chatSvr) SendVerifyCode(ctx context.Context, req *chat.SendVerifyCodeRe
 				return nil, errs.ErrArgs.Wrap("area code or phone number is empty")
 			}
 			if req.AreaCode[0] != '+' {
-				return nil, errs.ErrArgs.Wrap("area code must start with +")
+				req.AreaCode = "+" + req.AreaCode
 			}
 			if _, err := strconv.ParseUint(req.AreaCode[1:], 10, 64); err != nil {
 				return nil, errs.ErrArgs.Wrap("area code must be number")
