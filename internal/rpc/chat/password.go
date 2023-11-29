@@ -35,11 +35,21 @@ func (o *chatSvr) ResetPassword(ctx context.Context, req *chat.ResetPasswordReq)
 	if err != nil {
 		return nil, err
 	}
-	attribute, err := o.Database.GetAttributeByPhone(ctx, req.AreaCode, req.PhoneNumber)
-	if err != nil {
-		return nil, err
+
+	if req.Email == "" {
+		attribute, err := o.Database.GetAttributeByPhone(ctx, req.AreaCode, req.PhoneNumber)
+		if err != nil {
+			return nil, err
+		}
+		err = o.Database.UpdatePasswordAndDeleteVerifyCode(ctx, attribute.UserID, req.Password, verifyCodeID)
+	} else {
+		attribute, err := o.Database.GetAttributeByEmail(ctx, req.Email)
+		if err != nil {
+			return nil, err
+		}
+		err = o.Database.UpdatePasswordAndDeleteVerifyCode(ctx, attribute.UserID, req.Password, verifyCodeID)
 	}
-	err = o.Database.UpdatePasswordAndDeleteVerifyCode(ctx, attribute.UserID, req.Password, verifyCodeID)
+
 	if err != nil {
 		return nil, err
 	}
