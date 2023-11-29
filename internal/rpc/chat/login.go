@@ -248,11 +248,10 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 	if req.User == nil {
 		return nil, errs.ErrArgs.Wrap("user is nil")
 	}
-	if (req.User.AreaCode == "" && req.User.PhoneNumber != "") || (req.User.AreaCode != "" && req.User.PhoneNumber == "") {
-		return nil, errs.ErrArgs.Wrap("area code or phone number error")
-	}
-	if (req.User.PhoneNumber == "" || req.User.Account == "") && req.User.Email == "" {
-		return nil, errs.ErrArgs.Wrap("phone number, account, and  email is empty")
+	if req.User.Email == "" {
+		if (req.User.AreaCode == "" && req.User.PhoneNumber != "") || (req.User.AreaCode != "" && req.User.PhoneNumber == "") {
+			return nil, errs.ErrArgs.Wrap("area code or phone number error, no email provide")
+		}
 	}
 	var usedInvitationCode bool
 	if !isAdmin {
