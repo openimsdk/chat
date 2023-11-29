@@ -239,7 +239,7 @@ func (o *chatSvr) genVerifyCode() string {
 
 func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (*chat.RegisterUserResp, error) {
 	resp := &chat.RegisterUserResp{}
-	defer log.ZDebug(ctx, "return")
+
 	isAdmin, err := o.Admin.CheckNilOrAdmin(ctx)
 	ctx = mctx.WithAdminUser(ctx)
 	if err != nil {
@@ -248,6 +248,7 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 	if req.User == nil {
 		return nil, errs.ErrArgs.Wrap("user is nil")
 	}
+	log.ZDebug(ctx, "email", req.User.Email)
 	if req.User.Email == "" {
 		if (req.User.AreaCode == "" && req.User.PhoneNumber != "") || (req.User.AreaCode != "" && req.User.PhoneNumber == "") {
 			return nil, errs.ErrArgs.Wrap("area code or phone number error, no email provide")
