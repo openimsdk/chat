@@ -74,7 +74,7 @@ func (o *chatSvr) SendVerifyCode(ctx context.Context, req *chat.SendVerifyCodeRe
 			}
 			_, err := o.Database.TakeAttributeByEmail(ctx, req.Email)
 			if err == nil {
-				return nil, eerrs.ErrPhoneAlreadyRegister.Wrap("email already register")
+				return nil, eerrs.ErrEmailAlreadyRegister.Wrap("email already register")
 			} else if !o.Database.IsNotFound(err) {
 				return nil, err
 			}
