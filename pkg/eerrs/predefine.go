@@ -30,4 +30,5 @@ var (
 	ErrInvitationNotFound       = errs.NewCodeError(20011, "InvitationNotFound")       // 邀请码不存在
 	ErrForbidden                = errs.NewCodeError(20012, "Forbidden")                // 限制登录注册
 	ErrRefuseFriend             = errs.NewCodeError(20013, "RefuseFriend")             // 拒绝添加好友
+	ErrEmailAlreadyRegister     = errs.NewCodeError(20014, "EmailAlreadyRegister")     // 邮箱已经注册
 )
