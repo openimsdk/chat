@@ -1,3 +1,7 @@
+You may be licensed to use source code to create compiled versions not produced by OpenIM, Inc. in one of two ways:
+1. Under the Free Software Foundation’s GPL v.3.0, subject to the exceptions outlined in this policy; or
+2. Under a commercial license available from OpenIM  by contacting contract@openim.io
+
 # chat
 
 ### Modifying configuration items
