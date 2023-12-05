@@ -42,8 +42,12 @@ import (
 )
 
 func NewChat(chatConn, adminConn, emoticonConn grpc.ClientConnInterface) *ChatApi {
-	return &ChatApi{chatClient: chat.NewChatClient(chatConn), adminClient: admin.NewAdminClient(adminConn), imApiCaller: apicall.NewCallerInterface(),
-		emoticonClient: emoticon_pack.NewEmoticonClient(emoticonConn)}
+	return &ChatApi{
+		chatClient:     chat.NewChatClient(chatConn),
+		adminClient:    admin.NewAdminClient(adminConn),
+		imApiCaller:    apicall.NewCallerInterface(),
+		emoticonClient: emoticon_pack.NewEmoticonClient(emoticonConn),
+	}
 }
 
 type ChatApi struct {
