@@ -136,3 +136,14 @@ func (o *MW) CheckUser(c *gin.Context) {
 	}
 	o.setToken(c, userID, constant.NormalUser)
 }
+
+func (o *MW) CheckAdminOrNil(c *gin.Context) {
+	defer c.Next()
+	userID, userType, _, err := o.parseToken(c)
+	if err != nil {
+		return
+	}
+	if userType == constant.AdminUser {
+		o.setToken(c, userID, constant.AdminUser)
+	}
+}

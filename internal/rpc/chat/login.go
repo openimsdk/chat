@@ -54,7 +54,7 @@ func (o *chatSvr) SendVerifyCode(ctx context.Context, req *chat.SendVerifyCodeRe
 				return nil, errs.ErrArgs.Wrap("area code or phone number is empty")
 			}
 			if req.AreaCode[0] != '+' {
-				return nil, errs.ErrArgs.Wrap("area code must start with +")
+				req.AreaCode = "+" + req.AreaCode
 			}
 			if _, err := strconv.ParseUint(req.AreaCode[1:], 10, 64); err != nil {
 				return nil, errs.ErrArgs.Wrap("area code must be number")
@@ -306,7 +306,7 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 	}
 	if req.User.PhoneNumber != "" {
 		if req.User.AreaCode[0] != '+' {
-			return nil, errs.ErrArgs.Wrap("area code must start with +")
+			req.User.AreaCode = "+" + req.User.AreaCode
 		}
 		if _, err := strconv.ParseUint(req.User.AreaCode[1:], 10, 64); err != nil {
 			return nil, errs.ErrArgs.Wrap("area code must be number")
@@ -401,8 +401,14 @@ func (o *chatSvr) Login(ctx context.Context, req *chat.LoginReq) (*chat.LoginRes
 	if req.Account != "" {
 		attribute, err = o.Database.GetAttributeByAccount(ctx, req.Account)
 	} else if req.PhoneNumber != "" {
-		if req.AreaCode == "" || req.AreaCode[0] != '+' {
-			return nil, errs.ErrArgs.Wrap("area code must start with +")
+		if req.AreaCode == "" {
+			return nil, errs.ErrArgs.Wrap("area code must")
+		}
+		if req.AreaCode[0] != '+' {
+			req.AreaCode = "+" + req.AreaCode
+		}
+		if _, err := strconv.ParseUint(req.AreaCode[1:], 10, 64); err != nil {
+			return nil, errs.ErrArgs.Wrap("area code must be number")
 		}
 		attribute, err = o.Database.GetAttributeByPhone(ctx, req.AreaCode, req.PhoneNumber)
 	} else if req.Email != "" {
