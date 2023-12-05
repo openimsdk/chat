@@ -6,6 +6,7 @@ import (
 	"github.com/OpenIMSDK/chat/pkg/common/mctx"
 	"github.com/OpenIMSDK/chat/pkg/proto/emoticon_pack"
 	"github.com/OpenIMSDK/tools/errs"
+	"github.com/OpenIMSDK/tools/log"
 	"sync"
 	"time"
 )
@@ -79,7 +80,7 @@ func (o *chatSvr) AddEmoticon(ctx context.Context, req *emoticon_pack.AddEmotico
 	//if _, err := o.Database.GetUser(ctx, userID); err != nil {
 	//	return nil, err
 	//}
-
+	log.ZDebug(ctx, "hello here rpc", "add Emoticon")
 	sf, err := NewSnowflake(1, 1)
 	if err != nil {
 		return nil, err
