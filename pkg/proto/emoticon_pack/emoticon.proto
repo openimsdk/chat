@@ -16,7 +16,7 @@ package emoticon_pack;
 option go_package = "github.com/OpenIMSDK/chat/pkg/proto/emoticon_pack";
 
 message Emoticon {
-  string emoticon_id = 1;
+  int64 emoticon_id = 1;
   repeated string imageURL = 2;
   string user_id = 3;
 }
