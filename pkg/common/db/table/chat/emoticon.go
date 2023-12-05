@@ -10,10 +10,20 @@ type Image struct {
 	//EmoticonID string `gorm:"column:owner_id;type:char(64)"`
 	OwnerID string `gorm:"column:owner_id;type:char(64)"`
 }
+
+func (Image) TableName() string {
+	return "images"
+}
+
 type Emoticon struct {
 	EmoticonID int64  `gorm:"column:id;primary_key;"`
 	OwnerID    string `gorm:"column:owner_id;type:char(64)"`
 }
+
+func (Emoticon) TableName() string {
+	return "emoticons"
+}
+
 type EmoticonInterface interface {
 	AddEmoticon(ctx context.Context, emoticon *Emoticon) error
 	DeleteEmoticon(ctx context.Context, userID string, emoticonID int64) error
