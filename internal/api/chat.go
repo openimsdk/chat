@@ -41,8 +41,9 @@ import (
 	"github.com/OpenIMSDK/chat/pkg/proto/chat"
 )
 
-func NewChat(chatConn, adminConn grpc.ClientConnInterface) *ChatApi {
-	return &ChatApi{chatClient: chat.NewChatClient(chatConn), adminClient: admin.NewAdminClient(adminConn), imApiCaller: apicall.NewCallerInterface()}
+func NewChat(chatConn, adminConn, emoticonConn grpc.ClientConnInterface) *ChatApi {
+	return &ChatApi{chatClient: chat.NewChatClient(chatConn), adminClient: admin.NewAdminClient(adminConn), imApiCaller: apicall.NewCallerInterface(),
+		emoticonClient: emoticon_pack.NewEmoticonClient(emoticonConn)}
 }
 
 type ChatApi struct {
