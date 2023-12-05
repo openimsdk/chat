@@ -271,10 +271,10 @@ func EmailCheck(email string) error {
 }
 
 func AreaCodeCheck(areaCode string) error {
-	pattern := `\+[1-9][0-9]{1,2}`
-	if err := regexMatch(pattern, areaCode); err != nil {
-		return errs.Wrap(err, "AreaCode is invalid")
-	}
+	//pattern := `\+[1-9][0-9]{1,2}`
+	//if err := regexMatch(pattern, areaCode); err != nil {
+	//	return errs.Wrap(err, "AreaCode is invalid")
+	//}
 	return nil
 }
 

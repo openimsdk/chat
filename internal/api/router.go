@@ -35,7 +35,7 @@ func NewChatRoute(router gin.IRouter, discov discoveryregistry.SvcDiscoveryRegis
 	account := router.Group("/account")
 	account.POST("/code/send", chat.SendVerifyCode)                      // 发送验证码
 	account.POST("/code/verify", chat.VerifyCode)                        // 校验验证码
-	account.POST("/register", chat.RegisterUser)                         // 注册
+	account.POST("/register", mw.CheckAdminOrNil, chat.RegisterUser)     // 注册
 	account.POST("/login", chat.Login)                                   // 登录
 	account.POST("/password/reset", chat.ResetPassword)                  // 忘记密码
 	account.POST("/password/change", mw.CheckToken, chat.ChangePassword) // 修改密码
