@@ -75,10 +75,10 @@ func (s *Snowflake) Generate() (int64, error) {
 }
 
 func (o *chatSvr) AddEmoticon(ctx context.Context, req *emoticon_pack.AddEmoticonReq) (*emoticon_pack.AddEmoticonResp, error) {
-	userID, _, err := mctx.Check(ctx)
-	if _, err := o.Database.GetUser(ctx, userID); err != nil {
-		return nil, err
-	}
+	//userID, _, err := mctx.Check(ctx)
+	//if _, err := o.Database.GetUser(ctx, userID); err != nil {
+	//	return nil, err
+	//}
 	sf, err := NewSnowflake(1, 1)
 	if err != nil {
 		return nil, err
