@@ -79,6 +79,7 @@ func (o *chatSvr) AddEmoticon(ctx context.Context, req *emoticon_pack.AddEmotico
 	//if _, err := o.Database.GetUser(ctx, userID); err != nil {
 	//	return nil, err
 	//}
+
 	sf, err := NewSnowflake(1, 1)
 	if err != nil {
 		return nil, err
