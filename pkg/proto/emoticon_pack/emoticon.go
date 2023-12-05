@@ -35,3 +35,11 @@ func (e *RemoveEmoticonReq) Check() error {
 	}
 	return nil
 }
+
+// Check GetEmoticon
+//func (e *GetEmoticonReq) Check() error {
+//	if e.UserId == "" {
+//		return errs.ErrArgs.Wrap("User ID is empty")
+//	}
+//	return nil
+//}

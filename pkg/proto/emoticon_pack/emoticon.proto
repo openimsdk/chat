@@ -38,8 +38,17 @@ message RemoveEmoticonReq {
 message RemoveEmoticonResp {
 }
 
+//message GetEmoticonReq {
+//  string user_id = 1;
+//}
+//
+//message GetEmoticonResp {
+//
+//}
+
 service emoticon {
   rpc AddEmoticon(AddEmoticonReq) returns (AddEmoticonResp);
   rpc RemoveEmoticon(RemoveEmoticonReq) returns (RemoveEmoticonResp);
+//  rpc GetEmoticon(GetEmoticonReq) returns (GetEmoticonResp);
 }
 

@@ -59,9 +59,10 @@ func NewChatRoute(router gin.IRouter, discov discoveryregistry.SvcDiscoveryRegis
 
 	logs.POST("/upload", chat.UploadLogs)
 
-	emoticon := router.Group("/emoticon", mw.CheckToken)
-	emoticon.POST("/upload", chat.AddEmoticon)
-	emoticon.POST("/remove", chat.RemoveEmoticon)
+	//emoticon := router.Group("/emoticon", mw.CheckToken)
+	router.POST("/upload", chat.AddEmoticon)
+	router.POST("/remove", chat.RemoveEmoticon)
+	//emoticon.POST("/get", chat.GetEmoticon)
 }
 
 func NewAdminRoute(router gin.IRouter, discov discoveryregistry.SvcDiscoveryRegistry) {
