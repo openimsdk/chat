@@ -352,7 +352,7 @@ func (o *ChatApi) SearchFriend(c *gin.Context) {
 }
 
 func (o *ChatApi) AddEmoticon(c *gin.Context) {
-	log.ZDebug(c, "hello here api", "add Emoticon")
+	log.ZDebug(c, "hello here api")
 	a2r.Call(emoticon_pack.EmoticonClient.AddEmoticon, o.emoticonClient, c)
 }
 func (o *ChatApi) RemoveEmoticon(c *gin.Context) {

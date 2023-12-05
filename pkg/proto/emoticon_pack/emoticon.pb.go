@@ -475,7 +475,7 @@ func NewEmoticonClient(cc grpc.ClientConnInterface) EmoticonClient {
 }
 
 func (c *emoticonClient) AddEmoticon(ctx context.Context, in *AddEmoticonReq, opts ...grpc.CallOption) (*AddEmoticonResp, error) {
-	log.ZDebug(ctx, "hello here api bridge", "add Emoticon")
+	log.ZDebug(ctx, "hello here api bridge")
 	out := new(AddEmoticonResp)
 	err := c.cc.Invoke(ctx, "/emoticon_pack.emoticon/AddEmoticon", in, out, opts...)
 	if err != nil {
