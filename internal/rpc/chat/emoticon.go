@@ -74,7 +74,7 @@ func (s *Snowflake) Generate() (int64, error) {
 	return id, nil
 }
 
-func (o *chatSvr) AddImageToEmoticon(ctx context.Context, req *emoticon_pack.AddEmoticonReq) (*emoticon_pack.AddEmoticonResp, error) {
+func (o *chatSvr) AddEmoticon(ctx context.Context, req *emoticon_pack.AddEmoticonReq) (*emoticon_pack.AddEmoticonResp, error) {
 
 	log.ZDebug(ctx, "hello here rpc", "add Emoticon")
 	sf, err := NewSnowflake(1, 1)
