@@ -16,7 +16,6 @@ package api
 
 import (
 	"fmt"
-	"github.com/OpenIMSDK/chat/pkg/proto/emoticon_pack"
 	"io"
 	"net"
 	"time"
@@ -41,20 +40,18 @@ import (
 	"github.com/OpenIMSDK/chat/pkg/proto/chat"
 )
 
-func NewChat(chatConn, adminConn, emoticonConn grpc.ClientConnInterface) *ChatApi {
+func NewChat(chatConn, adminConn grpc.ClientConnInterface) *ChatApi {
 	return &ChatApi{
-		chatClient:     chat.NewChatClient(chatConn),
-		adminClient:    admin.NewAdminClient(adminConn),
-		imApiCaller:    apicall.NewCallerInterface(),
-		emoticonClient: emoticon_pack.NewEmoticonClient(emoticonConn),
+		chatClient:  chat.NewChatClient(chatConn),
+		adminClient: admin.NewAdminClient(adminConn),
+		imApiCaller: apicall.NewCallerInterface(),
 	}
 }
 
 type ChatApi struct {
-	chatClient     chat.ChatClient
-	adminClient    admin.AdminClient
-	emoticonClient emoticon_pack.EmoticonClient
-	imApiCaller    apicall.CallerInterface
+	chatClient  chat.ChatClient
+	adminClient admin.AdminClient
+	imApiCaller apicall.CallerInterface
 }
 
 // ################## ACCOUNT ##################
@@ -358,11 +355,11 @@ func (o *ChatApi) SearchFriend(c *gin.Context) {
 
 func (o *ChatApi) AddEmoticon(c *gin.Context) {
 	log.ZDebug(c, "hello here api")
-	a2r.Call(emoticon_pack.EmoticonClient.AddEmoticon, o.emoticonClient, c)
+	a2r.Call(chat.ChatClient.AddEmoticon, o.chatClient, c)
 }
 func (o *ChatApi) RemoveEmoticon(c *gin.Context) {
-	a2r.Call(emoticon_pack.EmoticonClient.RemoveEmoticon, o.emoticonClient, c)
+	a2r.Call(chat.ChatClient.RemoveEmoticon, o.chatClient, c)
 }
 func (o *ChatApi) GetEmoticon(c *gin.Context) {
-	a2r.Call(emoticon_pack.EmoticonClient.GetEmoticon, o.emoticonClient, c)
+	a2r.Call(chat.ChatClient.GetEmoticon, o.chatClient, c)
 }

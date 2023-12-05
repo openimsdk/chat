@@ -310,3 +310,29 @@ func (x *SearchUserInfoReq) Check() error {
 	}
 	return nil
 }
+
+func (e *AddEmoticonReq) Check() error {
+	if e.OwnerId == "" {
+		return errs.ErrArgs.Wrap("emoticon ID is empty")
+	}
+	if e.ImageData == "" {
+		return errs.ErrArgs.Wrap("image URL is empty")
+	}
+	return nil
+}
+
+// Check RemoveEmoticon
+func (e *RemoveEmoticonReq) Check() error {
+	if e.EmoticonId == 0 {
+		return errs.ErrArgs.Wrap("emoticon ID is empty")
+	}
+	return nil
+}
+
+// Check GetEmoticon
+func (e *GetEmoticonReq) Check() error {
+	if e.UserId == "" {
+		return errs.ErrArgs.Wrap("User ID is empty")
+	}
+	return nil
+}

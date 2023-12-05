@@ -3,7 +3,7 @@ package chat
 import (
 	"context"
 	table "github.com/OpenIMSDK/chat/pkg/common/db/table/chat"
-	"github.com/OpenIMSDK/chat/pkg/proto/emoticon_pack"
+	"github.com/OpenIMSDK/chat/pkg/proto/chat"
 	"github.com/OpenIMSDK/tools/errs"
 	"github.com/OpenIMSDK/tools/log"
 	"sync"
@@ -74,7 +74,7 @@ func (s *Snowflake) Generate() (int64, error) {
 	return id, nil
 }
 
-func (o *chatSvr) AddEmoticon(ctx context.Context, req *emoticon_pack.AddEmoticonReq) (*emoticon_pack.AddEmoticonResp, error) {
+func (o *chatSvr) AddEmoticon(ctx context.Context, req *chat.AddEmoticonReq) (*chat.AddEmoticonResp, error) {
 
 	log.ZDebug(ctx, "hello here rpc", "add Emoticon")
 	sf, err := NewSnowflake(1, 1)
@@ -95,9 +95,9 @@ func (o *chatSvr) AddEmoticon(ctx context.Context, req *emoticon_pack.AddEmotico
 		return nil, err
 	}
 
-	return &emoticon_pack.AddEmoticonResp{}, nil
+	return &chat.AddEmoticonResp{}, nil
 }
-func (o *chatSvr) RemoveEmoticon(ctx context.Context, req *emoticon_pack.RemoveEmoticonReq) (*emoticon_pack.RemoveEmoticonResp, error) {
+func (o *chatSvr) RemoveEmoticon(ctx context.Context, req *chat.RemoveEmoticonReq) (*chat.RemoveEmoticonResp, error) {
 	//userID, _, err := mctx.Check(ctx)
 	//if _, err := o.Database.GetUser(ctx, userID); err != nil {
 	//	return nil, err
@@ -108,22 +108,22 @@ func (o *chatSvr) RemoveEmoticon(ctx context.Context, req *emoticon_pack.RemoveE
 		return nil, err
 	}
 
-	return &emoticon_pack.RemoveEmoticonResp{}, nil
+	return &chat.RemoveEmoticonResp{}, nil
 }
-func (o *chatSvr) GetEmoticon(ctx context.Context, req *emoticon_pack.GetEmoticonReq) (*emoticon_pack.GetEmoticonResp, error) {
+func (o *chatSvr) GetEmoticon(ctx context.Context, req *chat.GetEmoticonReq) (*chat.GetEmoticonResp, error) {
 	results, err := o.Database.GetImages(ctx, req.UserId)
 	if err != nil {
 		return nil, err
 	}
 
-	var pbEmoticons []*emoticon_pack.Emoticon
+	var pbEmoticons []*chat.Emoticon
 	for _, result := range results {
-		pbEmoticons = append(pbEmoticons, &emoticon_pack.Emoticon{
+		pbEmoticons = append(pbEmoticons, &chat.Emoticon{
 			ImageURL:   result.ImageURL,
 			EmoticonId: result.ID,
 			UserId:     result.OwnerID,
 		})
 	}
 
-	return &emoticon_pack.GetEmoticonResp{E: pbEmoticons}, nil
+	return &chat.GetEmoticonResp{E: pbEmoticons}, nil
 }

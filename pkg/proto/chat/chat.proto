@@ -301,6 +301,38 @@ message SearchUserInfoResp {
   repeated OpenIMChat.common.UserFullInfo users = 2;
 }
 
+
+message Emoticon {
+  int64 emoticon_id = 1;
+  string imageURL = 2;
+  string user_id = 3;
+}
+
+message AddEmoticonReq {
+  string owner_id = 1;
+  string image_data = 2;
+}
+
+message AddEmoticonResp {
+}
+
+// Request to remove an emoticon from user's storage
+message RemoveEmoticonReq {
+  string user_id = 1;
+  int64 emoticon_id = 2;
+
+}
+message RemoveEmoticonResp {
+}
+
+message GetEmoticonReq {
+  string user_id = 1;
+}
+
+message GetEmoticonResp {
+  repeated Emoticon e = 1;
+}
+
 service chat {
   //编辑个人资料 自己或者管理员调用
   rpc UpdateUserInfo(UpdateUserInfoReq) returns(UpdateUserInfoResp);
@@ -334,4 +366,8 @@ service chat {
   rpc SearchLogs(SearchLogsReq) returns (SearchLogsResp);
 
   rpc SearchUserInfo(SearchUserInfoReq)returns(SearchUserInfoResp);
+  //表情包
+  rpc AddEmoticon(AddEmoticonReq) returns (AddEmoticonResp);
+  rpc RemoveEmoticon(RemoveEmoticonReq) returns (RemoveEmoticonResp);
+  rpc GetEmoticon(GetEmoticonReq) returns (GetEmoticonResp);
 }
