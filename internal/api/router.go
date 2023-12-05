@@ -30,8 +30,12 @@ func NewChatRoute(router gin.IRouter, discov discoveryregistry.SvcDiscoveryRegis
 	if err != nil {
 		panic(err)
 	}
+	emoticonConn, err := discov.GetConn(context.Background(), config.Config.RpcRegisterName.OpenImChatName)
+	if err != nil {
+		panic(err)
+	}
 	mw := NewMW(adminConn)
-	chat := NewChat(chatConn, adminConn)
+	chat := NewChat(chatConn, adminConn, emoticonConn)
 	account := router.Group("/account")
 	account.POST("/code/send", chat.SendVerifyCode)                      // 发送验证码
 	account.POST("/code/verify", chat.VerifyCode)                        // 校验验证码
