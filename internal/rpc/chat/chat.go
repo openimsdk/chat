@@ -41,6 +41,7 @@ func Start(discov discoveryregistry.SvcDiscoveryRegistry, server *grpc.Server) e
 		chat2.UserLoginRecord{},
 		chat2.Log{},
 		chat2.Emoticon{},
+		chat2.Image{},
 	}
 	if err := db.AutoMigrate(tables...); err != nil {
 		return err
