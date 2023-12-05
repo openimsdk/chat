@@ -35,6 +35,7 @@ func (o *chatSvr) IsNotFound(err error) bool {
 	return errs.ErrRecordNotFound.Is(specialerror.ErrCode(errs.Unwrap(err)))
 }
 
+// TODO!
 func (o *chatSvr) UploadLogs(ctx context.Context, req *chat.UploadLogsReq) (*chat.UploadLogsResp, error) {
 	var DBlogs []*table.Log
 	userID, _, err := mctx.Check(ctx)
@@ -67,6 +68,7 @@ func (o *chatSvr) UploadLogs(ctx context.Context, req *chat.UploadLogsReq) (*cha
 		}
 		DBlogs = append(DBlogs, &log)
 	}
+	//TODO!
 	err = o.Database.UploadLogs(ctx, DBlogs)
 	if err != nil {
 		return nil, err

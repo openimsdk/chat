@@ -61,6 +61,9 @@ type ChatDatabaseInterface interface {
 	DeleteLogs(ctx context.Context, logID []string, userID string) error
 	SearchLogs(ctx context.Context, keyword string, start time.Time, end time.Time, pageNumber int32, showNumber int32) (uint32, []*table.Log, error)
 	GetLogs(ctx context.Context, LogIDs []string, userID string) ([]*table.Log, error)
+
+	AddEmoticon(ctx context.Context, emoticon *table.Emoticon) error
+	RemoveEmoticon(ctx context.Context, userID, emoticonID string) error
 }
 
 func NewChatDatabase(db *gorm.DB) ChatDatabaseInterface {
@@ -73,6 +76,7 @@ func NewChatDatabase(db *gorm.DB) ChatDatabaseInterface {
 		verifyCode:       chat.NewVerifyCode(db),
 		forbiddenAccount: admin2.NewForbiddenAccount(db),
 		log:              chat.NewLogs(db),
+		emoticon:         chat.NewEmoticons(db),
 	}
 }
 
@@ -85,6 +89,16 @@ type ChatDatabase struct {
 	verifyCode       table.VerifyCodeInterface
 	forbiddenAccount admin.ForbiddenAccountInterface
 	log              table.LogInterface
+	emoticon         table.EmoticonInterface
+}
+
+func (o *ChatDatabase) RemoveEmoticon(ctx context.Context, userID, emoticonID string) error {
+	return o.emoticon.DeleteEmoticon(ctx, userID, emoticonID)
+}
+
+func (o *ChatDatabase) AddEmoticon(ctx context.Context, emoticon *table.Emoticon) error {
+
+	return o.emoticon.AddEmoticon(ctx, emoticon)
 }
 
 func (o *ChatDatabase) GetLogs(ctx context.Context, LogIDs []string, userID string) ([]*table.Log, error) {

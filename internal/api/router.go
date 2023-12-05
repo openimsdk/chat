@@ -16,7 +16,6 @@ package api
 
 import (
 	"context"
-
 	"github.com/OpenIMSDK/chat/pkg/common/config"
 	"github.com/OpenIMSDK/tools/discoveryregistry"
 	"github.com/gin-gonic/gin"
@@ -57,7 +56,12 @@ func NewChatRoute(router gin.IRouter, discov discoveryregistry.SvcDiscoveryRegis
 	router.Group("/callback").POST("/open_im", chat.OpenIMCallback) // 回调
 
 	logs := router.Group("/logs", mw.CheckToken)
+
 	logs.POST("/upload", chat.UploadLogs)
+
+	emoticon := router.Group("/emoticon", mw.CheckToken)
+	emoticon.POST("/upload", chat.AddEmoticon)
+	emoticon.POST("/remove", chat.RemoveEmoticon)
 }
 
 func NewAdminRoute(router gin.IRouter, discov discoveryregistry.SvcDiscoveryRegistry) {

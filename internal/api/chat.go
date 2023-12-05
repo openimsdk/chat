@@ -16,6 +16,7 @@ package api
 
 import (
 	"fmt"
+	"github.com/OpenIMSDK/chat/pkg/proto/emoticon_pack"
 	"io"
 	"net"
 	"time"
@@ -45,9 +46,10 @@ func NewChat(chatConn, adminConn grpc.ClientConnInterface) *ChatApi {
 }
 
 type ChatApi struct {
-	chatClient  chat.ChatClient
-	adminClient admin.AdminClient
-	imApiCaller apicall.CallerInterface
+	chatClient     chat.ChatClient
+	adminClient    admin.AdminClient
+	emoticonClient emoticon_pack.EmoticonClient
+	imApiCaller    apicall.CallerInterface
 }
 
 // ################## ACCOUNT ##################
@@ -309,6 +311,7 @@ func (o *ChatApi) getClientIP(c *gin.Context) (string, error) {
 	return ip, nil
 }
 
+// TODO!
 func (o *ChatApi) UploadLogs(c *gin.Context) {
 	a2r.Call(chat.ChatClient.UploadLogs, o.chatClient, c)
 }
@@ -346,4 +349,11 @@ func (o *ChatApi) SearchFriend(c *gin.Context) {
 		return
 	}
 	apiresp.GinSuccess(c, resp)
+}
+
+func (o *ChatApi) AddEmoticon(c *gin.Context) {
+	a2r.Call(emoticon_pack.EmoticonClient.AddEmoticon, o.emoticonClient, c)
+}
+func (o *ChatApi) RemoveEmoticon(c *gin.Context) {
+	a2r.Call(emoticon_pack.EmoticonClient.RemoveEmoticon, o.emoticonClient, c)
 }
