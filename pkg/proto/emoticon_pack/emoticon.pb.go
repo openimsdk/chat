@@ -22,6 +22,7 @@ package emoticon_pack
 
 import (
 	context "context"
+	"github.com/OpenIMSDK/tools/log"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -609,6 +610,7 @@ func NewEmoticonClient(cc grpc.ClientConnInterface) EmoticonClient {
 }
 
 func (c *emoticonClient) AddEmoticon(ctx context.Context, in *AddEmoticonReq, opts ...grpc.CallOption) (*AddEmoticonResp, error) {
+	log.ZDebug(ctx, "inter AddEmoticon", "in", in)
 	out := new(AddEmoticonResp)
 	err := c.cc.Invoke(ctx, "/emoticon_pack.emoticon/AddEmoticon", in, out, opts...)
 	if err != nil {
