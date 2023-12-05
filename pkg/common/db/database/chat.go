@@ -62,8 +62,9 @@ type ChatDatabaseInterface interface {
 	SearchLogs(ctx context.Context, keyword string, start time.Time, end time.Time, pageNumber int32, showNumber int32) (uint32, []*table.Log, error)
 	GetLogs(ctx context.Context, LogIDs []string, userID string) ([]*table.Log, error)
 
-	AddEmoticon(ctx context.Context, emoticon *table.Emoticon) error
-	RemoveEmoticon(ctx context.Context, userID, emoticonID string) error
+	AddImage(ctx context.Context, image *table.Image) error
+	RemoveImage(ctx context.Context, userID string, imageID int64) error
+	GetImages(ctx context.Context, userID string) ([]*table.Image, error)
 }
 
 func NewChatDatabase(db *gorm.DB) ChatDatabaseInterface {
@@ -92,13 +93,16 @@ type ChatDatabase struct {
 	emoticon         table.EmoticonInterface
 }
 
-func (o *ChatDatabase) RemoveEmoticon(ctx context.Context, userID, emoticonID string) error {
-	return o.emoticon.DeleteEmoticon(ctx, userID, emoticonID)
+func (o *ChatDatabase) AddImage(ctx context.Context, image *table.Image) error {
+	return o.emoticon.AddImage(ctx, image)
 }
 
-func (o *ChatDatabase) AddEmoticon(ctx context.Context, emoticon *table.Emoticon) error {
+func (o *ChatDatabase) RemoveImage(ctx context.Context, userID string, imageID int64) error {
+	return o.emoticon.DeleteImage(ctx, userID, imageID)
+}
 
-	return o.emoticon.AddEmoticon(ctx, emoticon)
+func (o *ChatDatabase) GetImages(ctx context.Context, userID string) ([]*table.Image, error) {
+	return o.emoticon.GetImages(ctx, userID)
 }
 
 func (o *ChatDatabase) GetLogs(ctx context.Context, LogIDs []string, userID string) ([]*table.Log, error) {

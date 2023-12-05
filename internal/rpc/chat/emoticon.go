@@ -3,7 +3,6 @@ package chat
 import (
 	"context"
 	table "github.com/OpenIMSDK/chat/pkg/common/db/table/chat"
-	"github.com/OpenIMSDK/chat/pkg/common/mctx"
 	"github.com/OpenIMSDK/chat/pkg/proto/emoticon_pack"
 	"github.com/OpenIMSDK/tools/errs"
 	"github.com/OpenIMSDK/tools/log"
@@ -75,11 +74,8 @@ func (s *Snowflake) Generate() (int64, error) {
 	return id, nil
 }
 
-func (o *chatSvr) AddEmoticon(ctx context.Context, req *emoticon_pack.AddEmoticonReq) (*emoticon_pack.AddEmoticonResp, error) {
-	//userID, _, err := mctx.Check(ctx)
-	//if _, err := o.Database.GetUser(ctx, userID); err != nil {
-	//	return nil, err
-	//}
+func (o *chatSvr) AddImageToEmoticon(ctx context.Context, req *emoticon_pack.AddEmoticonReq) (*emoticon_pack.AddEmoticonResp, error) {
+
 	log.ZDebug(ctx, "hello here rpc", "add Emoticon")
 	sf, err := NewSnowflake(1, 1)
 	if err != nil {
@@ -89,12 +85,12 @@ func (o *chatSvr) AddEmoticon(ctx context.Context, req *emoticon_pack.AddEmotico
 	if err != nil {
 		return nil, err
 	}
-	emoticon := &table.Emoticon{
+	image := &table.Image{
 		ID:       result,
 		ImageURL: req.ImageData,
 		OwnerID:  req.OwnerId,
 	}
-	err = o.Database.AddEmoticon(ctx, emoticon)
+	err = o.Database.AddImage(ctx, image)
 	if err != nil {
 		return nil, err
 	}
@@ -102,15 +98,32 @@ func (o *chatSvr) AddEmoticon(ctx context.Context, req *emoticon_pack.AddEmotico
 	return &emoticon_pack.AddEmoticonResp{}, nil
 }
 func (o *chatSvr) RemoveEmoticon(ctx context.Context, req *emoticon_pack.RemoveEmoticonReq) (*emoticon_pack.RemoveEmoticonResp, error) {
-	userID, _, err := mctx.Check(ctx)
-	if _, err := o.Database.GetUser(ctx, userID); err != nil {
-		return nil, err
-	}
+	//userID, _, err := mctx.Check(ctx)
+	//if _, err := o.Database.GetUser(ctx, userID); err != nil {
+	//	return nil, err
+	//}
 
-	err = o.Database.RemoveEmoticon(ctx, req.EmoticonId, req.UserId)
+	err := o.Database.RemoveImage(ctx, req.UserId, req.EmoticonId)
 	if err != nil {
 		return nil, err
 	}
 
 	return &emoticon_pack.RemoveEmoticonResp{}, nil
+}
+func (o *chatSvr) GetEmoticon(ctx context.Context, req *emoticon_pack.GetEmoticonReq) (*emoticon_pack.GetEmoticonResp, error) {
+	results, err := o.Database.GetImages(ctx, req.UserId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pbEmoticons []*emoticon_pack.Emoticon
+	for _, result := range results {
+		pbEmoticons = append(pbEmoticons, &emoticon_pack.Emoticon{
+			ImageURL:   result.ImageURL,
+			EmoticonId: result.ID,
+			UserId:     result.OwnerID,
+		})
+	}
+
+	return &emoticon_pack.GetEmoticonResp{E: pbEmoticons}, nil
 }

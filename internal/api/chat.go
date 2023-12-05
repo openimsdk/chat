@@ -358,3 +358,6 @@ func (o *ChatApi) AddEmoticon(c *gin.Context) {
 func (o *ChatApi) RemoveEmoticon(c *gin.Context) {
 	a2r.Call(emoticon_pack.EmoticonClient.RemoveEmoticon, o.emoticonClient, c)
 }
+func (o *ChatApi) GetEmoticon(c *gin.Context) {
+	a2r.Call(emoticon_pack.EmoticonClient.GetEmoticon, o.emoticonClient, c)
+}

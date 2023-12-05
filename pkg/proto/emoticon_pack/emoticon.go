@@ -30,16 +30,16 @@ func (e *AddEmoticonReq) Check() error {
 
 // Check RemoveEmoticon
 func (e *RemoveEmoticonReq) Check() error {
-	if e.EmoticonId == "" {
+	if e.EmoticonId == 0 {
 		return errs.ErrArgs.Wrap("emoticon ID is empty")
 	}
 	return nil
 }
 
 // Check GetEmoticon
-//func (e *GetEmoticonReq) Check() error {
-//	if e.UserId == "" {
-//		return errs.ErrArgs.Wrap("User ID is empty")
-//	}
-//	return nil
-//}
+func (e *GetEmoticonReq) Check() error {
+	if e.UserId == "" {
+		return errs.ErrArgs.Wrap("User ID is empty")
+	}
+	return nil
+}

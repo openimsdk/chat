@@ -17,7 +17,7 @@ option go_package = "github.com/OpenIMSDK/chat/pkg/proto/emoticon_pack";
 
 message Emoticon {
   int64 emoticon_id = 1;
-  repeated string imageURL = 2;
+  string imageURL = 2;
   string user_id = 3;
 }
 
@@ -32,23 +32,23 @@ message AddEmoticonResp {
 // Request to remove an emoticon from user's storage
 message RemoveEmoticonReq {
   string user_id = 1;
-  string emoticon_id = 2;
+  int64 emoticon_id = 2;
 
 }
 message RemoveEmoticonResp {
 }
 
-//message GetEmoticonReq {
-//  string user_id = 1;
-//}
-//
-//message GetEmoticonResp {
-//
-//}
+message GetEmoticonReq {
+  string user_id = 1;
+}
+
+message GetEmoticonResp {
+  repeated Emoticon e = 1;
+}
 
 service emoticon {
   rpc AddEmoticon(AddEmoticonReq) returns (AddEmoticonResp);
   rpc RemoveEmoticon(RemoveEmoticonReq) returns (RemoveEmoticonResp);
-//  rpc GetEmoticon(GetEmoticonReq) returns (GetEmoticonResp);
+  rpc GetEmoticon(GetEmoticonReq) returns (GetEmoticonResp);
 }
 
