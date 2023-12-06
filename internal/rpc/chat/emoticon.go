@@ -5,7 +5,6 @@ import (
 	table "github.com/OpenIMSDK/chat/pkg/common/db/table/chat"
 	"github.com/OpenIMSDK/chat/pkg/proto/chat"
 	"github.com/OpenIMSDK/tools/errs"
-	"github.com/OpenIMSDK/tools/log"
 	"sync"
 	"time"
 )
@@ -75,8 +74,9 @@ func (s *Snowflake) Generate() (int64, error) {
 }
 
 func (o *chatSvr) AddEmoticon(ctx context.Context, req *chat.AddEmoticonReq) (*chat.AddEmoticonResp, error) {
-
-	log.ZDebug(ctx, "hello here rpc", "add Emoticon")
+	if _, err := o.Database.GetUser(ctx, req.OwnerId); err != nil {
+		return nil, err
+	}
 	sf, err := NewSnowflake(1, 1)
 	if err != nil {
 		return nil, err
@@ -98,11 +98,10 @@ func (o *chatSvr) AddEmoticon(ctx context.Context, req *chat.AddEmoticonReq) (*c
 	return &chat.AddEmoticonResp{}, nil
 }
 func (o *chatSvr) RemoveEmoticon(ctx context.Context, req *chat.RemoveEmoticonReq) (*chat.RemoveEmoticonResp, error) {
-	//userID, _, err := mctx.Check(ctx)
-	//if _, err := o.Database.GetUser(ctx, userID); err != nil {
-	//	return nil, err
-	//}
 
+	if _, err := o.Database.GetUser(ctx, req.UserId); err != nil {
+		return nil, err
+	}
 	err := o.Database.RemoveImage(ctx, req.UserId, req.EmoticonId)
 	if err != nil {
 		return nil, err
@@ -111,6 +110,11 @@ func (o *chatSvr) RemoveEmoticon(ctx context.Context, req *chat.RemoveEmoticonRe
 	return &chat.RemoveEmoticonResp{}, nil
 }
 func (o *chatSvr) GetEmoticon(ctx context.Context, req *chat.GetEmoticonReq) (*chat.GetEmoticonResp, error) {
+
+	if _, err := o.Database.GetUser(ctx, req.UserId); err != nil {
+		return nil, err
+	}
+
 	results, err := o.Database.GetImages(ctx, req.UserId)
 	if err != nil {
 		return nil, err
