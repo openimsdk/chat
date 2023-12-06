@@ -110,7 +110,7 @@ func (o *chatSvr) GetEmoticon(ctx context.Context, req *chat.GetEmoticonReq) (*c
 		return nil, err
 	}
 
-	var pbEmoticons []*chat.Emoticon
+	pbEmoticons := make([]*chat.Emoticon, 0)
 	for _, result := range results {
 		pbEmoticons = append(pbEmoticons, &chat.Emoticon{
 			ImageURL:   result.ImageURL,
