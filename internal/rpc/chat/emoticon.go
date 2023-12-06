@@ -74,9 +74,6 @@ func (s *Snowflake) Generate() (int64, error) {
 }
 
 func (o *chatSvr) AddEmoticon(ctx context.Context, req *chat.AddEmoticonReq) (*chat.AddEmoticonResp, error) {
-	if _, err := o.Database.GetUser(ctx, req.OwnerId); err != nil {
-		return nil, err
-	}
 	sf, err := NewSnowflake(1, 1)
 	if err != nil {
 		return nil, err
@@ -99,9 +96,6 @@ func (o *chatSvr) AddEmoticon(ctx context.Context, req *chat.AddEmoticonReq) (*c
 }
 func (o *chatSvr) RemoveEmoticon(ctx context.Context, req *chat.RemoveEmoticonReq) (*chat.RemoveEmoticonResp, error) {
 
-	if _, err := o.Database.GetUser(ctx, req.UserId); err != nil {
-		return nil, err
-	}
 	err := o.Database.RemoveImage(ctx, req.UserId, req.EmoticonId)
 	if err != nil {
 		return nil, err
@@ -110,10 +104,6 @@ func (o *chatSvr) RemoveEmoticon(ctx context.Context, req *chat.RemoveEmoticonRe
 	return &chat.RemoveEmoticonResp{}, nil
 }
 func (o *chatSvr) GetEmoticon(ctx context.Context, req *chat.GetEmoticonReq) (*chat.GetEmoticonResp, error) {
-
-	if _, err := o.Database.GetUser(ctx, req.UserId); err != nil {
-		return nil, err
-	}
 
 	results, err := o.Database.GetImages(ctx, req.UserId)
 	if err != nil {
