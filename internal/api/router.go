@@ -59,7 +59,7 @@ func NewChatRoute(router gin.IRouter, discov discoveryregistry.SvcDiscoveryRegis
 
 	logs.POST("/upload", chat.UploadLogs)
 
-	emoticon := router.Group("/emoticon")
+	emoticon := router.Group("/emoticon", mw.CheckToken)
 	emoticon.POST("/upload", chat.AddEmoticon)
 	emoticon.POST("/remove", chat.RemoveEmoticon)
 	emoticon.POST("/get", chat.GetEmoticon)
