@@ -74,7 +74,7 @@ func (o *chatSvr) SendVerifyCode(ctx context.Context, req *chat.SendVerifyCodeRe
 			}
 			_, err := o.Database.TakeAttributeByEmail(ctx, req.Email)
 			if err == nil {
-				return nil, eerrs.ErrPhoneAlreadyRegister.Wrap("email already register")
+				return nil, eerrs.ErrEmailAlreadyRegister.Wrap("email already register")
 			} else if !o.Database.IsNotFound(err) {
 				return nil, err
 			}
@@ -239,7 +239,7 @@ func (o *chatSvr) genVerifyCode() string {
 
 func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (*chat.RegisterUserResp, error) {
 	resp := &chat.RegisterUserResp{}
-	defer log.ZDebug(ctx, "return")
+
 	isAdmin, err := o.Admin.CheckNilOrAdmin(ctx)
 	ctx = mctx.WithAdminUser(ctx)
 	if err != nil {
@@ -248,11 +248,11 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 	if req.User == nil {
 		return nil, errs.ErrArgs.Wrap("user is nil")
 	}
-	if (req.User.AreaCode == "" && req.User.PhoneNumber != "") || (req.User.AreaCode != "" && req.User.PhoneNumber == "") {
-		return nil, errs.ErrArgs.Wrap("area code or phone number error")
-	}
-	if req.User.PhoneNumber == "" && req.User.Account == "" {
-		return nil, errs.ErrArgs.Wrap("phone number and account is empty")
+	log.ZDebug(ctx, "email", req.User.Email)
+	if req.User.Email == "" {
+		if (req.User.AreaCode == "" && req.User.PhoneNumber != "") || (req.User.AreaCode != "" && req.User.PhoneNumber == "") {
+			return nil, errs.ErrArgs.Wrap("area code or phone number error, no email provide")
+		}
 	}
 	var usedInvitationCode bool
 	if !isAdmin {
@@ -325,6 +325,14 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 		_, err := o.Database.TakeAttributeByAccount(ctx, req.User.Account)
 		if err == nil {
 			return nil, eerrs.ErrAccountAlreadyRegister.Wrap()
+		} else if !o.Database.IsNotFound(err) {
+			return nil, err
+		}
+	}
+	if req.User.Email != "" {
+		_, err := o.Database.TakeAttributeByEmail(ctx, req.User.Email)
+		if err == nil {
+			return nil, eerrs.ErrEmailAlreadyRegister.Wrap()
 		} else if !o.Database.IsNotFound(err) {
 			return nil, err
 		}
@@ -403,8 +411,10 @@ func (o *chatSvr) Login(ctx context.Context, req *chat.LoginReq) (*chat.LoginRes
 			return nil, errs.ErrArgs.Wrap("area code must be number")
 		}
 		attribute, err = o.Database.GetAttributeByPhone(ctx, req.AreaCode, req.PhoneNumber)
+	} else if req.Email != "" {
+		attribute, err = o.Database.GetAttributeByEmail(ctx, req.Email)
 	} else {
-		err = errs.ErrArgs.Wrap("account or phone number must be set")
+		err = errs.ErrArgs.Wrap("account or phone number or email must be set")
 	}
 	if err != nil {
 		if o.Database.IsNotFound(err) {
