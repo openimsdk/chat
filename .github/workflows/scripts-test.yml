@@ -77,6 +77,7 @@ jobs:
 
     - name: start all services
       run: |
+        sudo cp ./config/config.yaml.template ./config/config.yaml
         sudo ./scripts/start_all.sh
       shell: bash
 
