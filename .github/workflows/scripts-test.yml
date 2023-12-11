@@ -49,7 +49,8 @@ jobs:
 
     - name: deploy all services
       run: |
-        git clone https://github.com/openimsdk/open-im-server.git openim && export openim=$(pwd)/openim && cd $openim
+        git clone https://github.com/openimsdk/open-im-server.git
+        cd open-im-server
         sudo make init
         sudo docker compose up -d
         sudo sleep 30
@@ -67,7 +68,7 @@ jobs:
     - name: start all services
       run: |
         sudo cp ./config/config.yaml.template ./config/config.yaml
-        sudo ./scripts/start_all.sh
+        sudo make start
       shell: bash
 
     - name: Check all services
