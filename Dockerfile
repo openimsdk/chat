@@ -40,6 +40,8 @@ FROM ghcr.io/openim-sigs/openim-ubuntu-image:latest
 
 WORKDIR ${CHAT_WORKDIR}
 
-COPY --from=builder $OPENIM_CHAT_BINDIR/platforms /openim/openim-chat/_output/bin/platforms
+COPY --from=builder ${OPENIM_CHAT_BINDIR} /openim/openim-chat/_output/bin
+COPY --from=builder ${CHAT_WORKDIR}/config /openim/openim-chat/config
+COPY --from=builder ${CHAT_WORKDIR}/scripts /openim/openim-chat/scripts
 
 CMD ["/openim/openim-chat/scripts/docker_start_all.sh"]
