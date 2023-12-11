@@ -50,23 +50,12 @@ jobs:
     - name: deploy all services
       run: |
         git clone https://github.com/openimsdk/open-im-server.git openim && export openim=$(pwd)/openim && cd $openim
-        curl -o docker-compose.yaml https://gist.githubusercontent.com/cubxxw/b1d5cbd2edfa23fee911118aa3e8249e/raw/openim-chat.sh
+        sudo make init
         sudo docker compose up -d
         sudo sleep 30
-        sudo chmod +x ./scripts/stop_all.sh
-        sudo ./scripts/stop_all.sh
 
-        sudo cat logs/openIM.log 2>/dev/null
-        sudo chmod +x ./scripts/build_all_service.sh
-        sudo ./scripts/build_all_service.sh
-
-        sudo cat logs/openIM.log 2>/dev/null
-        sudo chmod +x ./scripts/start_all.sh
-        sudo ./scripts/start_all.sh
-
-        sudo cat logs/openIM.log 2>/dev/null
-        sudo chmod +x ./scripts/check_all.sh
-        sudo ./scripts/check_all.sh
+        sudo make start
+        sudo make check
 
         sudo cat logs/openIM.log 2>/dev/null
         echo "pwd = $(pwd)"
@@ -83,8 +72,7 @@ jobs:
 
     - name: Check all services
       run: |
-        sleep 60;
-        make check
+        sudo make check
       shell: bash
 
     - name: Print openIM.log
