@@ -65,6 +65,17 @@ jobs:
       shell: bash
       continue-on-error: true
 
+    - name: start mysql
+      run: |
+        docker run -d \
+          --name mysql4 \
+          -p 13306:3306 \
+          -p 3306:33060 \
+          -v "$(pwd)/components/mysql/data:/var/lib/mysql" \
+          -v "/etc/localtime:/etc/localtime" \
+          -e MYSQL_ROOT_PASSWORD="openIM123" \
+          --restart always \
+          mysql:5.7
     - name: start all services
       run: |
         sudo cp ./config/config.yaml.template ./config/config.yaml
@@ -75,6 +86,14 @@ jobs:
       run: |
         sudo make check
       shell: bash
+
+    - name: Stop chat
+      run: |
+        sudo make stop
+
+    - name: Reinstall chat
+      run: |
+        sudo make install
 
     - name: Print openIM.log
       run: |
