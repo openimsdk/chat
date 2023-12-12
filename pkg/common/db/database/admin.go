@@ -33,6 +33,10 @@ type AdminDatabaseInterface interface {
 	GetAdmin(ctx context.Context, account string) (*table.Admin, error)
 	GetAdminUserID(ctx context.Context, userID string) (*table.Admin, error)
 	UpdateAdmin(ctx context.Context, userID string, update map[string]any) error
+	ChangePassword(ctx context.Context, userID string, newPassword string) error
+	AddAdminAccount(ctx context.Context, admin *table.Admin) error
+	DelAdminAccount(ctx context.Context, userIDs []string) error
+	SearchAdminAccount(ctx context.Context, keyword string, page, size int32) (uint32, []*table.Admin, error)
 	CreateApplet(ctx context.Context, applets ...*table.Applet) error
 	DelApplet(ctx context.Context, appletIDs []string) error
 	GetApplet(ctx context.Context, appletID string) (*table.Applet, error)
@@ -119,6 +123,21 @@ func (o *AdminDatabase) GetAdminUserID(ctx context.Context, userID string) (*tab
 
 func (o *AdminDatabase) UpdateAdmin(ctx context.Context, userID string, update map[string]any) error {
 	return o.admin.Update(ctx, userID, update)
+}
+
+func (o *AdminDatabase) ChangePassword(ctx context.Context, userID string, newPassword string) error {
+	return o.admin.ChangePassword(ctx, userID, newPassword)
+}
+func (o *AdminDatabase) AddAdminAccount(ctx context.Context, admin *table.Admin) error {
+	return o.admin.Create(ctx, admin)
+}
+
+func (o *AdminDatabase) DelAdminAccount(ctx context.Context, userIDs []string) error {
+	return o.admin.Delete(ctx, userIDs)
+}
+
+func (o *AdminDatabase) SearchAdminAccount(ctx context.Context, keyword string, page, size int32) (uint32, []*table.Admin, error) {
+	return o.admin.Search(ctx, keyword, page, size)
 }
 
 func (o *AdminDatabase) CreateApplet(ctx context.Context, applets ...*table.Applet) error {

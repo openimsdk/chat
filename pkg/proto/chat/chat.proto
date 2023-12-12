@@ -130,6 +130,16 @@ message RegisterUserResp {
   string chatToken = 3;
 }
 
+message AddUserAccountReq{
+  string ip=1;
+  string deviceID=2;
+  int32 platform=3;
+  RegisterUserInfo user=4;
+}
+
+message AddUserAccountResp{
+}
+
 message LoginReq {
   string areaCode = 1;
   string phoneNumber = 2;
@@ -304,6 +314,7 @@ message SearchUserInfoResp {
 service chat {
   //编辑个人资料 自己或者管理员调用
   rpc UpdateUserInfo(UpdateUserInfoReq) returns(UpdateUserInfoResp);
+  rpc AddUserAccount(AddUserAccountReq) returns(AddUserAccountResp);
   //获取用户的公开信息   陌生人调用
   rpc SearchUserPublicInfo(SearchUserPublicInfoReq) returns(SearchUserPublicInfoResp);
   rpc FindUserPublicInfo(FindUserPublicInfoReq) returns(FindUserPublicInfoResp);

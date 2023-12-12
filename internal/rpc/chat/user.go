@@ -16,6 +16,11 @@ package chat
 
 import (
 	"context"
+	chat2 "github.com/OpenIMSDK/chat/pkg/common/db/table/chat"
+	constant2 "github.com/OpenIMSDK/protocol/constant"
+	"github.com/OpenIMSDK/tools/mcontext"
+	"strconv"
+	"time"
 
 	"github.com/OpenIMSDK/chat/pkg/common/constant"
 	"github.com/OpenIMSDK/chat/pkg/common/mctx"
@@ -111,6 +116,87 @@ func (o *chatSvr) FindUserPublicInfo(ctx context.Context, req *chat.FindUserPubl
 	return &chat.FindUserPublicInfoResp{
 		Users: DbToPbAttributes(attributes),
 	}, nil
+}
+
+func (o *chatSvr) AddUserAccount(ctx context.Context, req *chat.AddUserAccountReq) (*chat.AddUserAccountResp, error) {
+	if _, _, err := mctx.Check(ctx); err != nil {
+		return nil, err
+	}
+
+	if req.User.PhoneNumber != "" {
+		if req.User.AreaCode[0] != '+' {
+			req.User.AreaCode = "+" + req.User.AreaCode
+		}
+		if _, err := strconv.ParseUint(req.User.AreaCode[1:], 10, 64); err != nil {
+			return nil, errs.ErrArgs.Wrap("area code must be number")
+		}
+		if _, err := strconv.ParseUint(req.User.PhoneNumber, 10, 64); err != nil {
+			return nil, errs.ErrArgs.Wrap("phone number must be number")
+		}
+		_, err := o.Database.TakeAttributeByPhone(ctx, req.User.AreaCode, req.User.PhoneNumber)
+		if err == nil {
+			return nil, eerrs.ErrPhoneAlreadyRegister.Wrap()
+		} else if !o.Database.IsNotFound(err) {
+			return nil, err
+		}
+	}
+
+	if req.User.Account != "" {
+		_, err := o.Database.TakeAttributeByAccount(ctx, req.User.Account)
+		if err == nil {
+			return nil, eerrs.ErrAccountAlreadyRegister.Wrap()
+		} else if !o.Database.IsNotFound(err) {
+			return nil, err
+		}
+	}
+
+	if req.User.Email != "" {
+		_, err := o.Database.TakeAttributeByEmail(ctx, req.User.Email)
+		if err == nil {
+			return nil, eerrs.ErrEmailAlreadyRegister.Wrap()
+		} else if !o.Database.IsNotFound(err) {
+			return nil, err
+		}
+	}
+
+	register := &chat2.Register{
+		UserID:      req.User.UserID,
+		DeviceID:    req.DeviceID,
+		IP:          req.Ip,
+		Platform:    constant2.PlatformID2Name[int(req.Platform)],
+		AccountType: "",
+		Mode:        constant.UserMode,
+		CreateTime:  time.Now(),
+	}
+	account := &chat2.Account{
+		UserID:         req.User.UserID,
+		Password:       req.User.Password,
+		OperatorUserID: mcontext.GetOpUserID(ctx),
+		ChangeTime:     register.CreateTime,
+		CreateTime:     register.CreateTime,
+	}
+	attribute := &chat2.Attribute{
+		UserID:         req.User.UserID,
+		Account:        req.User.Account,
+		PhoneNumber:    req.User.PhoneNumber,
+		AreaCode:       req.User.AreaCode,
+		Email:          req.User.Email,
+		Nickname:       req.User.Nickname,
+		FaceURL:        req.User.FaceURL,
+		Gender:         req.User.Gender,
+		BirthTime:      time.UnixMilli(req.User.Birth),
+		ChangeTime:     register.CreateTime,
+		CreateTime:     register.CreateTime,
+		AllowVibration: constant.DefaultAllowVibration,
+		AllowBeep:      constant.DefaultAllowBeep,
+		AllowAddFriend: constant.DefaultAllowAddFriend,
+	}
+
+	if err := o.Database.RegisterUser(ctx, register, account, attribute); err != nil {
+		return nil, err
+	}
+
+	return &chat.AddUserAccountResp{}, nil
 }
 
 func (o *chatSvr) SearchUserPublicInfo(ctx context.Context, req *chat.SearchUserPublicInfoReq) (*chat.SearchUserPublicInfoResp, error) {

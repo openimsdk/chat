@@ -110,3 +110,7 @@ func (o *ChatClient) UpdateUser(ctx context.Context, req *chat.UpdateUserInfoReq
 	_, err := o.client.UpdateUserInfo(ctx, req)
 	return err
 }
+
+func (o *ChatClient) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) error {
+	return nil
+}

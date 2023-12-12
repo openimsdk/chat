@@ -310,3 +310,13 @@ func (x *SearchUserInfoReq) Check() error {
 	}
 	return nil
 }
+
+func (x *AddUserAccountReq) Check() error {
+	if x.User.Email == "" {
+		if (x.User.AreaCode == "" && x.User.PhoneNumber != "") || (x.User.AreaCode != "" && x.User.PhoneNumber == "") {
+			return errs.ErrArgs.Wrap("area code or phone number error, no email provide")
+		}
+	}
+
+	return nil
+}

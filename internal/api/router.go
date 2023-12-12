@@ -72,9 +72,14 @@ func NewAdminRoute(router gin.IRouter, discov discoveryregistry.SvcDiscoveryRegi
 	mw := NewMW(adminConn)
 	admin := NewAdmin(chatConn, adminConn)
 	adminRouterGroup := router.Group("/account")
-	adminRouterGroup.POST("/login", admin.AdminLogin)                      // 登录
-	adminRouterGroup.POST("/update", mw.CheckAdmin, admin.AdminUpdateInfo) // 修改信息
-	adminRouterGroup.POST("/info", mw.CheckAdmin, admin.AdminInfo)         // 获取信息
+	adminRouterGroup.POST("/login", admin.AdminLogin)                                   // 登录
+	adminRouterGroup.POST("/update", mw.CheckAdmin, admin.AdminUpdateInfo)              // 修改信息
+	adminRouterGroup.POST("/info", mw.CheckAdmin, admin.AdminInfo)                      // 获取信息
+	adminRouterGroup.POST("/change_password", mw.CheckAdmin, admin.ChangeAdminPassword) // 修改管理员账号的密码
+	adminRouterGroup.POST("/add_admin", mw.CheckAdmin, admin.AddAdminAccount)           // 添加管理员账号
+	adminRouterGroup.POST("/add_user", mw.CheckAdmin, admin.AddUserAccount)             // 添加用户账号
+	adminRouterGroup.POST("/del_admin", mw.CheckAdmin, admin.DelAdminAccount)
+	adminRouterGroup.POST("/search", mw.CheckAdmin, admin.SearchAdminAccount)
 
 	defaultRouter := router.Group("/default", mw.CheckAdmin)
 	defaultUserRouter := defaultRouter.Group("/user")

@@ -18,8 +18,8 @@ import (
 	"context"
 	"crypto/md5"
 	"encoding/hex"
+	"github.com/OpenIMSDK/tools/ormutil"
 	"time"
-
 
 	"github.com/OpenIMSDK/tools/log"
 
@@ -51,6 +51,22 @@ func (o *Admin) TakeUserID(ctx context.Context, userID string) (*admin.Admin, er
 
 func (o *Admin) Update(ctx context.Context, account string, update map[string]any) error {
 	return errs.Wrap(o.db.WithContext(ctx).Model(&admin.Admin{}).Where("user_id = ?", account).Updates(update).Error)
+}
+
+func (o *Admin) Create(ctx context.Context, admin *admin.Admin) error {
+	return errs.Wrap(o.db.WithContext(ctx).Create(&admin).Error)
+}
+
+func (o *Admin) ChangePassword(ctx context.Context, userID string, newPassword string) error {
+	return errs.Wrap(o.db.WithContext(ctx).Model(&admin.Admin{}).Where("account=?", userID).Update("password", newPassword).Error)
+}
+
+func (o *Admin) Delete(ctx context.Context, userIDs []string) error {
+	return errs.Wrap(o.db.WithContext(ctx).Where("user_id in ?", userIDs).Delete(&admin.Admin{}).Error)
+}
+
+func (o *Admin) Search(ctx context.Context, keyword string, page, size int32) (uint32, []*admin.Admin, error) {
+	return ormutil.GormSearch[admin.Admin](o.db.WithContext(ctx), []string{}, keyword, page, size)
 }
 
 func (o *Admin) InitAdmin(ctx context.Context) error {

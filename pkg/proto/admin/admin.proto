@@ -34,6 +34,16 @@ message LoginResp {
   string adminUserID = 6;
 }
 
+message AddAdminAccountReq{
+  string account=1;
+  string password=2;
+  string faceURL=3;
+  string nickname=4;
+}
+
+message AddAdminAccountResp{
+}
+
 message AdminUpdateInfoReq {
   OpenIMServer.protobuf.StringValue account = 1;
   OpenIMServer.protobuf.StringValue password = 2;
@@ -56,6 +66,32 @@ message ChangePasswordResp  {}
 
 
 message GetAdminInfoReq {
+}
+
+message ChangeAdminPasswordReq{
+    string userID = 1;
+    string currentPassword = 2;
+    string newPassword = 3;
+}
+
+message ChangeAdminPasswordResp{
+}
+
+message DelAdminAccountReq{
+  repeated string userIDs=1;
+}
+
+message DelAdminAccountResp{
+}
+
+message SearchAdminAccountReq{
+  string keyword = 1;
+  OpenIMServer.sdkws.RequestPagination pagination = 2;
+}
+
+message SearchAdminAccountResp{
+  uint32 total = 1;
+  repeated  GetAdminInfoResp adminAccounts= 2;
 }
 
 message GetAdminInfoResp {
@@ -477,6 +513,10 @@ service admin {
   rpc AdminUpdateInfo(AdminUpdateInfoReq)returns(AdminUpdateInfoResp);
   // 获取管理员信息
   rpc GetAdminInfo(GetAdminInfoReq) returns(GetAdminInfoResp);
+  rpc AddAdminAccount(AddAdminAccountReq)returns(AddAdminAccountResp);
+  rpc ChangeAdminPassword(ChangeAdminPasswordReq)returns(ChangeAdminPasswordResp);
+  rpc DelAdminAccount(DelAdminAccountReq)returns(DelAdminAccountResp);
+  rpc SearchAdminAccount(SearchAdminAccountReq)returns(SearchAdminAccountResp);
 
   //添加 移除 获取  注册时默认好友列表
   rpc AddDefaultFriend(AddDefaultFriendReq) returns(AddDefaultFriendResp);
