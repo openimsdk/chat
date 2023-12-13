@@ -306,6 +306,10 @@ stop:
 .PHONY: restart
 restart: clean stop build start check
 
+## install: install openim chat
+.PHONY: install
+install: restart
+
 ## image.build.%: Build docker image for a specific platform
 .PHONY: image.build.%
 image.build.%: go.build.%
