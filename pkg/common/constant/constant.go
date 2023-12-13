@@ -58,6 +58,7 @@ const (
 // user level.
 const (
 	OrdinaryUserLevel = 1
+	NormalAdmin       = 80
 	AdvancedUserLevel = 100
 )
 

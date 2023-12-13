@@ -41,6 +41,6 @@ type AdminInterface interface {
 	Update(ctx context.Context, account string, update map[string]any) error
 	ChangePassword(ctx context.Context, userID string, newPassword string) error
 	Delete(ctx context.Context, userIDs []string) error
-	Search(ctx context.Context, key string, page, size int32) (uint32, []*Admin, error)
+	Search(ctx context.Context, page, size int32) (uint32, []*Admin, error)
 	InitAdmin(ctx context.Context) error
 }

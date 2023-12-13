@@ -18,7 +18,7 @@ import (
 	"context"
 	"crypto/md5"
 	"encoding/hex"
-	"github.com/OpenIMSDK/tools/ormutil"
+	"github.com/OpenIMSDK/chat/pkg/common/constant"
 	"time"
 
 	"github.com/OpenIMSDK/tools/log"
@@ -58,15 +58,24 @@ func (o *Admin) Create(ctx context.Context, admin *admin.Admin) error {
 }
 
 func (o *Admin) ChangePassword(ctx context.Context, userID string, newPassword string) error {
-	return errs.Wrap(o.db.WithContext(ctx).Model(&admin.Admin{}).Where("account=?", userID).Update("password", newPassword).Error)
+	return errs.Wrap(o.db.WithContext(ctx).Model(&admin.Admin{}).Where("user_id=?", userID).Update("password", newPassword).Error)
 }
 
 func (o *Admin) Delete(ctx context.Context, userIDs []string) error {
 	return errs.Wrap(o.db.WithContext(ctx).Where("user_id in ?", userIDs).Delete(&admin.Admin{}).Error)
 }
 
-func (o *Admin) Search(ctx context.Context, keyword string, page, size int32) (uint32, []*admin.Admin, error) {
-	return ormutil.GormSearch[admin.Admin](o.db.WithContext(ctx), []string{}, keyword, page, size)
+func (o *Admin) Search(ctx context.Context, page, size int32) (uint32, []*admin.Admin, error) {
+	var count int64
+	var admins []*admin.Admin
+	if err := o.db.WithContext(ctx).Model(&admin.Admin{}).Where("level=?", constant.NormalAdmin).Count(&count).Error; err != nil {
+		return 0, nil, errs.Wrap(err)
+	}
+	offset := (page - 1) * size
+	if err := o.db.WithContext(ctx).Order("create_time desc").Offset(int(offset)).Where("level=?", constant.NormalAdmin).Limit(int(size)).Find(&admins).Error; err != nil {
+		return 0, nil, errs.Wrap(err)
+	}
+	return uint32(count), admins, nil
 }
 
 func (o *Admin) InitAdmin(ctx context.Context) error {

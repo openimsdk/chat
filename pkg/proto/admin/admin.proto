@@ -85,7 +85,6 @@ message DelAdminAccountResp{
 }
 
 message SearchAdminAccountReq{
-  string keyword = 1;
   OpenIMServer.sdkws.RequestPagination pagination = 2;
 }
 

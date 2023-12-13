@@ -18,11 +18,13 @@ import (
 	"context"
 	"crypto/md5"
 	"encoding/hex"
+	"fmt"
 	"github.com/OpenIMSDK/chat/pkg/common/db/cache"
 	"github.com/OpenIMSDK/tools/discoveryregistry"
 	"github.com/OpenIMSDK/tools/errs"
 	"github.com/OpenIMSDK/tools/log"
 	"github.com/OpenIMSDK/tools/mcontext"
+	"github.com/OpenIMSDK/tools/utils"
 	"google.golang.org/grpc"
 	"math/rand"
 	"time"
@@ -101,9 +103,13 @@ func (o *adminServer) GetAdminInfo(ctx context.Context, req *admin.GetAdminInfoR
 }
 
 func (o *adminServer) ChangeAdminPassword(ctx context.Context, req *admin.ChangeAdminPasswordReq) (*admin.ChangeAdminPasswordResp, error) {
-	_, err := o.Database.GetAdmin(ctx, req.UserID)
+	user, err := o.Database.GetAdminUserID(ctx, req.UserID)
 	if err != nil {
 		return nil, err
+	}
+
+	if user.Password != o.passwordEncryption(req.CurrentPassword) {
+		return nil, errs.ErrInternalServer.Wrap("password error")
 	}
 
 	if err := o.Database.ChangePassword(ctx, req.UserID, o.passwordEncryption(req.NewPassword)); err != nil {
@@ -113,21 +119,11 @@ func (o *adminServer) ChangeAdminPassword(ctx context.Context, req *admin.Change
 }
 
 func (o *adminServer) AddAdminAccount(ctx context.Context, req *admin.AddAdminAccountReq) (*admin.AddAdminAccountResp, error) {
-	userID, err := mctx.CheckAdmin(ctx)
-	if err != nil {
+	if err := o.CheckSuperAdmin(ctx); err != nil {
 		return nil, err
 	}
 
-	adminUser, err := o.Database.GetAdminUserID(ctx, userID)
-	if err != nil {
-		return nil, err
-	}
-
-	if adminUser.Level != constant.AdvancedUserLevel {
-		return nil, errs.ErrNoPermission.Wrap()
-	}
-
-	_, err = o.Database.GetAdmin(ctx, req.Account)
+	_, err := o.Database.GetAdmin(ctx, req.Account)
 	if err == nil {
 		return nil, errs.ErrRegisteredAlready.Wrap("the account is registered")
 	}
@@ -148,6 +144,25 @@ func (o *adminServer) AddAdminAccount(ctx context.Context, req *admin.AddAdminAc
 }
 
 func (o *adminServer) DelAdminAccount(ctx context.Context, req *admin.DelAdminAccountReq) (*admin.DelAdminAccountResp, error) {
+	if err := o.CheckSuperAdmin(ctx); err != nil {
+		return nil, err
+	}
+
+	if utils.Duplicate(req.UserIDs) {
+		return nil, errs.ErrArgs.Wrap("user ids is duplicate")
+	}
+
+	for _, userID := range req.UserIDs {
+		superAdmin, err := o.Database.GetAdminUserID(ctx, userID)
+		if err != nil {
+			return nil, err
+		}
+		if superAdmin.Level == constant.AdvancedUserLevel {
+			str := fmt.Sprintf("%s is superAdminID", userID)
+			return nil, errs.ErrNoPermission.Wrap(str)
+		}
+	}
+
 	if err := o.Database.DelAdminAccount(ctx, req.UserIDs); err != nil {
 		return nil, err
 	}
@@ -156,20 +171,19 @@ func (o *adminServer) DelAdminAccount(ctx context.Context, req *admin.DelAdminAc
 
 func (o *adminServer) SearchAdminAccount(ctx context.Context, req *admin.SearchAdminAccountReq) (*admin.SearchAdminAccountResp, error) {
 	defer log.ZDebug(ctx, "return")
-	if _, err := mctx.CheckAdmin(ctx); err != nil {
+
+	if err := o.CheckSuperAdmin(ctx); err != nil {
 		return nil, err
 	}
-	var resp *admin.SearchAdminAccountResp
-	total, adminAccounts, err := o.Database.SearchAdminAccount(ctx, req.Keyword, req.Pagination.ShowNumber, req.Pagination.PageNumber)
+
+	total, adminAccounts, err := o.Database.SearchAdminAccount(ctx, req.Pagination.PageNumber, req.Pagination.ShowNumber)
 	if err != nil {
 		return nil, err
 	}
-	resp.Total = total
-	accounts := make([]*admin.GetAdminInfoResp, len(adminAccounts))
+	accounts := make([]*admin.GetAdminInfoResp, 0, len(adminAccounts))
 	for _, v := range adminAccounts {
 		temp := &admin.GetAdminInfoResp{
 			Account:    v.Account,
-			Password:   v.Password,
 			FaceURL:    v.FaceURL,
 			Nickname:   v.Nickname,
 			UserID:     v.UserID,
@@ -178,8 +192,7 @@ func (o *adminServer) SearchAdminAccount(ctx context.Context, req *admin.SearchA
 		}
 		accounts = append(accounts, temp)
 	}
-	resp.AdminAccounts = accounts
-	return resp, nil
+	return &admin.SearchAdminAccountResp{Total: total, AdminAccounts: accounts}, nil
 }
 
 func (o *adminServer) AdminUpdateInfo(ctx context.Context, req *admin.AdminUpdateInfoReq) (*admin.AdminUpdateInfoResp, error) {
@@ -220,7 +233,7 @@ func (o *adminServer) Login(ctx context.Context, req *admin.LoginReq) (*admin.Lo
 		}
 		return nil, err
 	}
-	if a.Password != req.Password {
+	if a.Password != o.passwordEncryption(req.Password) {
 		return nil, eerrs.ErrPassword.Wrap()
 	}
 	adminToken, err := o.CreateToken(ctx, &admin.CreateTokenReq{UserID: a.UserID, UserType: constant.AdminUser})
@@ -274,4 +287,21 @@ func (o *adminServer) genUserID() string {
 func (o *adminServer) passwordEncryption(password string) string {
 	paswd := md5.Sum([]byte(password))
 	return hex.EncodeToString(paswd[:])
+}
+
+func (o *adminServer) CheckSuperAdmin(ctx context.Context) error {
+	userID, err := mctx.CheckAdmin(ctx)
+	if err != nil {
+		return err
+	}
+
+	adminUser, err := o.Database.GetAdminUserID(ctx, userID)
+	if err != nil {
+		return err
+	}
+
+	if adminUser.Level != constant.AdvancedUserLevel {
+		return errs.ErrNoPermission.Wrap()
+	}
+	return nil
 }

@@ -16,6 +16,7 @@ package chat
 
 import (
 	"context"
+	"github.com/OpenIMSDK/chat/pkg/common/db/dbutil"
 	chat2 "github.com/OpenIMSDK/chat/pkg/common/db/table/chat"
 	constant2 "github.com/OpenIMSDK/protocol/constant"
 	"github.com/OpenIMSDK/tools/mcontext"
@@ -141,21 +142,30 @@ func (o *chatSvr) AddUserAccount(ctx context.Context, req *chat.AddUserAccountRe
 		}
 	}
 
-	if req.User.Account != "" {
-		_, err := o.Database.TakeAttributeByAccount(ctx, req.User.Account)
-		if err == nil {
-			return nil, eerrs.ErrAccountAlreadyRegister.Wrap()
-		} else if !o.Database.IsNotFound(err) {
-			return nil, err
-		}
-	}
-
 	if req.User.Email != "" {
 		_, err := o.Database.TakeAttributeByEmail(ctx, req.User.Email)
 		if err == nil {
 			return nil, eerrs.ErrEmailAlreadyRegister.Wrap()
 		} else if !o.Database.IsNotFound(err) {
 			return nil, err
+		}
+	}
+
+	if req.User.UserID == "" {
+		for i := 0; i < 20; i++ {
+			userID := o.genUserID()
+			_, err := o.Database.GetUser(ctx, userID)
+			if err == nil {
+				continue
+			} else if dbutil.IsGormNotFound(err) {
+				req.User.UserID = userID
+				break
+			} else {
+				return nil, err
+			}
+		}
+		if req.User.UserID == "" {
+			return nil, errs.ErrInternalServer.Wrap("gen user id failed")
 		}
 	}
 
