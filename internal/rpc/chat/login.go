@@ -92,11 +92,20 @@ func (o *chatSvr) SendVerifyCode(ctx context.Context, req *chat.SendVerifyCodeRe
 			}
 		}
 	case constant.VerificationCodeForLogin, constant.VerificationCodeForResetPassword:
-		_, err := o.Database.TakeAttributeByPhone(ctx, req.AreaCode, req.PhoneNumber)
-		if o.Database.IsNotFound(err) {
-			return nil, errs.ErrArgs.Wrap("phone unregistered")
-		} else if err != nil {
-			return nil, err
+		if req.Email == "" {
+			_, err := o.Database.TakeAttributeByPhone(ctx, req.AreaCode, req.PhoneNumber)
+			if o.Database.IsNotFound(err) {
+				return nil, errs.ErrArgs.Wrap("phone unregistered")
+			} else if err != nil {
+				return nil, err
+			}
+		} else {
+			_, err := o.Database.TakeAttributeByEmail(ctx, req.Email)
+			if o.Database.IsNotFound(err) {
+				return nil, errs.ErrArgs.Wrap("email unregistered")
+			} else if err != nil {
+				return nil, err
+			}
 		}
 	default:
 		return nil, errs.ErrArgs.Wrap("used unknown")
@@ -205,6 +214,7 @@ func (o *chatSvr) VerifyCode(ctx context.Context, req *chat.VerifyCodeReq) (*cha
 		account = o.verifyCodeJoin(req.AreaCode, req.PhoneNumber)
 	} else {
 		account = req.Email
+
 	}
 	if _, err := o.verifyCode(ctx, account, req.VerifyCode); err != nil {
 		return nil, err
