@@ -285,9 +285,16 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 				return nil, err
 			}
 		}
-		if _, err := o.verifyCode(ctx, o.verifyCodeJoin(req.User.AreaCode, req.User.PhoneNumber), req.VerifyCode); err != nil {
-			return nil, err
+		if req.User.Email == "" {
+			if _, err := o.verifyCode(ctx, o.verifyCodeJoin(req.User.AreaCode, req.User.PhoneNumber), req.VerifyCode); err != nil {
+				return nil, err
+			}
+		} else {
+			if _, err := o.verifyCode(ctx, req.User.Email, req.VerifyCode); err != nil {
+				return nil, err
+			}
 		}
+
 	}
 	log.ZDebug(ctx, "usedInvitationCode", usedInvitationCode)
 	if req.User.UserID == "" {
