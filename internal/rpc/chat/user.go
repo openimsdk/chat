@@ -127,6 +127,24 @@ func (o *chatSvr) AddUserAccount(ctx context.Context, req *chat.AddUserAccountRe
 		return nil, err
 	}
 
+	if req.User.UserID == "" {
+		for i := 0; i < 20; i++ {
+			userID := o.genUserID()
+			_, err := o.Database.GetUser(ctx, userID)
+			if err == nil {
+				continue
+			} else if dbutil.IsGormNotFound(err) {
+				req.User.UserID = userID
+				break
+			} else {
+				return nil, err
+			}
+		}
+		if req.User.UserID == "" {
+			return nil, errs.ErrInternalServer.Wrap("gen user id failed")
+		}
+	}
+
 	register := &chat2.Register{
 		UserID:      req.User.UserID,
 		DeviceID:    req.DeviceID,
@@ -277,24 +295,6 @@ func (o *chatSvr) checkTheUniqueness(ctx context.Context, req *chat.AddUserAccou
 			return eerrs.ErrEmailAlreadyRegister.Wrap()
 		} else if !o.Database.IsNotFound(err) {
 			return err
-		}
-	}
-
-	if req.User.UserID == "" {
-		for i := 0; i < 20; i++ {
-			userID := o.genUserID()
-			_, err := o.Database.GetUser(ctx, userID)
-			if err == nil {
-				continue
-			} else if dbutil.IsGormNotFound(err) {
-				req.User.UserID = userID
-				break
-			} else {
-				return err
-			}
-		}
-		if req.User.UserID == "" {
-			return errs.ErrInternalServer.Wrap("gen user id failed")
 		}
 	}
 	return nil
