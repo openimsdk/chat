@@ -312,13 +312,13 @@ message SearchUserInfoResp {
 }
 
 service chat {
-  //编辑个人资料 自己或者管理员调用
+  // Edit personal information - called by the user or an administrator
   rpc UpdateUserInfo(UpdateUserInfoReq) returns(UpdateUserInfoResp);
   rpc AddUserAccount(AddUserAccountReq) returns(AddUserAccountResp);
-  //获取用户的公开信息   陌生人调用
+  // Get user's public information - called by strangers
   rpc SearchUserPublicInfo(SearchUserPublicInfoReq) returns(SearchUserPublicInfoResp);
   rpc FindUserPublicInfo(FindUserPublicInfoReq) returns(FindUserPublicInfoResp);
-  //搜索用户信息 管理员调用 其他用户调用时返回public字段
+  // Search user information - called by administrators, other users get public fields
   rpc SearchUserFullInfo(SearchUserFullInfoReq) returns(SearchUserFullInfoResp);
   rpc FindUserFullInfo(FindUserFullInfoReq) returns(FindUserFullInfoResp);
 
@@ -337,12 +337,11 @@ service chat {
 
   rpc OpenIMCallback(OpenIMCallbackReq) returns(OpenIMCallbackResp);
 
-  //统计
+  // Statistics
   rpc UserLoginCount(UserLoginCountReq) returns (UserLoginCountResp);
-  //日志
+  // Logs
   rpc UploadLogs(UploadLogsReq) returns (UploadLogsResp);
   rpc DeleteLogs(DeleteLogsReq) returns (DeleteLogsResp);
   rpc SearchLogs(SearchLogsReq) returns (SearchLogsResp);
 
-  rpc SearchUserInfo(SearchUserInfoReq)returns(SearchUserInfoResp);
 }

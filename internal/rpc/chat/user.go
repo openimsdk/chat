@@ -20,7 +20,6 @@ import (
 	chat2 "github.com/OpenIMSDK/chat/pkg/common/db/table/chat"
 	constant2 "github.com/OpenIMSDK/protocol/constant"
 	"github.com/OpenIMSDK/tools/mcontext"
-	"strconv"
 	"time"
 
 	"github.com/OpenIMSDK/chat/pkg/common/constant"
@@ -124,49 +123,8 @@ func (o *chatSvr) AddUserAccount(ctx context.Context, req *chat.AddUserAccountRe
 		return nil, err
 	}
 
-	if req.User.PhoneNumber != "" {
-		if req.User.AreaCode[0] != '+' {
-			req.User.AreaCode = "+" + req.User.AreaCode
-		}
-		if _, err := strconv.ParseUint(req.User.AreaCode[1:], 10, 64); err != nil {
-			return nil, errs.ErrArgs.Wrap("area code must be number")
-		}
-		if _, err := strconv.ParseUint(req.User.PhoneNumber, 10, 64); err != nil {
-			return nil, errs.ErrArgs.Wrap("phone number must be number")
-		}
-		_, err := o.Database.TakeAttributeByPhone(ctx, req.User.AreaCode, req.User.PhoneNumber)
-		if err == nil {
-			return nil, eerrs.ErrPhoneAlreadyRegister.Wrap()
-		} else if !o.Database.IsNotFound(err) {
-			return nil, err
-		}
-	}
-
-	if req.User.Email != "" {
-		_, err := o.Database.TakeAttributeByEmail(ctx, req.User.Email)
-		if err == nil {
-			return nil, eerrs.ErrEmailAlreadyRegister.Wrap()
-		} else if !o.Database.IsNotFound(err) {
-			return nil, err
-		}
-	}
-
-	if req.User.UserID == "" {
-		for i := 0; i < 20; i++ {
-			userID := o.genUserID()
-			_, err := o.Database.GetUser(ctx, userID)
-			if err == nil {
-				continue
-			} else if dbutil.IsGormNotFound(err) {
-				req.User.UserID = userID
-				break
-			} else {
-				return nil, err
-			}
-		}
-		if req.User.UserID == "" {
-			return nil, errs.ErrInternalServer.Wrap("gen user id failed")
-		}
+	if err := o.checkTheUniqueness(ctx, req); err != nil {
+		return nil, err
 	}
 
 	register := &chat2.Register{
@@ -303,4 +261,41 @@ func (o *chatSvr) SearchUserInfo(ctx context.Context, req *chat.SearchUserInfoRe
 		Total: total,
 		Users: DbToPbUserFullInfos(list),
 	}, nil
+}
+
+func (o *chatSvr) checkTheUniqueness(ctx context.Context, req *chat.AddUserAccountReq) error {
+	if req.User.PhoneNumber != "" {
+		_, err := o.Database.TakeAttributeByPhone(ctx, req.User.AreaCode, req.User.PhoneNumber)
+		if err == nil {
+			return eerrs.ErrPhoneAlreadyRegister.Wrap()
+		} else if !o.Database.IsNotFound(err) {
+			return err
+		}
+	} else {
+		_, err := o.Database.TakeAttributeByEmail(ctx, req.User.Email)
+		if err == nil {
+			return eerrs.ErrEmailAlreadyRegister.Wrap()
+		} else if !o.Database.IsNotFound(err) {
+			return err
+		}
+	}
+
+	if req.User.UserID == "" {
+		for i := 0; i < 20; i++ {
+			userID := o.genUserID()
+			_, err := o.Database.GetUser(ctx, userID)
+			if err == nil {
+				continue
+			} else if dbutil.IsGormNotFound(err) {
+				req.User.UserID = userID
+				break
+			} else {
+				return err
+			}
+		}
+		if req.User.UserID == "" {
+			return errs.ErrInternalServer.Wrap("gen user id failed")
+		}
+	}
+	return nil
 }
