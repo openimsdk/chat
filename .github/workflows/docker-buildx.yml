@@ -68,7 +68,7 @@ jobs:
 
       - name: Extract metadata (tags, labels) for Docker chat-api-admin
         id: meta1
-        uses: docker/metadata-action@v4.6.0
+        uses: docker/metadata-action@v5.3.0
         with:
           images: |
             ghcr.io/openimsdk/chat-api-admin
@@ -76,7 +76,7 @@ jobs:
             registry.cn-hangzhou.aliyuncs.com/openimsdk/chat-api-admin
 
       - name: Build and push Docker image for chat-api-admin
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v5
         with:
           context: .
           file: ./build/images/api-admin/Dockerfile
@@ -87,7 +87,7 @@ jobs:
 
       - name: Extract metadata (tags, labels) for Docker chat-api-chat
         id: meta2
-        uses: docker/metadata-action@v4.6.0
+        uses: docker/metadata-action@v5.3.0
         with:
           images: |
             ghcr.io/openimsdk/chat-api-chat
@@ -95,7 +95,7 @@ jobs:
             registry.cn-hangzhou.aliyuncs.com/openimsdk/chat-api-chat
 
       - name: Build and push Docker image for chat-api-chat
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v5
         with:
           context: .
           file: ./build/images/api-chat/Dockerfile
@@ -106,7 +106,7 @@ jobs:
 
       - name: Extract metadata (tags, labels) for Docker chat-rpc-admin
         id: meta3
-        uses: docker/metadata-action@v4.6.0
+        uses: docker/metadata-action@v5.3.0
         with:
           images: |
             ghcr.io/openimsdk/chat-rpc-admin
@@ -114,7 +114,7 @@ jobs:
             registry.cn-hangzhou.aliyuncs.com/openimsdk/chat-rpc-admin
 
       - name: Build and push Docker image for chat-rpc-admin
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v5
         with:
           context: .
           file: ./build/images/rpc-admin/Dockerfile
@@ -125,7 +125,7 @@ jobs:
 
       - name: Extract metadata (tags, labels) for Docker chat-rpc-chat
         id: meta4
-        uses: docker/metadata-action@v4.6.0
+        uses: docker/metadata-action@v5.3.0
         with:
           images: |
             ghcr.io/openimsdk/chat-rpc-chat
@@ -133,7 +133,7 @@ jobs:
             registry.cn-hangzhou.aliyuncs.com/openimsdk/chat-rpc-chat
 
       - name: Build and push Docker image for chat-rpc-chat
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v5
         with:
           context: .
           file: ./build/images/rpc-chat/Dockerfile
