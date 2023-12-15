@@ -371,3 +371,4 @@ dist
 .note.md
 
 # config files, may contain sensitive informatio
+config/config.yaml

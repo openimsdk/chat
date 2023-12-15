@@ -115,6 +115,26 @@ func (o *AdminApi) AdminInfo(c *gin.Context) {
 	a2r.Call(admin.AdminClient.GetAdminInfo, o.adminClient, c)
 }
 
+func (o *AdminApi) ChangeAdminPassword(c *gin.Context) {
+	a2r.Call(admin.AdminClient.ChangeAdminPassword, o.adminClient, c)
+}
+
+func (o *AdminApi) AddAdminAccount(c *gin.Context) {
+	a2r.Call(admin.AdminClient.AddAdminAccount, o.adminClient, c)
+}
+
+func (o *AdminApi) AddUserAccount(c *gin.Context) {
+	a2r.Call(chat.ChatClient.AddUserAccount, o.chatClient, c)
+}
+
+func (o *AdminApi) DelAdminAccount(c *gin.Context) {
+	a2r.Call(admin.AdminClient.DelAdminAccount, o.adminClient, c)
+}
+
+func (o *AdminApi) SearchAdminAccount(c *gin.Context) {
+	a2r.Call(admin.AdminClient.SearchAdminAccount, o.adminClient, c)
+}
+
 func (o *AdminApi) AddDefaultFriend(c *gin.Context) {
 	a2r.Call(admin.AdminClient.AddDefaultFriend, o.adminClient, c)
 }
