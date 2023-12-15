@@ -16,11 +16,12 @@ package main
 
 import (
 	"fmt"
-	"github.com/OpenIMSDK/chat/pkg/discovery_register"
 	"math/rand"
 	"net"
 	"strconv"
 	"time"
+
+	"github.com/OpenIMSDK/chat/pkg/discovery_register"
 
 	"github.com/OpenIMSDK/chat/tools/component"
 	"github.com/OpenIMSDK/tools/discoveryregistry"
