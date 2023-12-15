@@ -95,14 +95,14 @@ func (o *chatSvr) SendVerifyCode(ctx context.Context, req *chat.SendVerifyCodeRe
 		if req.Email == "" {
 			_, err := o.Database.TakeAttributeByPhone(ctx, req.AreaCode, req.PhoneNumber)
 			if o.Database.IsNotFound(err) {
-				return nil, errs.ErrArgs.Wrap("phone unregistered")
+				return nil, errs.ErrRecordNotFound.Wrap("phone unregistered")
 			} else if err != nil {
 				return nil, err
 			}
 		} else {
 			_, err := o.Database.TakeAttributeByEmail(ctx, req.Email)
 			if o.Database.IsNotFound(err) {
-				return nil, errs.ErrArgs.Wrap("email unregistered")
+				return nil, errs.ErrRecordNotFound.Wrap("email unregistered")
 			} else if err != nil {
 				return nil, err
 			}
