@@ -100,8 +100,6 @@ var Config struct {
 			SmtpAddr                string `yaml:"smtpAddr"`
 			SmtpPort                int    `yaml:"smtpPort"`
 		} `yaml:"mail"`
-		TestDepartMentID string `yaml:"testDepartMentID"`
-		ImAPIURL         string `yaml:"imAPIURL"`
 	} `yaml:"verifyCode"`
 	ProxyHeader string  `yaml:"proxyHeader"`
 	AdminList   []Admin `yaml:"adminList"`
