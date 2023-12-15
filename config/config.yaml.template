@@ -109,5 +109,5 @@ openIMUrl: "http://127.0.0.1:10002" # OPENIM_SERVER_ADDRESS:API_OPENIM_PORT， U
 # Redis configuration - used for caching and session management
 redis:
   address: [ 127.0.0.1:16379 ] # REDIS_ADDRESS and REDIS_PORT, Redis server address and port
-  username: # REDIS_USERNAME, Username for Redis authentication
+  username: "" # REDIS_USERNAME, Username for Redis authentication
   password: openIM123 # REDIS_PASSWORD, Password for Redis
