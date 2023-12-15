@@ -346,4 +346,5 @@ service chat {
   rpc DeleteLogs(DeleteLogsReq) returns (DeleteLogsResp);
   rpc SearchLogs(SearchLogsReq) returns (SearchLogsResp);
 
+  rpc SearchUserInfo(SearchUserInfoReq)returns(SearchUserInfoResp);
 }

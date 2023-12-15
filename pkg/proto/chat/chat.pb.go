@@ -3509,7 +3509,7 @@ var file_chat_chat_proto_rawDesc = []byte{
 	0x05, 0x75, 0x73, 0x65, 0x72, 0x73, 0x18, 0x02, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x1f, 0x2e, 0x4f,
 	0x70, 0x65, 0x6e, 0x49, 0x4d, 0x43, 0x68, 0x61, 0x74, 0x2e, 0x63, 0x6f, 0x6d, 0x6d, 0x6f, 0x6e,
 	0x2e, 0x55, 0x73, 0x65, 0x72, 0x46, 0x75, 0x6c, 0x6c, 0x49, 0x6e, 0x66, 0x6f, 0x52, 0x05, 0x75,
-	0x73, 0x65, 0x72, 0x73, 0x32, 0xe8, 0x0e, 0x0a, 0x04, 0x63, 0x68, 0x61, 0x74, 0x12, 0x59, 0x0a,
+	0x73, 0x65, 0x72, 0x73, 0x32, 0xc3, 0x0f, 0x0a, 0x04, 0x63, 0x68, 0x61, 0x74, 0x12, 0x59, 0x0a,
 	0x0e, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x55, 0x73, 0x65, 0x72, 0x49, 0x6e, 0x66, 0x6f, 0x12,
 	0x22, 0x2e, 0x4f, 0x70, 0x65, 0x6e, 0x49, 0x4d, 0x43, 0x68, 0x61, 0x74, 0x2e, 0x63, 0x68, 0x61,
 	0x74, 0x2e, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x55, 0x73, 0x65, 0x72, 0x49, 0x6e, 0x66, 0x6f,
@@ -3627,11 +3627,16 @@ var file_chat_chat_proto_rawDesc = []byte{
 	0x2e, 0x4f, 0x70, 0x65, 0x6e, 0x49, 0x4d, 0x43, 0x68, 0x61, 0x74, 0x2e, 0x63, 0x68, 0x61, 0x74,
 	0x2e, 0x53, 0x65, 0x61, 0x72, 0x63, 0x68, 0x4c, 0x6f, 0x67, 0x73, 0x52, 0x65, 0x71, 0x1a, 0x1f,
 	0x2e, 0x4f, 0x70, 0x65, 0x6e, 0x49, 0x4d, 0x43, 0x68, 0x61, 0x74, 0x2e, 0x63, 0x68, 0x61, 0x74,
-	0x2e, 0x53, 0x65, 0x61, 0x72, 0x63, 0x68, 0x4c, 0x6f, 0x67, 0x73, 0x52, 0x65, 0x73, 0x70, 0x42,
-	0x2a, 0x5a, 0x28, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x4f, 0x70,
-	0x65, 0x6e, 0x49, 0x4d, 0x53, 0x44, 0x4b, 0x2f, 0x63, 0x68, 0x61, 0x74, 0x2f, 0x70, 0x6b, 0x67,
-	0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x63, 0x68, 0x61, 0x74, 0x62, 0x06, 0x70, 0x72, 0x6f,
-	0x74, 0x6f, 0x33,
+	0x2e, 0x53, 0x65, 0x61, 0x72, 0x63, 0x68, 0x4c, 0x6f, 0x67, 0x73, 0x52, 0x65, 0x73, 0x70, 0x12,
+	0x59, 0x0a, 0x0e, 0x53, 0x65, 0x61, 0x72, 0x63, 0x68, 0x55, 0x73, 0x65, 0x72, 0x49, 0x6e, 0x66,
+	0x6f, 0x12, 0x22, 0x2e, 0x4f, 0x70, 0x65, 0x6e, 0x49, 0x4d, 0x43, 0x68, 0x61, 0x74, 0x2e, 0x63,
+	0x68, 0x61, 0x74, 0x2e, 0x53, 0x65, 0x61, 0x72, 0x63, 0x68, 0x55, 0x73, 0x65, 0x72, 0x49, 0x6e,
+	0x66, 0x6f, 0x52, 0x65, 0x71, 0x1a, 0x23, 0x2e, 0x4f, 0x70, 0x65, 0x6e, 0x49, 0x4d, 0x43, 0x68,
+	0x61, 0x74, 0x2e, 0x63, 0x68, 0x61, 0x74, 0x2e, 0x53, 0x65, 0x61, 0x72, 0x63, 0x68, 0x55, 0x73,
+	0x65, 0x72, 0x49, 0x6e, 0x66, 0x6f, 0x52, 0x65, 0x73, 0x70, 0x42, 0x2a, 0x5a, 0x28, 0x67, 0x69,
+	0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x4f, 0x70, 0x65, 0x6e, 0x49, 0x4d, 0x53,
+	0x44, 0x4b, 0x2f, 0x63, 0x68, 0x61, 0x74, 0x2f, 0x70, 0x6b, 0x67, 0x2f, 0x70, 0x72, 0x6f, 0x74,
+	0x6f, 0x2f, 0x63, 0x68, 0x61, 0x74, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -3764,29 +3769,31 @@ var file_chat_chat_proto_depIdxs = []int32{
 	40, // 52: OpenIMChat.chat.chat.UploadLogs:input_type -> OpenIMChat.chat.UploadLogsReq
 	42, // 53: OpenIMChat.chat.chat.DeleteLogs:input_type -> OpenIMChat.chat.DeleteLogsReq
 	44, // 54: OpenIMChat.chat.chat.SearchLogs:input_type -> OpenIMChat.chat.SearchLogsReq
-	2,  // 55: OpenIMChat.chat.chat.UpdateUserInfo:output_type -> OpenIMChat.chat.UpdateUserInfoResp
-	17, // 56: OpenIMChat.chat.chat.AddUserAccount:output_type -> OpenIMChat.chat.AddUserAccountResp
-	6,  // 57: OpenIMChat.chat.chat.SearchUserPublicInfo:output_type -> OpenIMChat.chat.SearchUserPublicInfoResp
-	4,  // 58: OpenIMChat.chat.chat.FindUserPublicInfo:output_type -> OpenIMChat.chat.FindUserPublicInfoResp
-	36, // 59: OpenIMChat.chat.chat.SearchUserFullInfo:output_type -> OpenIMChat.chat.SearchUserFullInfoResp
-	8,  // 60: OpenIMChat.chat.chat.FindUserFullInfo:output_type -> OpenIMChat.chat.FindUserFullInfoResp
-	10, // 61: OpenIMChat.chat.chat.SendVerifyCode:output_type -> OpenIMChat.chat.SendVerifyCodeResp
-	12, // 62: OpenIMChat.chat.chat.VerifyCode:output_type -> OpenIMChat.chat.VerifyCodeResp
-	15, // 63: OpenIMChat.chat.chat.RegisterUser:output_type -> OpenIMChat.chat.RegisterUserResp
-	19, // 64: OpenIMChat.chat.chat.Login:output_type -> OpenIMChat.chat.LoginResp
-	21, // 65: OpenIMChat.chat.chat.ResetPassword:output_type -> OpenIMChat.chat.ResetPasswordResp
-	23, // 66: OpenIMChat.chat.chat.ChangePassword:output_type -> OpenIMChat.chat.ChangePasswordResp
-	25, // 67: OpenIMChat.chat.chat.FindUserAccount:output_type -> OpenIMChat.chat.FindUserAccountResp
-	27, // 68: OpenIMChat.chat.chat.FindAccountUser:output_type -> OpenIMChat.chat.FindAccountUserResp
-	30, // 69: OpenIMChat.chat.chat.AddSignalRecord:output_type -> OpenIMChat.chat.AddSignalRecordResp
-	32, // 70: OpenIMChat.chat.chat.GetSignalRecords:output_type -> OpenIMChat.chat.GetSignalRecordsResp
-	34, // 71: OpenIMChat.chat.chat.OpenIMCallback:output_type -> OpenIMChat.chat.OpenIMCallbackResp
-	38, // 72: OpenIMChat.chat.chat.UserLoginCount:output_type -> OpenIMChat.chat.UserLoginCountResp
-	41, // 73: OpenIMChat.chat.chat.UploadLogs:output_type -> OpenIMChat.chat.UploadLogsResp
-	43, // 74: OpenIMChat.chat.chat.DeleteLogs:output_type -> OpenIMChat.chat.DeleteLogsResp
-	45, // 75: OpenIMChat.chat.chat.SearchLogs:output_type -> OpenIMChat.chat.SearchLogsResp
-	55, // [55:76] is the sub-list for method output_type
-	34, // [34:55] is the sub-list for method input_type
+	46, // 55: OpenIMChat.chat.chat.SearchUserInfo:input_type -> OpenIMChat.chat.SearchUserInfoReq
+	2,  // 56: OpenIMChat.chat.chat.UpdateUserInfo:output_type -> OpenIMChat.chat.UpdateUserInfoResp
+	17, // 57: OpenIMChat.chat.chat.AddUserAccount:output_type -> OpenIMChat.chat.AddUserAccountResp
+	6,  // 58: OpenIMChat.chat.chat.SearchUserPublicInfo:output_type -> OpenIMChat.chat.SearchUserPublicInfoResp
+	4,  // 59: OpenIMChat.chat.chat.FindUserPublicInfo:output_type -> OpenIMChat.chat.FindUserPublicInfoResp
+	36, // 60: OpenIMChat.chat.chat.SearchUserFullInfo:output_type -> OpenIMChat.chat.SearchUserFullInfoResp
+	8,  // 61: OpenIMChat.chat.chat.FindUserFullInfo:output_type -> OpenIMChat.chat.FindUserFullInfoResp
+	10, // 62: OpenIMChat.chat.chat.SendVerifyCode:output_type -> OpenIMChat.chat.SendVerifyCodeResp
+	12, // 63: OpenIMChat.chat.chat.VerifyCode:output_type -> OpenIMChat.chat.VerifyCodeResp
+	15, // 64: OpenIMChat.chat.chat.RegisterUser:output_type -> OpenIMChat.chat.RegisterUserResp
+	19, // 65: OpenIMChat.chat.chat.Login:output_type -> OpenIMChat.chat.LoginResp
+	21, // 66: OpenIMChat.chat.chat.ResetPassword:output_type -> OpenIMChat.chat.ResetPasswordResp
+	23, // 67: OpenIMChat.chat.chat.ChangePassword:output_type -> OpenIMChat.chat.ChangePasswordResp
+	25, // 68: OpenIMChat.chat.chat.FindUserAccount:output_type -> OpenIMChat.chat.FindUserAccountResp
+	27, // 69: OpenIMChat.chat.chat.FindAccountUser:output_type -> OpenIMChat.chat.FindAccountUserResp
+	30, // 70: OpenIMChat.chat.chat.AddSignalRecord:output_type -> OpenIMChat.chat.AddSignalRecordResp
+	32, // 71: OpenIMChat.chat.chat.GetSignalRecords:output_type -> OpenIMChat.chat.GetSignalRecordsResp
+	34, // 72: OpenIMChat.chat.chat.OpenIMCallback:output_type -> OpenIMChat.chat.OpenIMCallbackResp
+	38, // 73: OpenIMChat.chat.chat.UserLoginCount:output_type -> OpenIMChat.chat.UserLoginCountResp
+	41, // 74: OpenIMChat.chat.chat.UploadLogs:output_type -> OpenIMChat.chat.UploadLogsResp
+	43, // 75: OpenIMChat.chat.chat.DeleteLogs:output_type -> OpenIMChat.chat.DeleteLogsResp
+	45, // 76: OpenIMChat.chat.chat.SearchLogs:output_type -> OpenIMChat.chat.SearchLogsResp
+	47, // 77: OpenIMChat.chat.chat.SearchUserInfo:output_type -> OpenIMChat.chat.SearchUserInfoResp
+	56, // [56:78] is the sub-list for method output_type
+	34, // [34:56] is the sub-list for method input_type
 	34, // [34:34] is the sub-list for extension type_name
 	34, // [34:34] is the sub-list for extension extendee
 	0,  // [0:34] is the sub-list for field type_name
@@ -4433,6 +4440,7 @@ type ChatClient interface {
 	UploadLogs(ctx context.Context, in *UploadLogsReq, opts ...grpc.CallOption) (*UploadLogsResp, error)
 	DeleteLogs(ctx context.Context, in *DeleteLogsReq, opts ...grpc.CallOption) (*DeleteLogsResp, error)
 	SearchLogs(ctx context.Context, in *SearchLogsReq, opts ...grpc.CallOption) (*SearchLogsResp, error)
+	SearchUserInfo(ctx context.Context, in *SearchUserInfoReq, opts ...grpc.CallOption) (*SearchUserInfoResp, error)
 }
 
 type chatClient struct {
@@ -4632,6 +4640,15 @@ func (c *chatClient) SearchLogs(ctx context.Context, in *SearchLogsReq, opts ...
 	return out, nil
 }
 
+func (c *chatClient) SearchUserInfo(ctx context.Context, in *SearchUserInfoReq, opts ...grpc.CallOption) (*SearchUserInfoResp, error) {
+	out := new(SearchUserInfoResp)
+	err := c.cc.Invoke(ctx, "/OpenIMChat.chat.chat/SearchUserInfo", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ChatServer is the server API for Chat service.
 type ChatServer interface {
 	// Edit personal information - called by the user or an administrator
@@ -4660,6 +4677,7 @@ type ChatServer interface {
 	UploadLogs(context.Context, *UploadLogsReq) (*UploadLogsResp, error)
 	DeleteLogs(context.Context, *DeleteLogsReq) (*DeleteLogsResp, error)
 	SearchLogs(context.Context, *SearchLogsReq) (*SearchLogsResp, error)
+	SearchUserInfo(context.Context, *SearchUserInfoReq) (*SearchUserInfoResp, error)
 }
 
 // UnimplementedChatServer can be embedded to have forward compatible implementations.
@@ -4728,6 +4746,9 @@ func (*UnimplementedChatServer) DeleteLogs(context.Context, *DeleteLogsReq) (*De
 }
 func (*UnimplementedChatServer) SearchLogs(context.Context, *SearchLogsReq) (*SearchLogsResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SearchLogs not implemented")
+}
+func (*UnimplementedChatServer) SearchUserInfo(context.Context, *SearchUserInfoReq) (*SearchUserInfoResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SearchUserInfo not implemented")
 }
 
 func RegisterChatServer(s *grpc.Server, srv ChatServer) {
@@ -5112,6 +5133,24 @@ func _Chat_SearchLogs_Handler(srv interface{}, ctx context.Context, dec func(int
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Chat_SearchUserInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SearchUserInfoReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ChatServer).SearchUserInfo(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/OpenIMChat.chat.chat/SearchUserInfo",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ChatServer).SearchUserInfo(ctx, req.(*SearchUserInfoReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _Chat_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "OpenIMChat.chat.chat",
 	HandlerType: (*ChatServer)(nil),
@@ -5199,6 +5238,10 @@ var _Chat_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SearchLogs",
 			Handler:    _Chat_SearchLogs_Handler,
+		},
+		{
+			MethodName: "SearchUserInfo",
+			Handler:    _Chat_SearchUserInfo_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
