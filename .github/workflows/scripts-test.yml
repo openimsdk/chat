@@ -75,7 +75,8 @@ jobs:
           -v "/etc/localtime:/etc/localtime" \
           -e MYSQL_ROOT_PASSWORD="openIM123" \
           --restart always \
-          mysql:5.7
+          mysql:5.7 
+        sleep 30;
     - name: start all services
       run: |
         sudo cp ./config/config.yaml.template ./config/config.yaml
