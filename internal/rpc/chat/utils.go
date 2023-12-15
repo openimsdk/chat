@@ -57,7 +57,7 @@ func DbToPbUserFullInfo(attribute *chat.Attribute) *common.UserFullInfo {
 		AllowBeep:        attribute.AllowBeep,
 		AllowVibration:   attribute.AllowVibration,
 		GlobalRecvMsgOpt: attribute.GlobalRecvMsgOpt,
-		EmailRegistered:  attribute.EmailRegister,
+		RegisterType:     attribute.RegisterType,
 	}
 }
 

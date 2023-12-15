@@ -321,6 +321,7 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 			return nil, err
 		}
 	}
+	var registerType int32
 	if req.User.PhoneNumber != "" {
 		if req.User.AreaCode[0] != '+' {
 			req.User.AreaCode = "+" + req.User.AreaCode
@@ -337,7 +338,9 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 		} else if !o.Database.IsNotFound(err) {
 			return nil, err
 		}
+		registerType = constant.PhoneRegister
 	}
+
 	if req.User.Account != "" {
 		_, err := o.Database.TakeAttributeByAccount(ctx, req.User.Account)
 		if err == nil {
@@ -346,10 +349,10 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 			return nil, err
 		}
 	}
-	var emailRegister bool
+
 	if req.User.Email != "" {
 		_, err := o.Database.TakeAttributeByEmail(ctx, req.User.Email)
-		emailRegister = true
+		registerType = constant.EmailRegister
 		if err == nil {
 			return nil, eerrs.ErrEmailAlreadyRegister.Wrap()
 		} else if !o.Database.IsNotFound(err) {
@@ -387,7 +390,7 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 		AllowVibration: constant.DefaultAllowVibration,
 		AllowBeep:      constant.DefaultAllowBeep,
 		AllowAddFriend: constant.DefaultAllowAddFriend,
-		EmailRegister:  emailRegister,
+		RegisterType:   registerType,
 	}
 	if err := o.Database.RegisterUser(ctx, register, account, attribute); err != nil {
 		return nil, err

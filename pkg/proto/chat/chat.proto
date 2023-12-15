@@ -44,7 +44,7 @@ message UpdateUserInfoReq{
   OpenIMServer.protobuf.Int32Value  allowBeep = 12;
   OpenIMServer.protobuf.Int32Value  allowVibration = 13;
   OpenIMServer.protobuf.Int32Value  globalRecvMsgOpt = 14;
-  OpenIMServer.protobuf.BoolValue  emailRegistered = 15;
+  OpenIMServer.protobuf.Int32Value RegisterType = 15;
 }
 
 message UpdateUserInfoResp{
@@ -114,7 +114,7 @@ message RegisterUserInfo {
   string email = 8;
   string account = 9;
   string password = 10;
-  bool emailRegistered = 11;
+  int32 RegisterType = 11;
 }
 
 message RegisterUserReq {
