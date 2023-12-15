@@ -346,8 +346,10 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 			return nil, err
 		}
 	}
+	var emailRegister bool
 	if req.User.Email != "" {
 		_, err := o.Database.TakeAttributeByEmail(ctx, req.User.Email)
+		emailRegister = true
 		if err == nil {
 			return nil, eerrs.ErrEmailAlreadyRegister.Wrap()
 		} else if !o.Database.IsNotFound(err) {
@@ -385,6 +387,7 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 		AllowVibration: constant.DefaultAllowVibration,
 		AllowBeep:      constant.DefaultAllowBeep,
 		AllowAddFriend: constant.DefaultAllowAddFriend,
+		EmailRegister:  emailRegister,
 	}
 	if err := o.Database.RegisterUser(ctx, register, account, attribute); err != nil {
 		return nil, err
