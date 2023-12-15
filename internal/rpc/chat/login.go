@@ -444,7 +444,14 @@ func (o *chatSvr) Login(ctx context.Context, req *chat.LoginReq) (*chat.LoginRes
 	}
 	var verifyCodeID *uint
 	if req.Password == "" {
-		id, err := o.verifyCode(ctx, o.verifyCodeJoin(req.AreaCode, req.PhoneNumber), req.VerifyCode)
+		var id uint
+		var err error
+		if req.Email == "" {
+			id, err = o.verifyCode(ctx, o.verifyCodeJoin(req.AreaCode, req.PhoneNumber), req.VerifyCode)
+		} else {
+			id, err = o.verifyCode(ctx, req.Email, req.VerifyCode)
+		}
+
 		if err != nil {
 			return nil, err
 		}
