@@ -1,19 +1,4 @@
-#!/usr/bin/env bash
-# Copyright © 2023 OpenIM. All rights reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
-# This script automatically initializes various configuration files and can generate example files.
+#!/bin/bash
 
 set -o errexit
 set -o nounset
@@ -23,4 +8,80 @@ set -o pipefail
 SCRIPTS_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 OPENIM_ROOT=$(dirname "${BASH_SOURCE[0]}")/..
 
-cp ${OPENIM_ROOT}/deployments/templates/config.yaml ${OPENIM_ROOT}/config/config.yaml
+config_file="${OPENIM_ROOT}/config/config.yaml"
+
+# Initialize flags
+FORCE=false
+SKIP=false
+
+show_help() {
+    echo "Usage: init-config.sh [options]"
+    echo "Options:"
+    echo "  -h, --help             Show this help message"
+    echo "  --force                Overwrite existing files without prompt"
+    echo "  --skip                 Skip generation if file exists"
+    echo "  --clean-config         Clean all configuration files"
+}
+
+clean_config() {
+    echo "Cleaning configuration files..."
+    rm -f "${config_file}"
+    echo "Configuration files cleaned."
+}
+
+generate_config() {
+    echo "Generating configuration file..."
+    cp "${OPENIM_ROOT}/deployments/templates/config.yaml" "${config_file}"
+    echo "Configuration file generated."
+}
+
+overwrite_prompt() {
+    while true; do
+        read -p "Configuration file exists. Overwrite? [Y/N]: " yn
+        case $yn in
+            [Yy]* ) generate_config; break;;
+            [Nn]* ) echo "Skipping generation."; exit;;
+            * ) echo "Please answer yes or no.";;
+        esac
+    done
+}
+
+# Parse command line arguments
+for i in "$@"
+do
+case $i in
+    -h|--help)
+    show_help
+    exit 0
+    ;;
+    --force)
+    FORCE=true
+    shift
+    ;;
+    --skip)
+    SKIP=true
+    shift
+    ;;
+    --clean-config)
+    clean_config
+    exit 0
+    ;;
+    *)
+    # unknown option
+    show_help
+    exit 1
+    ;;
+esac
+done
+
+if [[ "${FORCE}" == "true" ]]; then
+    generate_config
+elif [[ "${SKIP}" == "true" ]] && [[ -f "${config_file}" ]]; then
+    echo "Configuration file already exists. Skipping generation."
+else
+    if [[ -f "${config_file}" ]]; then
+        overwrite_prompt
+    else
+        generate_config
+    fi
+fi

@@ -48,7 +48,7 @@ sudo docker compose up -d
 **Setting configuration items:**
 
 ```bash
-cp ./deployments/templates/config.yaml ./config/config.yaml
+make init
 ```
 
 > Then modify the configuration file `config/config.yaml` according to your needs
