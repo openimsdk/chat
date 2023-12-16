@@ -12,13 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM BASE_IMAGE
-
-WORKDIR ${SERVER_WORKDIR}
-
-# Set HTTP proxy
-ARG BINARY_NAME
-
-COPY BINARY_NAME ./bin/BINARY_NAME
-
-ENTRYPOINT ["./bin/BINARY_NAME"]
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "chat-api.fullname" . }}
+  labels:
+    {{- include "chat-api.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "chat-api.selectorLabels" . | nindent 4 }}
