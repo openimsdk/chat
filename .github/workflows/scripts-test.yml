@@ -34,17 +34,31 @@ on:
 
 jobs:
   execute-scripts:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
 
+    - name: Set up environment
+      run: |
+        if [ "$RUNNER_OS" == "Linux" ]; then
+          sudo apt-get update
+          # Add other Linux specific setup here
+        elif [ "$RUNNER_OS" == "macOS" ]; then
+          # Add macOS specific setup here
+          brew update
+        fi
+      shell: bash
+
     - name: Build Chat
       run: |
-        sudo make build
-        sudo chmod +x ./scripts/build_all_service.sh
-        sudo ./scripts/build_all_service.sh
+        make build
+        chmod +x ./scripts/build_all_service.sh
+        ./scripts/build_all_service.sh
       shell: bash
 
     - name: deploy all services
