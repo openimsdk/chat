@@ -93,10 +93,6 @@ else
 	IMAGE_PLAT := $(PLATFORM)
 endif
 
-# Copy githook scripts when execute makefile
-# TODO! GIT_FILE_SIZE_LIMIT=42000000 git commit -m "This commit is allowed file sizes up to 42MB"
-COPY_GITHOOK:=$(shell cp -f scripts/githooks/* .git/hooks/; chmod +x .git/hooks/*)
-
 # Linux command settings
 FIND := find . ! -path './image/*' ! -path './vendor/*' ! -path './bin/*'
 XARGS := xargs -r
@@ -192,6 +188,18 @@ endif
 ## all: Build all the necessary targets.
 .PHONY: all
 all: copyright-verify tidy build start check #lint cover
+
+## init: Init openim-chat config
+.PHONY: init
+init:
+	@echo "===========> Init openim-chat config"
+	@$(ROOT_DIR)/scripts/init-config.sh
+
+## init-githooks: Initialize git hooks ✨
+.PHONY: init-githooks
+init-githooks:
+	@echo "===========> Initializing git hooks"
+	@${ROOT_DIR}/scripts/init-githooks.sh
 
 ## build: Build binaries by default.
 .PHONY: build
