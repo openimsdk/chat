@@ -12,13 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM BASE_IMAGE
-
-WORKDIR ${SERVER_WORKDIR}
-
-# Set HTTP proxy
-ARG BINARY_NAME
-
-COPY BINARY_NAME ./bin/BINARY_NAME
-
-ENTRYPOINT ["./bin/BINARY_NAME"]
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: imchat-cm
+data:
+  config.yaml: |+
+    {{- with .Values.config }}
+        {{- toYaml . | nindent 4 }}
+    {{- end }}
