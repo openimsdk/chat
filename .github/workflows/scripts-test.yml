@@ -66,6 +66,9 @@ jobs:
         echo "/usr/local/bin" >> $GITHUB_PATH
         echo "$(brew --prefix)/opt/gnu-sed/libexec/gnubin" >> $GITHUB_PATH
 
+        brew install --cask docker
+        open /Applications/Docker.app
+
     - name: Build Chat
       run: |
         make build
