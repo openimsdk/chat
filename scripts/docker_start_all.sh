@@ -58,7 +58,7 @@ service_prometheus_port_names=()
 
 cd "$SCRIPTS_ROOT"
 
-cp ./config/config.yaml.template ./config/config.yaml
+cp ./deployments/templates/config.yaml ./config/config.yaml
 
 # Function to kill a service
 kill_service() {
