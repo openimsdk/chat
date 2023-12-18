@@ -47,7 +47,6 @@ func readConfig(configFile string) ([]byte, error) {
 	//	if configFile != "" {
 	//		b, err := os.ReadFile(configFile)
 	//		if err == nil { // File exists and was read successfully
-	//			fmt.Println("这里aaaaaaaa")
 	//			return b, nil
 	//		}
 	//	}
@@ -227,6 +226,7 @@ func configGetEnv() error {
 	Config.Zookeeper.Schema = getEnv("ZOOKEEPER_SCHEMA", Config.Zookeeper.Schema)
 	Config.Zookeeper.Username = getEnv("ZOOKEEPER_USERNAME", Config.Zookeeper.Username)
 	Config.Zookeeper.Password = getEnv("ZOOKEEPER_PASSWORD", Config.Zookeeper.Password)
+	Config.Zookeeper.ZkAddr = getArrEnv("ZOOKEEPER_ADDRESS", "ZOOKEEPER_PORT", Config.Zookeeper.ZkAddr)
 
 	Config.ChatApi.ListenIP = getEnv("CHAT_API_LISTEN_IP", Config.ChatApi.ListenIP)
 	Config.AdminApi.ListenIP = getEnv("ADMIN_API_LISTEN_IP", Config.AdminApi.ListenIP)
@@ -236,16 +236,17 @@ func configGetEnv() error {
 	Config.Mysql.Username = getEnvStringPoint("MYSQL_USERNAME", Config.Mysql.Username)
 	Config.Mysql.Password = getEnvStringPoint("MYSQL_PASSWORD", Config.Mysql.Password)
 	Config.Mysql.Database = getEnvStringPoint("MYSQL_DATABASE", Config.Mysql.Database)
+	Config.Mysql.Address = getArrPointEnv("MYSQL_ADDRESS", "MYSQL_PORT", Config.Mysql.Address)
 
 	Config.Log.StorageLocation = getEnvStringPoint("LOG_STORAGE_LOCATION", Config.Log.StorageLocation)
 
 	Config.Secret = getEnvStringPoint("SECRET", Config.Secret)
-
 	Config.ProxyHeader = getEnv("PROXY_HEADER", Config.ProxyHeader)
 	Config.OpenIMUrl = getEnv("OPENIM_SERVER_ADDRESS", Config.OpenIMUrl)
 
 	Config.Redis.Username = getEnv("REDIS_USERNAME", Config.Redis.Username)
 	Config.Redis.Password = getEnv("REDIS_PASSWORD", Config.Redis.Password)
+	Config.Redis.Address = getArrPointEnv("REDIS_ADDRESS", "REDIS_PORT", Config.Redis.Address)
 
 	var err error
 	Config.TokenPolicy.Expire, err = getEnvIntPoint("TOKEN_EXPIRE", Config.TokenPolicy.Expire)
@@ -256,12 +257,30 @@ func configGetEnv() error {
 	return nil
 }
 
-func getEnv(key, fallback string) string {
+func getArrEnv(key1, key2 string, fallback []string) []string {
+	str1 := getEnv(key1, "")
+	str2 := getEnv(key2, "")
+	str := fmt.Sprintf("%s:%s", str1, str2)
+	if len(str) <= 1 {
+		return fallback
+	}
+	return []string{str}
+}
 
+func getArrPointEnv(key1, key2 string, fallback *[]string) *[]string {
+	str1 := getEnv(key1, "")
+	str2 := getEnv(key2, "")
+	str := fmt.Sprintf("%s:%s", str1, str2)
+	if len(str) <= 1 {
+		return fallback
+	}
+	return &[]string{str}
+}
+
+func getEnv(key, fallback string) string {
 	if value, exists := os.LookupEnv(key); exists {
 		return value
 	}
-
 	return fallback
 }
 
