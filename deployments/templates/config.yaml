@@ -20,7 +20,7 @@ envs:
 zookeeper:
   schema: openim # ZOOKEEPER_SCHEMA, the schema to use in Zookeeper
   zkAddr:
-    - 127.0.0.1:12181 # ZOOKEEPER_ADDRESS and ZOOKEEPER_PORT, Zookeeper address and port
+    - 127.28.0.1:12181 # ZOOKEEPER_ADDRESS and ZOOKEEPER_PORT, Zookeeper address and port
   username: "" # ZOOKEEPER_USERNAME, Username for Zookeeper authentication
   password: "" # ZOOKEEPER_PASSWORD, Password for Zookeeper authentication
 

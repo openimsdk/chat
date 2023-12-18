@@ -184,3 +184,8 @@ const (
 const DefaultPlatform = 1
 
 const CtxApiToken = "api-token"
+
+const (
+	EmailRegister = 1
+	PhoneRegister = 2
+)
