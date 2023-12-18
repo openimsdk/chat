@@ -26,12 +26,12 @@ zookeeper:
 
 # Configuration for the chat API service
 chatApi:
-  openImChatApiPort: [ 10008 ] # OPENIM_CHAT_API_PORT, Port for OpenIM Chat API
+  openImChatApiPort: [ 10008 ] # Port for OpenIM Chat API
   listenIP: # CHAT_API_LISTEN_IP, IP address to listen on for Chat API
 
 # Configuration for the admin API service
 adminApi:
-  openImAdminApiPort: [ 10009 ] # OPENIM_ADMIN_API_PORT, Port for OpenIM Admin API
+  openImAdminApiPort: [ 10009 ] # Port for OpenIM Admin API
   listenIP: # ADMIN_API_LISTEN_IP, IP address to listen on for Admin API
 
 # RPC configuration for service communication
@@ -41,8 +41,8 @@ rpc:
 
 # Ports for RPC services
 rpcPort:
-  openImAdminPort: [ 30200 ] # OPENIM_ADMIN_PORT, Port for OpenIM Admin RPC service
-  openImChatPort: [ 30300 ] # OPENIM_CHAT_PORT, Port for OpenIM Chat RPC service
+  openImAdminPort: [ 30200 ] # Port for OpenIM Admin RPC service
+  openImChatPort: [ 30300 ] # Port for OpenIM Chat RPC service
 
 # Names for RPC services registration
 rpcRegisterName:
