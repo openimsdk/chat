@@ -16,9 +16,11 @@ package config
 
 import (
 	"bytes"
+	"context"
 	"errors"
 	"flag"
 	"fmt"
+	"github.com/OpenIMSDK/tools/log"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -261,10 +263,14 @@ func getArrEnv(key1, key2 string, fallback []string) []string {
 	str1 := getEnv(key1, "")
 	str2 := getEnv(key2, "")
 	str := fmt.Sprintf("%s:%s", str1, str2)
+	log.ZInfo(context.Background(), "zookeeper Envirement valiable", "str", str)
+	arr := make([]string, 1)
 	if len(str) <= 1 {
 		return fallback
 	}
-	return []string{str}
+	arr[0] = str
+	log.ZInfo(context.Background(), "zookeeper Envirement valiable", "str", str, "arr", arr)
+	return arr
 }
 
 func getArrPointEnv(key1, key2 string, fallback *[]string) *[]string {
