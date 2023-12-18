@@ -56,9 +56,9 @@ service_port_names=(
 
 service_prometheus_port_names=()
 
-cd "$SCRIPTS_ROOT"
+${OPENIM_ROOT}/scripts/init-config.sh --skip
 
-cp ./config/config.yaml.template ./config/config.yaml
+cd "$SCRIPTS_ROOT"
 
 # Function to kill a service
 kill_service() {
