@@ -227,7 +227,6 @@ func configGetEnv() error {
 	Config.Zookeeper.Schema = getEnv("ZOOKEEPER_SCHEMA", Config.Zookeeper.Schema)
 	Config.Zookeeper.Username = getEnv("ZOOKEEPER_USERNAME", Config.Zookeeper.Username)
 	Config.Zookeeper.Password = getEnv("ZOOKEEPER_PASSWORD", Config.Zookeeper.Password)
-	Config.Zookeeper.ZkAddr = getArrEnv("ZOOKEEPER_ADDRESS", "ZOOKEEPER_PORT", Config.Zookeeper.ZkAddr)
 
 	Config.ChatApi.ListenIP = getEnv("CHAT_API_LISTEN_IP", Config.ChatApi.ListenIP)
 	Config.AdminApi.ListenIP = getEnv("ADMIN_API_LISTEN_IP", Config.AdminApi.ListenIP)
@@ -254,22 +253,22 @@ func configGetEnv() error {
 	if err != nil {
 		return err
 	}
-
+	getArrEnv("ZOOKEEPER_ADDRESS", "ZOOKEEPER_PORT", Config.Zookeeper.ZkAddr)
 	return nil
 }
 
-func getArrEnv(key1, key2 string, fallback []string) []string {
+func getArrEnv(key1, key2 string, fallback []string) {
 	str1 := getEnv(key1, "")
 	str2 := getEnv(key2, "")
 	str := fmt.Sprintf("%s:%s", str1, str2)
 	fmt.Println("zookeeper Envirement valiable", "str", str)
 	arr := make([]string, 1)
 	if len(str) <= 1 {
-		return fallback
+		return
 	}
 	arr[0] = str
 	fmt.Println("zookeeper Envirement valiable", "str", str, "arr", arr)
-	return arr
+	Config.Zookeeper.ZkAddr = arr
 }
 
 func getArrPointEnv(key1, key2 string, fallback *[]string) *[]string {

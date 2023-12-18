@@ -67,15 +67,17 @@ func main() {
 
 	flag.Parse()
 
-	err = component.ComponentCheck(configFile, hide)
-	if err != nil {
-		return
-	}
 	err = config.InitConfig(configFile)
 	if err != nil {
 		fmt.Println("err ", err.Error())
 		panic(err)
 	}
+
+	err = component.ComponentCheck(configFile, hide)
+	if err != nil {
+		return
+	}
+
 	if err := log.InitFromConfig("chat.log", "chat-api", *config.Config.Log.RemainLogLevel, *config.Config.Log.IsStdout, *config.Config.Log.IsJson, *config.Config.Log.StorageLocation, *config.Config.Log.RemainRotationCount, *config.Config.Log.RotationTime); err != nil {
 		panic(err)
 	}
