@@ -42,6 +42,7 @@ func Start(rpcPort int, rpcRegisterName string, prometheusPort int, rpcFn func(c
 				config.Config.Zookeeper.Password), openKeeper.WithRoundRobin(), openKeeper.WithTimeout(10), openKeeper.WithLogger(log.NewZkLogger()))*/if err != nil {
 		return errs.Wrap(err)
 	}
+	fmt.Println("flag1", err)
 	// defer zkClient.CloseZK()
 	defer zkClient.Close()
 	zkClient.AddOption(chatMw.AddUserType(), mw.GrpcClient(), grpc.WithTransportCredentials(insecure.NewCredentials()))
@@ -49,20 +50,25 @@ func Start(rpcPort int, rpcRegisterName string, prometheusPort int, rpcFn func(c
 	if err != nil {
 		return utils.Wrap1(err)
 	}
+	fmt.Println("flag2", err)
 	srv := grpc.NewServer(append(options, mw.GrpcServer())...)
 	defer srv.GracefulStop()
+	fmt.Println("flag3", err)
 	err = rpcFn(zkClient, srv)
 	if err != nil {
 		return errs.Wrap(err)
 	}
+	fmt.Println("flag4", err)
 	err = zkClient.Register(rpcRegisterName, registerIP, rpcPort, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return utils.Wrap1(err)
 	}
+	fmt.Println("flag5", err)
 	listener, err := net.Listen("tcp", net.JoinHostPort(network.GetListenIP(config.Config.Rpc.ListenIP), strconv.Itoa(rpcPort)))
 	if err != nil {
 		return utils.Wrap1(err)
 	}
 	defer listener.Close()
+	fmt.Println("flag6", err)
 	return utils.Wrap1(srv.Serve(listener))
 }
