@@ -77,7 +77,7 @@ func newZkClient() (*zk.Conn, error) {
 	var c *zk.Conn
 	c, _, err := zk.Connect(config.Config.Zookeeper.ZkAddr, time.Second, zk.WithLogger(log.NewZkLogger()))
 	if err != nil {
-		return nil, errs.Wrap(err, config.Config.Zookeeper.ZkAddr[0])
+		return nil, errs.Wrap(err)
 	} else {
 		if config.Config.Zookeeper.Username != "" && config.Config.Zookeeper.Password != "" {
 			if err := c.AddAuth("digest", []byte(config.Config.Zookeeper.Username+":"+config.Config.Zookeeper.Password)); err != nil {
