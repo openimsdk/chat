@@ -33,6 +33,7 @@ message UserFullInfo{
   int32  allowBeep = 13;
   int32  allowVibration = 14;
   int32 globalRecvMsgOpt = 15;
+  int32 registerType = 16;
 }
 
 message UserPublicInfo{
