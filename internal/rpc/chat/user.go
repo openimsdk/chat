@@ -16,6 +16,11 @@ package chat
 
 import (
 	"context"
+	"github.com/OpenIMSDK/chat/pkg/common/db/dbutil"
+	chat2 "github.com/OpenIMSDK/chat/pkg/common/db/table/chat"
+	constant2 "github.com/OpenIMSDK/protocol/constant"
+	"github.com/OpenIMSDK/tools/mcontext"
+	"time"
 
 	"github.com/OpenIMSDK/chat/pkg/common/constant"
 	"github.com/OpenIMSDK/chat/pkg/common/mctx"
@@ -113,6 +118,73 @@ func (o *chatSvr) FindUserPublicInfo(ctx context.Context, req *chat.FindUserPubl
 	}, nil
 }
 
+func (o *chatSvr) AddUserAccount(ctx context.Context, req *chat.AddUserAccountReq) (*chat.AddUserAccountResp, error) {
+	if _, _, err := mctx.Check(ctx); err != nil {
+		return nil, err
+	}
+
+	if err := o.checkTheUniqueness(ctx, req); err != nil {
+		return nil, err
+	}
+
+	if req.User.UserID == "" {
+		for i := 0; i < 20; i++ {
+			userID := o.genUserID()
+			_, err := o.Database.GetUser(ctx, userID)
+			if err == nil {
+				continue
+			} else if dbutil.IsGormNotFound(err) {
+				req.User.UserID = userID
+				break
+			} else {
+				return nil, err
+			}
+		}
+		if req.User.UserID == "" {
+			return nil, errs.ErrInternalServer.Wrap("gen user id failed")
+		}
+	}
+
+	register := &chat2.Register{
+		UserID:      req.User.UserID,
+		DeviceID:    req.DeviceID,
+		IP:          req.Ip,
+		Platform:    constant2.PlatformID2Name[int(req.Platform)],
+		AccountType: "",
+		Mode:        constant.UserMode,
+		CreateTime:  time.Now(),
+	}
+	account := &chat2.Account{
+		UserID:         req.User.UserID,
+		Password:       req.User.Password,
+		OperatorUserID: mcontext.GetOpUserID(ctx),
+		ChangeTime:     register.CreateTime,
+		CreateTime:     register.CreateTime,
+	}
+	attribute := &chat2.Attribute{
+		UserID:         req.User.UserID,
+		Account:        req.User.Account,
+		PhoneNumber:    req.User.PhoneNumber,
+		AreaCode:       req.User.AreaCode,
+		Email:          req.User.Email,
+		Nickname:       req.User.Nickname,
+		FaceURL:        req.User.FaceURL,
+		Gender:         req.User.Gender,
+		BirthTime:      time.UnixMilli(req.User.Birth),
+		ChangeTime:     register.CreateTime,
+		CreateTime:     register.CreateTime,
+		AllowVibration: constant.DefaultAllowVibration,
+		AllowBeep:      constant.DefaultAllowBeep,
+		AllowAddFriend: constant.DefaultAllowAddFriend,
+	}
+
+	if err := o.Database.RegisterUser(ctx, register, account, attribute); err != nil {
+		return nil, err
+	}
+
+	return &chat.AddUserAccountResp{}, nil
+}
+
 func (o *chatSvr) SearchUserPublicInfo(ctx context.Context, req *chat.SearchUserPublicInfoReq) (*chat.SearchUserPublicInfoResp, error) {
 	defer log.ZDebug(ctx, "return")
 	if _, _, err := mctx.Check(ctx); err != nil {
@@ -207,4 +279,23 @@ func (o *chatSvr) SearchUserInfo(ctx context.Context, req *chat.SearchUserInfoRe
 		Total: total,
 		Users: DbToPbUserFullInfos(list),
 	}, nil
+}
+
+func (o *chatSvr) checkTheUniqueness(ctx context.Context, req *chat.AddUserAccountReq) error {
+	if req.User.PhoneNumber != "" {
+		_, err := o.Database.TakeAttributeByPhone(ctx, req.User.AreaCode, req.User.PhoneNumber)
+		if err == nil {
+			return eerrs.ErrPhoneAlreadyRegister.Wrap()
+		} else if !o.Database.IsNotFound(err) {
+			return err
+		}
+	} else {
+		_, err := o.Database.TakeAttributeByEmail(ctx, req.User.Email)
+		if err == nil {
+			return eerrs.ErrEmailAlreadyRegister.Wrap()
+		} else if !o.Database.IsNotFound(err) {
+			return err
+		}
+	}
+	return nil
 }

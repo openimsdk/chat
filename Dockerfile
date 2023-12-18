@@ -43,5 +43,6 @@ WORKDIR ${CHAT_WORKDIR}
 COPY --from=builder ${OPENIM_CHAT_BINDIR} /openim/openim-chat/_output/bin
 COPY --from=builder ${CHAT_WORKDIR}/config /openim/openim-chat/config
 COPY --from=builder ${CHAT_WORKDIR}/scripts /openim/openim-chat/scripts
+COPY --from=builder ${CHAT_WORKDIR}/deployments /openim/openim-chat/deployments
 
 CMD ["/openim/openim-chat/scripts/docker_start_all.sh"]
