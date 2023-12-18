@@ -92,12 +92,22 @@ func (o *chatSvr) SendVerifyCode(ctx context.Context, req *chat.SendVerifyCodeRe
 			}
 		}
 	case constant.VerificationCodeForLogin, constant.VerificationCodeForResetPassword:
-		_, err := o.Database.TakeAttributeByPhone(ctx, req.AreaCode, req.PhoneNumber)
-		if o.Database.IsNotFound(err) {
-			return nil, errs.ErrArgs.Wrap("phone unregistered")
-		} else if err != nil {
-			return nil, err
+		if req.Email == "" {
+			_, err := o.Database.TakeAttributeByPhone(ctx, req.AreaCode, req.PhoneNumber)
+			if o.Database.IsNotFound(err) {
+				return nil, eerrs.ErrAccountNotFound.Wrap("phone unregistered")
+			} else if err != nil {
+				return nil, err
+			}
+		} else {
+			_, err := o.Database.TakeAttributeByEmail(ctx, req.Email)
+			if o.Database.IsNotFound(err) {
+				return nil, eerrs.ErrAccountNotFound.Wrap("email unregistered")
+			} else if err != nil {
+				return nil, err
+			}
 		}
+
 	default:
 		return nil, errs.ErrArgs.Wrap("used unknown")
 	}
@@ -275,9 +285,16 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 				return nil, err
 			}
 		}
-		if _, err := o.verifyCode(ctx, o.verifyCodeJoin(req.User.AreaCode, req.User.PhoneNumber), req.VerifyCode); err != nil {
-			return nil, err
+		if req.User.Email == "" {
+			if _, err := o.verifyCode(ctx, o.verifyCodeJoin(req.User.AreaCode, req.User.PhoneNumber), req.VerifyCode); err != nil {
+				return nil, err
+			}
+		} else {
+			if _, err := o.verifyCode(ctx, req.User.Email, req.VerifyCode); err != nil {
+				return nil, err
+			}
 		}
+
 	}
 	log.ZDebug(ctx, "usedInvitationCode", usedInvitationCode)
 	if req.User.UserID == "" {
@@ -427,7 +444,14 @@ func (o *chatSvr) Login(ctx context.Context, req *chat.LoginReq) (*chat.LoginRes
 	}
 	var verifyCodeID *uint
 	if req.Password == "" {
-		id, err := o.verifyCode(ctx, o.verifyCodeJoin(req.AreaCode, req.PhoneNumber), req.VerifyCode)
+		var id uint
+		var err error
+		if req.Email == "" {
+			id, err = o.verifyCode(ctx, o.verifyCodeJoin(req.AreaCode, req.PhoneNumber), req.VerifyCode)
+		} else {
+			id, err = o.verifyCode(ctx, req.Email, req.VerifyCode)
+		}
+
 		if err != nil {
 			return nil, err
 		}

@@ -269,7 +269,7 @@ func (x *SearchLogsReq) Check() error {
 }
 
 func EmailCheck(email string) error {
-	pattern := `^[0-9a-z][_.0-9a-z-]{0,31}@([0-9a-z][0-9a-z-]{0,30}[0-9a-z]\.){1,4}[a-z]{2,4}$`
+	pattern := `^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`
 	if err := regexMatch(pattern, email); err != nil {
 		return errs.Wrap(err, "Email is invalid")
 	}
