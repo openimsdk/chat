@@ -40,30 +40,8 @@ func initCfg(cfgPath string) error {
 	return err
 }
 
-//func ComponentCheck(cfgPath string, hide bool) error {
-//	err := initCfg(cfgPath)
-//	if err != nil {
-//		errorPrint(errs.Wrap(err).Error(), hide)
-//		return err
-//	}
-//	if config.Config.Envs.Discovery != "k8s" {
-//		var zkConn *zk.Conn
-//		if zkConn, err = checkNewZkClient(hide); err != nil {
-//			errorPrint(fmt.Sprintf("%v.Please check if your openIM server has started", err.Error()), hide)
-//			return err
-//		}
-//		if err = checkGetCfg(zkConn, hide); err != nil {
-//			errorPrint(fmt.Sprintf("%v.Please check if your openIM server has started", err.Error()), hide)
-//			return err
-//		}
-//	}
-//
-//	return nil
-//}
-
 func ComponentCheck(cfgPath string, hide bool) error {
-	//err := initCfg(cfgPath)
-	var err error
+	err := initCfg(cfgPath)
 	if err != nil {
 		errorPrint(errs.Wrap(err).Error(), hide)
 		return err
