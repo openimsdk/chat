@@ -130,6 +130,16 @@ message RegisterUserResp {
   string chatToken = 3;
 }
 
+message AddUserAccountReq{
+  string ip=1;
+  string deviceID=2;
+  int32 platform=3;
+  RegisterUserInfo user=4;
+}
+
+message AddUserAccountResp{
+}
+
 message LoginReq {
   string areaCode = 1;
   string phoneNumber = 2;
@@ -139,6 +149,7 @@ message LoginReq {
   int32 platform = 6;
   string deviceID = 7;
   string ip = 8;
+  string email = 9;
 }
 
 message LoginResp {
@@ -151,6 +162,7 @@ message ResetPasswordReq {
   string phoneNumber = 2;
   string verifyCode = 3;
   string password = 4;
+  string email = 5;
 }
 
 message ResetPasswordResp {
@@ -300,12 +312,13 @@ message SearchUserInfoResp {
 }
 
 service chat {
-  //编辑个人资料 自己或者管理员调用
+  // Edit personal information - called by the user or an administrator
   rpc UpdateUserInfo(UpdateUserInfoReq) returns(UpdateUserInfoResp);
-  //获取用户的公开信息   陌生人调用
+  rpc AddUserAccount(AddUserAccountReq) returns(AddUserAccountResp);
+  // Get user's public information - called by strangers
   rpc SearchUserPublicInfo(SearchUserPublicInfoReq) returns(SearchUserPublicInfoResp);
   rpc FindUserPublicInfo(FindUserPublicInfoReq) returns(FindUserPublicInfoResp);
-  //搜索用户信息 管理员调用 其他用户调用时返回public字段
+  // Search user information - called by administrators, other users get public fields
   rpc SearchUserFullInfo(SearchUserFullInfoReq) returns(SearchUserFullInfoResp);
   rpc FindUserFullInfo(FindUserFullInfoReq) returns(FindUserFullInfoResp);
 
@@ -324,12 +337,11 @@ service chat {
 
   rpc OpenIMCallback(OpenIMCallbackReq) returns(OpenIMCallbackResp);
 
-  //统计
+  // Statistics
   rpc UserLoginCount(UserLoginCountReq) returns (UserLoginCountResp);
-  //日志
+  // Logs
   rpc UploadLogs(UploadLogsReq) returns (UploadLogsResp);
   rpc DeleteLogs(DeleteLogsReq) returns (DeleteLogsResp);
   rpc SearchLogs(SearchLogsReq) returns (SearchLogsResp);
 
-  rpc SearchUserInfo(SearchUserInfoReq)returns(SearchUserInfoResp);
 }
