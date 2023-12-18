@@ -269,6 +269,8 @@ func getArrEnv(key1, key2 string, fallback []string) {
 	arr[0] = str
 	fmt.Println("zookeeper Envirement valiable", "str", str, "arr", arr)
 	Config.Zookeeper.ZkAddr = arr
+	Config.Zookeeper.Password = "password_test"
+	fmt.Println("zookeepre password_test", Config.Zookeeper.Password, Config.Zookeeper.ZkAddr)
 }
 
 func getArrPointEnv(key1, key2 string, fallback *[]string) *[]string {
