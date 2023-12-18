@@ -62,7 +62,6 @@ func main() {
 	if err != nil {
 		return
 	}
-
 	if err := config.InitConfig(configFile); err != nil {
 		panic(err)
 	}

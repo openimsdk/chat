@@ -47,15 +47,13 @@ func main() {
 		return
 	}
 
-	if err := config.InitConfig(configFile); err != nil {
-		panic(err)
-	}
-
 	err = component.ComponentCheck(configFile, hide)
 	if err != nil {
 		return
 	}
-
+	if err := config.InitConfig(configFile); err != nil {
+		panic(err)
+	}
 	if config.Config.Envs.Discovery == "k8s" {
 		rpcPort = 80
 	}

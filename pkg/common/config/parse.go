@@ -79,9 +79,6 @@ func InitConfig(configFile string) error {
 	if err := yaml.NewDecoder(bytes.NewReader(data)).Decode(&Config); err != nil {
 		return fmt.Errorf("parse loacl openIMConfig file error: %w", err)
 	}
-
-	configData, err := yaml.Marshal(&Config)
-	fmt.Printf("debug: %s\nconfig:\n%s\n", time.Now(), string(configData))
 	if err != nil {
 		return utils.Wrap(err, configFile)
 	}
@@ -90,7 +87,8 @@ func InitConfig(configFile string) error {
 		return fmt.Errorf("get env error:%w", err)
 	}
 
-	fmt.Printf("%s\nconfig:\n%s\n", time.Now(), Config)
+	configData, err := yaml.Marshal(&Config)
+	fmt.Printf("debug: %s\nconfig:\n%s\n", time.Now(), string(configData))
 
 	return nil
 }
@@ -267,10 +265,6 @@ func getArrEnv(key1, key2 string, fallback []string) {
 		return
 	}
 	arr[0] = str
-	fmt.Println("zookeeper Envirement valiable", "str", str, "arr", arr)
-	Config.Zookeeper.ZkAddr = arr
-	Config.Zookeeper.Password = "password_test"
-	fmt.Println("zookeepre password_test", Config.Zookeeper.Password, Config.Zookeeper.ZkAddr)
 }
 
 func getArrPointEnv(key1, key2 string, fallback *[]string) *[]string {
