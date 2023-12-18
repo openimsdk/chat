@@ -79,6 +79,9 @@ func InitConfig(configFile string) error {
 	if err := yaml.NewDecoder(bytes.NewReader(data)).Decode(&Config); err != nil {
 		return fmt.Errorf("parse loacl openIMConfig file error: %w", err)
 	}
+	if err != nil {
+		return utils.Wrap(err, configFile)
+	}
 
 	if err := configGetEnv(); err != nil {
 		return fmt.Errorf("get env error:%w", err)
@@ -86,10 +89,6 @@ func InitConfig(configFile string) error {
 
 	configData, err := yaml.Marshal(&Config)
 	fmt.Printf("debug: %s\nconfig:\n%s\n", time.Now(), string(configData))
-	if err != nil {
-		return utils.Wrap(err, configFile)
-	}
-	fmt.Printf("%s\nconfig:\n%s\n", time.Now(), string(configData))
 
 	return nil
 }
@@ -226,7 +225,6 @@ func configGetEnv() error {
 	Config.Zookeeper.Schema = getEnv("ZOOKEEPER_SCHEMA", Config.Zookeeper.Schema)
 	Config.Zookeeper.Username = getEnv("ZOOKEEPER_USERNAME", Config.Zookeeper.Username)
 	Config.Zookeeper.Password = getEnv("ZOOKEEPER_PASSWORD", Config.Zookeeper.Password)
-	Config.Zookeeper.ZkAddr = getArrEnv("ZOOKEEPER_ADDRESS", "ZOOKEEPER_PORT", Config.Zookeeper.ZkAddr)
 
 	Config.ChatApi.ListenIP = getEnv("CHAT_API_LISTEN_IP", Config.ChatApi.ListenIP)
 	Config.AdminApi.ListenIP = getEnv("ADMIN_API_LISTEN_IP", Config.AdminApi.ListenIP)
@@ -253,18 +251,21 @@ func configGetEnv() error {
 	if err != nil {
 		return err
 	}
-
+	getArrEnv("ZOOKEEPER_ADDRESS", "ZOOKEEPER_PORT", Config.Zookeeper.ZkAddr)
 	return nil
 }
 
-func getArrEnv(key1, key2 string, fallback []string) []string {
+func getArrEnv(key1, key2 string, fallback []string) {
 	str1 := getEnv(key1, "")
 	str2 := getEnv(key2, "")
 	str := fmt.Sprintf("%s:%s", str1, str2)
+	arr := make([]string, 1)
 	if len(str) <= 1 {
-		return fallback
+		return
 	}
-	return []string{str}
+	arr[0] = str
+	fmt.Println("zookeeper Envirement valiable", "str", str)
+	Config.Zookeeper.ZkAddr = arr
 }
 
 func getArrPointEnv(key1, key2 string, fallback *[]string) *[]string {
