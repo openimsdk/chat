@@ -259,12 +259,13 @@ func getArrEnv(key1, key2 string, fallback []string) {
 	str1 := getEnv(key1, "")
 	str2 := getEnv(key2, "")
 	str := fmt.Sprintf("%s:%s", str1, str2)
-	fmt.Println("zookeeper Envirement valiable", "str", str)
 	arr := make([]string, 1)
 	if len(str) <= 1 {
 		return
 	}
 	arr[0] = str
+	fmt.Println("zookeeper Envirement valiable", "str", str)
+	Config.Zookeeper.ZkAddr = arr
 }
 
 func getArrPointEnv(key1, key2 string, fallback *[]string) *[]string {
