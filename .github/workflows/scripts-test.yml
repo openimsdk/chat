@@ -79,7 +79,7 @@ jobs:
         sleep 30;
     - name: start all services
       run: |
-        sudo cp ./deployments/templates/config.yaml ./config/config.yaml
+        sudo make init
         sudo make start
       shell: bash
 
