@@ -82,15 +82,16 @@ func InitConfig(configFile string) error {
 		return fmt.Errorf("parse loacl openIMConfig file error: %w", err)
 	}
 
-	if err := configGetEnv(); err != nil {
-		return fmt.Errorf("get env error:%w", err)
-	}
-
 	configData, err := yaml.Marshal(&Config)
 	fmt.Printf("debug: %s\nconfig:\n%s\n", time.Now(), string(configData))
 	if err != nil {
 		return utils.Wrap(err, configFile)
 	}
+
+	if err := configGetEnv(); err != nil {
+		return fmt.Errorf("get env error:%w", err)
+	}
+
 	fmt.Printf("%s\nconfig:\n%s\n", time.Now(), string(configData))
 
 	return nil
