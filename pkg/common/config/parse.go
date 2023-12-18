@@ -242,7 +242,7 @@ func configGetEnv() error {
 
 	Config.Secret = getEnvStringPoint("SECRET", Config.Secret)
 	Config.ProxyHeader = getEnv("PROXY_HEADER", Config.ProxyHeader)
-	Config.OpenIMUrl = getEnv("OPENIM_SERVER_ADDRESS", Config.OpenIMUrl)
+	Config.OpenIMUrl = getStringEnv("OPENIM_SERVER_ADDRESS", "API_OPENIM_PORT", Config.OpenIMUrl)
 
 	Config.Redis.Username = getEnv("REDIS_USERNAME", Config.Redis.Username)
 	Config.Redis.Password = getEnv("REDIS_PASSWORD", Config.Redis.Password)
@@ -275,6 +275,16 @@ func getArrPointEnv(key1, key2 string, fallback *[]string) *[]string {
 		return fallback
 	}
 	return &[]string{str}
+}
+
+func getStringEnv(key1, key2 string, fallback string) string {
+	str1 := getEnv(key1, "")
+	str2 := getEnv(key2, "")
+	str := fmt.Sprintf("%s:%s", str1, str2)
+	if len(str) <= 2 {
+		return fallback
+	}
+	return str
 }
 
 func getEnv(key, fallback string) string {
