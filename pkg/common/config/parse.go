@@ -90,7 +90,7 @@ func InitConfig(configFile string) error {
 		return fmt.Errorf("get env error:%w", err)
 	}
 
-	fmt.Printf("%s\nconfig:\n%s\n", time.Now(), string(configData))
+	fmt.Printf("%s\nconfig:\n%s\n", time.Now(), Config)
 
 	return nil
 }
