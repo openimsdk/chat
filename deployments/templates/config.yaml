@@ -20,7 +20,7 @@ envs:
 zookeeper:
   schema: openim # ZOOKEEPER_SCHEMA, the schema to use in Zookeeper
   zkAddr:
-    - 127.28.0.1:12181 # ZOOKEEPER_ADDRESS and ZOOKEEPER_PORT, Zookeeper address and port
+    - 172.28.0.1:12181 # ZOOKEEPER_ADDRESS and ZOOKEEPER_PORT, Zookeeper address and port
   username: "" # ZOOKEEPER_USERNAME, Username for Zookeeper authentication
   password: "" # ZOOKEEPER_PASSWORD, Password for Zookeeper authentication
 
@@ -51,7 +51,7 @@ rpcRegisterName:
 
 # MySQL database configuration - used for storing OpenIM data
 mysql:
-   address: [ 127.0.0.1:13306 ]            # MYSQL_ADDRESS and MYSQL_PORT, MySQL server address and port
+   address: [ 172.28.0.1:13306 ]            # MYSQL_ADDRESS and MYSQL_PORT, MySQL server address and port
    username: root                          # MYSQL_USERNAME, Username for MySQL
    password: openIM123                     # MYSQL_PASSWORD, Password for MySQL
    database: openIM_v3                     # MYSQL_DATABASE, Database name
@@ -118,10 +118,10 @@ adminList:
     imAdmin: openIMAdmin
 
 # URL for OpenIM server
-openIMUrl: "127.0.0.1:10002" # OPENIM_SERVER_ADDRESS:API_OPENIM_PORT, URL of the OpenIM server
+openIMUrl: "172.28.0.1:10002" # OPENIM_SERVER_ADDRESS:API_OPENIM_PORT, URL of the OpenIM server
 
 # Redis configuration - used for caching and session management
 redis:
-  address: [ 127.0.0.1:16379 ] # REDIS_ADDRESS and REDIS_PORT, Redis server address and port
+  address: [ 172.28.0.1:16379 ] # REDIS_ADDRESS and REDIS_PORT, Redis server address and port
   username: # REDIS_USERNAME, Username for Redis authentication
   password: openIM123 # REDIS_PASSWORD, Password for Redis
