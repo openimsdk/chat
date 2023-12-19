@@ -34,7 +34,7 @@ for i in ${service_port_name[*]}; do
   list=$(cat $OPENIM_ROOT/config/config.yaml | grep -w ${i} | awk -F '[:]' '{print $NF}')
   list_to_string $list
   for j in ${ports_array}; do
-      name="ps -aux |grep -w $j |grep -v grep"
+      name="ps aux |grep -w $j |grep -v grep"
       count="${name}| wc -l"
       if [ $(eval ${count}) -gt 0 ]; then
         pid="${name}| awk '{print \$2}'"
