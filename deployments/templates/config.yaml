@@ -103,7 +103,7 @@ verifyCode:
     smtpPort: 465 # SMTP server port for email sending
 
 # Proxy header configuration for IP extraction
-proxyHeader: "X-Forwarded-For" # PROXY_HEADER, Header used for extracting the client IP address
+# proxyHeader: "X-Forwarded-For" # PROXY_HEADER, Header used for extracting the client IP address
 
 # List of admin users
 adminList:
