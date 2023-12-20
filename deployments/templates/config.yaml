@@ -117,6 +117,12 @@ adminList:
     nickname: chat3
     imAdmin: openIMAdmin
 
+# chatAdmin, use for send notification
+chatAdmin:
+  - adminID: chatAdmin
+    nickname: chatAdmin
+    imAdmin: imAdmin
+
 # URL for OpenIM server
 openIMUrl: "http://127.0.0.1:10002" # OPENIM_SERVER_ADDRESS:API_OPENIM_PORT, URL of the OpenIM server
 
