@@ -1,16 +1,22 @@
-You may be licensed to use source code to create compiled versions not produced by OpenIM in one of two ways:
-1. Under the Free Software Foundation’s GPL v.3.0, subject to the exceptions outlined in this policy; or
-2. Under a commercial license available from OpenIM by contacting contact@openim.io
+# openim-chat
 
-# chat
+## 📄 License Options for OpenIM Source Code
 
-### Modifying configuration items
+You may use the OpenIM source code to create compiled versions not originally produced by OpenIM under one of the following two licensing options:
 
-Refer to `config/config.yaml` for configuration instructions
+### 1. GNU General Public License v3.0 (GPLv3) 🆓
+
++ This option is governed by the Free Software Foundation's [GPL v3.0](https://www.gnu.org/licenses/gpl-3.0.en.html).
++ Usage is subject to certain exceptions as outlined in this policy.
+
+### 2. Commercial License 💼
+
++ Obtain a commercial license by contacting OpenIM.
++ For more details and licensing inquiries, please email 📧 [contact@openim.io](mailto:contact@openim.io).
 
 ## 🧩 Awesome features
 1. This repository implement a business system, which consists of two parts: User related function and background management function
-2. The business system depends on the api of the im system ([Open-IM-Server repository](https://github.com/OpenIMSDK/Open-IM-Server)) and implement various functions by calling the api of the im system
+2. The business system depends on the api of the im system ([open-im-server repository](https://github.com/openimsdk/open-im-server)) and implement various functions by calling the api of the im system
 3. User related part includes some regular functions like user login, user register, user info update, etc.
 4. Background management provides api for admin to manage the im system containing functions like user management, message mangement,group management,etc.
 
@@ -21,21 +27,58 @@ Refer to `config/config.yaml` for configuration instructions
 ### 📦 Installation
 
 ```bash
-git clone https://github.com/OpenIMSDK/chat openim-chat && export openim-chat=$(pwd)/openim-chat && cd $openim-chat && make
+git clone https://github.com/openimsdk/chat openim-chat && export openim-chat=$(pwd)/openim-chat && cd $openim-chat && make
 ```
 
 ### Developing chat
 
-If you wish to deploy chat, then you should first install and deploy OpenIM, this [Open-IM-Server repository](https://github.com/OpenIMSDK/Open-IM-Server)
+You can deploy OpenIM Chat in two ways, either from source (which requires openIM-server to be installed) or with [docker compose](https://github.com/openimsdk/openim-docker)
+
+**Here's how to deploy from source code:**
+
+If you wish to deploy chat, then you should first install and deploy OpenIM, this [open-im-server repository](https://github.com/openimsdk/open-im-server)
+
+First, install openim-server in a new directory or location repository
 
 ```bash
-git clone -b release-v3.1 https://github.com/OpenIMSDK/Open-IM-Server.git openim && export openim=$(pwd)/openim && cd $openim
+git clone -b release-v3.4 https://github.com/OpenIMSDK/Open-IM-Server.git openim && export openim=$(pwd)/openim && cd $openim
 sudo docker compose up -d
 ```
 
-Installing Chat
+**Setting configuration items:**
+
 ```bash
-$ make install
+make init
+```
+
+> Then modify the configuration file `config/config.yaml` according to your needs
+> Note: If you want to use the mysql database, you need to modify the mysql configuration item in the configuration file. If you want to use the mongo database, you need to modify the mongo configuration item in the configuration file
+
+
+Then go back to the chat directory, Installing Chat
+
+**Start Mysql:**
+
+> The newer versions of OpenIM remove the Mysql component, which requires an additional Mysql installation if you want to deploy chat
+
+```bash
+docker run -d \
+  --name mysql4 \
+  -p 13306:3306 \
+  -p 3306:33060 \
+  -v "$(pwd)/components/mysql/data:/var/lib/mysql" \
+  -v "/etc/localtime:/etc/localtime" \
+  -e MYSQL_ROOT_PASSWORD="openIM123" \
+  --restart always \
+  mysql:5.7
+```
+
+**Install Chat:**
+
+```bash
+$ make build
+$ make start
+$ make check
 ```
 
 ## 🛫 Quick start 
@@ -130,14 +173,14 @@ Contributions to this project are welcome! Please see [CONTRIBUTING.md](./CONTRI
 ## Community Meetings
 We want anyone to get involved in our community, we offer gifts and rewards, and we welcome you to join us every Thursday night.
 
-We take notes of each [biweekly meeting](https://github.com/OpenIMSDK/Open-IM-Server/issues/381) in [GitHub discussions](https://github.com/OpenIMSDK/Open-IM-Server/discussions/categories/meeting), and our minutes are written in [Google Docs](https://docs.google.com/document/d/1nx8MDpuG74NASx081JcCpxPgDITNTpIIos0DS6Vr9GU/edit?usp=sharing).
+We take notes of each [biweekly meeting](https://github.com/openimsdk/open-im-server/issues/381) in [GitHub discussions](https://github.com/openimsdk/open-im-server/discussions/categories/meeting), and our minutes are written in [Google Docs](https://docs.google.com/document/d/1nx8MDpuG74NASx081JcCpxPgDITNTpIIos0DS6Vr9GU/edit?usp=sharing).
 
 
-## Who are using Open-IM-Server
-The [user case studies](https://github.com/OpenIMSDK/community/blob/main/ADOPTERS.md) page includes the user list of the project. You can leave a [📝comment](https://github.com/OpenIMSDK/Open-IM-Server/issues/379) to let us know your use case.
+## Who are using open-im-server
+The [user case studies](https://github.com/openimsdk/community/blob/main/ADOPTERS.md) page includes the user list of the project. You can leave a [📝comment](https://github.com/openimsdk/open-im-server/issues/379) to let us know your use case.
 
-![avatar](https://github.com/OpenIMSDK/OpenIM-Docs/blob/main/docs/images/WechatIMG20.jpeg)
+![avatar](https://github.com/openimsdk/OpenIM-Docs/blob/main/docs/images/WechatIMG20.jpeg)
 
 ## 🚨 License
 
-chat is licensed under the  Apache 2.0 license. See [LICENSE](https://github.com/OpenIMSDK/chat/tree/main/LICENSE) for the full license text.
+chat is licensed under the  Apache 2.0 license. See [LICENSE](https://github.com/openimsdk/chat/tree/main/LICENSE) for the full license text.

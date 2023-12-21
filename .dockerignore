@@ -19,7 +19,6 @@ CHANGELOG/
 
 # Ignore deployment-related files
 docker-compose.yaml
-deployments/
 
 # Ignore assets
 assets/

@@ -344,3 +344,46 @@ func (x *SetClientConfigReq) Check() error {
 	}
 	return nil
 }
+
+func (x *ChangeAdminPasswordReq) Check() error {
+	if x.UserID == "" {
+		return errs.ErrArgs.Wrap("userID is empty")
+	}
+	if x.CurrentPassword == "" {
+		return errs.ErrArgs.Wrap("currentPassword is empty")
+	}
+	if x.NewPassword == "" {
+		return errs.ErrArgs.Wrap("newPassword is empty")
+	}
+	if x.CurrentPassword == x.NewPassword {
+		return errs.ErrArgs.Wrap("currentPassword is equal to newPassword")
+	}
+	return nil
+}
+
+func (x *AddAdminAccountReq) Check() error {
+	if x.Account == "" {
+		return errs.ErrArgs.Wrap("account is empty")
+	}
+	if x.Password == "" {
+		return errs.ErrArgs.Wrap("password is empty")
+	}
+	return nil
+}
+
+func (x *DelAdminAccountReq) Check() error {
+	if len(x.UserIDs) == 0 {
+		return errs.ErrArgs.Wrap("userIDs is empty")
+	}
+	return nil
+}
+
+func (x *SearchAdminAccountReq) Check() error {
+	if x.Pagination.ShowNumber == 0 {
+		return errs.ErrArgs.Wrap("showNumber is empty")
+	}
+	if x.Pagination.PageNumber == 0 {
+		return errs.ErrArgs.Wrap("pageNumber is empty")
+	}
+	return nil
+}

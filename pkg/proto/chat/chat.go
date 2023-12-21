@@ -193,9 +193,15 @@ func (x *ChangePasswordReq) Check() error {
 	if x.UserID == "" {
 		return errs.ErrArgs.Wrap("userID is empty")
 	}
+
+	if x.CurrentPassword == "" {
+		return errs.ErrArgs.Wrap("currentPassword is empty")
+	}
+
 	if x.NewPassword == "" {
 		return errs.ErrArgs.Wrap("newPassword is empty")
 	}
+
 	return nil
 }
 
@@ -263,7 +269,7 @@ func (x *SearchLogsReq) Check() error {
 }
 
 func EmailCheck(email string) error {
-	pattern := `^[0-9a-z][_.0-9a-z-]{0,31}@([0-9a-z][0-9a-z-]{0,30}[0-9a-z]\.){1,4}[a-z]{2,4}$`
+	pattern := `^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`
 	if err := regexMatch(pattern, email); err != nil {
 		return errs.Wrap(err, "Email is invalid")
 	}
@@ -308,5 +314,32 @@ func (x *SearchUserInfoReq) Check() error {
 	if x.Pagination.ShowNumber < 1 {
 		return errs.ErrArgs.Wrap("showNumber is invalid")
 	}
+	return nil
+}
+
+func (x *AddUserAccountReq) Check() error {
+	if x.User == nil {
+		return errs.ErrArgs.Wrap("user is empty")
+	}
+
+	if x.User.Email == "" {
+		if x.User.AreaCode == "" || x.User.PhoneNumber == "" {
+			return errs.ErrArgs.Wrap("area code or phone number is empty")
+		}
+		if x.User.AreaCode[0] != '+' {
+			x.User.AreaCode = "+" + x.User.AreaCode
+		}
+		if _, err := strconv.ParseUint(x.User.AreaCode[1:], 10, 64); err != nil {
+			return errs.ErrArgs.Wrap("area code must be number")
+		}
+		if _, err := strconv.ParseUint(x.User.PhoneNumber, 10, 64); err != nil {
+			return errs.ErrArgs.Wrap("phone number must be number")
+		}
+	} else {
+		if err := EmailCheck(x.User.Email); err != nil {
+			return errs.ErrArgs.Wrap("email must be right")
+		}
+	}
+
 	return nil
 }
