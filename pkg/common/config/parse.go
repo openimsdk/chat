@@ -20,8 +20,6 @@ import (
 	"flag"
 	"fmt"
 	"github.com/OpenIMSDK/chat/tools/component"
-	"github.com/OpenIMSDK/protocol/constant"
-	"github.com/OpenIMSDK/tools/errs"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -29,7 +27,6 @@ import (
 	"time"
 
 	Constant "github.com/OpenIMSDK/chat/pkg/common/constant"
-	openKeeper "github.com/OpenIMSDK/tools/discoveryregistry/zookeeper"
 	"github.com/OpenIMSDK/tools/utils"
 	"gopkg.in/yaml.v3"
 )
@@ -88,63 +85,8 @@ func InitConfig(configFile string, hide bool) error {
 	if err := component.ComponentCheck(configFile, hide); err != nil {
 		return err
 	}
-	if Config.Envs.Discovery != "k8s" {
-		zk, err := openKeeper.NewClient(Config.Zookeeper.ZkAddr, Config.Zookeeper.Schema,
-			openKeeper.WithFreq(time.Hour), openKeeper.WithUserNameAndPassword(Config.Zookeeper.Username,
-				Config.Zookeeper.Password), openKeeper.WithRoundRobin(), openKeeper.WithTimeout(10), openKeeper.WithLogger(&zkLogger{}))
-		if err != nil {
-			return utils.Wrap(err, "conn zk error ")
-		}
-		defer zk.Close()
-		var openIMConfigData []byte
-		for i := 0; i < 100; i++ {
-			var err error
-			configData, err := zk.GetConfFromRegistry(constant.OpenIMCommonConfigKey)
-			if err != nil {
-				fmt.Printf("get zk config [%d] error: %v\n;envs.descoery=%s", i, err, Config.Envs.Discovery)
-				time.Sleep(time.Second)
-				continue
-			}
-			if len(configData) == 0 {
-				fmt.Printf("get zk config [%d] data is empty\n", i)
-				time.Sleep(time.Second)
-				continue
-			}
-			openIMConfigData = configData
-		}
-		if len(openIMConfigData) == 0 {
-			return errs.Wrap(errors.New("get zk config data failed"))
-		}
-		if err := yaml.NewDecoder(bytes.NewReader(openIMConfigData)).Decode(&imConfig); err != nil {
-			return fmt.Errorf("parse zk openIMConfig: %w", err)
-		}
-		// can be optimized to struct replace
-		//utils.StructFieldNotNilReplace(&Config.Mysql,imConfig.Mysql) //not sure whether it works
-		configFieldCopy(&Config.Mysql.Address, imConfig.Mysql.Address)
-		configFieldCopy(&Config.Mysql.Username, imConfig.Mysql.Username)
-		configFieldCopy(&Config.Mysql.Password, imConfig.Mysql.Password)
-		configFieldCopy(&Config.Mysql.Database, imConfig.Mysql.Database)
-		configFieldCopy(&Config.Mysql.MaxOpenConn, imConfig.Mysql.MaxOpenConn)
-		configFieldCopy(&Config.Mysql.MaxIdleConn, imConfig.Mysql.MaxIdleConn)
-		configFieldCopy(&Config.Mysql.MaxLifeTime, imConfig.Mysql.MaxLifeTime)
-		configFieldCopy(&Config.Mysql.LogLevel, imConfig.Mysql.LogLevel)
-		configFieldCopy(&Config.Mysql.SlowThreshold, imConfig.Mysql.SlowThreshold)
-
-		configFieldCopy(&Config.Log.StorageLocation, imConfig.Log.StorageLocation)
-		configFieldCopy(&Config.Log.RotationTime, imConfig.Log.RotationTime)
-		configFieldCopy(&Config.Log.RemainRotationCount, imConfig.Log.RemainRotationCount)
-		configFieldCopy(&Config.Log.RemainLogLevel, imConfig.Log.RemainLogLevel)
-		configFieldCopy(&Config.Log.IsStdout, imConfig.Log.IsStdout)
-		configFieldCopy(&Config.Log.WithStack, imConfig.Log.WithStack)
-		configFieldCopy(&Config.Log.IsJson, imConfig.Log.IsJson)
-
-		configFieldCopy(&Config.Secret, imConfig.Secret)
-		configFieldCopy(&Config.TokenPolicy.Expire, imConfig.TokenPolicy.Expire)
-
-		// Redis
-		configFieldCopy(&Config.Redis.Address, imConfig.Redis.Address)
-		configFieldCopy(&Config.Redis.Password, imConfig.Redis.Password)
-		configFieldCopy(&Config.Redis.Username, imConfig.Redis.Username)
+	if err := configGetEnv(); err != nil {
+		return fmt.Errorf("get env error:%w", err)
 	}
 
 	configData, err := yaml.Marshal(&Config)
