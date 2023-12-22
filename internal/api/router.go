@@ -84,7 +84,7 @@ func NewAdminRoute(router gin.IRouter, discov discoveryregistry.SvcDiscoveryRegi
 	importGroup := router.Group("/user/import")
 	importGroup.POST("/json", mw.CheckAdminOrNil, admin.ImportUserByJson)
 	importGroup.POST("/xlsx", mw.CheckAdminOrNil, admin.ImportUserByXlsx)
-	importGroup.GET("/template", admin.BatchImportTemplate)
+	importGroup.GET("/xlsx", admin.BatchImportTemplate)
 
 	defaultRouter := router.Group("/default", mw.CheckAdmin)
 	defaultUserRouter := defaultRouter.Group("/user")
