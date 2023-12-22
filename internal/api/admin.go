@@ -430,6 +430,7 @@ func (o *AdminApi) checkSecretAdmin(c *gin.Context, secret string) error {
 }
 
 func (o *AdminApi) ImportUserByXlsx(c *gin.Context) {
+	defer log.ZDebug(c, "ImportUserByXlsx return")
 	formFile, err := c.FormFile("data")
 	if err != nil {
 		apiresp.GinError(c, err)
