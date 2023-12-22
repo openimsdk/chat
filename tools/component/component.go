@@ -16,7 +16,6 @@ package component
 
 import (
 	"fmt"
-	"os"
 	"time"
 
 	"github.com/OpenIMSDK/protocol/constant"
@@ -26,31 +25,13 @@ import (
 	"github.com/OpenIMSDK/tools/log"
 	"github.com/go-zookeeper/zk"
 	"github.com/pkg/errors"
-	"gopkg.in/yaml.v3"
 )
 
 var (
 	MaxConnectTimes = 100
 )
 
-func initCfg(cfgPath string) error {
-	file, err := os.ReadFile(cfgPath)
-	if err != nil {
-		return errs.Wrap(err)
-	}
-	err = yaml.Unmarshal(file, &config.Config)
-	if err != nil {
-		return errs.Wrap(err)
-	}
-	return err
-}
-
 func ComponentCheck(cfgPath string, hide bool) error {
-	err := initCfg(cfgPath)
-	if err != nil {
-		errorPrint(errs.Wrap(err).Error(), hide)
-		return err
-	}
 	if config.Config.Envs.Discovery != "k8s" {
 		if _, err := checkNewZkClient(hide); err != nil {
 			errorPrint(fmt.Sprintf("%v.Please check if your openIM server has started", err.Error()), hide)

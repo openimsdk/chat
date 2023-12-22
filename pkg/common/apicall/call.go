@@ -94,7 +94,7 @@ func (a caller[Req, Resp]) call(ctx context.Context, req *Req) (*Resp, error) {
 	log.ZDebug(ctx, "call caller successfully", "code", response.Status)
 	defer response.Body.Close()
 	if response.StatusCode != http.StatusOK {
-		return nil, errors.New(response.Status)
+		return nil, errs.Wrap(errors.New(response.Status))
 	}
 	data, err := io.ReadAll(response.Body)
 	if err != nil {

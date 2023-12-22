@@ -35,7 +35,7 @@ const (
 // NewRedis Initialize redis connection.
 func NewRedis() (redis.UniversalClient, error) {
 	if len(*config.Config.Redis.Address) == 0 {
-		return nil, errors.New("redis address is empty")
+		return nil, errs.Wrap(errors.New("redis address is empty"))
 	}
 	specialerror.AddReplace(redis.Nil, errs.ErrRecordNotFound)
 	var rdb redis.UniversalClient
