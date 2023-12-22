@@ -15,7 +15,6 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"math/rand"
 	"net"
@@ -24,8 +23,6 @@ import (
 
 	"github.com/OpenIMSDK/chat/pkg/discovery_register"
 	"github.com/OpenIMSDK/tools/discoveryregistry"
-
-	"github.com/OpenIMSDK/chat/tools/component"
 
 	mw2 "github.com/OpenIMSDK/chat/pkg/common/mw"
 	"github.com/OpenIMSDK/chat/pkg/common/version"
@@ -64,14 +61,7 @@ func main() {
 		fmt.Println("Platform:", ver.Platform)
 		return
 	}
-
-	flag.Parse()
-
-	err = component.ComponentCheck(configFile, hide)
-	if err != nil {
-		return
-	}
-	err = config.InitConfig(configFile)
+	err = config.InitConfig(configFile, hide)
 	if err != nil {
 		fmt.Println("err ", err.Error())
 		panic(err)

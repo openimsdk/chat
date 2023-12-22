@@ -19,6 +19,8 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"github.com/OpenIMSDK/chat/tools/component"
+	"github.com/OpenIMSDK/tools/errs"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -40,9 +42,10 @@ var (
 
 func readConfig(configFile string) ([]byte, error) {
 	b, err := os.ReadFile(configFile)
-	if err != nil { // File exists and was read successfully
+	if err != nil {
 		return nil, utils.Wrap(err, configFile)
 	}
+	// File exists and was read successfully
 	return b, nil
 
 	//	//First, check the configFile argument
@@ -73,13 +76,17 @@ func readConfig(configFile string) ([]byte, error) {
 	//	return b, nil
 }
 
-func InitConfig(configFile string) error {
+func InitConfig(configFile string, hide bool) error {
 	data, err := readConfig(configFile)
 	if err != nil {
-		return fmt.Errorf("read loacl config file error: %w", err)
+		return fmt.Errorf("read local config file error: %w", err)
 	}
 	if err := yaml.NewDecoder(bytes.NewReader(data)).Decode(&Config); err != nil {
-		return fmt.Errorf("parse loacl openIMConfig file error: %w", err)
+		return fmt.Errorf("parse local openIMConfig file error: %w", err)
+	}
+
+	if err := component.ComponentCheck(configFile, hide); err != nil {
+		return err
 	}
 	if Config.Envs.Discovery != "k8s" {
 		zk, err := openKeeper.NewClient(Config.Zookeeper.ZkAddr, Config.Zookeeper.Schema,
@@ -106,12 +113,13 @@ func InitConfig(configFile string) error {
 			openIMConfigData = configData
 		}
 		if len(openIMConfigData) == 0 {
-			return errors.New("get zk config data failed")
+			return errs.Wrap(errors.New("get zk config data failed"))
 		}
 		if err := yaml.NewDecoder(bytes.NewReader(openIMConfigData)).Decode(&imConfig); err != nil {
 			return fmt.Errorf("parse zk openIMConfig: %w", err)
 		}
-		// 这里可以优化，可将其优化为结构体层面的赋值
+		// can be optimized to struct replace
+		//utils.StructFieldNotNilReplace(&Config.Mysql,imConfig.Mysql) //not sure whether it works
 		configFieldCopy(&Config.Mysql.Address, imConfig.Mysql.Address)
 		configFieldCopy(&Config.Mysql.Username, imConfig.Mysql.Username)
 		configFieldCopy(&Config.Mysql.Password, imConfig.Mysql.Password)
@@ -211,8 +219,7 @@ func CreateCatalogPath(path string) []string {
 	// the parent is project(default)
 	pa3 := filepath.Join(path3, Constant.ConfigPath)
 
-	return []string{pa1, pa2,pa3}
-
+	return []string{pa1, pa2, pa3}
 
 }
 

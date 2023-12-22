@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/OpenIMSDK/chat/pkg/common/chatrpcstart"
-	"github.com/OpenIMSDK/chat/tools/component"
 	"github.com/OpenIMSDK/tools/log"
 
 	"github.com/OpenIMSDK/chat/internal/rpc/chat"
@@ -32,12 +31,7 @@ func main() {
 		fmt.Println("Platform:", ver.Platform)
 		return
 	}
-
-	err = component.ComponentCheck(configFile, hide)
-	if err != nil {
-		return
-	}
-	if err := config.InitConfig(configFile); err != nil {
+	if err := config.InitConfig(configFile, hide); err != nil {
 		panic(err)
 	}
 	if config.Config.Envs.Discovery == "k8s" {
