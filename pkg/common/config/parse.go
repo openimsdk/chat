@@ -20,6 +20,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/OpenIMSDK/chat/tools/component"
+	"github.com/OpenIMSDK/protocol/constant"
 	"github.com/OpenIMSDK/tools/errs"
 	"os"
 	"path/filepath"
@@ -28,6 +29,7 @@ import (
 	"time"
 
 	Constant "github.com/OpenIMSDK/chat/pkg/common/constant"
+	openKeeper "github.com/OpenIMSDK/tools/discoveryregistry/zookeeper"
 	"github.com/OpenIMSDK/tools/utils"
 	"gopkg.in/yaml.v3"
 )
