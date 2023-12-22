@@ -15,6 +15,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"math/rand"
 	"net"
@@ -61,6 +62,7 @@ func main() {
 		fmt.Println("Platform:", ver.Platform)
 		return
 	}
+	flag.Parse()
 	err = config.InitConfig(configFile, hide)
 	if err != nil {
 		fmt.Println("err ", err.Error())
