@@ -46,10 +46,12 @@ jobs:
           images: openim/openim-chat
           # generate Docker tags based on the following events/attributes
           tags: |
+            type=ref,event=tag
             type=schedule
             type=ref,event=branch
             type=ref,event=pr
             type=semver,pattern={{version}}
+            type=semver,pattern=v{{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=semver,pattern={{major}}
             type=sha
@@ -85,6 +87,16 @@ jobs:
         uses: docker/metadata-action@v4.6.0
         with:
           images: registry.cn-hangzhou.aliyuncs.com/openimsdk/openim-chat
+          tags: |
+            type=ref,event=tag
+            type=schedule
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern=v{{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+            type=sha
 
       - name: Log in to AliYun Docker Hub
         uses: docker/login-action@v2
@@ -118,6 +130,16 @@ jobs:
         uses: docker/metadata-action@v4.6.0
         with:
           images: ghcr.io/openimsdk/openim-chat
+          tags: |
+            type=ref,event=tag
+            type=schedule
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern=v{{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+            type=sha
 
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v2

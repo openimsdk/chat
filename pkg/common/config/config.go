@@ -43,8 +43,8 @@ var Config struct {
 	} `yaml:"rpc"`
 	Redis struct {
 		Address  *[]string `yaml:"address"`
-		Username *string   `yaml:"username"`
-		Password *string   `yaml:"password"`
+		Username string    `yaml:"username"`
+		Password string    `yaml:"password"`
 	} `yaml:"redis"`
 	RpcPort struct {
 		OpenImAdminPort []int `yaml:"openImAdminPort"`

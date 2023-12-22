@@ -1,0 +1,127 @@
+# Copyright © 2023 OpenIM open source community. All rights reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# OpenIM Server should be started before this configuration is applied
+envs:
+  discovery: "zookeeper" # ENVS_DISCOVERY, e.g., zookeeper, etcd...
+
+# Zookeeper configuration - used for service discovery and coordination
+zookeeper:
+  schema: openim # ZOOKEEPER_SCHEMA, the schema to use in Zookeeper
+  zkAddr:
+    - 172.28.0.1:12181 # ZOOKEEPER_ADDRESS and ZOOKEEPER_PORT, Zookeeper address and port
+  username: "" # ZOOKEEPER_USERNAME, Username for Zookeeper authentication
+  password: "" # ZOOKEEPER_PASSWORD, Password for Zookeeper authentication
+
+# Configuration for the chat API service
+chatApi:
+  openImChatApiPort: [ 10008 ] # Port for OpenIM Chat API
+  listenIP: # CHAT_API_LISTEN_IP, IP address to listen on for Chat API
+
+# Configuration for the admin API service
+adminApi:
+  openImAdminApiPort: [ 10009 ] # Port for OpenIM Admin API
+  listenIP: # ADMIN_API_LISTEN_IP, IP address to listen on for Admin API
+
+# RPC configuration for service communication
+rpc:
+  registerIP: # RPC_REGISTER_IP, IP address to register with Zookeeper for RPC
+  listenIP:   # RPC_LISTEN_IP, IP address to listen on for RPC (default 0.0.0.0)
+
+# Ports for RPC services
+rpcPort:
+  openImAdminPort: [ 30200 ] # Port for OpenIM Admin RPC service
+  openImChatPort: [ 30300 ] # Port for OpenIM Chat RPC service
+
+# Names for RPC services registration
+rpcRegisterName:
+  openImAdminName: admin # Name for OpenIM Admin RPC service
+  openImChatName: chat   # Name for OpenIM Chat RPC service
+
+# MySQL database configuration - used for storing OpenIM data
+mysql:
+   address: [ 172.28.0.1:13306 ]            # MYSQL_ADDRESS and MYSQL_PORT, MySQL server address and port
+   username: root                          # MYSQL_USERNAME, Username for MySQL
+   password: openIM123                     # MYSQL_PASSWORD, Password for MySQL
+   database: openIM_v3                     # MYSQL_DATABASE, Database name
+   maxOpenConn: 1000                       # Max open connections
+   maxIdleConn: 100                        # Max idle connections
+   maxLifeTime: 60                         # Max lifetime of connections in seconds
+   logLevel: 4                             # Log level for MySQL
+   slowThreshold: 500                      # Slow query threshold in milliseconds
+
+# Log configuration - defines how logging is handled
+log:
+  storageLocation: ../logs/           # LOG_STORAGE_LOCATION, Directory for storing logs
+  rotationTime: 24                    # Log rotation time in hours
+  remainRotationCount: 2              # Number of log files to retain
+  remainLogLevel: 6                   # Log level (6 = all levels)
+  isStdout: false                     # Whether to output logs to stdout
+  isJson: false                       # Whether to output logs in JSON format
+  withStack: false                    # Whether to include stack trace in logs
+
+# Secret key for secure communication
+secret: openIM123 # SECRET, Secret key for encryption and secure communication
+
+# Token policy configuration
+tokenPolicy:
+  expire: 86400 # TOKEN_EXPIRE, Token expiration time in seconds
+
+# Verification code settings
+verifyCode:
+  validTime: 300 # Verification code valid time in seconds
+  validCount: 5 # Number of times a verification code is valid
+  uintTime: 86400 # Time unit for verification code
+  maxCount: 10 # Maximum number of verification codes in a time unit
+  superCode: "666666" # Super verification code (used only when `use` is empty)
+  len: 6 # Length of the verification code
+  use: "" # Service used for verification code (e.g., "ali")
+  # Aliyun SMS service configuration
+  ali:
+    endpoint: "dysmsapi.aliyuncs.com"
+    accessKeyId: ""
+    accessKeySecret: ""
+    signName: ""
+    verificationCodeTemplateCode: ""
+  # Email service configuration
+  mail:
+    title: ""
+    senderMail: "" # Email address of the sender
+    senderAuthorizationCode: "" # Authorization code for the sender's email
+    smtpAddr: "smtp.qq.com" # SMTP server address
+    smtpPort: 465 # SMTP server port for email sending
+
+# Proxy header configuration for IP extraction
+# proxyHeader: "X-Forwarded-For" # PROXY_HEADER, Header used for extracting the client IP address
+
+# List of admin users
+adminList:
+  - adminID: admin1
+    nickname: chat1
+    imAdmin: openIM123456
+  - adminID: admin2
+    nickname: chat2
+    imAdmin: openIM654321
+  - adminID: admin3
+    nickname: chat3
+    imAdmin: openIMAdmin
+
+# URL for OpenIM server
+openIMUrl: "http://172.28.0.1:10002" # OPENIM_SERVER_ADDRESS:API_OPENIM_PORT, URL of the OpenIM server
+
+# Redis configuration - used for caching and session management
+redis:
+  address: [ 172.28.0.1:16379 ] # REDIS_ADDRESS and REDIS_PORT, Redis server address and port
+  username: # REDIS_USERNAME, Username for Redis authentication
+  password: openIM123 # REDIS_PASSWORD, Password for Redis

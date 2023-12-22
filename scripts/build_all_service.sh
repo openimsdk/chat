@@ -45,12 +45,20 @@ logs_dir="$OPENIM_ROOT/logs"
 echo "==> bin_dir=$bin_dir"
 echo "==> logs_dir=$logs_dir"
 
-
 cd $SCRIPTS_ROOT/..
 
+# Get the current operating system and architecture
+OS=$(uname -s | tr '[:upper:]' '[:lower:]')
+ARCH=$(uname -m)
+
 # CPU core number
-cpu_count=$(lscpu | grep -e '^CPU(s):' | awk '{print $2}')
-echo -e "${GREEN_PREFIX}======> cpu_count=$cpu_count${COLOR_SUFFIX}"
+if [[ "$OS" == "darwin" ]]; then
+    cpu_count=$(sysctl -n hw.ncpu)
+elif [[ "$OS" == "linux" ]]; then
+    cpu_count=$(lscpu | grep -e 'CPU(s):' | awk '{print $3}')
+else [[ "$OS" == "windows" ]];
+    cpu_count=$(lscpu | grep -e 'CPU(s):' | awk '{print $3}')
+fi
 
 # Count the number of concurrent compilations (half the number of cpus)
 compile_count=$((cpu_count / 2))
@@ -62,10 +70,6 @@ if [ $? -ne 0 ]; then
   echo "make build Error, script exits"
   exit 1
 fi
-
-# Get the current operating system and architecture
-OS=$(uname -s | tr '[:upper:]' '[:lower:]')
-ARCH=$(uname -m)
 
 # Select the repository home directory based on the operating system and architecture
 if [[ "$OS" == "darwin" ]]; then

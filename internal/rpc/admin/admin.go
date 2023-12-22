@@ -130,7 +130,7 @@ func (o *adminServer) AddAdminAccount(ctx context.Context, req *admin.AddAdminAc
 
 	adm := &admin2.Admin{
 		Account:    req.Account,
-		Password:   o.passwordEncryption(req.Password),
+		Password:   req.Password,
 		FaceURL:    req.FaceURL,
 		Nickname:   req.Nickname,
 		UserID:     o.genUserID(),
@@ -233,7 +233,7 @@ func (o *adminServer) Login(ctx context.Context, req *admin.LoginReq) (*admin.Lo
 		}
 		return nil, err
 	}
-	if a.Password != o.passwordEncryption(req.Password) {
+	if a.Password != req.Password {
 		return nil, eerrs.ErrPassword.Wrap()
 	}
 	adminToken, err := o.CreateToken(ctx, &admin.CreateTokenReq{UserID: a.UserID, UserType: constant.AdminUser})
