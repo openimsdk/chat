@@ -562,7 +562,7 @@ func (o *AdminApi) registerChatUser(ctx context.Context, ip string, users []*cha
 		return errs.ErrArgs.Wrap("users is empty")
 	}
 	for _, info := range users {
-		respRegisterUser, err := o.chatClient.RegisterUser(ctx, &chat.RegisterUserReq{Ip: ip, User: info})
+		respRegisterUser, err := o.chatClient.RegisterUser(ctx, &chat.RegisterUserReq{Ip: ip, User: info, Platform: constant.AdminPlatformID})
 		if err != nil {
 			return err
 		}
