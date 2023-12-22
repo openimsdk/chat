@@ -95,12 +95,6 @@ func InitConfig(configFile string, hide bool) error {
 	return nil
 }
 
-func configFieldCopy[T any](local **T, remote T) {
-	if *local == nil {
-		*local = &remote
-	}
-}
-
 func GetDefaultIMAdmin() string {
 	return Config.AdminList[0].ImAdminID
 }
