@@ -72,7 +72,7 @@ func newZkClient() (*zk.Conn, error) {
 		return nil, errs.Wrap(err, "Zookeeper Addr: "+strings.Join(config.Config.Zookeeper.ZkAddr, " "))
 	}
 
-	// 等待成功连接
+	// wait for successfully connect
 	timeout := time.After(5 * time.Second)
 	for {
 		select {
