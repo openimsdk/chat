@@ -99,7 +99,7 @@ func checkNewZkClient(hide bool) (*zk.Conn, error) {
 			errorPrint(fmt.Sprintf("Starting Zookeeper failed: %v.Please make sure your Zookeeper service has started", err.Error()), hide)
 			continue
 		}
-		successPrint(fmt.Sprint("zk starts successfully"), hide)
+		successPrint(fmt.Sprintf("zk starts successfully after: %v times ", i), hide)
 		return zkConn, nil
 	}
 	return nil, errs.Wrap(errors.New("Connecting to zk fails"))
