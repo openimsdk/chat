@@ -82,6 +82,11 @@ func NewAdminRoute(router gin.IRouter, discov discoveryregistry.SvcDiscoveryRegi
 	adminRouterGroup.POST("/search", mw.CheckAdmin, admin.SearchAdminAccount)           // Get admin list
 	//account.POST("/add_notification_account")
 
+	importGroup := router.Group("/user/import")
+	importGroup.POST("/json", mw.CheckAdminOrNil, admin.ImportUserByJson)
+	importGroup.POST("/xlsx", mw.CheckAdminOrNil, admin.ImportUserByXlsx)
+	importGroup.GET("/xlsx", admin.BatchImportTemplate)
+
 	defaultRouter := router.Group("/default", mw.CheckAdmin)
 	defaultUserRouter := defaultRouter.Group("/user")
 	defaultUserRouter.POST("/add", admin.AddDefaultFriend)       // Add default friend at registration

@@ -85,6 +85,8 @@ config:
     withStack: false
 
   secret: openIM123
+  chatSecret: openIM123
+
   tokenPolicy:
     expire: 86400
 
