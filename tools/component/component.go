@@ -95,15 +95,6 @@ Connected:
 		}
 	}
 
-	result, _, err := c.Exists("/zookeeper")
-	if err != nil {
-		return nil, errs.Wrap(err, "Failed to check /zookeeper existence")
-	}
-	if !result {
-		err = errors.New("zookeeper not exist")
-		return nil, errs.Wrap(err, "Zookeeper Addr: "+strings.Join(config.Config.Zookeeper.ZkAddr, " "))
-	}
-
 	return c, nil
 }
 
