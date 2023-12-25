@@ -32,7 +32,7 @@ import (
 )
 
 var (
-	MaxConnectTimes = 100
+	MaxConnectTimes = 200
 )
 
 func ComponentCheck(cfgPath string, hide bool) error {
@@ -66,8 +66,9 @@ func successPrint(s string, hide bool) {
 func newZkClient() (*zk.Conn, error) {
 	var c *zk.Conn
 	c, _, err := zk.Connect(config.Config.Zookeeper.ZkAddr, time.Second, zk.WithLogger(log.NewZkLogger()))
+	result, _, _ := c.Exists("zookeeper")
 	fmt.Println("zk addr=", config.Config.Zookeeper.ZkAddr)
-	if err != nil {
+	if err != nil || !result {
 		fmt.Println("zookeeper connect error:", err)
 		return nil, errs.Wrap(err, "Zookeeper Addr: "+strings.Join(config.Config.Zookeeper.ZkAddr, " "))
 	} else {
