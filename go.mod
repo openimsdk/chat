@@ -28,7 +28,7 @@ require (
 
 require (
 	github.com/OpenIMSDK/protocol v0.0.21
-	github.com/OpenIMSDK/tools v0.0.17
+	github.com/OpenIMSDK/tools v0.0.21
 	github.com/go-zookeeper/zk v1.0.3
 	github.com/redis/go-redis/v9 v9.1.0
 	github.com/xuri/excelize/v2 v2.8.0
@@ -98,6 +98,5 @@ require (
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 )
-replace (
-	github.com/OpenIMSDK/tools v0.0.17 => ./zktools
-)
+
+replace github.com/OpenIMSDK/tools v0.0.21 => ./zktools
