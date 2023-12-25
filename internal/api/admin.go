@@ -15,10 +15,17 @@
 package api
 
 import (
+	"context"
+	"crypto/md5"
+	"encoding/hex"
+	"fmt"
 	"github.com/OpenIMSDK/chat/pkg/common/apicall"
 	"github.com/OpenIMSDK/chat/pkg/common/apistruct"
 	"github.com/OpenIMSDK/chat/pkg/common/config"
+	constant2 "github.com/OpenIMSDK/chat/pkg/common/constant"
 	"github.com/OpenIMSDK/chat/pkg/common/mctx"
+	"github.com/OpenIMSDK/chat/pkg/common/xlsx"
+	"github.com/OpenIMSDK/chat/pkg/common/xlsx/model"
 	"github.com/OpenIMSDK/chat/pkg/proto/admin"
 	"github.com/OpenIMSDK/chat/pkg/proto/chat"
 	"github.com/OpenIMSDK/protocol/constant"
@@ -32,6 +39,11 @@ import (
 	"github.com/OpenIMSDK/tools/utils"
 	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc"
+	"net"
+	"net/http"
+	"strconv"
+	"strings"
+	"time"
 )
 
 func NewAdmin(chatConn, adminConn grpc.ClientConnInterface) *AdminApi {
@@ -386,4 +398,204 @@ func (o *AdminApi) SearchLogs(c *gin.Context) {
 
 func (o *AdminApi) DeleteLogs(c *gin.Context) {
 	a2r.Call(chat.ChatClient.DeleteLogs, o.chatClient, c)
+}
+
+func (o *AdminApi) getClientIP(c *gin.Context) (string, error) {
+	if config.Config.ProxyHeader == "" {
+		ip, _, err := net.SplitHostPort(c.Request.RemoteAddr)
+		return ip, err
+	}
+	ip := c.Request.Header.Get(config.Config.ProxyHeader)
+	if ip == "" {
+		return "", errs.ErrInternalServer.Wrap()
+	}
+	if ip := net.ParseIP(ip); ip == nil {
+		return "", errs.ErrInternalServer.Wrap(fmt.Sprintf("parse proxy ip header %s failed", ip))
+	}
+	return ip, nil
+}
+
+func (o *AdminApi) checkSecretAdmin(c *gin.Context, secret string) error {
+	if _, ok := c.Get(constant2.RpcOpUserID); ok {
+		return nil
+	}
+	if config.Config.ChatSecret == "" {
+		return errs.ErrNoPermission.Wrap("not config chat secret")
+	}
+	if config.Config.ChatSecret != secret {
+		return errs.ErrNoPermission.Wrap("secret error")
+	}
+	SetToken(c, config.GetDefaultIMAdmin(), constant2.AdminUser)
+	return nil
+}
+
+func (o *AdminApi) ImportUserByXlsx(c *gin.Context) {
+	defer log.ZDebug(c, "ImportUserByXlsx return")
+	formFile, err := c.FormFile("data")
+	if err != nil {
+		apiresp.GinError(c, err)
+		return
+	}
+	ip, err := o.getClientIP(c)
+	if err != nil {
+		apiresp.GinError(c, err)
+		return
+	}
+	secret := c.PostForm("secret")
+	if err := o.checkSecretAdmin(c, secret); err != nil {
+		apiresp.GinError(c, err)
+		return
+	}
+	file, err := formFile.Open()
+	if err != nil {
+		apiresp.GinError(c, err)
+		return
+	}
+	defer file.Close()
+	var users []model.User
+	if err := xlsx.ParseAll(file, &users); err != nil {
+		apiresp.GinError(c, errs.ErrArgs.Wrap("xlsx file parse error "+err.Error()))
+		return
+	}
+	us, err := o.xlsx2user(users)
+	if err != nil {
+		apiresp.GinError(c, err)
+		return
+	}
+	imToken, err := o.imApiCaller.ImAdminTokenWithDefaultAdmin(c)
+	if err != nil {
+		apiresp.GinError(c, err)
+		return
+	}
+
+	ctx := mctx.WithAdminUser(mctx.WithApiToken(c, imToken))
+	apiresp.GinError(c, o.registerChatUser(ctx, ip, us))
+}
+
+func (o *AdminApi) ImportUserByJson(c *gin.Context) {
+	var req struct {
+		Secret string                   `json:"secret"`
+		Users  []*chat.RegisterUserInfo `json:"users"`
+	}
+	if err := c.BindJSON(&req); err != nil {
+		apiresp.GinError(c, err)
+		return
+	}
+	ip, err := o.getClientIP(c)
+	if err != nil {
+		apiresp.GinError(c, err)
+		return
+	}
+	if err := o.checkSecretAdmin(c, req.Secret); err != nil {
+		apiresp.GinError(c, err)
+		return
+	}
+	imToken, err := o.imApiCaller.ImAdminTokenWithDefaultAdmin(c)
+	if err != nil {
+		apiresp.GinError(c, err)
+		return
+	}
+	ctx := mctx.WithAdminUser(mctx.WithApiToken(c, imToken))
+	apiresp.GinError(c, o.registerChatUser(ctx, ip, req.Users))
+}
+
+func (o *AdminApi) xlsx2user(users []model.User) ([]*chat.RegisterUserInfo, error) {
+	chatUsers := make([]*chat.RegisterUserInfo, len(users))
+	for i, info := range users {
+		if info.Nickname == "" {
+			return nil, errs.ErrArgs.Wrap("nickname is empty")
+		}
+		if info.AreaCode == "" || info.PhoneNumber == "" {
+			return nil, errs.ErrArgs.Wrap("areaCode or phoneNumber is empty")
+		}
+		if info.Password == "" {
+			return nil, errs.ErrArgs.Wrap("password is empty")
+		}
+		if !strings.HasPrefix(info.AreaCode, "+") {
+			return nil, errs.ErrArgs.Wrap("areaCode format error")
+		}
+		if _, err := strconv.ParseUint(info.AreaCode[1:], 10, 16); err != nil {
+			return nil, errs.ErrArgs.Wrap("areaCode format error")
+		}
+		gender, _ := strconv.Atoi(info.Gender)
+		chatUsers[i] = &chat.RegisterUserInfo{
+			UserID:      info.UserID,
+			Nickname:    info.Nickname,
+			FaceURL:     info.FaceURL,
+			Birth:       o.xlsxBirth(info.Birth).UnixMilli(),
+			Gender:      int32(gender),
+			AreaCode:    info.AreaCode,
+			PhoneNumber: info.PhoneNumber,
+			Email:       info.Email,
+			Account:     info.Account,
+			Password:    utils.Md5(info.Password),
+		}
+	}
+	return chatUsers, nil
+}
+
+func (o *AdminApi) xlsxBirth(s string) time.Time {
+	if s == "" {
+		return time.Now()
+	}
+	var separator byte
+	for _, b := range []byte(s) {
+		if b < '0' || b > '9' {
+			separator = b
+		}
+	}
+	arr := strings.Split(s, string([]byte{separator}))
+	if len(arr) != 3 {
+		return time.Now()
+	}
+	year, _ := strconv.Atoi(arr[0])
+	month, _ := strconv.Atoi(arr[1])
+	day, _ := strconv.Atoi(arr[2])
+	t := time.Date(year, time.Month(month), day, 0, 0, 0, 0, time.Local)
+	if t.Before(time.Date(1900, 0, 0, 0, 0, 0, 0, time.Local)) {
+		return time.Now()
+	}
+	return t
+}
+
+func (o *AdminApi) registerChatUser(ctx context.Context, ip string, users []*chat.RegisterUserInfo) error {
+	if len(users) == 0 {
+		return errs.ErrArgs.Wrap("users is empty")
+	}
+	for _, info := range users {
+		respRegisterUser, err := o.chatClient.RegisterUser(ctx, &chat.RegisterUserReq{Ip: ip, User: info, Platform: constant.AdminPlatformID})
+		if err != nil {
+			return err
+		}
+		userInfo := &sdkws.UserInfo{
+			UserID:   respRegisterUser.UserID,
+			Nickname: info.Nickname,
+			FaceURL:  info.FaceURL,
+		}
+		if err = o.imApiCaller.RegisterUser(ctx, []*sdkws.UserInfo{userInfo}); err != nil {
+			return err
+		}
+		if resp, err := o.adminClient.FindDefaultFriend(ctx, &admin.FindDefaultFriendReq{}); err == nil {
+			_ = o.imApiCaller.ImportFriend(ctx, respRegisterUser.UserID, resp.UserIDs)
+		}
+		if resp, err := o.adminClient.FindDefaultGroup(ctx, &admin.FindDefaultGroupReq{}); err == nil {
+			_ = o.imApiCaller.InviteToGroup(ctx, respRegisterUser.UserID, resp.GroupIDs)
+		}
+	}
+	return nil
+}
+
+func (o *AdminApi) BatchImportTemplate(c *gin.Context) {
+	md5Sum := md5.Sum(config.ImportTemplate)
+	md5Val := hex.EncodeToString(md5Sum[:])
+	if c.GetHeader("If-None-Match") == md5Val {
+		c.Status(http.StatusNotModified)
+		return
+	}
+	c.Header("Content-Disposition", "attachment; filename=template.xlsx")
+	c.Header("Content-Transfer-Encoding", "binary")
+	c.Header("Content-Description", "File Transfer")
+	c.Header("Content-Length", strconv.Itoa(len(config.ImportTemplate)))
+	c.Header("ETag", md5Val)
+	c.Data(http.StatusOK, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", config.ImportTemplate)
 }
