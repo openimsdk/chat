@@ -72,7 +72,8 @@ log:
   withStack: false                    # Whether to include stack trace in logs
 
 # Secret key for secure communication
-secret: openIM123 # SECRET, Secret key for encryption and secure communication
+secret: openIM123 # SECRET, Secret OpenIM key for encryption and secure communication
+chatSecret: openIM123 # ChatSecret, ChatSecret chat key for encryption and secure communication
 
 # Token policy configuration
 tokenPolicy:
