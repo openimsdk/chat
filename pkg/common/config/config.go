@@ -16,8 +16,12 @@ package config
 
 import _ "embed"
 
-//go:embed version
-var Version string
+var (
+	//go:embed version
+	Version string
+	//go:embed template.xlsx
+	ImportTemplate []byte
+)
 
 var Config struct {
 	Envs struct {
@@ -75,6 +79,7 @@ var Config struct {
 		WithStack           *bool   `yaml:"withStack"`
 	} `yaml:"log"`
 	Secret      *string `yaml:"secret"`
+	ChatSecret  string  `yaml:"chatSecret"`
 	OpenIMUrl   string  `yaml:"openIMUrl"`
 	TokenPolicy struct {
 		Expire *int64 `yaml:"expire"`
