@@ -60,6 +60,11 @@ type K8sDR struct {
 	rpcRegisterAddr string
 }
 
+func (cli *K8sDR) GetUserIdHashGatewayHost(ctx context.Context, userId string) (string, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
 func NewK8sDiscoveryRegister() (discoveryregistry.SvcDiscoveryRegistry, error) {
 	return &K8sDR{}, nil
 }
