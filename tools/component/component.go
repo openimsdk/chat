@@ -65,12 +65,28 @@ func successPrint(s string, hide bool) {
 
 func newZkClient() (*zk.Conn, error) {
 	var c *zk.Conn
-	c, _, err := zk.Connect(config.Config.Zookeeper.ZkAddr, time.Second, zk.WithLogger(log.NewZkLogger()))
-	fmt.Println("zk addr=", config.Config.Zookeeper.ZkAddr)
+	var err error
+	c, eventChan, err := zk.Connect(config.Config.Zookeeper.ZkAddr, time.Second*5, zk.WithLogger(log.NewZkLogger()))
 	if err != nil {
 		fmt.Println("zookeeper connect error:", err)
 		return nil, errs.Wrap(err, "Zookeeper Addr: "+strings.Join(config.Config.Zookeeper.ZkAddr, " "))
 	}
+
+	// wait for successfully connect
+	timeout := time.After(5 * time.Second)
+	for {
+		select {
+		case event := <-eventChan:
+			if event.State == zk.StateConnected {
+				fmt.Println("Connected to Zookeeper")
+				goto Connected
+			}
+		case <-timeout:
+			return nil, errs.Wrap(errors.New("timeout waiting for Zookeeper connection"), "Zookeeper Addr: "+strings.Join(config.Config.Zookeeper.ZkAddr, " "))
+		}
+	}
+Connected:
+
 	if config.Config.Zookeeper.Username != "" && config.Config.Zookeeper.Password != "" {
 		if err := c.AddAuth("digest", []byte(config.Config.Zookeeper.Username+":"+config.Config.Zookeeper.Password)); err != nil {
 			return nil, errs.Wrap(err, "Zookeeper Username: "+config.Config.Zookeeper.Username+
@@ -78,11 +94,7 @@ func newZkClient() (*zk.Conn, error) {
 				", Zookeeper Addr: "+strings.Join(config.Config.Zookeeper.ZkAddr, " "))
 		}
 	}
-	result, _, _ := c.Exists("/zookeeper")
-	if !result {
-		err = errors.New("zookeeper not exist")
-		return nil, errs.Wrap(err, "Zookeeper Addr: "+strings.Join(config.Config.Zookeeper.ZkAddr, " "))
-	}
+
 	return c, nil
 }
 
@@ -99,7 +111,7 @@ func checkNewZkClient(hide bool) (*zk.Conn, error) {
 			errorPrint(fmt.Sprintf("Starting Zookeeper failed: %v.Please make sure your Zookeeper service has started", err.Error()), hide)
 			continue
 		}
-		successPrint(fmt.Sprintf("zk starts successfully after: %v times ", i), hide)
+		successPrint(fmt.Sprintf("zk starts successfully after: %v times ", i+1), hide)
 		return zkConn, nil
 	}
 	return nil, errs.Wrap(errors.New("Connecting to zk fails"))
