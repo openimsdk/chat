@@ -108,6 +108,7 @@ var Config struct {
 	} `yaml:"verifyCode"`
 	ProxyHeader string  `yaml:"proxyHeader"`
 	AdminList   []Admin `yaml:"adminList"`
+	ChatAdmin   []Admin `yaml:"chatAdmin"`
 }
 
 type Admin struct {

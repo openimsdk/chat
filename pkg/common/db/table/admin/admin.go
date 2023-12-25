@@ -26,7 +26,7 @@ type Admin struct {
 	FaceURL    string    `gorm:"column:face_url;type:varchar(255)"`
 	Nickname   string    `gorm:"column:nickname;type:varchar(64)"`
 	UserID     string    `gorm:"column:user_id;type:varchar(64)"` // openIM userID
-	Level      int32     `gorm:"column:level;default:1"  `
+	Level      int32     `gorm:"column:level;default:1"`
 	CreateTime time.Time `gorm:"column:create_time"`
 }
 
