@@ -16,9 +16,12 @@ package zookeeper
 
 import (
 	"context"
+	"errors"
+	"github.com/OpenIMSDK/tools/errs"
 	"github.com/OpenIMSDK/tools/log"
 	"net"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 
@@ -130,6 +133,23 @@ func NewClient(zkServers []string, zkRoot string, options ...ZkOption) (*ZkClien
 		log.ZError(context.Background(), "zk Connect", err)
 		return nil, err
 	}
+
+	// wait for successfully connect
+	timeout := time.After(5 * time.Second)
+	for {
+		select {
+		case event := <-eventChan:
+			if event.State == zk.StateConnected {
+
+				goto Connected
+			}
+		case <-timeout:
+			return nil, errs.Wrap(errors.New("timeout waiting for Zookeeper connection"), "Zookeeper Addr: "+strings.Join(zkServers, " "))
+		}
+	}
+
+Connected:
+
 	if client.userName != "" && client.password != "" {
 		if err := conn.AddAuth("digest", []byte(client.userName+":"+client.password)); err != nil {
 			log.ZError(context.Background(), "zk addAuth", err)
@@ -137,9 +157,11 @@ func NewClient(zkServers []string, zkRoot string, options ...ZkOption) (*ZkClien
 		}
 
 	}
+
 	client.zkRoot += zkRoot
 	client.eventChan = eventChan
 	client.conn = conn
+
 	if err := client.ensureRoot(); err != nil {
 		client.Close()
 		log.ZError(context.Background(), "zk client ensure root bug", err)
