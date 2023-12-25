@@ -78,7 +78,7 @@ func newZkClient() (*zk.Conn, error) {
 				", Zookeeper Addr: "+strings.Join(config.Config.Zookeeper.ZkAddr, " "))
 		}
 	}
-	result, _, _ := c.Exists("zookeeper")
+	result, _, _ := c.Exists("/zookeeper")
 	if !result {
 		err = errors.New("zookeeper not exist")
 		return nil, errs.Wrap(err, "Zookeeper Addr: "+strings.Join(config.Config.Zookeeper.ZkAddr, " "))
