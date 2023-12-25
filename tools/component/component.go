@@ -66,19 +66,22 @@ func successPrint(s string, hide bool) {
 func newZkClient() (*zk.Conn, error) {
 	var c *zk.Conn
 	c, _, err := zk.Connect(config.Config.Zookeeper.ZkAddr, time.Second, zk.WithLogger(log.NewZkLogger()))
-	result, _, _ := c.Exists("zookeeper")
 	fmt.Println("zk addr=", config.Config.Zookeeper.ZkAddr)
-	if err != nil || !result {
+	if err != nil {
 		fmt.Println("zookeeper connect error:", err)
 		return nil, errs.Wrap(err, "Zookeeper Addr: "+strings.Join(config.Config.Zookeeper.ZkAddr, " "))
-	} else {
-		if config.Config.Zookeeper.Username != "" && config.Config.Zookeeper.Password != "" {
-			if err := c.AddAuth("digest", []byte(config.Config.Zookeeper.Username+":"+config.Config.Zookeeper.Password)); err != nil {
-				return nil, errs.Wrap(err, "Zookeeper Username: "+config.Config.Zookeeper.Username+
-					", Zookeeper Password: "+config.Config.Zookeeper.Password+
-					", Zookeeper Addr: "+strings.Join(config.Config.Zookeeper.ZkAddr, " "))
-			}
+	}
+	if config.Config.Zookeeper.Username != "" && config.Config.Zookeeper.Password != "" {
+		if err := c.AddAuth("digest", []byte(config.Config.Zookeeper.Username+":"+config.Config.Zookeeper.Password)); err != nil {
+			return nil, errs.Wrap(err, "Zookeeper Username: "+config.Config.Zookeeper.Username+
+				", Zookeeper Password: "+config.Config.Zookeeper.Password+
+				", Zookeeper Addr: "+strings.Join(config.Config.Zookeeper.ZkAddr, " "))
 		}
+	}
+	result, _, _ := c.Exists("/zookeeper")
+	if !result {
+		err = errors.New("zookeeper not exist")
+		return nil, errs.Wrap(err, "Zookeeper Addr: "+strings.Join(config.Config.Zookeeper.ZkAddr, " "))
 	}
 	return c, nil
 }
