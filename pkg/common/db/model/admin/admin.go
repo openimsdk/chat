@@ -91,26 +91,41 @@ func (o *Admin) InitAdmin(ctx context.Context) error {
 		log.ZInfo(ctx, "AdminList is empty", "adminList", config.Config.AdminList)
 		return nil
 	}
-	now := time.Now()
-	admins := make([]*admin.Admin, 0, len(config.Config.AdminList))
-	for _, adminChat := range config.Config.AdminList {
-		password := md5.Sum([]byte(adminChat.AdminID))
+
+	admins := make([]*admin.Admin, 0, len(config.Config.AdminList)+len(config.Config.ChatAdmin))
+	o.createAdmins(&admins, config.Config.AdminList, true)
+	o.createAdmins(&admins, config.Config.ChatAdmin, false)
+
+	if err := o.db.WithContext(ctx).Create(&admins).Error; err != nil {
+		return errs.Wrap(err)
+	}
+	return nil
+}
+
+func (o *Admin) createAdmins(adminList *[]*admin.Admin, registerList []config.Admin, flag bool) {
+	// chatAdmin set the level to 50, this account use for send notification.
+	level := int32(50)
+	if flag {
+		level = 100
+	}
+	for _, adminChat := range registerList {
 		table := admin.Admin{
 			Account:    adminChat.AdminID,
 			UserID:     adminChat.ImAdminID,
-			Password:   hex.EncodeToString(password[:]),
-			Level:      100,
-			CreateTime: now,
+			Password:   o.passwordEncryption(adminChat.AdminID),
+			Level:      level,
+			CreateTime: time.Now(),
 		}
 		if adminChat.NickName != "" {
 			table.Nickname = adminChat.NickName
 		} else {
 			table.Nickname = adminChat.AdminID
 		}
-		admins = append(admins, &table)
+		*adminList = append(*adminList, &table)
 	}
-	if err := o.db.WithContext(ctx).Create(&admins).Error; err != nil {
-		return errs.Wrap(err)
-	}
-	return nil
+}
+
+func (o *Admin) passwordEncryption(password string) string {
+	paswd := md5.Sum([]byte(password))
+	return hex.EncodeToString(paswd[:])
 }
