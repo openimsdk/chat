@@ -72,8 +72,7 @@ log:
   withStack: false                    # Whether to include stack trace in logs
 
 # Secret key for secure communication
-secret: openIM123 # SECRET, Secret OpenIM key for encryption and secure communication
-chatSecret: openIM123 # ChatSecret, ChatSecret chat key for encryption and secure communication
+secret: openIM123 # SECRET, Secret key for encryption and secure communication
 
 # Token policy configuration
 tokenPolicy:
@@ -117,6 +116,12 @@ adminList:
   - adminID: admin3
     nickname: chat3
     imAdmin: openIMAdmin
+
+# chatAdmin, use for send notification
+chatAdmin:
+  - adminID: chatAdmin
+    nickname: chatAdmin
+    imAdmin: imAdmin
 
 # URL for OpenIM server
 openIMUrl: "http://172.28.0.1:10002" # OPENIM_SERVER_ADDRESS:API_OPENIM_PORT, URL of the OpenIM server

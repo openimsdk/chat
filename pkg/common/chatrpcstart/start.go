@@ -40,7 +40,7 @@ func Start(rpcPort int, rpcRegisterName string, prometheusPort int, rpcFn func(c
 		zkClient, err := openKeeper.NewClient(config.Config.Zookeeper.ZkAddr, config.Config.Zookeeper.Schema,
 			openKeeper.WithFreq(time.Hour), openKeeper.WithUserNameAndPassword(config.Config.Zookeeper.Username,
 				config.Config.Zookeeper.Password), openKeeper.WithRoundRobin(), openKeeper.WithTimeout(10), openKeeper.WithLogger(log.NewZkLogger()))*/if err != nil {
-		return errs.Wrap(err)
+		return errs.Wrap(err, fmt.Sprintf(";the addr is:%v", &config.Config.Zookeeper.ZkAddr))
 	}
 	// defer zkClient.CloseZK()
 	defer zkClient.Close()

@@ -115,6 +115,18 @@ func GetIMAdmin(chatAdminID string) string {
 			return admin.ImAdminID
 		}
 	}
+	if id := getChatAdmin(chatAdminID); id != "" {
+		return id
+	}
+	return ""
+}
+
+func getChatAdmin(chatAdminID string) string {
+	for _, admin := range Config.ChatAdmin {
+		if admin.ImAdminID == chatAdminID {
+			return admin.ImAdminID
+		}
+	}
 	return ""
 }
 
