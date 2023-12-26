@@ -162,7 +162,7 @@ Connected:
 	client.eventChan = eventChan
 	client.conn = conn
 
-	time.Sleep(time.Second * 3)
+	time.Sleep(time.Second * 5)
 
 	if err := client.ensureRoot(); err != nil {
 		client.Close()
