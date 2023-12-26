@@ -82,7 +82,7 @@ jobs:
         cd open-im-server
         sudo make init
         sudo docker compose up -d
-        sudo sleep 30
+        sudo sleep 60
 
         sudo make start
         sudo make check
