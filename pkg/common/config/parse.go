@@ -19,6 +19,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"github.com/OpenIMSDK/tools/errs"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -114,6 +115,18 @@ func GetIMAdmin(chatAdminID string) string {
 			return admin.ImAdminID
 		}
 	}
+	if id := getChatAdmin(chatAdminID); id != "" {
+		return id
+	}
+	return ""
+}
+
+func getChatAdmin(chatAdminID string) string {
+	for _, admin := range Config.ChatAdmin {
+		if admin.ImAdminID == chatAdminID {
+			return admin.ImAdminID
+		}
+	}
 	return ""
 }
 
@@ -165,7 +178,7 @@ func findConfigPath(configFile string) (string, error) {
 	// First, check the configFile argument
 	if configFile != "" {
 		if _, err := findConfigFile([]string{configFile}); err != nil {
-			return "", errors.New("the configFile argument path is error")
+			return "", errs.Wrap(errors.New("the configFile argument path is error"))
 		}
 		fmt.Println("configfile:", configFile)
 		return configFile, nil
@@ -176,7 +189,7 @@ func findConfigPath(configFile string) (string, error) {
 	envConfigPath := os.Getenv(Constant.OpenIMConfig)
 	if envConfigPath != "" {
 		if _, err := findConfigFile([]string{envConfigPath}); err != nil {
-			return "", errors.New("the environment path config path is error")
+			return "", errs.Wrap(errors.New("the environment path config path is error"))
 		}
 		return envConfigPath, nil
 	}
@@ -194,7 +207,7 @@ func findConfigPath(configFile string) (string, error) {
 	}
 
 	// Forth, use the Default path.
-	return "", errors.New("the config.yaml path not found")
+	return "", errs.Wrap(errors.New("the config.yaml path not found"))
 }
 
 func FlagParse() (string, int, bool, bool, error) {

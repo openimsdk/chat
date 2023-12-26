@@ -15,8 +15,11 @@
 package component
 
 import (
+	"context"
 	"fmt"
+	"github.com/redis/go-redis/v9"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/OpenIMSDK/protocol/constant"
@@ -26,31 +29,13 @@ import (
 	"github.com/OpenIMSDK/tools/log"
 	"github.com/go-zookeeper/zk"
 	"github.com/pkg/errors"
-	"gopkg.in/yaml.v3"
 )
 
 var (
-	MaxConnectTimes = 100
+	MaxConnectTimes = 200
 )
 
-func initCfg(cfgPath string) error {
-	file, err := os.ReadFile(cfgPath)
-	if err != nil {
-		return errs.Wrap(err)
-	}
-	err = yaml.Unmarshal(file, &config.Config)
-	if err != nil {
-		return errs.Wrap(err)
-	}
-	return err
-}
-
 func ComponentCheck(cfgPath string, hide bool) error {
-	err := initCfg(cfgPath)
-	if err != nil {
-		errorPrint(errs.Wrap(err).Error(), hide)
-		return err
-	}
 	if config.Config.Envs.Discovery != "k8s" {
 		if _, err := checkNewZkClient(hide); err != nil {
 			errorPrint(fmt.Sprintf("%v.Please check if your openIM server has started", err.Error()), hide)
@@ -61,6 +46,7 @@ func ComponentCheck(cfgPath string, hide bool) error {
 		// 	return err
 		// }
 	}
+	//_, err := checkRedis()
 
 	return nil
 }
@@ -79,18 +65,36 @@ func successPrint(s string, hide bool) {
 
 func newZkClient() (*zk.Conn, error) {
 	var c *zk.Conn
-	c, _, err := zk.Connect(config.Config.Zookeeper.ZkAddr, time.Second, zk.WithLogger(log.NewZkLogger()))
-	fmt.Println("zk addr=", config.Config.Zookeeper.ZkAddr)
+	var err error
+	c, eventChan, err := zk.Connect(config.Config.Zookeeper.ZkAddr, time.Second*5, zk.WithLogger(log.NewZkLogger()))
 	if err != nil {
 		fmt.Println("zookeeper connect error:", err)
-		return nil, errs.Wrap(err)
-	} else {
-		if config.Config.Zookeeper.Username != "" && config.Config.Zookeeper.Password != "" {
-			if err := c.AddAuth("digest", []byte(config.Config.Zookeeper.Username+":"+config.Config.Zookeeper.Password)); err != nil {
-				return nil, errs.Wrap(err)
+		return nil, errs.Wrap(err, "Zookeeper Addr: "+strings.Join(config.Config.Zookeeper.ZkAddr, " "))
+	}
+
+	// wait for successfully connect
+	timeout := time.After(5 * time.Second)
+	for {
+		select {
+		case event := <-eventChan:
+			if event.State == zk.StateConnected {
+				fmt.Println("Connected to Zookeeper")
+				goto Connected
 			}
+		case <-timeout:
+			return nil, errs.Wrap(errors.New("timeout waiting for Zookeeper connection"), "Zookeeper Addr: "+strings.Join(config.Config.Zookeeper.ZkAddr, " "))
 		}
 	}
+Connected:
+
+	if config.Config.Zookeeper.Username != "" && config.Config.Zookeeper.Password != "" {
+		if err := c.AddAuth("digest", []byte(config.Config.Zookeeper.Username+":"+config.Config.Zookeeper.Password)); err != nil {
+			return nil, errs.Wrap(err, "Zookeeper Username: "+config.Config.Zookeeper.Username+
+				", Zookeeper Password: "+config.Config.Zookeeper.Password+
+				", Zookeeper Addr: "+strings.Join(config.Config.Zookeeper.ZkAddr, " "))
+		}
+	}
+
 	return c, nil
 }
 
@@ -107,10 +111,10 @@ func checkNewZkClient(hide bool) (*zk.Conn, error) {
 			errorPrint(fmt.Sprintf("Starting Zookeeper failed: %v.Please make sure your Zookeeper service has started", err.Error()), hide)
 			continue
 		}
-		successPrint(fmt.Sprint("zk starts successfully"), hide)
+		successPrint(fmt.Sprintf("zk starts successfully after: %v times ", i+1), hide)
 		return zkConn, nil
 	}
-	return nil, errors.New("Connecting to zk fails")
+	return nil, errs.Wrap(errors.New("Connecting to zk fails"))
 }
 
 func checkGetCfg(conn *zk.Conn, hide bool) error {
@@ -133,4 +137,48 @@ func checkGetCfg(conn *zk.Conn, hide bool) error {
 		return nil
 	}
 	return errors.New("Getting config from zk failed")
+}
+
+// checkRedis checks the Redis connection
+func checkRedis() (string, error) {
+	// Prioritize environment variables
+	address := getEnv("REDIS_ADDRESS", strings.Join(*config.Config.Redis.Address, ","))
+	username := getEnv("REDIS_USERNAME", config.Config.Redis.Username)
+	password := getEnv("REDIS_PASSWORD", config.Config.Redis.Password)
+
+	// Split address to handle multiple addresses for cluster setup
+	redisAddresses := strings.Split(address, ",")
+
+	var redisClient redis.UniversalClient
+	if len(redisAddresses) > 1 {
+		// Use cluster client for multiple addresses
+		redisClient = redis.NewClusterClient(&redis.ClusterOptions{
+			Addrs:    redisAddresses,
+			Username: username,
+			Password: password,
+		})
+	} else {
+		// Use regular client for single address
+		redisClient = redis.NewClient(&redis.Options{
+			Addr:     redisAddresses[0],
+			Username: username,
+			Password: password,
+		})
+	}
+	defer redisClient.Close()
+
+	// Ping Redis to check connectivity
+	_, err := redisClient.Ping(context.Background()).Result()
+	str := "the addr is:" + strings.Join(redisAddresses, ",")
+	if err != nil {
+		return "", errs.Wrap(err, str)
+	}
+
+	return str, nil
+}
+func getEnv(key, fallback string) string {
+	if value, exists := os.LookupEnv(key); exists {
+		return value
+	}
+	return fallback
 }
