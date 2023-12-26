@@ -105,7 +105,7 @@ jobs:
           -e MYSQL_ROOT_PASSWORD="openIM123" \
           --restart always \
           mysql:5.7
-        sleep 30;
+        sleep 60;
     - name: start all services
       run: |
         sudo make init
