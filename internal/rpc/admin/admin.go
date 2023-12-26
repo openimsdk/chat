@@ -16,8 +16,6 @@ package admin
 
 import (
 	"context"
-	"crypto/md5"
-	"encoding/hex"
 	"fmt"
 	"github.com/OpenIMSDK/chat/pkg/common/db/cache"
 	"github.com/OpenIMSDK/tools/discoveryregistry"
@@ -108,11 +106,11 @@ func (o *adminServer) ChangeAdminPassword(ctx context.Context, req *admin.Change
 		return nil, err
 	}
 
-	if user.Password != o.passwordEncryption(req.CurrentPassword) {
+	if user.Password != req.CurrentPassword {
 		return nil, errs.ErrInternalServer.Wrap("password error")
 	}
 
-	if err := o.Database.ChangePassword(ctx, req.UserID, o.passwordEncryption(req.NewPassword)); err != nil {
+	if err := o.Database.ChangePassword(ctx, req.UserID, req.NewPassword); err != nil {
 		return nil, err
 	}
 	return &admin.ChangeAdminPasswordResp{}, nil
@@ -282,11 +280,6 @@ func (o *adminServer) genUserID() string {
 		}
 	}
 	return string(data)
-}
-
-func (o *adminServer) passwordEncryption(password string) string {
-	paswd := md5.Sum([]byte(password))
-	return hex.EncodeToString(paswd[:])
 }
 
 func (o *adminServer) CheckSuperAdmin(ctx context.Context) error {
