@@ -162,6 +162,8 @@ Connected:
 	client.eventChan = eventChan
 	client.conn = conn
 
+	time.Sleep(time.Second * 2)
+
 	if err := client.ensureRoot(); err != nil {
 		client.Close()
 		log.ZError(context.Background(), "zk client ensure root bug", err)
