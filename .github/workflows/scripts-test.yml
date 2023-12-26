@@ -85,6 +85,9 @@ jobs:
         sudo sleep 30
 
         sudo make start
+        
+        sudo sleep 10
+        
         sudo make check
 
         sudo cat logs/openIM.log 2>/dev/null
