@@ -44,7 +44,7 @@ service_port_name=(
    openImAdminPort
    openImChatPort
 )
-
+sleep 10
 switch=$(cat $config_path | grep demoswitch |awk -F '[:]' '{print $NF}')
 for i in ${service_port_name[*]}; do
   case $i in
