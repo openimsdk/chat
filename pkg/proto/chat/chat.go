@@ -343,3 +343,9 @@ func (x *AddUserAccountReq) Check() error {
 
 	return nil
 }
+func (x *RegisterUserInfo) Check() error {
+	if x.Nickname == "" {
+		return errs.ErrArgs.Wrap("Nickname is nil")
+	}
+	return nil
+}
