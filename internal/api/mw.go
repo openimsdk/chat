@@ -87,9 +87,7 @@ func (o *MW) isValidToken(c *gin.Context, userID string, token string) error {
 }
 
 func (o *MW) setToken(c *gin.Context, userID string, userType int32) {
-	c.Set(constant.RpcOpUserID, userID)
-	c.Set(constant.RpcOpUserType, []string{strconv.Itoa(int(userType))})
-	c.Set(constant.RpcCustomHeader, []string{constant.RpcOpUserType})
+	SetToken(c, userID, userType)
 }
 
 func (o *MW) CheckToken(c *gin.Context) {
@@ -146,4 +144,10 @@ func (o *MW) CheckAdminOrNil(c *gin.Context) {
 	if userType == constant.AdminUser {
 		o.setToken(c, userID, constant.AdminUser)
 	}
+}
+
+func SetToken(c *gin.Context, userID string, userType int32) {
+	c.Set(constant.RpcOpUserID, userID)
+	c.Set(constant.RpcOpUserType, []string{strconv.Itoa(int(userType))})
+	c.Set(constant.RpcCustomHeader, []string{constant.RpcOpUserType})
 }

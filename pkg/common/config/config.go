@@ -16,8 +16,12 @@ package config
 
 import _ "embed"
 
-//go:embed version
-var Version string
+var (
+	//go:embed version
+	Version string
+	//go:embed template.xlsx
+	ImportTemplate []byte
+)
 
 var Config struct {
 	Envs struct {
@@ -43,8 +47,8 @@ var Config struct {
 	} `yaml:"rpc"`
 	Redis struct {
 		Address  *[]string `yaml:"address"`
-		Username *string   `yaml:"username"`
-		Password *string   `yaml:"password"`
+		Username string    `yaml:"username"`
+		Password string    `yaml:"password"`
 	} `yaml:"redis"`
 	RpcPort struct {
 		OpenImAdminPort []int `yaml:"openImAdminPort"`
@@ -75,6 +79,7 @@ var Config struct {
 		WithStack           *bool   `yaml:"withStack"`
 	} `yaml:"log"`
 	Secret      *string `yaml:"secret"`
+	ChatSecret  string  `yaml:"chatSecret"`
 	OpenIMUrl   string  `yaml:"openIMUrl"`
 	TokenPolicy struct {
 		Expire *int64 `yaml:"expire"`
@@ -100,11 +105,10 @@ var Config struct {
 			SmtpAddr                string `yaml:"smtpAddr"`
 			SmtpPort                int    `yaml:"smtpPort"`
 		} `yaml:"mail"`
-		TestDepartMentID string `yaml:"testDepartMentID"`
-		ImAPIURL         string `yaml:"imAPIURL"`
 	} `yaml:"verifyCode"`
 	ProxyHeader string  `yaml:"proxyHeader"`
 	AdminList   []Admin `yaml:"adminList"`
+	ChatAdmin   []Admin `yaml:"chatAdmin"`
 }
 
 type Admin struct {

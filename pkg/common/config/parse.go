@@ -19,15 +19,14 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"github.com/OpenIMSDK/tools/errs"
 	"os"
 	"path/filepath"
 	"runtime"
+	"strconv"
 	"time"
 
 	Constant "github.com/OpenIMSDK/chat/pkg/common/constant"
-	"github.com/OpenIMSDK/protocol/constant"
-	openKeeper "github.com/OpenIMSDK/tools/discoveryregistry/zookeeper"
-
 	"github.com/OpenIMSDK/tools/utils"
 	"gopkg.in/yaml.v3"
 )
@@ -49,7 +48,6 @@ func readConfig(configFile string) ([]byte, error) {
 	//	if configFile != "" {
 	//		b, err := os.ReadFile(configFile)
 	//		if err == nil { // File exists and was read successfully
-	//			fmt.Println("这里aaaaaaaa")
 	//			return b, nil
 	//		}
 	//	}
@@ -78,73 +76,20 @@ func InitConfig(configFile string) error {
 	if err != nil {
 		return fmt.Errorf("read loacl config file error: %w", err)
 	}
+
 	if err := yaml.NewDecoder(bytes.NewReader(data)).Decode(&Config); err != nil {
 		return fmt.Errorf("parse loacl openIMConfig file error: %w", err)
 	}
-	if Config.Envs.Discovery != "k8s" {
-		zk, err := openKeeper.NewClient(Config.Zookeeper.ZkAddr, Config.Zookeeper.Schema,
-			openKeeper.WithFreq(time.Hour), openKeeper.WithUserNameAndPassword(Config.Zookeeper.Username,
-				Config.Zookeeper.Password), openKeeper.WithRoundRobin(), openKeeper.WithTimeout(10), openKeeper.WithLogger(&zkLogger{}))
-		if err != nil {
-			return utils.Wrap(err, "conn zk error ")
-		}
-		defer zk.Close()
-		var openIMConfigData []byte
-		for i := 0; i < 100; i++ {
-			var err error
-			configData, err := zk.GetConfFromRegistry(constant.OpenIMCommonConfigKey)
-			if err != nil {
-				fmt.Printf("get zk config [%d] error: %v\n;envs.descoery=%s", i, err, Config.Envs.Discovery)
-				time.Sleep(time.Second)
-				continue
-			}
-			if len(configData) == 0 {
-				fmt.Printf("get zk config [%d] data is empty\n", i)
-				time.Sleep(time.Second)
-				continue
-			}
-			openIMConfigData = configData
-		}
-		if len(openIMConfigData) == 0 {
-			return errors.New("get zk config data failed")
-		}
-		if err := yaml.NewDecoder(bytes.NewReader(openIMConfigData)).Decode(&imConfig); err != nil {
-			return fmt.Errorf("parse zk openIMConfig: %w", err)
-		}
-		// 这里可以优化，可将其优化为结构体层面的赋值
-		configFieldCopy(&Config.Mysql.Address, imConfig.Mysql.Address)
-		configFieldCopy(&Config.Mysql.Username, imConfig.Mysql.Username)
-		configFieldCopy(&Config.Mysql.Password, imConfig.Mysql.Password)
-		configFieldCopy(&Config.Mysql.Database, imConfig.Mysql.Database)
-		configFieldCopy(&Config.Mysql.MaxOpenConn, imConfig.Mysql.MaxOpenConn)
-		configFieldCopy(&Config.Mysql.MaxIdleConn, imConfig.Mysql.MaxIdleConn)
-		configFieldCopy(&Config.Mysql.MaxLifeTime, imConfig.Mysql.MaxLifeTime)
-		configFieldCopy(&Config.Mysql.LogLevel, imConfig.Mysql.LogLevel)
-		configFieldCopy(&Config.Mysql.SlowThreshold, imConfig.Mysql.SlowThreshold)
+	if err != nil {
+		return utils.Wrap(err, configFile)
+	}
 
-		configFieldCopy(&Config.Log.StorageLocation, imConfig.Log.StorageLocation)
-		configFieldCopy(&Config.Log.RotationTime, imConfig.Log.RotationTime)
-		configFieldCopy(&Config.Log.RemainRotationCount, imConfig.Log.RemainRotationCount)
-		configFieldCopy(&Config.Log.RemainLogLevel, imConfig.Log.RemainLogLevel)
-		configFieldCopy(&Config.Log.IsStdout, imConfig.Log.IsStdout)
-		configFieldCopy(&Config.Log.WithStack, imConfig.Log.WithStack)
-		configFieldCopy(&Config.Log.IsJson, imConfig.Log.IsJson)
-
-		configFieldCopy(&Config.Secret, imConfig.Secret)
-		configFieldCopy(&Config.TokenPolicy.Expire, imConfig.TokenPolicy.Expire)
-
-		// Redis
-		configFieldCopy(&Config.Redis.Address, imConfig.Redis.Address)
-		configFieldCopy(&Config.Redis.Password, imConfig.Redis.Password)
-		configFieldCopy(&Config.Redis.Username, imConfig.Redis.Username)
+	if err := configGetEnv(); err != nil {
+		return fmt.Errorf("get env error:%w", err)
 	}
 
 	configData, err := yaml.Marshal(&Config)
 	fmt.Printf("debug: %s\nconfig:\n%s\n", time.Now(), string(configData))
-	if err != nil {
-		return utils.Wrap(err, configFile)
-	}
-	fmt.Printf("%s\nconfig:\n%s\n", time.Now(), string(configData))
 
 	return nil
 }
@@ -167,6 +112,18 @@ func GetIMAdmin(chatAdminID string) string {
 	}
 	for _, admin := range Config.AdminList {
 		if admin.AdminID == chatAdminID {
+			return admin.ImAdminID
+		}
+	}
+	if id := getChatAdmin(chatAdminID); id != "" {
+		return id
+	}
+	return ""
+}
+
+func getChatAdmin(chatAdminID string) string {
+	for _, admin := range Config.ChatAdmin {
+		if admin.ImAdminID == chatAdminID {
 			return admin.ImAdminID
 		}
 	}
@@ -211,8 +168,7 @@ func CreateCatalogPath(path string) []string {
 	// the parent is project(default)
 	pa3 := filepath.Join(path3, Constant.ConfigPath)
 
-	return []string{pa1, pa2,pa3}
-
+	return []string{pa1, pa2, pa3}
 
 }
 
@@ -222,7 +178,7 @@ func findConfigPath(configFile string) (string, error) {
 	// First, check the configFile argument
 	if configFile != "" {
 		if _, err := findConfigFile([]string{configFile}); err != nil {
-			return "", errors.New("the configFile argument path is error")
+			return "", errs.Wrap(errors.New("the configFile argument path is error"))
 		}
 		fmt.Println("configfile:", configFile)
 		return configFile, nil
@@ -233,7 +189,7 @@ func findConfigPath(configFile string) (string, error) {
 	envConfigPath := os.Getenv(Constant.OpenIMConfig)
 	if envConfigPath != "" {
 		if _, err := findConfigFile([]string{envConfigPath}); err != nil {
-			return "", errors.New("the environment path config path is error")
+			return "", errs.Wrap(errors.New("the environment path config path is error"))
 		}
 		return envConfigPath, nil
 	}
@@ -251,7 +207,7 @@ func findConfigPath(configFile string) (string, error) {
 	}
 
 	// Forth, use the Default path.
-	return "", errors.New("the config.yaml path not found")
+	return "", errs.Wrap(errors.New("the config.yaml path not found"))
 }
 
 func FlagParse() (string, int, bool, bool, error) {
@@ -275,4 +231,98 @@ func FlagParse() (string, int, bool, bool, error) {
 		return "", 0, false, false, err
 	}
 	return configFile, ginPort, hide, showVersion, nil
+}
+
+func configGetEnv() error {
+	Config.Envs.Discovery = getEnv("ENVS_DISCOVERY", Config.Envs.Discovery)
+	Config.Zookeeper.Schema = getEnv("ZOOKEEPER_SCHEMA", Config.Zookeeper.Schema)
+	Config.Zookeeper.Username = getEnv("ZOOKEEPER_USERNAME", Config.Zookeeper.Username)
+	Config.Zookeeper.Password = getEnv("ZOOKEEPER_PASSWORD", Config.Zookeeper.Password)
+
+	Config.ChatApi.ListenIP = getEnv("CHAT_API_LISTEN_IP", Config.ChatApi.ListenIP)
+	Config.AdminApi.ListenIP = getEnv("ADMIN_API_LISTEN_IP", Config.AdminApi.ListenIP)
+	Config.Rpc.RegisterIP = getEnv("RPC_REGISTER_IP", Config.Rpc.RegisterIP)
+	Config.Rpc.ListenIP = getEnv("RPC_LISTEN_IP", Config.Rpc.ListenIP)
+
+	Config.Mysql.Username = getEnvStringPoint("MYSQL_USERNAME", Config.Mysql.Username)
+	Config.Mysql.Password = getEnvStringPoint("MYSQL_PASSWORD", Config.Mysql.Password)
+	Config.Mysql.Database = getEnvStringPoint("MYSQL_DATABASE", Config.Mysql.Database)
+	Config.Mysql.Address = getArrPointEnv("MYSQL_ADDRESS", "MYSQL_PORT", Config.Mysql.Address)
+
+	Config.Log.StorageLocation = getEnvStringPoint("LOG_STORAGE_LOCATION", Config.Log.StorageLocation)
+
+	Config.Secret = getEnvStringPoint("SECRET", Config.Secret)
+	Config.ProxyHeader = getEnv("PROXY_HEADER", Config.ProxyHeader)
+	Config.OpenIMUrl = getStringEnv("OPENIM_SERVER_ADDRESS", "API_OPENIM_PORT", Config.OpenIMUrl)
+
+	Config.Redis.Username = getEnv("REDIS_USERNAME", Config.Redis.Username)
+	Config.Redis.Password = getEnv("REDIS_PASSWORD", Config.Redis.Password)
+	Config.Redis.Address = getArrPointEnv("REDIS_ADDRESS", "REDIS_PORT", Config.Redis.Address)
+
+	var err error
+	Config.TokenPolicy.Expire, err = getEnvIntPoint("TOKEN_EXPIRE", Config.TokenPolicy.Expire)
+	if err != nil {
+		return err
+	}
+	getArrEnv("ZOOKEEPER_ADDRESS", "ZOOKEEPER_PORT", Config.Zookeeper.ZkAddr)
+	return nil
+}
+
+func getArrEnv(key1, key2 string, fallback []string) {
+	str1 := getEnv(key1, "")
+	str2 := getEnv(key2, "")
+	str := fmt.Sprintf("%s:%s", str1, str2)
+	arr := make([]string, 1)
+	if len(str) <= 1 {
+		return
+	}
+	arr[0] = str
+	fmt.Println("zookeeper Envirement valiable", "str", str)
+	Config.Zookeeper.ZkAddr = arr
+}
+
+func getArrPointEnv(key1, key2 string, fallback *[]string) *[]string {
+	str1 := getEnv(key1, "")
+	str2 := getEnv(key2, "")
+	str := fmt.Sprintf("%s:%s", str1, str2)
+	if len(str) <= 1 {
+		return fallback
+	}
+	return &[]string{str}
+}
+
+func getStringEnv(key1, key2 string, fallback string) string {
+	str1 := getEnv(key1, "")
+	str2 := getEnv(key2, "")
+	str := fmt.Sprintf("%s:%s", str1, str2)
+	if len(str) <= 2 {
+		return fallback
+	}
+	return str
+}
+
+func getEnv(key, fallback string) string {
+	if value, exists := os.LookupEnv(key); exists {
+		return value
+	}
+	return fallback
+}
+
+func getEnvStringPoint(key string, fallback *string) *string {
+	if value, exists := os.LookupEnv(key); exists {
+		return &value
+	}
+	return fallback
+}
+
+func getEnvIntPoint(key string, fallback *int64) (*int64, error) {
+	if value, exists := os.LookupEnv(key); exists {
+		val, err := strconv.Atoi(value)
+		temp := int64(val)
+		if err != nil {
+			return nil, err
+		}
+		return &temp, nil
+	}
+	return fallback, nil
 }

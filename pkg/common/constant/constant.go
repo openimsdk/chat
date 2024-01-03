@@ -58,6 +58,7 @@ const (
 // user level.
 const (
 	OrdinaryUserLevel = 1
+	NormalAdmin       = 80
 	AdvancedUserLevel = 100
 )
 
@@ -183,3 +184,8 @@ const (
 const DefaultPlatform = 1
 
 const CtxApiToken = "api-token"
+
+const (
+	EmailRegister = 1
+	PhoneRegister = 2
+)

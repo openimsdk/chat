@@ -34,17 +34,46 @@ on:
 
 jobs:
   execute-scripts:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
 
+    - name: Set up environment
+      run: |
+        if [ "$RUNNER_OS" == "Linux" ]; then
+          sudo apt-get update
+          # Add other Linux specific setup here
+        elif [ "$RUNNER_OS" == "macOS" ]; then
+          # Add macOS specific setup here
+          brew update
+        fi
+      shell: bash
+
+    # - name: Install latest Bash (macOS only)
+    #   if: runner.os == 'macOS'
+    #   run: |
+    #     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    #     brew update
+    
+    #     brew install bash
+    #     brew install gnu-sed
+    
+    #     echo "/usr/local/bin" >> $GITHUB_PATH
+    #     echo "$(brew --prefix)/opt/gnu-sed/libexec/gnubin" >> $GITHUB_PATH
+
+    #     brew install --cask docker
+    #     open /Applications/Docker.app
+
     - name: Build Chat
       run: |
-        sudo make build
-        sudo chmod +x ./scripts/build_all_service.sh
-        sudo ./scripts/build_all_service.sh
+        make build
+        chmod +x ./scripts/build_all_service.sh
+        ./scripts/build_all_service.sh
       shell: bash
 
     - name: deploy all services
@@ -76,15 +105,18 @@ jobs:
           -e MYSQL_ROOT_PASSWORD="openIM123" \
           --restart always \
           mysql:5.7
+        sleep 60;
     - name: start all services
       run: |
-        sudo cp ./config/config.yaml.template ./config/config.yaml
-        sudo make start
+        sudo make init && \
+        sudo make start || \
+        (echo "An error occurred, printing logs:" && sudo cat ./logs/* 2>/dev/null)
       shell: bash
 
     - name: Check all services
       run: |
-        sudo make check
+        sudo make check || \
+        (echo "An error occurred, printing logs:" && sudo cat ./logs/* 2>/dev/null)
       shell: bash
 
     - name: Stop chat

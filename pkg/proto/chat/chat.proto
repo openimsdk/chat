@@ -44,6 +44,7 @@ message UpdateUserInfoReq{
   OpenIMServer.protobuf.Int32Value  allowBeep = 12;
   OpenIMServer.protobuf.Int32Value  allowVibration = 13;
   OpenIMServer.protobuf.Int32Value  globalRecvMsgOpt = 14;
+  OpenIMServer.protobuf.Int32Value RegisterType = 15;
 }
 
 message UpdateUserInfoResp{
@@ -113,6 +114,7 @@ message RegisterUserInfo {
   string email = 8;
   string account = 9;
   string password = 10;
+  int32 RegisterType = 11;
 }
 
 message RegisterUserReq {
@@ -128,6 +130,16 @@ message RegisterUserReq {
 message RegisterUserResp {
   string userID = 1;
   string chatToken = 3;
+}
+
+message AddUserAccountReq{
+  string ip=1;
+  string deviceID=2;
+  int32 platform=3;
+  RegisterUserInfo user=4;
+}
+
+message AddUserAccountResp{
 }
 
 message LoginReq {
@@ -334,12 +346,13 @@ message GetEmoticonResp {
 }
 
 service chat {
-  //编辑个人资料 自己或者管理员调用
+  // Edit personal information - called by the user or an administrator
   rpc UpdateUserInfo(UpdateUserInfoReq) returns(UpdateUserInfoResp);
-  //获取用户的公开信息   陌生人调用
+  rpc AddUserAccount(AddUserAccountReq) returns(AddUserAccountResp);
+  // Get user's public information - called by strangers
   rpc SearchUserPublicInfo(SearchUserPublicInfoReq) returns(SearchUserPublicInfoResp);
   rpc FindUserPublicInfo(FindUserPublicInfoReq) returns(FindUserPublicInfoResp);
-  //搜索用户信息 管理员调用 其他用户调用时返回public字段
+  // Search user information - called by administrators, other users get public fields
   rpc SearchUserFullInfo(SearchUserFullInfoReq) returns(SearchUserFullInfoResp);
   rpc FindUserFullInfo(FindUserFullInfoReq) returns(FindUserFullInfoResp);
 
@@ -358,9 +371,9 @@ service chat {
 
   rpc OpenIMCallback(OpenIMCallbackReq) returns(OpenIMCallbackResp);
 
-  //统计
+  // Statistics
   rpc UserLoginCount(UserLoginCountReq) returns (UserLoginCountResp);
-  //日志
+  // Logs
   rpc UploadLogs(UploadLogsReq) returns (UploadLogsResp);
   rpc DeleteLogs(DeleteLogsReq) returns (DeleteLogsResp);
   rpc SearchLogs(SearchLogsReq) returns (SearchLogsResp);

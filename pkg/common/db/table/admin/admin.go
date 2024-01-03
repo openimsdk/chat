@@ -26,7 +26,7 @@ type Admin struct {
 	FaceURL    string    `gorm:"column:face_url;type:varchar(255)"`
 	Nickname   string    `gorm:"column:nickname;type:varchar(64)"`
 	UserID     string    `gorm:"column:user_id;type:varchar(64)"` // openIM userID
-	Level      int32     `gorm:"column:level;default:1"  `
+	Level      int32     `gorm:"column:level;default:1"`
 	CreateTime time.Time `gorm:"column:create_time"`
 }
 
@@ -35,8 +35,12 @@ func (Admin) TableName() string {
 }
 
 type AdminInterface interface {
+	Create(ctx context.Context, admin *Admin) error
 	Take(ctx context.Context, account string) (*Admin, error)
 	TakeUserID(ctx context.Context, userID string) (*Admin, error)
 	Update(ctx context.Context, account string, update map[string]any) error
+	ChangePassword(ctx context.Context, userID string, newPassword string) error
+	Delete(ctx context.Context, userIDs []string) error
+	Search(ctx context.Context, page, size int32) (uint32, []*Admin, error)
 	InitAdmin(ctx context.Context) error
 }

@@ -1,9 +1,25 @@
+// Copyright © 2023 OpenIM open source community. All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package discovery_register
 
 import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/OpenIMSDK/tools/errs"
+	"strings"
 	"time"
 
 	"github.com/OpenIMSDK/chat/pkg/common/config"
@@ -23,11 +39,18 @@ func NewDiscoveryRegister(envType string) (discoveryregistry.SvcDiscoveryRegistr
 				config.Config.Zookeeper.Username,
 				config.Config.Zookeeper.Password,
 			), openkeeper.WithRoundRobin(), openkeeper.WithTimeout(10), openkeeper.WithLogger(log.NewZkLogger()))
+		err = errs.Wrap(err,
+			"Zookeeper ZkAddr: "+strings.Join(config.Config.Zookeeper.ZkAddr, ",")+
+				", Zookeeper Schema: "+config.Config.Zookeeper.Schema+
+				", Zookeeper Username: "+config.Config.Zookeeper.Username+
+				", Zookeeper Password: "+config.Config.Zookeeper.Password)
 	case "k8s":
 		client, err = NewK8sDiscoveryRegister()
+		err = errs.Wrap(err,
+			"envType: "+"k8s")
 	default:
 		client = nil
-		err = errors.New("envType not correct")
+		err = errs.Wrap(errors.New("envType not correct"))
 	}
 	return client, err
 }
@@ -35,6 +58,11 @@ func NewDiscoveryRegister(envType string) (discoveryregistry.SvcDiscoveryRegistr
 type K8sDR struct {
 	options         []grpc.DialOption
 	rpcRegisterAddr string
+}
+
+func (cli *K8sDR) GetUserIdHashGatewayHost(ctx context.Context, userId string) (string, error) {
+	//TODO implement me
+	panic("implement me")
 }
 
 func NewK8sDiscoveryRegister() (discoveryregistry.SvcDiscoveryRegistry, error) {

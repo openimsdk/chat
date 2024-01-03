@@ -37,6 +37,7 @@ type Attribute struct {
 	AllowBeep        int32     `gorm:"column:allow_beep;default:1"`
 	AllowAddFriend   int32     `gorm:"column:allow_add_friend;default:1"`
 	GlobalRecvMsgOpt int32     `gorm:"column:global_recv_msg_opt;default:0"`
+	RegisterType     int32     `gorm:"column:register_type"`
 }
 
 func (Attribute) TableName() string {

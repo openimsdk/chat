@@ -16,11 +16,12 @@ package main
 
 import (
 	"fmt"
-	"github.com/OpenIMSDK/chat/pkg/discovery_register"
 	"math/rand"
 	"net"
 	"strconv"
 	"time"
+
+	"github.com/OpenIMSDK/chat/pkg/discovery_register"
 
 	"github.com/OpenIMSDK/chat/tools/component"
 	"github.com/OpenIMSDK/tools/discoveryregistry"
@@ -57,11 +58,11 @@ func main() {
 		return
 	}
 
+	if err := config.InitConfig(configFile); err != nil {
+		panic(err)
+	}
 	err = component.ComponentCheck(configFile, hide)
 	if err != nil {
-		return
-	}
-	if err := config.InitConfig(configFile); err != nil {
 		panic(err)
 	}
 	if err := log.InitFromConfig("chat.log", "admin-api", *config.Config.Log.RemainLogLevel, *config.Config.Log.IsStdout, *config.Config.Log.IsJson, *config.Config.Log.StorageLocation, *config.Config.Log.RemainRotationCount, *config.Config.Log.RotationTime); err != nil {

@@ -32,6 +32,11 @@ printf "${YELLOW_PREFIX}=======>pwd=%s${COLOR_SUFFIX}\n" "$PWD"
 bin_dir="$BIN_DIR"
 logs_dir="$SCRIPTS_ROOT/../logs"
 
+if [ ! -d "$logs_dir" ]; then
+    echo "mkdir -p $logs_dir"
+    mkdir -p "$logs_dir"
+fi
+
 printf "${YELLOW_PREFIX}=======>bin_dir=%s${COLOR_SUFFIX}\n" "$bin_dir"
 printf "${YELLOW_PREFIX}=======>logs_dir=%s${COLOR_SUFFIX}\n" "$logs_dir"
 printf "${YELLOW_PREFIX}=======>sdk_db_dir=%s${COLOR_SUFFIX}\n" "$sdk_db_dir"
@@ -55,6 +60,8 @@ service_port_names=(
 )
 
 service_prometheus_port_names=()
+
+${OPENIM_ROOT}/scripts/init-config.sh --skip
 
 cd "$SCRIPTS_ROOT"
 
