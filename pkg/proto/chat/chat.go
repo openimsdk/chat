@@ -340,6 +340,8 @@ func (e *GetEmoticonReq) Check() error {
 	if e.UserId == "" {
 		return errs.ErrArgs.Wrap("User ID is empty")
 	}
+	return nil
+}
 func (x *AddUserAccountReq) Check() error {
 	if x.User == nil {
 		return errs.ErrArgs.Wrap("user is empty")
