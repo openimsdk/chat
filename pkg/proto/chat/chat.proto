@@ -379,7 +379,7 @@ service chat {
   rpc SearchLogs(SearchLogsReq) returns (SearchLogsResp);
 
   rpc SearchUserInfo(SearchUserInfoReq)returns(SearchUserInfoResp);
-  //表情包
+  //emoticon
   rpc AddEmoticon(AddEmoticonReq) returns (AddEmoticonResp);
   rpc RemoveEmoticon(RemoveEmoticonReq) returns (RemoveEmoticonResp);
   rpc GetEmoticon(GetEmoticonReq) returns (GetEmoticonResp);
