@@ -313,7 +313,6 @@ func (o *ChatApi) getClientIP(c *gin.Context) (string, error) {
 	return ip, nil
 }
 
-// TODO!
 func (o *ChatApi) UploadLogs(c *gin.Context) {
 	a2r.Call(chat.ChatClient.UploadLogs, o.chatClient, c)
 }
