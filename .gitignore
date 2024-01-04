@@ -16,6 +16,7 @@
 
 .idea/
 bin/
+components/
 logs
 
 # Created by https://www.toptal.com/developers/gitignore/api/vim,jetbrains,vscode,git,go,tags,backup,test,emacs
