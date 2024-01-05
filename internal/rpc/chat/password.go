@@ -16,6 +16,8 @@ package chat
 
 import (
 	"context"
+	"github.com/OpenIMSDK/chat/pkg/common/config"
+	constant2 "github.com/OpenIMSDK/protocol/constant"
 	"github.com/OpenIMSDK/tools/log"
 
 	"github.com/OpenIMSDK/tools/errs"
@@ -32,6 +34,7 @@ func (o *chatSvr) ResetPassword(ctx context.Context, req *chat.ResetPasswordReq)
 	}
 	var verifyCodeID uint
 	var err error
+	var userID string
 	if req.Email == "" {
 		verifyCodeID, err = o.verifyCode(ctx, o.verifyCodeJoin(req.AreaCode, req.PhoneNumber), req.VerifyCode)
 	} else {
@@ -47,18 +50,31 @@ func (o *chatSvr) ResetPassword(ctx context.Context, req *chat.ResetPasswordReq)
 		if err != nil {
 			return nil, err
 		}
+		userID = attribute.UserID
 		err = o.Database.UpdatePasswordAndDeleteVerifyCode(ctx, attribute.UserID, req.Password, verifyCodeID)
 	} else {
 		attribute, err := o.Database.GetAttributeByEmail(ctx, req.Email)
 		if err != nil {
 			return nil, err
 		}
+		userID = attribute.UserID
 		err = o.Database.UpdatePasswordAndDeleteVerifyCode(ctx, attribute.UserID, req.Password, verifyCodeID)
 	}
 
 	if err != nil {
 		return nil, err
 	}
+
+	imToken, err := o.imApiCaller.UserToken(ctx, config.GetIMAdmin(mctx.GetOpUserID(ctx)), constant2.AdminPlatformID)
+	if err != nil {
+		return nil, err
+	}
+
+	err = o.imApiCaller.ForceOffLine(mctx.WithApiToken(ctx, imToken), userID)
+	if err != nil {
+		return nil, err
+	}
+
 	return &chat.ResetPasswordResp{}, nil
 }
 
