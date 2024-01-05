@@ -93,7 +93,7 @@ func (o *AdminApi) AdminLogin(c *gin.Context) {
 }
 
 func (o *AdminApi) ResetUserPassword(c *gin.Context) {
-	a2r.Call(chat.ChatClient.ChangePassword, o.chatClient, c)
+	a2r.Call(chat.ChatClient.ResetPassword, o.chatClient, c)
 }
 
 func (o *AdminApi) AdminUpdateInfo(c *gin.Context) {
