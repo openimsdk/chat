@@ -34,7 +34,6 @@ func (o *chatSvr) ResetPassword(ctx context.Context, req *chat.ResetPasswordReq)
 	}
 	var verifyCodeID uint
 	var err error
-	var userID string
 	if req.Email == "" {
 		verifyCodeID, err = o.verifyCode(ctx, o.verifyCodeJoin(req.AreaCode, req.PhoneNumber), req.VerifyCode)
 	} else {
@@ -50,31 +49,18 @@ func (o *chatSvr) ResetPassword(ctx context.Context, req *chat.ResetPasswordReq)
 		if err != nil {
 			return nil, err
 		}
-		userID = attribute.UserID
 		err = o.Database.UpdatePasswordAndDeleteVerifyCode(ctx, attribute.UserID, req.Password, verifyCodeID)
 	} else {
 		attribute, err := o.Database.GetAttributeByEmail(ctx, req.Email)
 		if err != nil {
 			return nil, err
 		}
-		userID = attribute.UserID
 		err = o.Database.UpdatePasswordAndDeleteVerifyCode(ctx, attribute.UserID, req.Password, verifyCodeID)
 	}
 
 	if err != nil {
 		return nil, err
 	}
-
-	imToken, err := o.imApiCaller.UserToken(ctx, config.GetIMAdmin(mctx.GetOpUserID(ctx)), constant2.AdminPlatformID)
-	if err != nil {
-		return nil, err
-	}
-
-	err = o.imApiCaller.ForceOffLine(mctx.WithApiToken(ctx, imToken), userID)
-	if err != nil {
-		return nil, err
-	}
-
 	return &chat.ResetPasswordResp{}, nil
 }
 
@@ -119,5 +105,16 @@ func (o *chatSvr) ChangePassword(ctx context.Context, req *chat.ChangePasswordRe
 			return nil, err
 		}
 	}
+
+	imToken, err := o.imApiCaller.UserToken(ctx, config.GetIMAdmin(mctx.GetOpUserID(ctx)), constant2.AdminPlatformID)
+	if err != nil {
+		return nil, err
+	}
+
+	err = o.imApiCaller.ForceOffLine(mctx.WithApiToken(ctx, imToken), req.UserID)
+	if err != nil {
+		return nil, err
+	}
+
 	return &chat.ChangePasswordResp{}, nil
 }
