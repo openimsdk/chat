@@ -115,6 +115,9 @@ func (x *RegisterUserReq) Check() error {
 	//if x.VerifyCode == "" {
 	//	return errs.ErrArgs.Wrap("VerifyCode is empty")
 	//}
+	if x.User.Nickname == "" {
+		return errs.ErrArgs.Wrap("Nickname is nil")
+	}
 	if x.Platform < constant2.IOSPlatformID || x.Platform > constant2.AdminPlatformID {
 		return errs.ErrArgs.Wrap("platform is invalid")
 	}
