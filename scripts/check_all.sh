@@ -45,24 +45,41 @@ service_port_name=(
    openImChatPort
 )
 sleep 10
-switch=$(cat $config_path | grep demoswitch |awk -F '[:]' '{print $NF}')
-for i in ${service_port_name[*]}; do
+
+
+# Define the path to the configuration YAML file
+config_yaml="$OPENIM_ROOT/config/config.yaml" # Replace with the actual path to your YAML file
+
+
+# Function to extract a value from the YAML file and remove any leading/trailing whitespace
+extract_yaml_value() {
+  local key=$1
+  grep -oP "${key}: \[\s*\K[^\]]+" "$config_yaml" | xargs
+}
+
+# Extract port numbers from the YAML configuration
+openImChatApiPort=$(extract_yaml_value 'openImChatApiPort')
+openImAdminApiPort=$(extract_yaml_value 'openImAdminApiPort')
+openImAdminPort=$(extract_yaml_value 'openImAdminPort')
+openImChatPort=$(extract_yaml_value 'openImChatPort')
+
+for i in "${service_port_name[@]}"; do
   case $i in
     "openImChatApiPort")
       new_service_name="chat-api"
-      new_service_port="10008"
+      new_service_port=$openImChatApiPort
       ;;
     "openImAdminApiPort")
-      new_service_name="admin-rpc"
-      new_service_port="30200"
+      new_service_name="admin-api"
+      new_service_port=$openImAdminApiPort
       ;;
     "openImAdminPort")
-      new_service_name="chat-rpc"
-      new_service_port="30300"
+      new_service_name="admin-rpc"
+      new_service_port=$openImAdminPort
       ;;
     "openImChatPort")
-      new_service_name="admin-api"
-      new_service_port="10009"
+      new_service_name="chat-rpc"
+      new_service_port=$openImChatPort
       ;;
     *)
       echo "Invalid service name: $i"
@@ -70,12 +87,23 @@ for i in ${service_port_name[*]}; do
       ;;
   esac
 
-  port=$(ss -tunlp | grep "$new_service_name" | awk '{print $5}' | awk -F '[:]' '{print $NF}')
-  if [[ "$port" != "$new_service_port" ]]; then
-    echo -e "${YELLOW_PREFIX}${i}${COLOR_SUFFIX}${RED_PREFIX} service does not start normally, not initiated port is ${COLOR_SUFFIX}${YELLOW_PREFIX}${new_service_port}${COLOR_SUFFIX}"
-    echo -e "${RED_PREFIX}please check ${SCRIPTS_ROOT}/../logs/openIM.log ${COLOR_SUFFIX}"
-    exit -1
-  else
+
+  ports=$(ss -tunlp | grep "$new_service_name" | awk '{print $5}' | awk -F '[:]' '{print $NF}')
+
+found_port=false
+for port in $ports; do
+  if [[ "$port" == "$new_service_port" ]]; then
     echo -e "${new_service_port}${GREEN_PREFIX} port has been listening, belongs service is ${i}${COLOR_SUFFIX}"
+    found_port=true
+    break
   fi
 done
+
+if [[ "$found_port" != true ]]; then
+  echo -e "${YELLOW_PREFIX}${i}${COLOR_SUFFIX}${RED_PREFIX} service does not start normally, expected port is ${COLOR_SUFFIX}${YELLOW_PREFIX}${new_service_port}${COLOR_SUFFIX}"
+  echo -e "${RED_PREFIX}please check ${SCRIPTS_ROOT}/../logs/openIM.log ${COLOR_SUFFIX}"
+  exit -1
+fi
+
+done
+
