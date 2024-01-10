@@ -15,6 +15,7 @@
 package chat
 
 import (
+	"github.com/OpenIMSDK/chat/pkg/common/apicall"
 	"github.com/OpenIMSDK/tools/discoveryregistry"
 	"google.golang.org/grpc"
 
@@ -58,17 +59,19 @@ func Start(discov discoveryregistry.SvcDiscoveryRegistry, server *grpc.Server) e
 		panic(err)
 	}
 	chat.RegisterChatServer(server, &chatSvr{
-		Database: database.NewChatDatabase(db),
-		Admin:    chatClient.NewAdminClient(discov),
-		SMS:      s,
-		Mail:     email,
+		Database:    database.NewChatDatabase(db),
+		Admin:       chatClient.NewAdminClient(discov),
+		SMS:         s,
+		Mail:        email,
+		imApiCaller: apicall.NewCallerInterface(),
 	})
 	return nil
 }
 
 type chatSvr struct {
-	Database database.ChatDatabaseInterface
-	Admin    *chatClient.AdminClient
-	SMS      sms.SMS
-	Mail     email.Mail
+	Database    database.ChatDatabaseInterface
+	Admin       *chatClient.AdminClient
+	SMS         sms.SMS
+	Mail        email.Mail
+	imApiCaller apicall.CallerInterface
 }
