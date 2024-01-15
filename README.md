@@ -41,7 +41,7 @@ If you wish to deploy chat, then you should first install and deploy OpenIM, thi
 First, install openim-server in a new directory or location repository
 
 ```bash
-git clone -b release-v3.4 https://github.com/OpenIMSDK/Open-IM-Server.git openim && export openim=$(pwd)/openim && cd $openim
+git clone -b release-v3.5 https://github.com/OpenIMSDK/Open-IM-Server.git openim && export openim=$(pwd)/openim && cd $openim
 sudo docker compose up -d
 ```
 
