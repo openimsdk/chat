@@ -19,7 +19,6 @@ import (
 
 	"github.com/OpenIMSDK/chat/pkg/common/config"
 	"github.com/OpenIMSDK/chat/pkg/common/constant"
-	utils "github.com/OpenIMSDK/open_utils"
 	"github.com/OpenIMSDK/tools/errs"
 	"github.com/golang-jwt/jwt/v4"
 )
@@ -58,7 +57,7 @@ func CreateToken(UserID string, userType int32, ttl int64) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := token.SignedString([]byte(*config.Config.Secret))
 	if err != nil {
-		return "", utils.Wrap(err, "")
+		return "", errs.Wrap(err, "")
 	}
 	return tokenString, nil
 }
