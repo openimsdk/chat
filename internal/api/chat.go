@@ -419,7 +419,7 @@ func (m *ChatApi) CallbackExample(c *gin.Context) {
 		Data    apistruct.AdminLoginResp `json:"data,omitempty"`
 	}
 
-	admin_output := TokenInfo{}
+	admin_output := &TokenInfo{}
 
 	if err = json.Unmarshal(b, admin_output); err != nil {
 		log.ZError(c, "CallbackExample unmarshal failed", err)
