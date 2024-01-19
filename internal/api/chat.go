@@ -431,7 +431,7 @@ func (m *ChatApi) CallbackExample(c *gin.Context) {
 
 	header["token"] = admin_output.Data.AdminToken
 
-	url = "http://127.0.0.1:10009/user/find/public"
+	url = "http://127.0.0.1:10008/user/find/public"
 
 	search_input := chat.FindUserFullInfoReq{
 		UserIDs: []string{"robotics"},
