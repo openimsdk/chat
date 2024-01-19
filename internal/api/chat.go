@@ -451,7 +451,7 @@ func (m *ChatApi) CallbackExample(c *gin.Context) {
 		Data    chat.FindUserFullInfoResp `json:"data,omitempty"`
 	}
 
-	log.ZDebug(c, "callback", "search_input_b", b)
+	log.ZDebug(c, "callback", "search_input_b", string(b))
 
 	search_output := &UserInfo{}
 
