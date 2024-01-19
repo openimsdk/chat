@@ -384,7 +384,7 @@ func (m *ChatApi) CallbackExample(c *gin.Context) {
 
 	// UserID of the robot account
 
-	if req.SendID == "robotics" {
+	if req.SendID == "robotics" || req.RecvID != "robotics" {
 		return
 	}
 
@@ -427,8 +427,6 @@ func (m *ChatApi) CallbackExample(c *gin.Context) {
 		return
 	}
 
-	log.ZDebug(c, "callback", "admin_output", admin_output)
-
 	header["token"] = admin_output.Data.AdminToken
 
 	url = "http://127.0.0.1:10008/user/find/public"
@@ -450,8 +448,6 @@ func (m *ChatApi) CallbackExample(c *gin.Context) {
 		ErrDlt  string                    `json:"errDlt"`
 		Data    chat.FindUserFullInfoResp `json:"data,omitempty"`
 	}
-
-	log.ZDebug(c, "callback", "search_input_b", string(b))
 
 	search_output := &UserInfo{}
 
