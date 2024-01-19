@@ -387,6 +387,11 @@ func (m *ChatApi) CallbackExample(c *gin.Context) {
 	if req.SendID == "robotics" {
 		return
 	}
+
+	if req.ContentType != constant.Picture && req.ContentType != constant.Text {
+		return
+	}
+
 	// Administrator token
 	url := "http://127.0.0.1:10009/account/login"
 	adminID := config.Config.ChatAdmin[0].AdminID
@@ -422,6 +427,8 @@ func (m *ChatApi) CallbackExample(c *gin.Context) {
 		return
 	}
 
+	log.ZDebug(c, "callback", "admin_output", admin_output)
+
 	header["token"] = admin_output.Data.AdminToken
 
 	url = "http://127.0.0.1:10009/user//find/public"
@@ -453,33 +460,16 @@ func (m *ChatApi) CallbackExample(c *gin.Context) {
 	}
 
 	if len(search_output.Data.Users) == 0 {
-		user_input := &chat.AddUserAccountReq{
-			User: &chat.RegisterUserInfo{
-				UserID:   "robotics",
-				Nickname: "robotics",
-				Email:    "robotics@gmail",
-			},
-		}
-
-		url = "http://127.0.0.1:10009/account/add_user"
-
-		b, err = Post(c, url, header, user_input, 10)
-		if err != nil {
-			log.ZError(c, "CallbackExample unmarshal failed", err)
-			apiresp.GinError(c, errs.ErrInternalServer.WithDetail(err.Error()).Wrap())
-			return
-		}
-		search_output.Data.Users[0].UserID = user_input.User.UserID
-		search_output.Data.Users[0].Nickname = user_input.User.Nickname
+		apiresp.GinError(c, errs.ErrRecordNotFound.Wrap("the robotics not found"))
+		return
 	}
+
+	log.ZDebug(c, "callback", "searchUserAccount", search_output)
 
 	text := apistruct.TextElem{}
 	picture := apistruct.PictureElem{}
 	mapStruct := make(map[string]any)
 	// Processing text messages
-	if req.ContentType != constant.Picture && req.ContentType != constant.Text {
-		return
-	}
 
 	if err != nil {
 		log.ZError(c, "CallbackExample get Sender failed", err)

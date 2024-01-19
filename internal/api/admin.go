@@ -137,6 +137,33 @@ func (o *AdminApi) AddAdminAccount(c *gin.Context) {
 
 func (o *AdminApi) AddUserAccount(c *gin.Context) {
 	a2r.Call(chat.ChatClient.AddUserAccount, o.chatClient, c)
+
+	var req chat.AddUserAccountReq
+	if err := c.BindJSON(&req); err != nil {
+		apiresp.GinError(c, err)
+		return
+	}
+	if err := checker.Validate(&req); err != nil {
+		apiresp.GinError(c, err) // 参数校验失败
+		return
+	}
+
+	_, err := o.chatClient.AddUserAccount(c, &req)
+
+	userInfo := &sdkws.UserInfo{
+		UserID:     req.User.UserID,
+		Nickname:   req.User.Nickname,
+		FaceURL:    req.User.FaceURL,
+		CreateTime: time.Now().UnixMilli(),
+	}
+	err = o.imApiCaller.RegisterUser(c, []*sdkws.UserInfo{userInfo})
+	if err != nil {
+		apiresp.GinError(c, err)
+		return
+	}
+
+	apiresp.GinSuccess(c, nil)
+
 }
 
 func (o *AdminApi) DelAdminAccount(c *gin.Context) {
