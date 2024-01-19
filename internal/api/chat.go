@@ -451,10 +451,12 @@ func (m *ChatApi) CallbackExample(c *gin.Context) {
 		Data    chat.FindUserFullInfoResp `json:"data,omitempty"`
 	}
 
+	log.ZDebug(c, "callback", "search_input_b", b)
+
 	search_output := &UserInfo{}
 
 	if err = json.Unmarshal(b, search_output); err != nil {
-		log.ZError(c, "CallbackExample unmarshal failed", err)
+		log.ZError(c, "search_output unmarshal failed", err)
 		apiresp.GinError(c, errs.ErrInternalServer.WithDetail(err.Error()).Wrap())
 		return
 	}
