@@ -3,9 +3,7 @@ module github.com/OpenIMSDK/chat
 go 1.19
 
 require (
-	github.com/OpenIMSDK/open_utils v1.0.8
 	github.com/gin-gonic/gin v1.9.1
-	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/google/uuid v1.3.1
