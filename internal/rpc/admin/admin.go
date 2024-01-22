@@ -42,7 +42,7 @@ import (
 func Start(discov discoveryregistry.SvcDiscoveryRegistry, server *grpc.Server) error {
 	db, err := dbconn.NewGormDB()
 	if err != nil {
-		return errs.Wrap(err, "NewGormDB failed")
+		return errs.Wrap(err)
 	}
 	tables := []any{
 		admin2.Admin{},
@@ -56,11 +56,11 @@ func Start(discov discoveryregistry.SvcDiscoveryRegistry, server *grpc.Server) e
 		admin2.ClientConfig{},
 	}
 	if err := db.AutoMigrate(tables...); err != nil {
-		return errs.Wrap(err, "AutoMigrate error")
+		return errs.Wrap(err)
 	}
 	rdb, err := cache.NewRedis()
 	if err != nil {
-		return errs.Wrap(err, "NewRedis error")
+		return errs.Wrap(err)
 	}
 	if err := database.NewAdminDatabase(db, rdb).InitAdmin(context.Background()); err != nil {
 		return err
