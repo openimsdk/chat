@@ -193,7 +193,7 @@ func findConfigPath(configFile string) (string, error) {
 
 	p1, err := os.Executable()
 	if err != nil {
-		return "", err
+		return "", errs.Wrap(err)
 	}
 
 	path = CreateCatalogPath(p1)
