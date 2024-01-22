@@ -42,7 +42,7 @@ import (
 func Start(discov discoveryregistry.SvcDiscoveryRegistry, server *grpc.Server) error {
 	db, err := dbconn.NewGormDB()
 	if err != nil {
-		return err
+		return errs.Wrap(err)
 	}
 	tables := []any{
 		admin2.Admin{},
@@ -56,17 +56,17 @@ func Start(discov discoveryregistry.SvcDiscoveryRegistry, server *grpc.Server) e
 		admin2.ClientConfig{},
 	}
 	if err := db.AutoMigrate(tables...); err != nil {
-		return err
+		return errs.Wrap(err)
 	}
 	rdb, err := cache.NewRedis()
 	if err != nil {
-		return err
+		return errs.Wrap(err)
 	}
 	if err := database.NewAdminDatabase(db, rdb).InitAdmin(context.Background()); err != nil {
 		return err
 	}
 	if err := discov.CreateRpcRootNodes([]string{config.Config.RpcRegisterName.OpenImAdminName, config.Config.RpcRegisterName.OpenImChatName}); err != nil {
-		panic(err)
+		panic(errs.Wrap(err, "CreateRpcRootNodes error"))
 	}
 
 	admin.RegisterAdminServer(server, &adminServer{Database: database.NewAdminDatabase(db, rdb),
