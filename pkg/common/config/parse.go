@@ -80,9 +80,6 @@ func InitConfig(configFile string) error {
 	if err := yaml.NewDecoder(bytes.NewReader(data)).Decode(&Config); err != nil {
 		return fmt.Errorf("parse loacl openIMConfig file error: %w", err)
 	}
-	if err != nil {
-		return utils.Wrap(err, configFile)
-	}
 
 	if err := configGetEnv(); err != nil {
 		return fmt.Errorf("get env error:%w", err)
@@ -180,7 +177,6 @@ func findConfigPath(configFile string) (string, error) {
 		if _, err := findConfigFile([]string{configFile}); err != nil {
 			return "", errs.Wrap(errors.New("the configFile argument path is error"))
 		}
-		fmt.Println("configfile:", configFile)
 		return configFile, nil
 	}
 
@@ -197,7 +193,7 @@ func findConfigPath(configFile string) (string, error) {
 
 	p1, err := os.Executable()
 	if err != nil {
-		return "", err
+		return "", errs.Wrap(err)
 	}
 
 	path = CreateCatalogPath(p1)
