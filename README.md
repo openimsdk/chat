@@ -57,13 +57,13 @@ make init
 
 Then go back to the chat directory, Installing Chat
 
-**Start Mysql:**
+**Starting MySQL:**
 
-> The newer versions of OpenIM remove the Mysql component, which requires an additional Mysql installation if you want to deploy chat
+> Recent OpenIM versions have discontinued the MySQL component, necessitating a separate MySQL installation for chat deployment.
 
 ```bash
 docker run -d \
-  --name mysql4 \
+  --name mysql \
   -p 13306:3306 \
   -p 3306:33060 \
   -v "$(pwd)/components/mysql/data:/var/lib/mysql" \
@@ -72,6 +72,25 @@ docker run -d \
   --restart always \
   mysql:5.7
 ```
+
+**MySQL Compatibility Note:**
+
+The MySQL version 5.7 primarily supports the linux/amd64 architecture. Users operating on Mac or other architectures, or those with specific version requirements for MySQL, can opt for the latest version of the open-source MariaDB. MariaDB is compatible with MySQL and can be a suitable alternative.
+
+```bash
+docker run -d \
+  --name mysql \
+  -p 13306:3306 \
+  -p 3306:33060 \
+  -v "$(pwd)/components/mysql/data:/var/lib/mysql" \
+  -v "/etc/localtime:/etc/localtime" \
+  -e MYSQL_ROOT_PASSWORD="openIM123" \
+  --restart always \
+  mariadb:10.6
+```
+
+If you want to use a local or remote database, edit the `config/config.yaml` section after the initial configuration
+
 
 **Install Chat:**
 

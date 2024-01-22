@@ -13,8 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
-
 #Don't put the space between "="
 
 #Include shell font styles and some basic information
@@ -39,6 +37,7 @@ declare -A supported_architectures=(
     ["linux-ppc64le"]="_output/bin/platforms/linux/ppc64le"
     ["linux-s390x"]="_output/bin/platforms/linux/s390x"
     ["darwin-amd64"]="_output/bin/platforms/darwin/amd64"
+    ["darwin-arm64"]="_output/bin/platforms/darwin/arm64"
     ["windows-amd64"]="_output/bin/platforms/windows/amd64"
     ["linux-x86_64"]="_output/bin/platforms/linux/amd64"  # Alias for linux-amd64
     ["darwin-x86_64"]="_output/bin/platforms/darwin/amd64"  # Alias for darwin-amd64

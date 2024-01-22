@@ -41,6 +41,22 @@ logs_dir="$SCRIPTS_ROOT/../logs"
 echo -e "${YELLOW_PREFIX}=======>bin_dir=$bin_dir${COLOR_SUFFIX}"
 echo -e "${YELLOW_PREFIX}=======>logs_dir=$logs_dir${COLOR_SUFFIX}"
 
+# Define the path to the configuration file
+CONFIG_FILE="${OPENIM_ROOT}/config/config.yaml"
+
+# Check if the configuration file exists
+if [ -f "$CONFIG_FILE" ]; then
+    # The file exists
+    echo "Configuration file already exists at $CONFIG_FILE."
+else
+    echo ""
+    # The file does not exist
+    echo "Error: Configuration file does not exist."
+    echo "+++ You need to execute 'make init' to generate the configuration file and then modify the configuration items."
+    echo ""
+    exit 1
+fi
+
 #service filename
 service_filename=(
   chat-api
