@@ -67,8 +67,7 @@ func main() {
 		panic(err)
 	}
 	if err := log.InitFromConfig("chat.log", "admin-api", *config.Config.Log.RemainLogLevel, *config.Config.Log.IsStdout, *config.Config.Log.IsJson, *config.Config.Log.StorageLocation, *config.Config.Log.RemainRotationCount, *config.Config.Log.RotationTime); err != nil {
-		fmt.Errorf("InitFromConfig failed:%w", err)
-		panic(err)
+		panic(fmt.Errorf("InitFromConfig failed:%w", err))
 	}
 	if config.Config.Envs.Discovery == "k8s" {
 		ginPort = 80

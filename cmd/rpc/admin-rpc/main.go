@@ -62,8 +62,7 @@ func main() {
 		rpcPort = 80
 	}
 	if err := log.InitFromConfig("chat.log", "admin-rpc", *config.Config.Log.RemainLogLevel, *config.Config.Log.IsStdout, *config.Config.Log.IsJson, *config.Config.Log.StorageLocation, *config.Config.Log.RemainRotationCount, *config.Config.Log.RotationTime); err != nil {
-		fmt.Errorf("InitFromConfig failed:%w", err)
-		panic(err)
+		panic(fmt.Errorf("InitFromConfig failed:%w", err))
 	}
 	err = chatrpcstart.Start(rpcPort, config.Config.RpcRegisterName.OpenImAdminName, 0, admin.Start)
 	if err != nil {
