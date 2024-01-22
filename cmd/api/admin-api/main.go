@@ -16,6 +16,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/OpenIMSDK/tools/errs"
 	"math/rand"
 	"net"
 	"strconv"
@@ -66,7 +67,7 @@ func main() {
 		panic(err)
 	}
 	if err := log.InitFromConfig("chat.log", "admin-api", *config.Config.Log.RemainLogLevel, *config.Config.Log.IsStdout, *config.Config.Log.IsJson, *config.Config.Log.StorageLocation, *config.Config.Log.RemainRotationCount, *config.Config.Log.RotationTime); err != nil {
-		panic(err)
+		panic(fmt.Errorf("InitFromConfig failed:%w", err))
 	}
 	if config.Config.Envs.Discovery == "k8s" {
 		ginPort = 80
@@ -80,7 +81,7 @@ func main() {
 	}
 
 	if err := zk.CreateRpcRootNodes([]string{config.Config.RpcRegisterName.OpenImAdminName, config.Config.RpcRegisterName.OpenImChatName}); err != nil {
-		panic(err)
+		panic(errs.Wrap(err, "CreateRpcRootNodes error"))
 	}
 	zk.AddOption(mw.GrpcClient(), grpc.WithTransportCredentials(insecure.NewCredentials())) // 默认RPC中间件
 	engine := gin.Default()

@@ -53,7 +53,7 @@ func Start(rpcPort int, rpcRegisterName string, prometheusPort int, rpcFn func(c
 	defer srv.GracefulStop()
 	err = rpcFn(zkClient, srv)
 	if err != nil {
-		return errs.Wrap(err)
+		return err
 	}
 	err = zkClient.Register(rpcRegisterName, registerIP, rpcPort, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
