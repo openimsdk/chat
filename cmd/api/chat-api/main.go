@@ -17,6 +17,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/OpenIMSDK/tools/errs"
 	"math/rand"
 	"net"
 	"strconv"
@@ -92,7 +93,7 @@ func main() {
 		panic(err)
 	}
 	if err := zk.CreateRpcRootNodes([]string{config.Config.RpcRegisterName.OpenImAdminName, config.Config.RpcRegisterName.OpenImChatName}); err != nil {
-		panic(err)
+		panic(errs.Wrap(err, "CreateRpcRootNodes error"))
 	}
 	zk.AddOption(mw.GrpcClient(), grpc.WithTransportCredentials(insecure.NewCredentials())) // 默认RPC中间件
 	engine := gin.Default()

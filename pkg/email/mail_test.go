@@ -49,10 +49,7 @@ func TestEmail(T *testing.T) {
 			want: errors.New("dial tcp :0: connectex: The requested address is not valid in its context."),
 		},
 	}
-	mail, err := NewMail()
-	if err != nil {
-		T.Errorf("Init mail failed,%v", err)
-	}
+	mail := NewMail()
 
 	for _, tt := range tests {
 		T.Run(tt.name, func(t *testing.T) {

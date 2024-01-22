@@ -22,14 +22,14 @@ import (
 	"gopkg.in/gomail.v2"
 )
 
-func NewMail() (Mail, error) {
+func NewMail() Mail {
 	dail := gomail.NewDialer(
 		config.Config.VerifyCode.Mail.SmtpAddr,
 		config.Config.VerifyCode.Mail.SmtpPort,
 		config.Config.VerifyCode.Mail.SenderMail,
 		config.Config.VerifyCode.Mail.SenderAuthorizationCode)
 
-	return &mail{dail: dail}, nil
+	return &mail{dail: dail}
 }
 
 type Mail interface {
