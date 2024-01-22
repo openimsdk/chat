@@ -39,7 +39,7 @@ func NewMysqlGormDB() (*gorm.DB, error) {
 		time.Sleep(time.Duration(30) * time.Second)
 		db, err = gorm.Open(mysql.Open(dsn), nil)
 		if err != nil {
-			return nil, fmt.Errorf("failed to open initial database connection with DSN %s: %w", dsn, err)
+			return nil, errs.Wrap(err, fmt.Sprintf("failed to open initial database connection with DSN %s", dsn))
 		}
 
 	}
