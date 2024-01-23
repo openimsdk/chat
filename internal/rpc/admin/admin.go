@@ -62,14 +62,17 @@ func Start(discov discoveryregistry.SvcDiscoveryRegistry, server *grpc.Server) e
 	if err != nil {
 		return errs.Wrap(err)
 	}
-	if err := database.NewAdminDatabase(db, rdb).InitAdmin(context.Background()); err != nil {
+
+	adminDatabase := database.NewAdminDatabase(db, rdb)
+
+	if err := adminDatabase.InitAdmin(context.Background()); err != nil {
 		return err
 	}
 	if err := discov.CreateRpcRootNodes([]string{config.Config.RpcRegisterName.OpenImAdminName, config.Config.RpcRegisterName.OpenImChatName}); err != nil {
 		panic(errs.Wrap(err, "CreateRpcRootNodes error"))
 	}
 
-	admin.RegisterAdminServer(server, &adminServer{Database: database.NewAdminDatabase(db, rdb),
+	admin.RegisterAdminServer(server, &adminServer{Database: adminDatabase,
 		Chat: chat.NewChatClient(discov),
 	})
 	return nil
