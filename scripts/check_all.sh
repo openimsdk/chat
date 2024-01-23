@@ -62,7 +62,7 @@ extract_yaml_value() {
       ;;
     "Darwin")
       # Use sed for macOS
-      sed -nE "/openImAdminApiPort: \[ */{s///; s/\].*//; p;}" "./config/config.yaml" | tr -d '[]' | xargs
+      sed -nE "/${key}: \[ */{s///; s/\].*//; p;}" "$config_yaml" | tr -d '[]' | xargs
       ;;
     *)
       echo "Unsupported operating system"
