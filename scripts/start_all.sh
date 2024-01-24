@@ -119,7 +119,9 @@ for ((i = 0; i < ${#service_filename[*]}; i++)); do
       cmd="$bin_dir/${service_filename[$i]} -port ${service_ports[$j]} --config_folder_path ${config_path}"
     fi
     echo $cmd
-    nohup $cmd >>${logs_dir}/openIM.log 2>&1 &
+
+#    nohup $cmd >>${logs_dir}/openIM.log 2>&1 &
+    /_output/logs/*.log
     sleep 1
 #    pid="netstat -ntlp|grep $j |awk '{printf \$7}'|cut -d/ -f1"
 #    echo -e "${GREEN_PREFIX}${service_filename[$i]} start success,port number:${service_ports[$j]} pid:$(eval $pid)$COLOR_SUFFIX"
