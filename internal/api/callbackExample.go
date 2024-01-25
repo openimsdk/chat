@@ -71,12 +71,12 @@ func (o *ChatApi) CallbackExample(c *gin.Context) {
 	log.ZDebug(c, "mapStruct", mapStruct)
 
 	// 2.6 Send Message
-	err = sendMessage(c, adminToken.ImToken, robotics, msgInfo, robUser, mapStruct)
+	err = sendMessage(c, adminToken.ImToken, msgInfo, robUser, mapStruct)
 	if err != nil {
 		log.ZError(c, "getRobotAccountInfo failed", err)
 		return
 	}
-	log.ZDebug(c, "callbackExample", "mapStruct", mapStruct)
+	log.ZDebug(c, "callbackExample", mapStruct)
 }
 
 // struct to map
@@ -305,12 +305,12 @@ func contextToMap(c *gin.Context, req *apistruct.CallbackAfterSendSingleMsgReq) 
 	return mapStruct, nil
 }
 
-func sendMessage(c *gin.Context, token, receiveID string, req *apistruct.CallbackAfterSendSingleMsgReq, rob *common.UserPublicInfo, mapStruct map[string]interface{}) error {
+func sendMessage(c *gin.Context, token string, req *apistruct.CallbackAfterSendSingleMsgReq, rob *common.UserPublicInfo, mapStruct map[string]interface{}) error {
 	header := map[string]string{}
 	header["token"] = token
 
 	input := &apistruct.SendMsgReq{
-		RecvID: receiveID,
+		RecvID: req.SendID,
 		SendMsg: apistruct.SendMsg{
 			SendID:           rob.UserID,
 			SenderNickname:   rob.Nickname,
