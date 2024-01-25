@@ -60,7 +60,7 @@ func (o *ChatApi) CallbackExample(c *gin.Context) {
 		return
 	}
 
-	log.ZDebug(c, "callbackExample", "robUser", robUser)
+	log.ZDebug(c, "callbackExample", robUser)
 
 	// 2.5 Constructing Message Field Contents
 	mapStruct, err := contextToMap(c, msgInfo)
@@ -68,7 +68,7 @@ func (o *ChatApi) CallbackExample(c *gin.Context) {
 		log.ZError(c, "contextToMap", err)
 		return
 	}
-	log.ZDebug(c, "callbackExample", "mapStruct", mapStruct)
+	log.ZDebug(c, "mapStruct", mapStruct)
 
 	// 2.6 Send Message
 	err = sendMessage(c, adminToken.ImToken, robotics, msgInfo, robUser, mapStruct)
@@ -154,9 +154,9 @@ func Post(ctx context.Context, url string, header map[string]string, data any, t
 // handlingCallbackAfterSendMsg Handling callbacks after sending a message
 func handlingCallbackAfterSendMsg(c *gin.Context) (*apistruct.CallbackAfterSendSingleMsgReq, error) {
 
-	var req apistruct.CallbackAfterSendSingleMsgReq
+	var req *apistruct.CallbackAfterSendSingleMsgReq
 
-	if err := c.BindJSON(&req); err != nil {
+	if err := c.BindJSON(req); err != nil {
 		return nil, err
 	}
 
@@ -170,7 +170,7 @@ func handlingCallbackAfterSendMsg(c *gin.Context) (*apistruct.CallbackAfterSendS
 		},
 	}
 	c.JSON(http.StatusOK, resp)
-	return &req, nil
+	return req, nil
 }
 
 func getAdminToken(c *gin.Context) (*apistruct.AdminLoginResp, error) {
@@ -256,6 +256,7 @@ func contextToMap(c *gin.Context, req *apistruct.CallbackAfterSendSingleMsgReq) 
 	var err error
 	// Handle message structures
 	if req.ContentType == constant.Text {
+		log.ZDebug(c, "callback", "req", req)
 		err = json.Unmarshal([]byte(req.Content), &text)
 		if err != nil {
 			return nil, err
