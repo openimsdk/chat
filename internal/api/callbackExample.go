@@ -13,8 +13,6 @@ import (
 	"github.com/OpenIMSDK/chat/pkg/proto/chat"
 	"github.com/OpenIMSDK/chat/pkg/proto/common"
 	"github.com/OpenIMSDK/protocol/constant"
-	"github.com/OpenIMSDK/protocol/msg"
-	"github.com/OpenIMSDK/tools/apiresp"
 	"github.com/OpenIMSDK/tools/errs"
 	"github.com/OpenIMSDK/tools/log"
 	"github.com/OpenIMSDK/tools/utils"
@@ -60,15 +58,12 @@ func (o *ChatApi) CallbackExample(c *gin.Context) {
 		return
 	}
 
-	log.ZDebug(c, "callbackExample", robUser)
-
 	// 2.5 Constructing Message Field Contents
 	mapStruct, err := contextToMap(c, msgInfo)
 	if err != nil {
 		log.ZError(c, "contextToMap", err)
 		return
 	}
-	log.ZDebug(c, "mapStruct", mapStruct)
 
 	// 2.6 Send Message
 	err = sendMessage(c, adminToken.ImToken, msgInfo, robUser, mapStruct)
@@ -76,7 +71,6 @@ func (o *ChatApi) CallbackExample(c *gin.Context) {
 		log.ZError(c, "getRobotAccountInfo failed", err)
 		return
 	}
-	log.ZDebug(c, "callbackExample", mapStruct)
 }
 
 // struct to map
@@ -219,7 +213,6 @@ func getRobotAccountInfo(c *gin.Context, token, robotics string) (*common.UserPu
 
 	b, err := Post(c, url, header, searchInput, 10)
 	if err != nil {
-		log.ZError(c, "CallbackExample getRobotAccountInfo Post failed", err)
 		return nil, err
 	}
 
@@ -229,23 +222,14 @@ func getRobotAccountInfo(c *gin.Context, token, robotics string) (*common.UserPu
 		ErrDlt  string                      `json:"errDlt"`
 		Data    chat.FindUserPublicInfoResp `json:"data,omitempty"`
 	}
-
 	searchOutput := &UserInfo{}
-
-	log.ZDebug(c, "callback", "b", string(b))
-
 	if err = json.Unmarshal(b, searchOutput); err != nil {
 		return nil, err
 	}
 
-	log.ZDebug(c, "callback", "searchOutput", searchOutput)
-
 	if len(searchOutput.Data.Users) == 0 || searchOutput.Data.Users == nil {
-		log.ZError(c, "robAccount not found", err)
 		return nil, err
 	}
-
-	log.ZDebug(c, "callbackcallback", "searchOutput.Data.Users", searchOutput.Data.Users)
 	return searchOutput.Data.Users[0], nil
 }
 
@@ -256,19 +240,16 @@ func contextToMap(c *gin.Context, req *apistruct.CallbackAfterSendSingleMsgReq) 
 	var err error
 	// Handle message structures
 	if req.ContentType == constant.Text {
-		log.ZDebug(c, "contextToMap", "req", req)
 		err = json.Unmarshal([]byte(req.Content), &text)
 		if err != nil {
 			return nil, err
 		}
-		log.ZDebug(c, "callback", "text", text)
 		mapStruct["content"] = text.Content
 	} else {
 		err = json.Unmarshal([]byte(req.Content), &picture)
 		if err != nil {
 			return nil, err
 		}
-		log.ZDebug(c, "callback", "text", picture)
 		if strings.Contains(picture.SourcePicture.Type, "/") {
 			arr := strings.Split(picture.SourcePicture.Type, "/")
 			picture.SourcePicture.Type = arr[1]
@@ -325,29 +306,10 @@ func sendMessage(c *gin.Context, token string, req *apistruct.CallbackAfterSendS
 
 	url := "http://127.0.0.1:10002/msg/send_msg"
 
-	type sendResp struct {
-		ErrCode int             `json:"errCode"`
-		ErrMsg  string          `json:"errMsg"`
-		ErrDlt  string          `json:"errDlt"`
-		Data    msg.SendMsgResp `json:"data,omitempty"`
-	}
-
-	output := &sendResp{}
-
 	// Initiate a post request that calls the interface that sends the message (the bot sends a message to user)
-	b, err := Post(c, url, header, input, 10)
+	_, err := Post(c, url, header, input, 10)
 	if err != nil {
 		return err
 	}
-	if err = json.Unmarshal(b, output); err != nil {
-		return err
-	}
-
-	res := &msg.SendMsgResp{
-		ServerMsgID: output.Data.ServerMsgID,
-		ClientMsgID: output.Data.ClientMsgID,
-		SendTime:    output.Data.SendTime,
-	}
-	apiresp.GinSuccess(c, res)
 	return nil
 }
