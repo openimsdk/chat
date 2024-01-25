@@ -214,6 +214,7 @@ func getRobotAccountInfo(c *gin.Context, token, robotics string) (*common.UserFu
 
 	b, err := Post(c, url, header, searchInput, 10)
 	if err != nil {
+		log.ZError(c, "CallbackExample getRobotAccountInfo Post failed", err)
 		return nil, errs.Wrap(err)
 	}
 
@@ -226,10 +227,14 @@ func getRobotAccountInfo(c *gin.Context, token, robotics string) (*common.UserFu
 
 	searchOutput := &UserInfo{}
 
+	log.ZDebug(c, "callback", "b", b)
+
 	if err = json.Unmarshal(b, searchOutput); err != nil {
-		log.ZError(c, "CallbackExample send message failed", err)
+		log.ZError(c, "CallbackExample Unmarshal failed", err)
 		return nil, errs.Wrap(err)
 	}
+
+	log.ZDebug(c, "callback", "searchOutput", searchOutput)
 
 	if len(searchOutput.Data.Users) == 0 {
 		return nil, errs.Wrap(err)
