@@ -120,8 +120,7 @@ for ((i = 0; i < ${#service_filename[*]}; i++)); do
     fi
     echo $cmd
 
-#    nohup $cmd >>${logs_dir}/openIM.log 2>&1 &
-    /_output/logs/*.log
+    nohup $cmd >>${logs_dir}/../_output/logs/openim_$(data '+%Y%m%d').log 2>&1 &
     sleep 1
 #    pid="netstat -ntlp|grep $j |awk '{printf \$7}'|cut -d/ -f1"
 #    echo -e "${GREEN_PREFIX}${service_filename[$i]} start success,port number:${service_ports[$j]} pid:$(eval $pid)$COLOR_SUFFIX"

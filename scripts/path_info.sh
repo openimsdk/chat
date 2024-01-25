@@ -62,6 +62,16 @@ config_path="$OPENIM_ROOT/config/config.yaml"
 configfile_path="$OPENIM_ROOT/config"
 log_path="$OPENIM_ROOT/log"
 
+# If OPENIM_OUTPUT is not set, set it to the default value
+if [ -z "${OPENIM_OUTPUT+x}" ]; then
+    OPENIM_OUTPUT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../_output" && pwd -P)"
+fi
+
+if [[ ! -d "${OPENIM_OUTPUT}/logs" ]]; then
+        mkdir -p "${OPENIM_OUTPUT}/logs"
+        touch "$LOG_FILE"
+fi
+
 #servicefile dir path
 service_source_root=(
   #api service file
