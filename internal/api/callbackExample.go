@@ -249,14 +249,14 @@ func getRobotAccountInfo(c *gin.Context, token, robotics string) (*common.UserPu
 	return searchOutput.Data.Users[0], nil
 }
 
-func contextToMap(c *gin.Context, req *apistruct.CallbackAfterSendSingleMsgReq) (map[string]interface{}, error) {
+func contextToMap(c *gin.Context, req *apistruct.CallbackAfterSendSingleMsgReq) (map[string]any, error) {
 	text := apistruct.TextElem{}
 	picture := apistruct.PictureElem{}
 	mapStruct := make(map[string]any)
 	var err error
 	// Handle message structures
 	if req.ContentType == constant.Text {
-		log.ZDebug(c, "callback", "req", req)
+		log.ZDebug(c, "contextToMap", "req", req)
 		err = json.Unmarshal([]byte(req.Content), &text)
 		if err != nil {
 			return nil, err
@@ -302,7 +302,7 @@ func contextToMap(c *gin.Context, req *apistruct.CallbackAfterSendSingleMsgReq) 
 		mapStruct["sourcePicture"] = mapStructSource
 		mapStruct["sourcePath"] = picture.SourcePath
 	}
-	return nil, nil
+	return mapStruct, nil
 }
 
 func sendMessage(c *gin.Context, token, receiveID string, req *apistruct.CallbackAfterSendSingleMsgReq, rob *common.UserPublicInfo, mapStruct map[string]interface{}) error {
