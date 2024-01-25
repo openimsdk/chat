@@ -202,13 +202,13 @@ func getAdminToken(c *gin.Context) (*apistruct.AdminLoginResp, error) {
 }
 
 // CheckRobotAccount Verify if the robot account exists
-func getRobotAccountInfo(c *gin.Context, token, robotics string) (*common.UserPublicInfo, error) {
+func getRobotAccountInfo(c *gin.Context, token, robotics string) (*common.UserFullInfo, error) {
 	header := make(map[string]string)
 	header["token"] = token
 
 	url := "http://127.0.0.1:10008/user/find/public"
 
-	searchInput := chat.FindUserPublicInfoReq{
+	searchInput := chat.FindUserFullInfoReq{
 		UserIDs: []string{robotics},
 	}
 
@@ -218,10 +218,10 @@ func getRobotAccountInfo(c *gin.Context, token, robotics string) (*common.UserPu
 	}
 
 	type UserInfo struct {
-		ErrCode int                         `json:"errCode"`
-		ErrMsg  string                      `json:"errMsg"`
-		ErrDlt  string                      `json:"errDlt"`
-		Data    chat.FindUserPublicInfoResp `json:"data,omitempty"`
+		ErrCode int                       `json:"errCode"`
+		ErrMsg  string                    `json:"errMsg"`
+		ErrDlt  string                    `json:"errDlt"`
+		Data    chat.FindUserFullInfoResp `json:"data,omitempty"`
 	}
 
 	searchOutput := &UserInfo{}
@@ -291,7 +291,7 @@ func contextToMap(c *gin.Context, req *apistruct.CallbackAfterSendSingleMsgReq) 
 	return nil, nil
 }
 
-func sendMessage(c *gin.Context, token, receiveID string, req *apistruct.CallbackAfterSendSingleMsgReq, rob *common.UserPublicInfo, mapStruct map[string]interface{}) error {
+func sendMessage(c *gin.Context, token, receiveID string, req *apistruct.CallbackAfterSendSingleMsgReq, rob *common.UserFullInfo, mapStruct map[string]interface{}) error {
 	header := map[string]string{}
 	header["token"] = token
 
