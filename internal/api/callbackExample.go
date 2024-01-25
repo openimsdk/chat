@@ -68,6 +68,7 @@ func (o *ChatApi) CallbackExample(c *gin.Context) {
 		log.ZError(c, "contextToMap", err)
 		return
 	}
+	log.ZDebug(c, "callbackExample", "mapStruct", mapStruct)
 
 	// 2.6 Send Message
 	err = sendMessage(c, adminToken.ImToken, robotics, msgInfo, robUser, mapStruct)
@@ -75,6 +76,7 @@ func (o *ChatApi) CallbackExample(c *gin.Context) {
 		log.ZError(c, "getRobotAccountInfo failed", err)
 		return
 	}
+	log.ZDebug(c, "callbackExample", "mapStruct", mapStruct)
 }
 
 // struct to map
@@ -205,13 +207,13 @@ func getAdminToken(c *gin.Context) (*apistruct.AdminLoginResp, error) {
 }
 
 // CheckRobotAccount Verify if the robot account exists
-func getRobotAccountInfo(c *gin.Context, token, robotics string) (*common.UserFullInfo, error) {
+func getRobotAccountInfo(c *gin.Context, token, robotics string) (*common.UserPublicInfo, error) {
 	header := make(map[string]string)
 	header["token"] = token
 
 	url := "http://127.0.0.1:10008/user/find/public"
 
-	searchInput := chat.FindUserFullInfoReq{
+	searchInput := chat.FindUserPublicInfoReq{
 		UserIDs: []string{robotics},
 	}
 
@@ -222,10 +224,10 @@ func getRobotAccountInfo(c *gin.Context, token, robotics string) (*common.UserFu
 	}
 
 	type UserInfo struct {
-		ErrCode int                       `json:"errCode"`
-		ErrMsg  string                    `json:"errMsg"`
-		ErrDlt  string                    `json:"errDlt"`
-		Data    chat.FindUserFullInfoResp `json:"data,omitempty"`
+		ErrCode int                         `json:"errCode"`
+		ErrMsg  string                      `json:"errMsg"`
+		ErrDlt  string                      `json:"errDlt"`
+		Data    chat.FindUserPublicInfoResp `json:"data,omitempty"`
 	}
 
 	searchOutput := &UserInfo{}
@@ -242,6 +244,8 @@ func getRobotAccountInfo(c *gin.Context, token, robotics string) (*common.UserFu
 		log.ZError(c, "robAccount not found", err)
 		return nil, err
 	}
+
+	log.ZDebug(c, "callbackcallback", "searchOutput.Data.Users", searchOutput.Data.Users)
 	return searchOutput.Data.Users[0], nil
 }
 
@@ -300,7 +304,7 @@ func contextToMap(c *gin.Context, req *apistruct.CallbackAfterSendSingleMsgReq) 
 	return nil, nil
 }
 
-func sendMessage(c *gin.Context, token, receiveID string, req *apistruct.CallbackAfterSendSingleMsgReq, rob *common.UserFullInfo, mapStruct map[string]interface{}) error {
+func sendMessage(c *gin.Context, token, receiveID string, req *apistruct.CallbackAfterSendSingleMsgReq, rob *common.UserPublicInfo, mapStruct map[string]interface{}) error {
 	header := map[string]string{}
 	header["token"] = token
 
