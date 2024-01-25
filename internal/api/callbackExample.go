@@ -6,6 +6,7 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"github.com/OpenIMSDK/chat/pkg/common/apistruct"
 	"github.com/OpenIMSDK/chat/pkg/common/config"
 	"github.com/OpenIMSDK/chat/pkg/proto/admin"
@@ -29,7 +30,7 @@ func (o *ChatApi) CallbackExample(c *gin.Context) {
 	// 1. Handling callbacks after sending a single chat message
 	msgInfo, err := handlingCallbackAfterSendMsg(c)
 	if err != nil {
-		apiresp.GinError(c, err)
+		log.ZError(c, "handlingCallbackAfterSendMsg failed", err)
 		return
 	}
 
@@ -48,28 +49,30 @@ func (o *ChatApi) CallbackExample(c *gin.Context) {
 	// 2.3 Get administrator token
 	adminToken, err := getAdminToken(c)
 	if err != nil {
-		apiresp.GinError(c, err)
+		log.ZError(c, "getAdminToken failed", err)
 		return
 	}
 
 	// 2.4 Get RobotAccount info
 	robUser, err := getRobotAccountInfo(c, adminToken.AdminToken, robotics)
 	if err != nil {
-		apiresp.GinError(c, err)
+		log.ZError(c, "getRobotAccountInfo failed", err)
 		return
 	}
+
+	log.ZDebug(c, "callbackExample", "robUser", robUser)
 
 	// 2.5 Constructing Message Field Contents
 	mapStruct, err := contextToMap(c, msgInfo)
 	if err != nil {
-		apiresp.GinError(c, err)
+		log.ZError(c, "contextToMap", err)
 		return
 	}
 
 	// 2.6 Send Message
 	err = sendMessage(c, adminToken.ImToken, robotics, msgInfo, robUser, mapStruct)
 	if err != nil {
-		apiresp.GinError(c, err)
+		log.ZError(c, "getRobotAccountInfo failed", err)
 		return
 	}
 }
@@ -81,7 +84,7 @@ func convertStructToMap(input interface{}) (map[string]interface{}, error) {
 	inputValue := reflect.ValueOf(input)
 
 	if inputType.Kind() != reflect.Struct {
-		return nil, errs.ErrArgs.Wrap("input is not a struct")
+		return nil, errors.New("input is not a struct")
 	}
 
 	for i := 0; i < inputType.NumField(); i++ {
@@ -116,12 +119,12 @@ func Post(ctx context.Context, url string, header map[string]string, data any, t
 
 	jsonStr, err := json.Marshal(data)
 	if err != nil {
-		return nil, errs.Wrap(err)
+		return nil, err
 	}
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewBuffer(jsonStr))
 	if err != nil {
-		return nil, errs.Wrap(err)
+		return nil, err
 	}
 
 	if operationID, _ := ctx.Value(constant.OperationID).(string); operationID != "" {
@@ -140,7 +143,7 @@ func Post(ctx context.Context, url string, header map[string]string, data any, t
 
 	result, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, errs.Wrap(err)
+		return nil, err
 	}
 
 	return result, nil
@@ -152,7 +155,7 @@ func handlingCallbackAfterSendMsg(c *gin.Context) (*apistruct.CallbackAfterSendS
 	var req apistruct.CallbackAfterSendSingleMsgReq
 
 	if err := c.BindJSON(&req); err != nil {
-		return nil, errs.Wrap(err)
+		return nil, err
 	}
 
 	resp := apistruct.CallbackAfterSendSingleMsgResp{
@@ -183,7 +186,7 @@ func getAdminToken(c *gin.Context) (*apistruct.AdminLoginResp, error) {
 
 	b, err := Post(c, url, header, adminInput, 10)
 	if err != nil {
-		return nil, errs.Wrap(err)
+		return nil, err
 	}
 
 	type TokenInfo struct {
@@ -196,7 +199,7 @@ func getAdminToken(c *gin.Context) (*apistruct.AdminLoginResp, error) {
 	adminOutput := &TokenInfo{}
 
 	if err = json.Unmarshal(b, adminOutput); err != nil {
-		return nil, errs.Wrap(err)
+		return nil, err
 	}
 	return &apistruct.AdminLoginResp{AdminToken: adminOutput.Data.AdminToken, ImToken: adminOutput.Data.ImToken}, nil
 }
@@ -215,7 +218,7 @@ func getRobotAccountInfo(c *gin.Context, token, robotics string) (*common.UserFu
 	b, err := Post(c, url, header, searchInput, 10)
 	if err != nil {
 		log.ZError(c, "CallbackExample getRobotAccountInfo Post failed", err)
-		return nil, errs.Wrap(err)
+		return nil, err
 	}
 
 	type UserInfo struct {
@@ -227,17 +230,17 @@ func getRobotAccountInfo(c *gin.Context, token, robotics string) (*common.UserFu
 
 	searchOutput := &UserInfo{}
 
-	log.ZDebug(c, "callback", "b", b)
+	log.ZDebug(c, "callback", "b", string(b))
 
 	if err = json.Unmarshal(b, searchOutput); err != nil {
-		log.ZError(c, "CallbackExample Unmarshal failed", err)
-		return nil, errs.Wrap(err)
+		return nil, err
 	}
 
 	log.ZDebug(c, "callback", "searchOutput", searchOutput)
 
-	if len(searchOutput.Data.Users) == 0 {
-		return nil, errs.Wrap(err)
+	if len(searchOutput.Data.Users) == 0 || searchOutput.Data.Users == nil {
+		log.ZError(c, "robAccount not found", err)
+		return nil, err
 	}
 	return searchOutput.Data.Users[0], nil
 }
@@ -251,14 +254,14 @@ func contextToMap(c *gin.Context, req *apistruct.CallbackAfterSendSingleMsgReq) 
 	if req.ContentType == constant.Text {
 		err = json.Unmarshal([]byte(req.Content), &text)
 		if err != nil {
-			return nil, errs.Wrap(err)
+			return nil, err
 		}
 		log.ZDebug(c, "callback", "text", text)
 		mapStruct["content"] = text.Content
 	} else {
 		err = json.Unmarshal([]byte(req.Content), &picture)
 		if err != nil {
-			return nil, errs.Wrap(err)
+			return nil, err
 		}
 		log.ZDebug(c, "callback", "text", picture)
 		if strings.Contains(picture.SourcePicture.Type, "/") {
@@ -329,10 +332,10 @@ func sendMessage(c *gin.Context, token, receiveID string, req *apistruct.Callbac
 	// Initiate a post request that calls the interface that sends the message (the bot sends a message to user)
 	b, err := Post(c, url, header, input, 10)
 	if err != nil {
-		return errs.Wrap(err)
+		return err
 	}
 	if err = json.Unmarshal(b, output); err != nil {
-		return errs.Wrap(err)
+		return err
 	}
 
 	res := &msg.SendMsgResp{
