@@ -40,7 +40,11 @@ echo -e "${BOLD_PREFIX}_________________________________________________________
 
 
 bin_dir="$BIN_DIR"
-logs_dir="$OPENIM_ROOT/logs"
+logs_dir="$OPENIM_ROOT/_output/logs"
+
+if [ ! -d $logs_dir ]; then
+  mkdir -p $logs_dir
+fi
 
 echo "==> bin_dir=$bin_dir"
 echo "==> logs_dir=$logs_dir"
