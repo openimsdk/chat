@@ -227,6 +227,7 @@ func getRobotAccountInfo(c *gin.Context, token, robotics string) (*common.UserFu
 	searchOutput := &UserInfo{}
 
 	if err = json.Unmarshal(b, searchOutput); err != nil {
+		log.ZError(c, "CallbackExample send message failed", err)
 		return nil, errs.Wrap(err)
 	}
 
@@ -328,5 +329,12 @@ func sendMessage(c *gin.Context, token, receiveID string, req *apistruct.Callbac
 	if err = json.Unmarshal(b, output); err != nil {
 		return errs.Wrap(err)
 	}
+
+	res := &msg.SendMsgResp{
+		ServerMsgID: output.Data.ServerMsgID,
+		ClientMsgID: output.Data.ClientMsgID,
+		SendTime:    output.Data.SendTime,
+	}
+	apiresp.GinSuccess(c, res)
 	return nil
 }
