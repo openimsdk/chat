@@ -67,6 +67,8 @@ if [ -z "${OPENIM_OUTPUT+x}" ]; then
     OPENIM_OUTPUT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../_output" && pwd -P)"
 fi
 
+LOG_FILE="${OPENIM_OUTPUT}/logs/openim_$(date '+%Y%m%d').log"
+
 if [[ ! -d "${OPENIM_OUTPUT}/logs" ]]; then
         mkdir -p "${OPENIM_OUTPUT}/logs"
         touch "$LOG_FILE"
