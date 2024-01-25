@@ -42,7 +42,7 @@ sleep 1
 cd ${push_binary_root}
 
 for ((i = 0; i < ${#rpc_ports[@]}; i++)); do
-  nohup ./${push_name} -port ${rpc_ports[$i]} -prometheus_port ${prome_ports[$i]} >>../_output/logs/openim_$(data '+%Y%m%d').log 2>&1 &
+  nohup ./${push_name} -port ${rpc_ports[$i]} -prometheus_port ${prome_ports[$i]} >>../logs/openim_$(date '+%Y%m%d').log 2>&1 &
 done
 
 sleep 3
@@ -61,5 +61,5 @@ if [ $check -ge 1 ]; then
   echo -e ${SKY_BLUE_PREFIX}"PID: "${COLOR_SUFFIX}${YELLOW_PREFIX}${newPid}${COLOR_SUFFIX}
   echo -e ${SKY_BLUE_PREFIX}"LISTENING_PORT: "${COLOR_SUFFIX}${YELLOW_PREFIX}${allPorts}${COLOR_SUFFIX}
 else
-  echo -e ${YELLOW_PREFIX}${push_name}${COLOR_SUFFIX}${RED_PREFIX}"SERVICE START ERROR, PLEASE CHECK openIM.log"${COLOR_SUFFIX}
+  echo -e ${YELLOW_PREFIX}${push_name}${COLOR_SUFFIX}${RED_PREFIX}"SERVICE START ERROR, PLEASE CHECK openim_$(date '+%Y%m%d').log"${COLOR_SUFFIX}
 fi

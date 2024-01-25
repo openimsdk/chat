@@ -100,7 +100,7 @@ for ((i = 0; i < ${#service_filenames[*]}; i++)); do
       cmd="$bin_dir/$service_name -port $port --config_folder_path $config_path"
     fi
     echo "$cmd"
-    nohup $cmd >> "${logs_dir}/openIM.log" 2>&1 &
+    nohup $cmd >> "${logs_dir}/openim_$(date '+%Y%m%d').log" 2>&1 &
     sleep 1
   done
 done
@@ -108,4 +108,4 @@ done
 sleep 50
 ${OPENIM_ROOT}/scripts/check_all.sh
 
-tail -f ${logs_dir}/openIM.log
+tail -f ${logs_dir}/openim_$(date '+%Y%m%d').log

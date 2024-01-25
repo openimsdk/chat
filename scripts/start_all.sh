@@ -36,7 +36,7 @@ echo -e "${YELLOW_PREFIX}=======>pwd=$PWD${COLOR_SUFFIX}"
 # fi
 
 bin_dir="$BIN_DIR"
-logs_dir="$SCRIPTS_ROOT/../logs"
+logs_dir="$SCRIPTS_ROOT/../_output/logs"
 
 echo -e "${YELLOW_PREFIX}=======>bin_dir=$bin_dir${COLOR_SUFFIX}"
 echo -e "${YELLOW_PREFIX}=======>logs_dir=$logs_dir${COLOR_SUFFIX}"
@@ -119,8 +119,7 @@ for ((i = 0; i < ${#service_filename[*]}; i++)); do
       cmd="$bin_dir/${service_filename[$i]} -port ${service_ports[$j]} --config_folder_path ${config_path}"
     fi
     echo $cmd
-
-    nohup $cmd >>${logs_dir}/../_output/logs/openim_$(data '+%Y%m%d').log 2>&1 &
+    nohup $cmd >>${logs_dir}/openim_$(date '+%Y%m%d').log 2>&1 &
     sleep 1
 #    pid="netstat -ntlp|grep $j |awk '{printf \$7}'|cut -d/ -f1"
 #    echo -e "${GREEN_PREFIX}${service_filename[$i]} start success,port number:${service_ports[$j]} pid:$(eval $pid)$COLOR_SUFFIX"
