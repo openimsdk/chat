@@ -154,9 +154,9 @@ func Post(ctx context.Context, url string, header map[string]string, data any, t
 // handlingCallbackAfterSendMsg Handling callbacks after sending a message
 func handlingCallbackAfterSendMsg(c *gin.Context) (*apistruct.CallbackAfterSendSingleMsgReq, error) {
 
-	var req *apistruct.CallbackAfterSendSingleMsgReq
+	var req apistruct.CallbackAfterSendSingleMsgReq
 
-	if err := c.BindJSON(req); err != nil {
+	if err := c.BindJSON(&req); err != nil {
 		return nil, err
 	}
 
@@ -170,7 +170,7 @@ func handlingCallbackAfterSendMsg(c *gin.Context) (*apistruct.CallbackAfterSendS
 		},
 	}
 	c.JSON(http.StatusOK, resp)
-	return req, nil
+	return &req, nil
 }
 
 func getAdminToken(c *gin.Context) (*apistruct.AdminLoginResp, error) {
