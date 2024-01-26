@@ -1,4 +1,4 @@
-package api
+package callback
 
 import (
 	"bytes"
@@ -24,7 +24,7 @@ import (
 	"time"
 )
 
-func (o *ChatApi) CallbackExample(c *gin.Context) {
+func CallbackExample(c *gin.Context) {
 	// 1. Handling callbacks after sending a single chat message
 	msgInfo, err := handlingCallbackAfterSendMsg(c)
 	if err != nil {
