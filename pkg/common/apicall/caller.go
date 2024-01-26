@@ -68,6 +68,7 @@ func (c *Caller) ImAdminTokenWithDefaultAdmin(ctx context.Context) (string, erro
 	defer c.lock.Unlock()
 	if c.token == "" || c.timeout.Before(time.Now()) {
 		userID := config.GetDefaultIMAdmin()
+		log.ZDebug(ctx, "AdminList length", "length", len(config.Config.AdminList))
 		token, err := c.UserToken(ctx, config.GetDefaultIMAdmin(), constant.AdminPlatformID)
 		if err != nil {
 			log.ZError(ctx, "get im admin token", err, "userID", userID)
