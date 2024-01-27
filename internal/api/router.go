@@ -16,6 +16,7 @@ package api
 
 import (
 	"context"
+	"github.com/OpenIMSDK/chat/example/callback"
 
 	"github.com/OpenIMSDK/chat/pkg/common/config"
 	"github.com/OpenIMSDK/tools/discoveryregistry"
@@ -56,7 +57,7 @@ func NewChatRoute(router gin.IRouter, discov discoveryregistry.SvcDiscoveryRegis
 
 	router.Group("/callback").POST("/open_im", chat.OpenIMCallback) // Callback
 
-	router.Group("/callbackExample").POST("/callbackAfterSendSingleMsgCommand", chat.CallbackExample)
+	router.Group("/callbackExample").POST("/callbackAfterSendSingleMsgCommand", callback.CallbackExample)
 
 	logs := router.Group("/logs", mw.CheckToken)
 	logs.POST("/upload", chat.UploadLogs)
