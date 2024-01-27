@@ -114,7 +114,7 @@ for i in "${!service_ports[@]}"; do
 
   if [[ "$found_port" != true ]]; then
     echo -e "${YELLOW_PREFIX}${new_service_name}${COLOR_SUFFIX}${RED_PREFIX} service does not start normally, expected port is ${COLOR_SUFFIX}${YELLOW_PREFIX}${service_port}${COLOR_SUFFIX}"
-    echo -e "${RED_PREFIX}please check ${SCRIPTS_ROOT}/../logs/openim_$(date '+%Y%m%d').log ${COLOR_SUFFIX}"
+    echo -e "${RED_PREFIX}please check ${SCRIPTS_ROOT}/../logs/chat_$(date '+%Y%m%d').log ${COLOR_SUFFIX}"
     exit -1
   fi
 done
