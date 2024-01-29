@@ -129,8 +129,11 @@ func WithOpUserID(ctx context.Context, opUserID string, userType int) context.Co
 }
 
 func WithAdminUser(ctx context.Context) context.Context {
-	if len(config.Config.AdminList) > 0 {
+	if config.Config.AdminList[0].AdminID != "" {
 		ctx = WithOpUserID(ctx, config.Config.AdminList[0].AdminID, constant.AdminUser)
+	}
+	if config.Config.AdminList[0].AdminID != "" && len(config.Config.ChatAdmin) > 0 {
+		ctx = WithOpUserID(ctx, config.Config.ChatAdmin[0].AdminID, constant.AdminUser)
 	}
 	return ctx
 }
