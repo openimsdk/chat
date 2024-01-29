@@ -29,7 +29,7 @@ fi
 mkdir -p ${SCRIPTS_ROOT}/../logs
 # 如果没有设置 PRINT_SCREEN 标记，那么进行日志重定向
 if [ -z "$PRINT_SCREEN" ]; then
-    exec >> ${SCRIPTS_ROOT}/../logs/openIM.log 2>&1
+    exec >> ${SCRIPTS_ROOT}/../logs/openim_$(date '+%Y%m%d').log 2>&1
 fi
 
 #Include shell font styles and some basic information
@@ -50,50 +50,71 @@ sleep 10
 # Define the path to the configuration YAML file
 config_yaml="$OPENIM_ROOT/config/config.yaml" # Replace with the actual path to your YAML file
 
-
 # Function to extract a value from the YAML file and remove any leading/trailing whitespace
 extract_yaml_value() {
   local key=$1
-  grep -oP "${key}: \[\s*\K[^\]]+" "$config_yaml" | xargs
+
+  # Detect the operating system
+  case "$(uname)" in
+    "Linux")
+      # Use grep with Perl-compatible regex for Linux
+      grep -oP "${key}: \[\s*\K[^\]]+" "$config_yaml" | xargs
+      ;;
+    "Darwin")
+      # Use sed for macOS
+      sed -nE "/${key}: \[ */{s///; s/\].*//; p;}" "$config_yaml" | tr -d '[]' | xargs
+      ;;
+    *)
+      echo "Unsupported operating system"
+      exit 1
+      ;;
+  esac
 }
 
 # Extract port numbers from the YAML configuration
-openImChatApiPort=$(extract_yaml_value 'openImChatApiPort')
-openImAdminApiPort=$(extract_yaml_value 'openImAdminApiPort')
-openImAdminPort=$(extract_yaml_value 'openImAdminPort')
-openImChatPort=$(extract_yaml_value 'openImChatPort')
+declare -A service_ports=(
+  ["openImChatApiPort"]="chat-api"
+  ["openImAdminApiPort"]="admin-api"
+  ["openImAdminPort"]="admin-rpc"
+  ["openImChatPort"]="chat-rpc"
+)
 
-for i in "${service_port_name[@]}"; do
-  case $i in
-    "openImChatApiPort")
-      new_service_name="chat-api"
-      new_service_port=$openImChatApiPort
+for i in "${!service_ports[@]}"; do
+  service_port=$(extract_yaml_value "$i")
+  new_service_name=${service_ports[$i]}
+
+  # Check for empty port value
+  if [ -z "$service_port" ]; then
+    echo "No port value found for $i"
+    continue
+  fi
+
+  # Determine command based on OS
+  case "$(uname)" in
+    "Linux")
+      ports=$(ss -tunlp | grep "$new_service_name" | awk '{print $5}' | awk -F '[:]' '{print $NF}')
       ;;
-    "openImAdminApiPort")
-      new_service_name="admin-api"
-      new_service_port=$openImAdminApiPort
-      ;;
-    "openImAdminPort")
-      new_service_name="admin-rpc"
-      new_service_port=$openImAdminPort
-      ;;
-    "openImChatPort")
-      new_service_name="chat-rpc"
-      new_service_port=$openImChatPort
+    "Darwin")
+      ports=$(lsof -i -P | grep LISTEN | grep "$new_service_name" | awk '{print $9}' | awk -F '[:]' '{print $2}')
       ;;
     *)
-      echo "Invalid service name: $i"
-      exit -1
+      echo "Unsupported operating system"
+      exit 1
       ;;
   esac
 
-  port=$(ss -tunlp | grep "$new_service_name" | awk '{print $5}' | awk -F '[:]' '{print $NF}')
-  if [[ "$port" != "$new_service_port" ]]; then
-    echo -e "${YELLOW_PREFIX}${i}${COLOR_SUFFIX}${RED_PREFIX} service does not start normally, not initiated port is ${COLOR_SUFFIX}${YELLOW_PREFIX}${new_service_port}${COLOR_SUFFIX}"
-    echo -e "${RED_PREFIX}please check ${SCRIPTS_ROOT}/../logs/openIM.log ${COLOR_SUFFIX}"
+  found_port=false
+  for port in $ports; do
+    if [[ "$port" == "$service_port" ]]; then
+      echo -e "${service_port}${GREEN_PREFIX} port has been listening, belongs service is ${new_service_name}${COLOR_SUFFIX}"
+      found_port=true
+      break
+    fi
+  done
+
+  if [[ "$found_port" != true ]]; then
+    echo -e "${YELLOW_PREFIX}${new_service_name}${COLOR_SUFFIX}${RED_PREFIX} service does not start normally, expected port is ${COLOR_SUFFIX}${YELLOW_PREFIX}${service_port}${COLOR_SUFFIX}"
+    echo -e "${RED_PREFIX}please check ${SCRIPTS_ROOT}/../logs/chat_$(date '+%Y%m%d').log ${COLOR_SUFFIX}"
     exit -1
-  else
-    echo -e "${new_service_port}${GREEN_PREFIX} port has been listening, belongs service is ${i}${COLOR_SUFFIX}"
   fi
 done
-
