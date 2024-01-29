@@ -16,6 +16,7 @@ package chat
 
 import (
 	"github.com/OpenIMSDK/tools/discoveryregistry"
+	"github.com/OpenIMSDK/tools/errs"
 	"google.golang.org/grpc"
 
 	"github.com/OpenIMSDK/chat/pkg/common/config"
@@ -31,7 +32,7 @@ import (
 func Start(discov discoveryregistry.SvcDiscoveryRegistry, server *grpc.Server) error {
 	db, err := dbconn.NewGormDB()
 	if err != nil {
-		return err
+		return errs.Wrap(err)
 	}
 	tables := []any{
 		chat2.Account{},
@@ -53,7 +54,7 @@ func Start(discov discoveryregistry.SvcDiscoveryRegistry, server *grpc.Server) e
 		return err
 	}
 	if err := discov.CreateRpcRootNodes([]string{config.Config.RpcRegisterName.OpenImAdminName, config.Config.RpcRegisterName.OpenImChatName}); err != nil {
-		panic(err)
+		panic(errs.Wrap(err, "CreateRpcRootNodes error"))
 	}
 	chat.RegisterChatServer(server, &chatSvr{
 		Database: database.NewChatDatabase(db),
