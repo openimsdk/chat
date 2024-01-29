@@ -24,6 +24,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"strconv"
+	"strings"
 	"time"
 
 	Constant "github.com/OpenIMSDK/chat/pkg/common/constant"
@@ -209,7 +210,7 @@ func findConfigPath(configFile string) (string, error) {
 	return "", errs.Wrap(errors.New("the config.yaml path not found"))
 }
 
-func FlagParse() (string, int, bool, bool, error) {
+func FlagParse() (string, int, bool, error) {
 	var configFile string
 	flag.StringVar(&configFile, "config_folder_path", "", "Config full path")
 
@@ -227,9 +228,9 @@ func FlagParse() (string, int, bool, bool, error) {
 
 	configFile, err := findConfigPath(configFile)
 	if err != nil {
-		return "", 0, false, false, err
+		return "", 0, false, err
 	}
-	return configFile, ginPort, hide, showVersion, nil
+	return configFile, ginPort, showVersion, nil
 }
 
 func configGetEnv() error {
@@ -246,7 +247,7 @@ func configGetEnv() error {
 	Config.Mysql.Username = getEnvStringPoint("MYSQL_USERNAME", Config.Mysql.Username)
 	Config.Mysql.Password = getEnvStringPoint("MYSQL_PASSWORD", Config.Mysql.Password)
 	Config.Mysql.Database = getEnvStringPoint("MYSQL_DATABASE", Config.Mysql.Database)
-	Config.Mysql.Address = getArrPointEnv("MYSQL_ADDRESS", "MYSQL_PORT", Config.Mysql.Address)
+	Config.Mysql.Address = getArrPointEnv("MYSQL_ADDRESS", "MYSQL_PORT", *Config.Mysql.Address)
 
 	Config.Log.StorageLocation = getEnvStringPoint("LOG_STORAGE_LOCATION", Config.Log.StorageLocation)
 
@@ -256,47 +257,99 @@ func configGetEnv() error {
 
 	Config.Redis.Username = getEnv("REDIS_USERNAME", Config.Redis.Username)
 	Config.Redis.Password = getEnv("REDIS_PASSWORD", Config.Redis.Password)
-	Config.Redis.Address = getArrPointEnv("REDIS_ADDRESS", "REDIS_PORT", Config.Redis.Address)
+	Config.Redis.Address = getArrPointEnv("REDIS_ADDRESS", "REDIS_PORT", *Config.Redis.Address)
 
 	var err error
 	Config.TokenPolicy.Expire, err = getEnvIntPoint("TOKEN_EXPIRE", Config.TokenPolicy.Expire)
 	if err != nil {
 		return err
 	}
-	getArrEnv("ZOOKEEPER_ADDRESS", "ZOOKEEPER_PORT", Config.Zookeeper.ZkAddr)
+	Config.Zookeeper.ZkAddr = getArrEnv("ZOOKEEPER_ADDRESS", "ZOOKEEPER_PORT", Config.Zookeeper.ZkAddr)
 	return nil
 }
 
-func getArrEnv(key1, key2 string, fallback []string) {
-	str1 := getEnv(key1, "")
-	str2 := getEnv(key2, "")
-	str := fmt.Sprintf("%s:%s", str1, str2)
-	arr := make([]string, 1)
-	if len(str) <= 1 {
-		return
+func getArrEnv(key1, key2 string, fallback []string) []string {
+	address, addrExists := os.LookupEnv(key1)
+	port, portExists := os.LookupEnv(key2)
+
+	if addrExists && portExists {
+		addresses := strings.Split(address, ",")
+		for i, addr := range addresses {
+			addresses[i] = addr + ":" + port
+		}
+		return addresses
 	}
-	arr[0] = str
-	Config.Zookeeper.ZkAddr = arr
+
+	if addrExists && !portExists {
+		addresses := strings.Split(address, ",")
+		for i, addr := range addresses {
+			addresses[i] = addr + ":" + "0"
+		}
+		return addresses
+	}
+
+	if !addrExists && portExists {
+		result := make([]string, len(fallback))
+		for i, addr := range fallback {
+			add := strings.Split(addr, ":")
+			result[i] = add[0] + ":" + port
+		}
+		return result
+	}
+	return fallback
 }
 
-func getArrPointEnv(key1, key2 string, fallback *[]string) *[]string {
-	str1 := getEnv(key1, "")
-	str2 := getEnv(key2, "")
-	str := fmt.Sprintf("%s:%s", str1, str2)
-	if len(str) <= 1 {
-		return fallback
+func getArrPointEnv(key1, key2 string, fallback []string) *[]string {
+	address, addrExists := os.LookupEnv(key1)
+	port, portExists := os.LookupEnv(key2)
+
+	if addrExists && portExists {
+		addresses := strings.Split(address, ",")
+		for i, addr := range addresses {
+			addresses[i] = addr + ":" + port
+		}
+		return &addresses
 	}
-	return &[]string{str}
+
+	if addrExists && !portExists {
+		addresses := strings.Split(address, ",")
+		for i, addr := range addresses {
+			addresses[i] = addr + ":" + "0"
+		}
+		return &addresses
+	}
+
+	if !addrExists && portExists {
+		result := make([]string, len(fallback))
+		for i, addr := range fallback {
+			add := strings.Split(addr, ":")
+			result[i] = add[0] + ":" + port
+		}
+		return &result
+	}
+	return &fallback
 }
 
 func getStringEnv(key1, key2 string, fallback string) string {
-	str1 := getEnv(key1, "")
-	str2 := getEnv(key2, "")
-	str := fmt.Sprintf("%s:%s", str1, str2)
-	if len(str) <= 2 {
-		return fallback
+	address, addrExists := os.LookupEnv(key1)
+	port, portExists := os.LookupEnv(key2)
+
+	if addrExists && portExists {
+		return address + ":" + port
 	}
-	return str
+
+	if addrExists && !portExists {
+		addresses := address + ":" + "0"
+		return addresses
+	}
+
+	if !addrExists && portExists {
+		result := ""
+		addr := strings.Split(fallback, ":")
+		result = addr[0] + ":" + port
+		return result
+	}
+	return fallback
 }
 
 func getEnv(key, fallback string) string {

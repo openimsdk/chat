@@ -30,7 +30,7 @@ import (
 
 func main() {
 	rand.Seed(time.Now().UnixNano())
-	configFile, rpcPort, hide, showVersion, err := config.FlagParse()
+	configFile, rpcPort, showVersion, err := config.FlagParse()
 	if err != nil {
 		panic(err)
 	}
@@ -53,7 +53,7 @@ func main() {
 	if config.Config.Envs.Discovery == "k8s" {
 		rpcPort = 80
 	}
-	err = component.ComponentCheck(configFile, hide)
+	err = component.ComponentCheck()
 	if err != nil {
 		panic(err)
 	}
