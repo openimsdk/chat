@@ -98,7 +98,10 @@ func configFieldCopy[T any](local **T, remote T) {
 }
 
 func GetDefaultIMAdmin() string {
-	return Config.AdminList[0].ImAdminID
+	if Config.AdminList[0].AdminID != "" {
+		return Config.AdminList[0].ImAdminID
+	}
+	return Config.ChatAdmin[0].ImAdminID
 }
 
 func GetIMAdmin(chatAdminID string) string {

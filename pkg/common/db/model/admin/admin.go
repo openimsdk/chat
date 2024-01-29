@@ -87,14 +87,13 @@ func (o *Admin) InitAdmin(ctx context.Context) error {
 		log.ZInfo(ctx, "Admins are already registered in database", "admin count", count)
 		return nil
 	}
-	if len(config.Config.AdminList) == 0 {
-		log.ZInfo(ctx, "AdminList is empty", "adminList", config.Config.AdminList)
+	if len(config.Config.ChatAdmin) == 0 {
+		log.ZInfo(ctx, "ChatAdmin is empty", "ChatAdmin", config.Config.ChatAdmin)
 		return nil
 	}
 
-	admins := make([]*admin.Admin, 0, len(config.Config.AdminList)+len(config.Config.ChatAdmin))
-	o.createAdmins(&admins, config.Config.AdminList, true)
-	o.createAdmins(&admins, config.Config.ChatAdmin, false)
+	admins := make([]*admin.Admin, 0, len(config.Config.ChatAdmin))
+	o.createAdmins(&admins, config.Config.ChatAdmin)
 
 	if err := o.db.WithContext(ctx).Create(&admins).Error; err != nil {
 		return errs.Wrap(err)
@@ -102,18 +101,14 @@ func (o *Admin) InitAdmin(ctx context.Context) error {
 	return nil
 }
 
-func (o *Admin) createAdmins(adminList *[]*admin.Admin, registerList []config.Admin, flag bool) {
+func (o *Admin) createAdmins(adminList *[]*admin.Admin, registerList []config.Admin) {
 	// chatAdmin set the level to 50, this account use for send notification.
-	level := int32(50)
-	if flag {
-		level = 100
-	}
 	for _, adminChat := range registerList {
 		table := admin.Admin{
 			Account:    adminChat.AdminID,
 			UserID:     adminChat.ImAdminID,
 			Password:   o.passwordEncryption(adminChat.AdminID),
-			Level:      level,
+			Level:      100,
 			CreateTime: time.Now(),
 		}
 		if adminChat.NickName != "" {

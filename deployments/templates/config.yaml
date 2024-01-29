@@ -106,16 +106,17 @@ verifyCode:
 # proxyHeader: "X-Forwarded-For" # PROXY_HEADER, Header used for extracting the client IP address
 
 # List of admin users
+# Attention! This configure is discarded. If you have used him before, configure your own
 adminList:
-  - adminID: admin1
-    nickname: chat1
-    imAdmin: openIM123456
-  - adminID: admin2
-    nickname: chat2
-    imAdmin: openIM654321
-  - adminID: admin3
-    nickname: chat3
-    imAdmin: openIMAdmin
+  - adminID:
+    nickname:
+    imAdmin:
+  - adminID:
+    nickname:
+    imAdmin:
+  - adminID:
+    nickname:
+    imAdmin:
 
 # chatAdmin, use for send notification
 chatAdmin:
