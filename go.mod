@@ -26,7 +26,7 @@ require (
 
 require (
 	github.com/OpenIMSDK/protocol v0.0.21
-	github.com/OpenIMSDK/tools v0.0.28
+	github.com/OpenIMSDK/tools v0.0.31
 	github.com/redis/go-redis/v9 v9.4.0
 	github.com/xuri/excelize/v2 v2.8.0
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
@@ -116,5 +116,3 @@ require (
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 )
-
-replace github.com/OpenIMSDK/tools v0.0.28 => github.com/luhaoling/tools v0.0.0-20240129093731-a82c07b43a68
