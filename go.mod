@@ -13,7 +13,7 @@ require (
 	google.golang.org/grpc v1.58.0
 	google.golang.org/protobuf v1.31.0
 	gopkg.in/yaml.v3 v3.0.1
-	gorm.io/driver/mysql v1.5.2
+	gorm.io/driver/mysql v1.5.1
 	gorm.io/gorm v1.25.4
 )
 
@@ -27,7 +27,7 @@ require (
 require (
 	github.com/OpenIMSDK/protocol v0.0.21
 	github.com/OpenIMSDK/tools v0.0.31
-	github.com/redis/go-redis/v9 v9.4.0
+	github.com/redis/go-redis/v9 v9.2.1
 	github.com/xuri/excelize/v2 v2.8.0
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
 )

@@ -53,7 +53,7 @@ rpcRegisterName:
 mysql:
    address: [ 172.28.0.1:13306 ]            # MYSQL_ADDRESS and MYSQL_PORT, MySQL server address and port
    username: root                          # MYSQL_USERNAME, Username for MySQL
-   password: openIM123                     # MYSQL_USERNAME, Password for MySQL
+   password: openIM123                     # MYSQL_PASSWORD, Password for MySQL
    database: openim_v3                     # MYSQL_DATABASE, Database name
    maxOpenConn: 1000                       # Max open connections
    maxIdleConn: 100                        # Max idle connections
