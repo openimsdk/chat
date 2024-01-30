@@ -32,14 +32,15 @@ type checkFunc struct {
 }
 
 func ComponentCheck() error {
+	var err error
+	var strInfo string
 	if config.Config.Envs.Discovery != "k8s" {
 		checks := []checkFunc{
 			{name: "Zookeeper", function: checkZookeeper},
 			{name: "Redis", function: checkRedis},
 			{name: "MySQL", function: checkMySQL},
 		}
-		var err error
-		var strInfo string
+
 		for i := 0; i < component.MaxRetry; i++ {
 			if i != 0 {
 				time.Sleep(1 * time.Second)
@@ -61,12 +62,10 @@ func ComponentCheck() error {
 			if allSuccess {
 				component.SuccessPrint("All components started successfully!")
 				return nil
-			} else {
-				return err
 			}
 		}
 	}
-	return nil
+	return err
 }
 
 // checkZookeeper checks the Zookeeper connection
