@@ -166,17 +166,6 @@ func (x *LoginReq) Check() error {
 	return nil
 }
 
-func (x *GetUserTokenReq) Check() error {
-	if x.UserID == "" {
-		return errs.ErrArgs.Wrap("userID is empty")
-	}
-
-	if x.PlatFormID == "" {
-		return errs.ErrArgs.Wrap("platFormID is empty")
-	}
-	return nil
-}
-
 func (x *ResetPasswordReq) Check() error {
 	if x.Password == "" {
 		return errs.ErrArgs.Wrap("password is empty")
