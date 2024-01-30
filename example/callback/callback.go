@@ -189,7 +189,7 @@ func getAdminToken(c *gin.Context) (*apistruct.AdminLoginResp, error) {
 		ErrCode int                      `json:"errCode"`
 		ErrMsg  string                   `json:"errMsg"`
 		ErrDlt  string                   `json:"errDlt"`
-		Data    apistruct.AdminLoginResp `json:"data,omitempty"`
+		Data    apistruct.AdminLoginResp `json:"data"`
 	}
 
 	adminOutput := &TokenInfo{}
@@ -220,7 +220,7 @@ func getRobotAccountInfo(c *gin.Context, token, robotics string) (*common.UserPu
 		ErrCode int                         `json:"errCode"`
 		ErrMsg  string                      `json:"errMsg"`
 		ErrDlt  string                      `json:"errDlt"`
-		Data    chat.FindUserPublicInfoResp `json:"data,omitempty"`
+		Data    chat.FindUserPublicInfoResp `json:"data"`
 	}
 	searchOutput := &UserInfo{}
 	if err = json.Unmarshal(b, searchOutput); err != nil {

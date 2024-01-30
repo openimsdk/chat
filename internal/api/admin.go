@@ -92,6 +92,38 @@ func (o *AdminApi) AdminLogin(c *gin.Context) {
 	apiresp.GinSuccess(c, resp)
 }
 
+func (o *AdminApi) GetUserToken(c *gin.Context) {
+	var req struct {
+		PlatFormID int32  `json:"platFormID" binding:"required"`
+		UserID     string `json:"userID" binding:"required"`
+	}
+
+	var resp struct {
+		Token             string `json:"token"`
+		ExpireTimeSeconds int64  `json:"expireTimeSeconds"`
+	}
+
+	if err := c.BindJSON(&req); err != nil {
+		apiresp.GinError(c, err)
+		return
+	}
+	log.ZInfo(c, "AdminLogin api", "req", &req)
+	if err := checker.Validate(&req); err != nil {
+		apiresp.GinError(c, err) // 参数校验失败
+		return
+	}
+
+	imToken, err := o.imApiCaller.UserToken(c, req.UserID, req.PlatFormID)
+	if err != nil {
+		apiresp.GinError(c, err)
+		return
+	}
+
+	resp.Token = imToken
+	resp.ExpireTimeSeconds = *config.Config.TokenPolicy.Expire
+	apiresp.GinSuccess(c, resp)
+}
+
 func (o *AdminApi) ResetUserPassword(c *gin.Context) {
 	a2r.Call(chat.ChatClient.ChangePassword, o.chatClient, c)
 }
@@ -146,10 +178,15 @@ func (o *AdminApi) AddUserAccount(c *gin.Context) {
 		return
 	}
 
-	_, err := o.chatClient.AddUserAccount(c, &req)
+	if _, err := mctx.CheckAdmin(c); err != nil {
+		apiresp.GinError(c, err)
+		return
+	}
+
+	user, err := o.chatClient.AddUserAccount(c, &req)
 
 	userInfo := &sdkws.UserInfo{
-		UserID:     req.User.UserID,
+		UserID:     user.UserID,
 		Nickname:   req.User.Nickname,
 		FaceURL:    req.User.FaceURL,
 		CreateTime: time.Now().UnixMilli(),

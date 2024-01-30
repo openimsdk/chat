@@ -119,10 +119,6 @@ func (o *chatSvr) FindUserPublicInfo(ctx context.Context, req *chat.FindUserPubl
 }
 
 func (o *chatSvr) AddUserAccount(ctx context.Context, req *chat.AddUserAccountReq) (*chat.AddUserAccountResp, error) {
-	if _, _, err := mctx.Check(ctx); err != nil {
-		return nil, err
-	}
-
 	if err := o.checkTheUniqueness(ctx, req); err != nil {
 		return nil, err
 	}
@@ -182,7 +178,7 @@ func (o *chatSvr) AddUserAccount(ctx context.Context, req *chat.AddUserAccountRe
 		return nil, err
 	}
 
-	return &chat.AddUserAccountResp{}, nil
+	return &chat.AddUserAccountResp{UserID: req.User.UserID}, nil
 }
 
 func (o *chatSvr) SearchUserPublicInfo(ctx context.Context, req *chat.SearchUserPublicInfoReq) (*chat.SearchUserPublicInfoResp, error) {

@@ -544,13 +544,13 @@ const (
 // User represents a user restful resource. It is also used as gorm model.
 type User struct {
     // Standard object's metadata.
-    metav1.ObjectMeta `json:"metadata,omitempty"`
+    metav1.ObjectMeta `json:"metadata"`
 
     Nickname string `json:"nickname" gorm:"column:nickname"`
     Password string `json:"password" gorm:"column:password"`
     Email    string `json:"email" gorm:"column:email"`
     Phone    string `json:"phone" gorm:"column:phone"`
-    IsAdmin  int    `json:"isAdmin,omitempty" gorm:"column:isAdmin"`
+    IsAdmin  int    `json:"isAdmin" gorm:"column:isAdmin"`
 }
 ```
 

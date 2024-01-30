@@ -18,10 +18,10 @@ package version
 // TODO: Add []string of api versions supported? It's still unclear
 // how we'll want to distribute that information.
 type Info struct {
-	Major      string `json:"major,omitempty"`
-	Minor      string `json:"minor,omitempty"`
+	Major      string `json:"major"`
+	Minor      string `json:"minor"`
 	GitVersion string `json:"gitVersion"`
-	GitCommit  string `json:"gitCommit,omitempty"`
+	GitCommit  string `json:"gitCommit"`
 	BuildDate  string `json:"buildDate"`
 	GoVersion  string `json:"goVersion"`
 	Compiler   string `json:"compiler"`

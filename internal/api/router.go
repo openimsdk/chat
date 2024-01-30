@@ -130,6 +130,7 @@ func NewAdminRoute(router gin.IRouter, discov discoveryregistry.SvcDiscoveryRegi
 	blockRouter.POST("/search", admin.SearchBlockUser) // Search blocked users
 
 	userRouter := router.Group("/user", mw.CheckAdmin)
+	userRouter.POST("/get/token", admin.GetUserToken)           // Get user token
 	userRouter.POST("/password/reset", admin.ResetUserPassword) // Reset user password
 
 	initGroup := router.Group("/client_config", mw.CheckAdmin)
