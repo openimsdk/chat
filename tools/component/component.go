@@ -38,7 +38,8 @@ func ComponentCheck() error {
 			{name: "Redis", function: checkRedis},
 			{name: "MySQL", function: checkMySQL},
 		}
-
+		var err error
+		var strInfo string
 		for i := 0; i < component.MaxRetry; i++ {
 			if i != 0 {
 				time.Sleep(1 * time.Second)
@@ -47,19 +48,21 @@ func ComponentCheck() error {
 
 			allSuccess := true
 			for _, check := range checks {
-				str, err := check.function()
+				strInfo, err = check.function()
 				if err != nil {
 					component.ErrorPrint(fmt.Sprintf("Starting %s failed, %v", check.name, err))
 					allSuccess = false
 					break
 				} else {
-					component.SuccessPrint(fmt.Sprintf("%s connected successfully, %s", check.name, str))
+					component.SuccessPrint(fmt.Sprintf("%s connected successfully, %s", check.name, strInfo))
 				}
 			}
 
 			if allSuccess {
 				component.SuccessPrint("All components started successfully!")
 				return nil
+			} else {
+				return err
 			}
 		}
 	}
