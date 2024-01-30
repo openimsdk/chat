@@ -120,7 +120,7 @@ func (o *AdminApi) GetUserToken(c *gin.Context) {
 	}
 
 	resp.Token = imToken
-	resp.ExpireTimeSeconds = *config.Config.TokenPolicy.Expire
+	resp.ExpireTimeSeconds = *config.Config.TokenPolicy.Expire * 90
 	apiresp.GinSuccess(c, resp)
 }
 
