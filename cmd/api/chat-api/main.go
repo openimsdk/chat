@@ -49,7 +49,7 @@ func init() {
 
 func main() {
 
-	configFile, ginPort, hide, showVersion, err := config.FlagParse()
+	configFile, ginPort, showVersion, err := config.FlagParse()
 	if err != nil {
 		panic(err)
 	}
@@ -73,7 +73,7 @@ func main() {
 		fmt.Println("err ", err.Error())
 		panic(err)
 	}
-	err = component.ComponentCheck(configFile, hide)
+	err = component.ComponentCheck()
 	if err != nil {
 		panic(err)
 	}
