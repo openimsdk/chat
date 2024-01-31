@@ -42,7 +42,7 @@ import (
 
 func main() {
 	rand.Seed(time.Now().UnixNano())
-	configFile, ginPort, hide, showVersion, err := config.FlagParse()
+	configFile, ginPort, showVersion, err := config.FlagParse()
 	if err != nil {
 		panic(err)
 	}
@@ -62,7 +62,7 @@ func main() {
 	if err := config.InitConfig(configFile); err != nil {
 		panic(err)
 	}
-	err = component.ComponentCheck(configFile, hide)
+	err = component.ComponentCheck()
 	if err != nil {
 		panic(err)
 	}
