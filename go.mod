@@ -116,5 +116,3 @@ require (
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 )
-
-replace github.com/OpenIMSDK/tools v0.0.28 => github.com/luhaoling/tools v0.0.0-20240129093731-a82c07b43a68
