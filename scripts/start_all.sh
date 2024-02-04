@@ -25,10 +25,6 @@ source $SCRIPTS_ROOT/style_info.sh
 source $SCRIPTS_ROOT/path_info.sh
 source $SCRIPTS_ROOT/function.sh
 
-echo -e "${YELLOW_PREFIX}=======>SCRIPTS_ROOT=$SCRIPTS_ROOT${COLOR_SUFFIX}"
-echo -e "${YELLOW_PREFIX}=======>OPENIM_ROOT=$OPENIM_ROOT${COLOR_SUFFIX}"
-echo -e "${YELLOW_PREFIX}=======>pwd=$PWD${COLOR_SUFFIX}"
-
 # if [ ! -d "${OPENIM_ROOT}/_output/bin/platforms" ]; then
 #   cd $OPENIM_ROOT
 #   # exec build_all_service.sh
@@ -37,9 +33,6 @@ echo -e "${YELLOW_PREFIX}=======>pwd=$PWD${COLOR_SUFFIX}"
 
 bin_dir="$BIN_DIR"
 logs_dir="$SCRIPTS_ROOT/../_output/logs"
-
-echo -e "${YELLOW_PREFIX}=======>bin_dir=$bin_dir${COLOR_SUFFIX}"
-echo -e "${YELLOW_PREFIX}=======>logs_dir=$logs_dir${COLOR_SUFFIX}"
 
 # Define the path to the configuration file
 CONFIG_FILE="${OPENIM_ROOT}/config/config.yaml"
@@ -86,6 +79,7 @@ fi
 cd $SCRIPTS_ROOT
 
 for ((i = 0; i < ${#service_filename[*]}; i++)); do
+  rm -rf ${logs_dir}/chat_tmp_$(date '+%Y%m%d').log
   #Check whether the service exists
 #  service_name="ps |grep -w ${service_filename[$i]} |grep -v grep"
 #  count="${service_name}| wc -l"
@@ -119,9 +113,12 @@ for ((i = 0; i < ${#service_filename[*]}; i++)); do
       cmd="$bin_dir/${service_filename[$i]} -port ${service_ports[$j]} --config_folder_path ${config_path}"
     fi
     echo $cmd
-    nohup $cmd >>${logs_dir}/openim_$(date '+%Y%m%d').log 2>&1 &
-    sleep 1
+    nohup $cmd >> ${logs_dir}/chat_$(date '+%Y%m%d').log 2> >(tee -a ${logs_dir}/chat_err_$(date '+%Y%m%d').log ${logs_dir}/chat_tmp_$(date '+%Y%m%d').log) &
+
+    sleep 2
 #    pid="netstat -ntlp|grep $j |awk '{printf \$7}'|cut -d/ -f1"
 #    echo -e "${GREEN_PREFIX}${service_filename[$i]} start success,port number:${service_ports[$j]} pid:$(eval $pid)$COLOR_SUFFIX"
   done
 done
+
+echo -e "${SKY_BLUE_PREFIX}All services have been started successfully${COLOR_SUFFIX}"

@@ -27,15 +27,26 @@ if [ "$1" == "--print-screen" ]; then
 fi
 
 mkdir -p ${SCRIPTS_ROOT}/../logs
-# 如果没有设置 PRINT_SCREEN 标记，那么进行日志重定向
+
 if [ -z "$PRINT_SCREEN" ]; then
-    exec >> ${SCRIPTS_ROOT}/../logs/openim_$(date '+%Y%m%d').log 2>&1
+    exec >> ${SCRIPTS_ROOT}/../logs/chat_$(date '+%Y%m%d').log 2>&1
 fi
 
 #Include shell font styles and some basic information
 source $SCRIPTS_ROOT/style_info.sh
 source $SCRIPTS_ROOT/path_info.sh
 source $SCRIPTS_ROOT/function.sh
+
+bin_dir="$BIN_DIR"
+logs_dir="$SCRIPTS_ROOT/../_output/logs"
+
+handle_error() {
+  echo "An error occurred. Printing ${STDERR_LOG_FILE} contents:"
+  cat ${logs_dir}/chat_err_$(date '+%Y%m%d').log
+  exit 1
+}
+
+trap handle_error ERR
 
 service_port_name=(
  openImChatApiPort
@@ -115,6 +126,11 @@ for i in "${!service_ports[@]}"; do
   if [[ "$found_port" != true ]]; then
     echo -e "${YELLOW_PREFIX}${new_service_name}${COLOR_SUFFIX}${RED_PREFIX} service does not start normally, expected port is ${COLOR_SUFFIX}${YELLOW_PREFIX}${service_port}${COLOR_SUFFIX}"
     echo -e "${RED_PREFIX}please check ${SCRIPTS_ROOT}/../logs/chat_$(date '+%Y%m%d').log ${COLOR_SUFFIX}"
+    cat ${logs_dir}/chat_err_$(date '+%Y%m%d').log
     exit -1
   fi
 done
+trap - ERR
+
+echo ""
+echo -e "${SKY_BLUE_PREFIX}All services are running normally${COLOR_SUFFIX}"
