@@ -17,6 +17,7 @@ package main
 import (
 	"fmt"
 	"math/rand"
+	"os"
 	"time"
 
 	"github.com/OpenIMSDK/chat/pkg/common/chatrpcstart"
@@ -32,7 +33,8 @@ func main() {
 	rand.Seed(time.Now().UnixNano())
 	configFile, rpcPort, showVersion, err := config.FlagParse()
 	if err != nil {
-		panic(err)
+		fmt.Fprintf(os.Stderr, "\n\nexit -1: \n%+v\n\n", err)
+		os.Exit(-1)
 	}
 
 	// Check if the version flag was set
@@ -48,20 +50,23 @@ func main() {
 	}
 
 	if err := config.InitConfig(configFile); err != nil {
-		panic(err)
+		fmt.Fprintf(os.Stderr, "\n\nexit -1: \n%+v\n\n", err)
+		os.Exit(-1)
 	}
 	if config.Config.Envs.Discovery == "k8s" {
 		rpcPort = 80
 	}
 	err = component.ComponentCheck()
 	if err != nil {
-		panic(err)
+		fmt.Fprintf(os.Stderr, "\n\nexit -1: \n%+v\n\n", err)
+		os.Exit(-1)
 	}
 	if err := log.InitFromConfig("chat.log", "chat-rpc", *config.Config.Log.RemainLogLevel, *config.Config.Log.IsStdout, *config.Config.Log.IsJson, *config.Config.Log.StorageLocation, *config.Config.Log.RemainRotationCount, *config.Config.Log.RotationTime); err != nil {
 		panic(fmt.Errorf("InitFromConfig failed:%w", err))
 	}
 	err = chatrpcstart.Start(rpcPort, config.Config.RpcRegisterName.OpenImChatName, 0, chat.Start)
 	if err != nil {
-		panic(err)
+		fmt.Fprintf(os.Stderr, "\n\nexit -1: \n%+v\n\n", err)
+		os.Exit(-1)
 	}
 }

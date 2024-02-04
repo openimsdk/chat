@@ -18,6 +18,7 @@ import (
 	"flag"
 	"fmt"
 	"math/rand"
+	"os"
 	"time"
 
 	"github.com/OpenIMSDK/chat/pkg/common/chatrpcstart"
@@ -34,7 +35,8 @@ func main() {
 
 	configFile, rpcPort, showVersion, err := config.FlagParse()
 	if err != nil {
-		panic(err)
+		fmt.Fprintf(os.Stderr, "\n\nexit -1: \n%+v\n\n", err)
+		os.Exit(-1)
 	}
 
 	// Check if the version flag was set
@@ -52,11 +54,13 @@ func main() {
 	flag.Parse()
 
 	if err := config.InitConfig(configFile); err != nil {
-		panic(err)
+		fmt.Fprintf(os.Stderr, "\n\nexit -1: \n%+v\n\n", err)
+		os.Exit(-1)
 	}
 	err = component.ComponentCheck()
 	if err != nil {
-		panic(err)
+		fmt.Fprintf(os.Stderr, "\n\nexit -1: \n%+v\n\n", err)
+		os.Exit(-1)
 	}
 	if config.Config.Envs.Discovery == "k8s" {
 		rpcPort = 80
@@ -66,6 +70,7 @@ func main() {
 	}
 	err = chatrpcstart.Start(rpcPort, config.Config.RpcRegisterName.OpenImAdminName, 0, admin.Start)
 	if err != nil {
-		panic(err)
+		fmt.Fprintf(os.Stderr, "\n\nexit -1: \n%+v\n\n", err)
+		os.Exit(-1)
 	}
 }

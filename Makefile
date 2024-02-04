@@ -372,7 +372,7 @@ copyright-add: tools.verify.addlicense
 .PHONY: clean
 clean:
 	@echo "===========> Cleaning all builds TMP_DIR($(TMP_DIR)) AND BIN_DIR($(BIN_DIR))"
-	@-rm -vrf $(TMP_DIR) $(BIN_DIR)
+	@-rm -vrf $(TMP_DIR) $(BIN_DIR) _output/logs
 	@echo "===========> End clean..."
 
 ## help: Show this help info.
