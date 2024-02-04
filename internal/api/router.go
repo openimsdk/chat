@@ -16,6 +16,9 @@ package api
 
 import (
 	"context"
+	"fmt"
+	"os"
+
 	"github.com/OpenIMSDK/chat/example/callback"
 
 	"github.com/OpenIMSDK/chat/pkg/common/config"
@@ -26,11 +29,13 @@ import (
 func NewChatRoute(router gin.IRouter, discov discoveryregistry.SvcDiscoveryRegistry) {
 	chatConn, err := discov.GetConn(context.Background(), config.Config.RpcRegisterName.OpenImChatName)
 	if err != nil {
-		panic(err)
+		fmt.Fprintf(os.Stderr, "\n\nexit -1: \n%+v\n\n", err)
+		os.Exit(-1)
 	}
 	adminConn, err := discov.GetConn(context.Background(), config.Config.RpcRegisterName.OpenImAdminName)
 	if err != nil {
-		panic(err)
+		fmt.Fprintf(os.Stderr, "\n\nexit -1: \n%+v\n\n", err)
+		os.Exit(-1)
 	}
 	mw := NewMW(adminConn)
 	chat := NewChat(chatConn, adminConn)
@@ -66,11 +71,13 @@ func NewChatRoute(router gin.IRouter, discov discoveryregistry.SvcDiscoveryRegis
 func NewAdminRoute(router gin.IRouter, discov discoveryregistry.SvcDiscoveryRegistry) {
 	adminConn, err := discov.GetConn(context.Background(), config.Config.RpcRegisterName.OpenImAdminName)
 	if err != nil {
-		panic(err)
+		fmt.Fprintf(os.Stderr, "\n\nexit -1: \n%+v\n\n", err)
+		os.Exit(-1)
 	}
 	chatConn, err := discov.GetConn(context.Background(), config.Config.RpcRegisterName.OpenImChatName)
 	if err != nil {
-		panic(err)
+		fmt.Fprintf(os.Stderr, "\n\nexit -1: \n%+v\n\n", err)
+		os.Exit(-1)
 	}
 	mw := NewMW(adminConn)
 	admin := NewAdmin(chatConn, adminConn)

@@ -16,11 +16,13 @@ package main
 
 import (
 	"fmt"
-	"github.com/OpenIMSDK/tools/errs"
 	"math/rand"
 	"net"
+	"os"
 	"strconv"
 	"time"
+
+	"github.com/OpenIMSDK/tools/errs"
 
 	"github.com/OpenIMSDK/chat/pkg/discovery_register"
 
@@ -44,7 +46,8 @@ func main() {
 	rand.Seed(time.Now().UnixNano())
 	configFile, ginPort, showVersion, err := config.FlagParse()
 	if err != nil {
-		panic(err)
+		fmt.Fprintf(os.Stderr, "\n\nexit -1: \n%+v\n\n", err)
+		os.Exit(-1)
 	}
 
 	// Check if the version flag was set
@@ -60,11 +63,13 @@ func main() {
 	}
 
 	if err := config.InitConfig(configFile); err != nil {
-		panic(err)
+		fmt.Fprintf(os.Stderr, "\n\nexit -1: \n%+v\n\n", err)
+		os.Exit(-1)
 	}
 	err = component.ComponentCheck()
 	if err != nil {
-		panic(err)
+		fmt.Fprintf(os.Stderr, "\n\nexit -1: \n%+v\n\n", err)
+		os.Exit(-1)
 	}
 	if err := log.InitFromConfig("chat.log", "admin-api", *config.Config.Log.RemainLogLevel, *config.Config.Log.IsStdout, *config.Config.Log.IsJson, *config.Config.Log.StorageLocation, *config.Config.Log.RemainRotationCount, *config.Config.Log.RotationTime); err != nil {
 		panic(fmt.Errorf("InitFromConfig failed:%w", err))
@@ -77,7 +82,8 @@ func main() {
 	//zk, err = openKeeper.NewClient(config.Config.Zookeeper.ZkAddr, config.Config.Zookeeper.Schema,
 	//		openKeeper.WithFreq(time.Hour), openKeeper.WithUserNameAndPassword(config.Config.Zookeeper.Username, config.Config.Zookeeper.Password), openKeeper.WithRoundRobin(), openKeeper.WithTimeout(10), openKeeper.WithLogger(log.NewZkLogger()))
 	if err != nil {
-		panic(err)
+		fmt.Fprintf(os.Stderr, "\n\nexit -1: \n%+v\n\n", err)
+		os.Exit(-1)
 	}
 
 	if err := zk.CreateRpcRootNodes([]string{config.Config.RpcRegisterName.OpenImAdminName, config.Config.RpcRegisterName.OpenImChatName}); err != nil {
@@ -90,6 +96,7 @@ func main() {
 
 	address := net.JoinHostPort(config.Config.AdminApi.ListenIP, strconv.Itoa(ginPort))
 	if err := engine.Run(address); err != nil {
-		panic(err)
+		fmt.Fprintf(os.Stderr, "\n\nexit -1: \n%+v\n\n", err)
+		os.Exit(-1)
 	}
 }
