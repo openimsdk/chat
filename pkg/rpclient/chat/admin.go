@@ -16,6 +16,8 @@ package chat
 
 import (
 	"context"
+	"fmt"
+	"os"
 
 	"github.com/OpenIMSDK/tools/discoveryregistry"
 
@@ -28,7 +30,8 @@ import (
 func NewAdminClient(discov discoveryregistry.SvcDiscoveryRegistry) *AdminClient {
 	conn, err := discov.GetConn(context.Background(), config.Config.RpcRegisterName.OpenImAdminName)
 	if err != nil {
-		panic(err)
+		fmt.Fprintf(os.Stderr, "\n\nexit -1: \n%+v\n\n", err)
+		os.Exit(-1)
 	}
 	return &AdminClient{
 		client: admin.NewAdminClient(conn),

@@ -17,15 +17,19 @@ package email
 import (
 	"context"
 	"errors"
+	"fmt"
+	"io/ioutil"
+	"os"
+	"testing"
+
 	"github.com/OpenIMSDK/chat/pkg/common/config"
 	"gopkg.in/yaml.v3"
-	"io/ioutil"
-	"testing"
 )
 
 func TestEmail(T *testing.T) {
 	if err := InitConfig(); err != nil {
-		panic(err)
+		fmt.Fprintf(os.Stderr, "\n\nexit -1: \n%+v\n\n", err)
+		os.Exit(-1)
 	}
 	tests := []struct {
 		name string

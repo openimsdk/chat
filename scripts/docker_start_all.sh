@@ -25,10 +25,6 @@ source "$SCRIPTS_ROOT/style_info.sh"
 source "$SCRIPTS_ROOT/path_info.sh"
 source "$SCRIPTS_ROOT/function.sh"
 
-printf "${YELLOW_PREFIX}=======>SCRIPTS_ROOT=%s${COLOR_SUFFIX}\n" "$SCRIPTS_ROOT"
-printf "${YELLOW_PREFIX}=======>OPENIM_ROOT=%s${COLOR_SUFFIX}\n" "$OPENIM_ROOT"
-printf "${YELLOW_PREFIX}=======>pwd=%s${COLOR_SUFFIX}\n" "$PWD"
-
 bin_dir="$BIN_DIR"
 logs_dir="$SCRIPTS_ROOT/../logs"
 
@@ -37,9 +33,6 @@ if [ ! -d "$logs_dir" ]; then
     mkdir -p "$logs_dir"
 fi
 
-printf "${YELLOW_PREFIX}=======>bin_dir=%s${COLOR_SUFFIX}\n" "$bin_dir"
-printf "${YELLOW_PREFIX}=======>logs_dir=%s${COLOR_SUFFIX}\n" "$logs_dir"
-printf "${YELLOW_PREFIX}=======>sdk_db_dir=%s${COLOR_SUFFIX}\n" "$sdk_db_dir"
 
 # Service filenames
 service_filenames=(
@@ -70,8 +63,6 @@ kill_service() {
   local service_name=$1
   local pid=$(pgrep -f "$service_name")
   if [ -n "$pid" ]; then
-    echo "$service_name service has been started, pid: $pid"
-    echo "Killing the service $service_name, pid: $pid"
     killall "$service_name"
     sleep 0.5
   fi
@@ -100,7 +91,7 @@ for ((i = 0; i < ${#service_filenames[*]}; i++)); do
       cmd="$bin_dir/$service_name -port $port --config_folder_path $config_path"
     fi
     echo "$cmd"
-    nohup $cmd >> "${logs_dir}/openim_$(date '+%Y%m%d').log" 2>&1 &
+    nohup $cmd >> "${logs_dir}/chat_$(date '+%Y%m%d').log" 2>&1 &
     sleep 1
   done
 done
@@ -108,4 +99,4 @@ done
 sleep 50
 ${OPENIM_ROOT}/scripts/check_all.sh
 
-tail -f ${logs_dir}/openim_$(date '+%Y%m%d').log
+tail -f ${logs_dir}/chat_$(date '+%Y%m%d').log

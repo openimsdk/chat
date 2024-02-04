@@ -27,17 +27,9 @@ source $SCRIPTS_ROOT/style_info.sh
 source $SCRIPTS_ROOT/path_info.sh
 source $SCRIPTS_ROOT/function.sh
 
-echo -e "${YELLOW_PREFIX}=======>SCRIPTS_ROOT=$SCRIPTS_ROOT${COLOR_SUFFIX}"
-echo -e "${YELLOW_PREFIX}=======>OPENIM_ROOT=$OPENIM_ROOT${COLOR_SUFFIX}"
-echo -e "${YELLOW_PREFIX}=======>pwd=$PWD${COLOR_SUFFIX}"
-
-echo -e  ""
-
 echo -e "${BACKGROUND_BLUE}===============> Building all using make build binary files ${COLOR_SUFFIX}" 
 
 echo -e  ""
-echo -e "${BOLD_PREFIX}____________________________________________________________ ${COLOR_SUFFIX}"
-
 
 bin_dir="$BIN_DIR"
 logs_dir="$OPENIM_ROOT/_output/logs"

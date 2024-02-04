@@ -16,6 +16,8 @@ package chat
 
 import (
 	"context"
+	"fmt"
+	"os"
 
 	"github.com/OpenIMSDK/tools/discoveryregistry"
 	"github.com/OpenIMSDK/tools/errs"
@@ -29,7 +31,8 @@ import (
 func NewChatClient(discov discoveryregistry.SvcDiscoveryRegistry) *ChatClient {
 	conn, err := discov.GetConn(context.Background(), config.Config.RpcRegisterName.OpenImChatName)
 	if err != nil {
-		panic(err)
+		fmt.Fprintf(os.Stderr, "\n\nexit -1: \n%+v\n\n", err)
+		os.Exit(-1)
 	}
 	return &ChatClient{
 		client: chat.NewChatClient(conn),
