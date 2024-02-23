@@ -26,9 +26,10 @@ require (
 
 require (
 	github.com/OpenIMSDK/protocol v0.0.21
-	github.com/OpenIMSDK/tools v0.0.31
+	github.com/OpenIMSDK/tools v0.0.36
 	github.com/redis/go-redis/v9 v9.2.1
 	github.com/xuri/excelize/v2 v2.8.0
+	go.mongodb.org/mongo-driver v1.12.0
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
 )
 
@@ -101,7 +102,6 @@ require (
 	github.com/xuri/efp v0.0.0-20230802181842-ad255f2331ca // indirect
 	github.com/xuri/nfp v0.0.0-20230819163627-dc951e3ffe1a // indirect
 	github.com/youmark/pkcs8 v0.0.0-20181117223130-1be2e3e5546d // indirect
-	go.mongodb.org/mongo-driver v1.12.0 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.7.0 // indirect
 	go.uber.org/zap v1.24.0 // indirect

@@ -33,7 +33,7 @@ func (Account) TableName() string {
 }
 
 type AccountInterface interface {
-	NewTx(tx any) AccountInterface
+	//NewTx(tx any) AccountInterface
 	Create(ctx context.Context, accounts ...*Account) error
 	Take(ctx context.Context, userId string) (*Account, error)
 	Update(ctx context.Context, userID string, data map[string]any) error

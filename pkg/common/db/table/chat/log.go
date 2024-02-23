@@ -16,6 +16,7 @@ package chat
 
 import (
 	"context"
+	"github.com/OpenIMSDK/tools/pagination"
 	"time"
 )
 
@@ -33,7 +34,7 @@ type Log struct {
 
 type LogInterface interface {
 	Create(ctx context.Context, log []*Log) error
-	Search(ctx context.Context, keyword string, start time.Time, end time.Time, pageNumber int32, showNumber int32) (uint32, []*Log, error)
+	Search(ctx context.Context, keyword string, start time.Time, end time.Time, pagination pagination.Pagination) (int64, []*Log, error)
 	Delete(ctx context.Context, logID []string, userID string) error
 	Get(ctx context.Context, logIDs []string, userID string) ([]*Log, error)
 }

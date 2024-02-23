@@ -16,8 +16,8 @@ package chat
 
 import (
 	"context"
+	"go.mongodb.org/mongo-driver/mongo"
 	"time"
-
 
 	"github.com/OpenIMSDK/tools/errs"
 
@@ -26,26 +26,26 @@ import (
 	"github.com/OpenIMSDK/chat/pkg/common/db/table/chat"
 )
 
-func NewUserLoginRecord(db *gorm.DB) chat.UserLoginRecordInterface {
+func NewUserLoginRecord(db *mongo.Database) (chat.UserLoginRecordInterface, error) {
 	return &UserLoginRecord{
-		db: db,
-	}
+		coll: db,
+	}, nil
 }
 
 type UserLoginRecord struct {
-	db *gorm.DB
+	coll *gorm.DB
 }
 
 func (o *UserLoginRecord) NewTx(tx any) chat.UserLoginRecordInterface {
-	return &UserLoginRecord{db: tx.(*gorm.DB)}
+	return &UserLoginRecord{coll: tx.(*gorm.DB)}
 }
 
 func (o *UserLoginRecord) Create(ctx context.Context, records ...*chat.UserLoginRecord) error {
-	return o.db.WithContext(ctx).Create(&records).Error
+	return o.coll.WithContext(ctx).Create(&records).Error
 }
 
 func (o *UserLoginRecord) CountTotal(ctx context.Context, before *time.Time) (count int64, err error) {
-	db := o.db.WithContext(ctx).Model(&chat.UserLoginRecord{})
+	db := o.coll.WithContext(ctx).Model(&chat.UserLoginRecord{})
 	if before != nil {
 		db.Where("create_time < ?", before)
 	}
@@ -61,7 +61,7 @@ func (o *UserLoginRecord) CountRangeEverydayTotal(ctx context.Context, start *ti
 		Count int64     `gorm:"column:count"`
 	}
 	var loginCount int64
-	err := o.db.WithContext(ctx).
+	err := o.coll.WithContext(ctx).
 		Model(&chat.UserLoginRecord{}).
 		Select("DATE(login_time) AS date, count(distinct(user_id)) AS count").
 		Where("login_time >= ? and login_time < ?", start, end).

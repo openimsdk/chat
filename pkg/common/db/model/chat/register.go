@@ -16,6 +16,7 @@ package chat
 
 import (
 	"context"
+	"go.mongodb.org/mongo-driver/mongo"
 	"time"
 
 	"github.com/OpenIMSDK/tools/errs"
@@ -24,24 +25,24 @@ import (
 	"github.com/OpenIMSDK/chat/pkg/common/db/table/chat"
 )
 
-func NewRegister(db *gorm.DB) chat.RegisterInterface {
-	return &Register{db: db}
+func NewRegister(db *mongo.Database) (chat.RegisterInterface, error) {
+	return &Register{coll: db}, nil
 }
 
 type Register struct {
-	db *gorm.DB
+	coll *gorm.DB
 }
 
 func (o *Register) NewTx(tx any) chat.RegisterInterface {
-	return &Register{db: tx.(*gorm.DB)}
+	return &Register{coll: tx.(*gorm.DB)}
 }
 
 func (o *Register) Create(ctx context.Context, registers ...*chat.Register) error {
-	return errs.Wrap(o.db.WithContext(ctx).Create(registers).Error)
+	return errs.Wrap(o.coll.WithContext(ctx).Create(registers).Error)
 }
 
 func (o *Register) CountTotal(ctx context.Context, before *time.Time) (count int64, err error) {
-	db := o.db.WithContext(ctx).Model(&chat.Register{})
+	db := o.coll.WithContext(ctx).Model(&chat.Register{})
 	if before != nil {
 		db.Where("create_time < ?", before)
 	}

@@ -16,6 +16,7 @@ package chat
 
 import (
 	"context"
+	"github.com/OpenIMSDK/tools/pagination"
 	"time"
 )
 
@@ -45,16 +46,16 @@ func (Attribute) TableName() string {
 }
 
 type AttributeInterface interface {
-	NewTx(tx any) AttributeInterface
+	//NewTx(tx any) AttributeInterface
 	Create(ctx context.Context, attribute ...*Attribute) error
 	Update(ctx context.Context, userID string, data map[string]any) error
 	Find(ctx context.Context, userIds []string) ([]*Attribute, error)
 	FindAccount(ctx context.Context, accounts []string) ([]*Attribute, error)
-	Search(ctx context.Context, keyword string, genders []int32, page int32, size int32) (uint32, []*Attribute, error)
+	Search(ctx context.Context, keyword string, genders []int32, pagination pagination.Pagination) (int64, []*Attribute, error)
 	TakePhone(ctx context.Context, areaCode string, phoneNumber string) (*Attribute, error)
 	TakeEmail(ctx context.Context, email string) (*Attribute, error)
 	TakeAccount(ctx context.Context, account string) (*Attribute, error)
 	Take(ctx context.Context, userID string) (*Attribute, error)
-	SearchNormalUser(ctx context.Context, keyword string, forbiddenID []string, gender int32, page int32, size int32) (uint32, []*Attribute, error)
-	SearchUser(ctx context.Context, keyword string, userIDs []string, genders []int32, pageNumber int32, showNumber int32) (uint32, []*Attribute, error)
+	SearchNormalUser(ctx context.Context, keyword string, forbiddenID []string, gender int32, pagination pagination.Pagination) (int64, []*Attribute, error)
+	SearchUser(ctx context.Context, keyword string, userIDs []string, genders []int32, pagination pagination.Pagination) (int64, []*Attribute, error)
 }

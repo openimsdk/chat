@@ -35,7 +35,7 @@ func (VerifyCode) TableName() string {
 }
 
 type VerifyCodeInterface interface {
-	NewTx(tx any) VerifyCodeInterface
+	//NewTx(tx any) VerifyCodeInterface
 	Add(ctx context.Context, ms []*VerifyCode) error
 	RangeNum(ctx context.Context, account string, start time.Time, end time.Time) (uint32, error)
 	TakeLast(ctx context.Context, account string) (*VerifyCode, error)

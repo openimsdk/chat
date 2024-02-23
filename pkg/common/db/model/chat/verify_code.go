@@ -16,6 +16,7 @@ package chat
 
 import (
 	"context"
+	"go.mongodb.org/mongo-driver/mongo"
 	"time"
 
 	"github.com/OpenIMSDK/chat/pkg/common/db/table/chat"
@@ -23,27 +24,23 @@ import (
 	"gorm.io/gorm"
 )
 
-func NewVerifyCode(db *gorm.DB) *VerifyCode {
+func NewVerifyCode(db *mongo.Database) (chat.VerifyCodeInterface, error) {
 	return &VerifyCode{
-		db: db,
-	}
+		coll: db,
+	}, nil
 }
 
 type VerifyCode struct {
-	db *gorm.DB
-}
-
-func (o *VerifyCode) NewTx(tx any) chat.VerifyCodeInterface {
-	return &VerifyCode{db: tx.(*gorm.DB)}
+	coll *gorm.DB
 }
 
 func (o *VerifyCode) Add(ctx context.Context, ms []*chat.VerifyCode) error {
-	return errs.Wrap(o.db.WithContext(ctx).Create(&ms).Error)
+	return errs.Wrap(o.coll.WithContext(ctx).Create(&ms).Error)
 }
 
 func (o *VerifyCode) RangeNum(ctx context.Context, account string, start time.Time, end time.Time) (uint32, error) {
 	var count int64
-	if err := o.db.WithContext(ctx).Model(&chat.VerifyCode{}).Where("account = ?", account).Where("create_time BETWEEN ? AND ?", start, end).Count(&count).Error; err != nil {
+	if err := o.coll.WithContext(ctx).Model(&chat.VerifyCode{}).Where("account = ?", account).Where("create_time BETWEEN ? AND ?", start, end).Count(&count).Error; err != nil {
 		return 0, errs.Wrap(err)
 	}
 	return uint32(count), nil
@@ -51,13 +48,13 @@ func (o *VerifyCode) RangeNum(ctx context.Context, account string, start time.Ti
 
 func (o *VerifyCode) TakeLast(ctx context.Context, account string) (*chat.VerifyCode, error) {
 	var m chat.VerifyCode
-	return &m, errs.Wrap(o.db.WithContext(ctx).Where("account = ?", account).Order("id DESC").Take(&m).Error)
+	return &m, errs.Wrap(o.coll.WithContext(ctx).Where("account = ?", account).Order("id DESC").Take(&m).Error)
 }
 
 func (o *VerifyCode) Incr(ctx context.Context, id uint) error {
-	return errs.Wrap(o.db.WithContext(ctx).Model(&chat.VerifyCode{}).Where("id = ?", id).Updates(map[string]any{"count": gorm.Expr("count + 1")}).Error)
+	return errs.Wrap(o.coll.WithContext(ctx).Model(&chat.VerifyCode{}).Where("id = ?", id).Updates(map[string]any{"count": gorm.Expr("count + 1")}).Error)
 }
 
 func (o *VerifyCode) Delete(ctx context.Context, id uint) error {
-	return errs.Wrap(o.db.WithContext(ctx).Where("id = ?", id).Delete(&chat.VerifyCode{}).Error)
+	return errs.Wrap(o.coll.WithContext(ctx).Where("id = ?", id).Delete(&chat.VerifyCode{}).Error)
 }

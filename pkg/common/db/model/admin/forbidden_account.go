@@ -16,6 +16,7 @@ package admin
 
 import (
 	"context"
+	"go.mongodb.org/mongo-driver/mongo"
 
 	"github.com/OpenIMSDK/tools/errs"
 	"github.com/OpenIMSDK/tools/ormutil"
@@ -24,8 +25,8 @@ import (
 	"github.com/OpenIMSDK/chat/pkg/common/db/table/admin"
 )
 
-func NewForbiddenAccount(db *gorm.DB) admin.ForbiddenAccountInterface {
-	return &ForbiddenAccount{db: db}
+func NewForbiddenAccount(db *mongo.Database) (admin.ForbiddenAccountInterface, error) {
+	return &ForbiddenAccount{db: db}, nil
 }
 
 type ForbiddenAccount struct {
