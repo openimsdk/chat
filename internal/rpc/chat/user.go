@@ -18,6 +18,7 @@ import (
 	"context"
 	"github.com/OpenIMSDK/chat/pkg/common/db/dbutil"
 	chat2 "github.com/OpenIMSDK/chat/pkg/common/db/table/chat"
+	"github.com/OpenIMSDK/chat/pkg/common/rtc"
 	constant2 "github.com/OpenIMSDK/protocol/constant"
 	"github.com/OpenIMSDK/tools/mcontext"
 	"time"
@@ -279,6 +280,21 @@ func (o *chatSvr) SearchUserInfo(ctx context.Context, req *chat.SearchUserInfoRe
 		Total: total,
 		Users: DbToPbUserFullInfos(list),
 	}, nil
+}
+
+func (o *chatSvr) GetTokenForVideoMeeting(ctx context.Context, req *chat.GetTokenForVideoMeetingReq) (*chat.GetTokenForVideoMeetingResp, error) {
+	if _, _, err := mctx.Check(ctx); err != nil {
+		return nil, err
+	}
+	serverUrl := rtc.GetLiveKitServerUrl()
+	token, err := rtc.GetLiveKitToken(req.Room, req.Identity)
+	if err != nil {
+		return nil, err
+	}
+	return &chat.GetTokenForVideoMeetingResp{
+		ServerUrl: serverUrl,
+		Token:     token,
+	}, err
 }
 
 func (o *chatSvr) checkTheUniqueness(ctx context.Context, req *chat.AddUserAccountReq) error {

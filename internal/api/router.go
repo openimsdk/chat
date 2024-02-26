@@ -48,11 +48,12 @@ func NewChatRoute(router gin.IRouter, discov discoveryregistry.SvcDiscoveryRegis
 	account.POST("/password/change", mw.CheckToken, chat.ChangePassword) // Change password
 
 	user := router.Group("/user", mw.CheckToken)
-	user.POST("/update", chat.UpdateUserInfo)              // Edit personal information
-	user.POST("/find/public", chat.FindUserPublicInfo)     // Get user's public information
-	user.POST("/find/full", chat.FindUserFullInfo)         // Get all information of the user
-	user.POST("/search/full", chat.SearchUserFullInfo)     // Search user's public information
-	user.POST("/search/public", chat.SearchUserPublicInfo) // Search all information of the user
+	user.POST("/update", chat.UpdateUserInfo)                 // Edit personal information
+	user.POST("/find/public", chat.FindUserPublicInfo)        // Get user's public information
+	user.POST("/find/full", chat.FindUserFullInfo)            // Get all information of the user
+	user.POST("/search/full", chat.SearchUserFullInfo)        // Search user's public information
+	user.POST("/search/public", chat.SearchUserPublicInfo)    // Search all information of the user
+	user.POST("/rtc/get_token", chat.GetTokenForVideoMeeting) // Get token for video meeting for the user
 
 	router.POST("/friend/search", mw.CheckToken, chat.SearchFriend)
 
