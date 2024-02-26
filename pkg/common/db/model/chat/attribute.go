@@ -16,88 +16,147 @@ package chat
 
 import (
 	"context"
-	"github.com/OpenIMSDK/tools/pagination"
-	"go.mongodb.org/mongo-driver/mongo"
-
 	"github.com/OpenIMSDK/tools/errs"
-	"github.com/OpenIMSDK/tools/ormutil"
-	"gorm.io/gorm"
+	"github.com/OpenIMSDK/tools/mgoutil"
+	"github.com/OpenIMSDK/tools/pagination"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
 
 	"github.com/OpenIMSDK/chat/pkg/common/db/table/chat"
 )
 
 func NewAttribute(db *mongo.Database) (chat.AttributeInterface, error) {
-	return &Attribute{coll: db}, nil
+	coll := db.Collection("attribute")
+	_, err := coll.Indexes().CreateMany(context.Background(), []mongo.IndexModel{
+		{
+			Keys: bson.D{
+				{Key: "user_id", Value: 1},
+			},
+		},
+		{
+			Keys: bson.D{
+				{Key: "account", Value: 1},
+			},
+		},
+		{
+			Keys: bson.D{
+				{Key: "email", Value: 1},
+			},
+		},
+		{
+			Keys: bson.D{
+				{Key: "area_code", Value: 1},
+				{Key: "phone_number", Value: 1},
+			},
+		},
+	})
+	if err != nil {
+		return nil, errs.Wrap(err)
+	}
+	return &Attribute{coll: coll}, nil
 }
 
 type Attribute struct {
-	coll *gorm.DB
+	coll *mongo.Collection
 }
 
 func (o *Attribute) Create(ctx context.Context, attribute ...*chat.Attribute) error {
-	return errs.Wrap(o.coll.WithContext(ctx).Create(attribute).Error)
+	return mgoutil.InsertMany(ctx, o.coll, attribute)
 }
 
 func (o *Attribute) Update(ctx context.Context, userID string, data map[string]any) error {
-	return errs.Wrap(o.coll.WithContext(ctx).Model(&chat.Attribute{}).Where("user_id = ?", userID).Updates(data).Error)
+	if len(data) == 0 {
+		return nil
+	}
+	return mgoutil.UpdateOne(ctx, o.coll, bson.M{"user_id": userID}, bson.M{"$set": data}, false)
 }
 
 func (o *Attribute) Find(ctx context.Context, userIds []string) ([]*chat.Attribute, error) {
-	var a []*chat.Attribute
-	return a, errs.Wrap(o.coll.WithContext(ctx).Where("user_id in (?)", userIds).Find(&a).Error)
+	return mgoutil.Find[*chat.Attribute](ctx, o.coll, bson.M{"user_id": bson.M{"$in": userIds}})
 }
 
 func (o *Attribute) FindAccount(ctx context.Context, accounts []string) ([]*chat.Attribute, error) {
-	var a []*chat.Attribute
-	return a, errs.Wrap(o.coll.WithContext(ctx).Where("account in (?)", accounts).Find(&a).Error)
+	return mgoutil.Find[*chat.Attribute](ctx, o.coll, bson.M{"account": bson.M{"$in": accounts}})
 }
 
 func (o *Attribute) Search(ctx context.Context, keyword string, genders []int32, pagination pagination.Pagination) (int64, []*chat.Attribute, error) {
-	db := o.coll.WithContext(ctx)
+	filter := bson.M{}
 	if len(genders) > 0 {
-		db = db.Where("gender in ?", genders)
+		filter["gender"] = bson.M{
+			"$in": genders,
+		}
 	}
-	return ormutil.GormSearch[chat.Attribute](db, []string{"user_id", "account", "nickname", "phone_number"}, keyword, page, size)
+	if keyword != "" {
+		filter["$or"] = []bson.M{
+			{"user_id": bson.M{"$regex": keyword, "$options": "i"}},
+			{"account": bson.M{"$regex": keyword, "$options": "i"}},
+			{"nickname": bson.M{"$regex": keyword, "$options": "i"}},
+			{"phone_number": bson.M{"$regex": keyword, "$options": "i"}},
+		}
+	}
+	return mgoutil.FindPage[*chat.Attribute](ctx, o.coll, filter, pagination)
 }
 
 func (o *Attribute) TakePhone(ctx context.Context, areaCode string, phoneNumber string) (*chat.Attribute, error) {
-	var a chat.Attribute
-	return &a, errs.Wrap(o.coll.WithContext(ctx).Where("area_code = ? and phone_number = ?", areaCode, phoneNumber).First(&a).Error)
+	return mgoutil.FindOne[*chat.Attribute](ctx, o.coll, bson.M{"area_code": areaCode, "phone_number": phoneNumber})
 }
 
 func (o *Attribute) TakeEmail(ctx context.Context, email string) (*chat.Attribute, error) {
-	var a chat.Attribute
-	return &a, errs.Wrap(o.coll.WithContext(ctx).Where("email = ?", email).First(&a).Error)
+	return mgoutil.FindOne[*chat.Attribute](ctx, o.coll, bson.M{"email": email})
 }
 
 func (o *Attribute) TakeAccount(ctx context.Context, account string) (*chat.Attribute, error) {
-	var a chat.Attribute
-	return &a, errs.Wrap(o.coll.WithContext(ctx).Where("account = ?", account).Take(&a).Error)
+	return mgoutil.FindOne[*chat.Attribute](ctx, o.coll, bson.M{"account": account})
 }
 
 func (o *Attribute) Take(ctx context.Context, userID string) (*chat.Attribute, error) {
-	var a chat.Attribute
-	return &a, errs.Wrap(o.coll.WithContext(ctx).Where("user_id = ?", userID).Take(&a).Error)
+	return mgoutil.FindOne[*chat.Attribute](ctx, o.coll, bson.M{"user_id": userID})
 }
 
 func (o *Attribute) SearchNormalUser(ctx context.Context, keyword string, forbiddenIDs []string, gender int32, pagination pagination.Pagination) (int64, []*chat.Attribute, error) {
-	db := o.coll.WithContext(ctx)
-	var genders []int32
+	filter := bson.M{}
 	if gender == 0 {
-		genders = append(genders, 0, 1, 2)
+		filter["gender"] = bson.M{
+			"$in": []int32{0, 1, 2},
+		}
 	} else {
-		genders = append(genders, gender)
+		filter["gender"] = gender
 	}
-	db = db.Where("gender in ?", genders)
 	if len(forbiddenIDs) > 0 {
-		db = db.Where("user_id not in ?", forbiddenIDs)
+		filter["user_id"] = bson.M{
+			"$nin": forbiddenIDs,
+		}
 	}
-	return ormutil.GormSearch[chat.Attribute](db, []string{"user_id", "account", "nickname", "phone_number"}, keyword, page, size)
+	if keyword != "" {
+		filter["$or"] = []bson.M{
+			{"user_id": bson.M{"$regex": keyword, "$options": "i"}},
+			{"account": bson.M{"$regex": keyword, "$options": "i"}},
+			{"nickname": bson.M{"$regex": keyword, "$options": "i"}},
+			{"phone_number": bson.M{"$regex": keyword, "$options": "i"}},
+		}
+	}
+	return mgoutil.FindPage[*chat.Attribute](ctx, o.coll, filter, pagination)
 }
 
 func (o *Attribute) SearchUser(ctx context.Context, keyword string, userIDs []string, genders []int32, pagination pagination.Pagination) (int64, []*chat.Attribute, error) {
-	db := o.coll.WithContext(ctx)
-	ormutil.GormIn(&db, "user_id", userIDs)
-	ormutil.GormIn(&db, "gender", genders)
-	return ormutil.GormSearch[chat.Attribute](db, []string{"user_id", "nickname", "phone_number"}, keyword, pageNumber, showNumber)
+	filter := bson.M{}
+	if len(genders) > 0 {
+		filter["gender"] = bson.M{
+			"$in": genders,
+		}
+	}
+	if len(userIDs) > 0 {
+		filter["user_id"] = bson.M{
+			"$in": userIDs,
+		}
+	}
+	if keyword != "" {
+		filter["$or"] = []bson.M{
+			{"user_id": bson.M{"$regex": keyword, "$options": "i"}},
+			{"account": bson.M{"$regex": keyword, "$options": "i"}},
+			{"nickname": bson.M{"$regex": keyword, "$options": "i"}},
+			{"phone_number": bson.M{"$regex": keyword, "$options": "i"}},
+		}
+	}
+	return mgoutil.FindPage[*chat.Attribute](ctx, o.coll, filter, pagination)
 }

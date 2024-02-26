@@ -42,11 +42,11 @@ type ChatDatabaseInterface interface {
 	TakeAttributeByUserID(ctx context.Context, userID string) (*table.Attribute, error)
 	Search(ctx context.Context, normalUser int32, keyword string, gender int32, pagination pagination.Pagination) (int64, []*table.Attribute, error)
 	SearchUser(ctx context.Context, keyword string, userIDs []string, genders []int32, pagination pagination.Pagination) (int64, []*table.Attribute, error)
-	CountVerifyCodeRange(ctx context.Context, account string, start time.Time, end time.Time) (uint32, error)
+	CountVerifyCodeRange(ctx context.Context, account string, start time.Time, end time.Time) (int64, error)
 	AddVerifyCode(ctx context.Context, verifyCode *table.VerifyCode, fn func() error) error
-	UpdateVerifyCodeIncrCount(ctx context.Context, id uint) error
+	UpdateVerifyCodeIncrCount(ctx context.Context, id string) error
 	TakeLastVerifyCode(ctx context.Context, account string) (*table.VerifyCode, error)
-	DelVerifyCode(ctx context.Context, id uint) error
+	DelVerifyCode(ctx context.Context, id string) error
 	RegisterUser(ctx context.Context, register *table.Register, account *table.Account, attribute *table.Attribute) error
 	GetAccount(ctx context.Context, userID string) (*table.Account, error)
 	GetAttribute(ctx context.Context, userID string) (*table.Attribute, error)
@@ -189,7 +189,7 @@ func (o *ChatDatabase) SearchUser(ctx context.Context, keyword string, userIDs [
 	return o.attribute.SearchUser(ctx, keyword, userIDs, genders, pagination)
 }
 
-func (o *ChatDatabase) CountVerifyCodeRange(ctx context.Context, account string, start time.Time, end time.Time) (uint32, error) {
+func (o *ChatDatabase) CountVerifyCodeRange(ctx context.Context, account string, start time.Time, end time.Time) (int64, error) {
 	return o.verifyCode.RangeNum(ctx, account, start, end)
 }
 
@@ -205,7 +205,7 @@ func (o *ChatDatabase) AddVerifyCode(ctx context.Context, verifyCode *table.Veri
 	})
 }
 
-func (o *ChatDatabase) UpdateVerifyCodeIncrCount(ctx context.Context, id uint) error {
+func (o *ChatDatabase) UpdateVerifyCodeIncrCount(ctx context.Context, id string) error {
 	return o.verifyCode.Incr(ctx, id)
 }
 
@@ -213,7 +213,7 @@ func (o *ChatDatabase) TakeLastVerifyCode(ctx context.Context, account string) (
 	return o.verifyCode.TakeLast(ctx, account)
 }
 
-func (o *ChatDatabase) DelVerifyCode(ctx context.Context, id uint) error {
+func (o *ChatDatabase) DelVerifyCode(ctx context.Context, id string) error {
 	return o.verifyCode.Delete(ctx, id)
 }
 

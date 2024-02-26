@@ -20,14 +20,14 @@ import (
 )
 
 type VerifyCode struct {
-	ID         uint      `gorm:"column:id;primary_key;autoIncrement"`
-	Account    string    `gorm:"column:account;type:char(64)"`
-	Platform   string    `gorm:"column:platform;type:varchar(32)"`
-	Code       string    `gorm:"column:verify_code;type:varchar(16)"`
-	Duration   uint      `gorm:"column:duration;type:int(11)"`
-	Count      int       `gorm:"column:count;type:int(11)"`
-	Used       bool      `gorm:"column:used"`
-	CreateTime time.Time `gorm:"column:create_time;autoCreateTime"`
+	ID         string
+	Account    string
+	Platform   string
+	Code       string
+	Duration   uint
+	Count      int
+	Used       bool
+	CreateTime time.Time
 }
 
 func (VerifyCode) TableName() string {
@@ -37,8 +37,8 @@ func (VerifyCode) TableName() string {
 type VerifyCodeInterface interface {
 	//NewTx(tx any) VerifyCodeInterface
 	Add(ctx context.Context, ms []*VerifyCode) error
-	RangeNum(ctx context.Context, account string, start time.Time, end time.Time) (uint32, error)
+	RangeNum(ctx context.Context, account string, start time.Time, end time.Time) (int64, error)
 	TakeLast(ctx context.Context, account string) (*VerifyCode, error)
-	Incr(ctx context.Context, id uint) error
-	Delete(ctx context.Context, id uint) error
+	Incr(ctx context.Context, id string) error
+	Delete(ctx context.Context, id string) error
 }

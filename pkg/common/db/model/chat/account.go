@@ -16,6 +16,7 @@ package chat
 
 import (
 	"context"
+	"github.com/OpenIMSDK/tools/errs"
 	"github.com/OpenIMSDK/tools/mgoutil"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -34,7 +35,7 @@ func NewAccount(db *mongo.Database) (chat.AccountInterface, error) {
 		Options: options.Index().SetUnique(true),
 	})
 	if err != nil {
-		return nil, err
+		return nil, errs.Wrap(err)
 	}
 	return &Account{coll: coll}, nil
 }
@@ -52,6 +53,9 @@ func (o *Account) Take(ctx context.Context, userId string) (*chat.Account, error
 }
 
 func (o *Account) Update(ctx context.Context, userID string, data map[string]any) error {
+	if len(data) == 0 {
+		return nil
+	}
 	return mgoutil.UpdateOne(ctx, o.coll, bson.M{"user_id": userID}, bson.M{"$set": data}, false)
 }
 

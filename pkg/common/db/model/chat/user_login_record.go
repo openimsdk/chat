@@ -16,65 +16,105 @@ package chat
 
 import (
 	"context"
+	"github.com/OpenIMSDK/tools/mgoutil"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"time"
-
-	"github.com/OpenIMSDK/tools/errs"
-
-	"gorm.io/gorm"
 
 	"github.com/OpenIMSDK/chat/pkg/common/db/table/chat"
 )
 
 func NewUserLoginRecord(db *mongo.Database) (chat.UserLoginRecordInterface, error) {
+	coll := db.Collection("register")
+	_, err := coll.Indexes().CreateMany(context.Background(), []mongo.IndexModel{
+		{
+			Keys: bson.D{
+				{Key: "create_time", Value: 1},
+			},
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
 	return &UserLoginRecord{
-		coll: db,
+		coll: coll,
 	}, nil
 }
 
 type UserLoginRecord struct {
-	coll *gorm.DB
-}
-
-func (o *UserLoginRecord) NewTx(tx any) chat.UserLoginRecordInterface {
-	return &UserLoginRecord{coll: tx.(*gorm.DB)}
+	coll *mongo.Collection
 }
 
 func (o *UserLoginRecord) Create(ctx context.Context, records ...*chat.UserLoginRecord) error {
-	return o.coll.WithContext(ctx).Create(&records).Error
+	return mgoutil.InsertMany(ctx, o.coll, records)
 }
 
 func (o *UserLoginRecord) CountTotal(ctx context.Context, before *time.Time) (count int64, err error) {
-	db := o.coll.WithContext(ctx).Model(&chat.UserLoginRecord{})
+	filter := bson.M{}
 	if before != nil {
-		db.Where("create_time < ?", before)
+		filter["create_time"] = bson.M{"$lt": before}
 	}
-	if err := db.Count(&count).Error; err != nil {
-		return 0, errs.Wrap(err)
-	}
-	return count, nil
+	return mgoutil.Count(ctx, o.coll, filter)
 }
 
 func (o *UserLoginRecord) CountRangeEverydayTotal(ctx context.Context, start *time.Time, end *time.Time) (map[string]int64, int64, error) {
-	var res []struct {
-		Date  time.Time `gorm:"column:date"`
-		Count int64     `gorm:"column:count"`
+	pipeline := make([]bson.M, 0, 4)
+	if start != nil || end != nil {
+		filter := bson.M{}
+		if start != nil {
+			filter["$gte"] = start
+		}
+		if end != nil {
+			filter["$lt"] = end
+		}
+		pipeline = append(pipeline, bson.M{"$match": bson.M{"login_time": filter}})
+	}
+	pipeline = append(pipeline,
+		bson.M{
+			"$project": bson.M{
+				"_id":     0,
+				"user_id": 1,
+				"login_time": bson.M{
+					"$dateToString": bson.M{
+						"format": "%Y-%m-%d",
+						"date":   "$login_time",
+					},
+				},
+			},
+		},
+
+		bson.M{
+			"$group": bson.M{
+				"_id": bson.M{
+					"user_id":    "$user_id",
+					"login_time": "$login_time",
+				},
+			},
+		},
+
+		bson.M{
+			"$group": bson.M{
+				"_id": "$_id.login_time",
+				"count": bson.M{
+					"$sum": 1,
+				},
+			},
+		},
+	)
+
+	type Temp struct {
+		ID    string `bson:"_id"`
+		Count int64  `bson:"count"`
+	}
+	res, err := mgoutil.Aggregate[Temp](ctx, o.coll, pipeline)
+	if err != nil {
+		return nil, 0, err
 	}
 	var loginCount int64
-	err := o.coll.WithContext(ctx).
-		Model(&chat.UserLoginRecord{}).
-		Select("DATE(login_time) AS date, count(distinct(user_id)) AS count").
-		Where("login_time >= ? and login_time < ?", start, end).
-		Group("date").
-		Find(&res).
-		Error
-	if err != nil {
-		return nil, 0, errs.Wrap(err)
-	}
-	v := make(map[string]int64)
+	countMap := make(map[string]int64, len(res))
 	for _, r := range res {
 		loginCount += r.Count
-		v[r.Date.Format("2006-01-02")] = r.Count
+		countMap[r.ID] = r.Count
 	}
-	return v, loginCount, nil
+	return countMap, loginCount, nil
 }
