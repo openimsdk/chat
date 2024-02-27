@@ -42,6 +42,12 @@ var imConfig struct {
 		Password string   `yaml:"password"`
 	} `yaml:"redis"`
 
+	LiveKit struct {
+		LiveKitUrl string `yaml:"liveKitUrl"`
+		Key        string `yaml:"key"`
+		Secret     string `yaml:"secret"`
+	} `yaml:"liveKit"`
+
 	Rpc struct {
 		RegisterIP string `yaml:"registerIP"`
 		ListenIP   string `yaml:"listenIP"`

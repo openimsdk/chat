@@ -50,6 +50,11 @@ var Config struct {
 		Username string    `yaml:"username"`
 		Password string    `yaml:"password"`
 	} `yaml:"redis"`
+	LiveKit struct {
+		LiveKitUrl string `yaml:"liveKitUrl"`
+		Key        string `yaml:"key"`
+		Secret     string `yaml:"secret"`
+	} `yaml:"liveKit"`
 	RpcPort struct {
 		OpenImAdminPort []int `yaml:"openImAdminPort"`
 		OpenImChatPort  []int `yaml:"openImChatPort"`
