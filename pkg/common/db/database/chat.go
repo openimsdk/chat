@@ -53,9 +53,9 @@ type ChatDatabaseInterface interface {
 	GetAttributeByAccount(ctx context.Context, account string) (*table.Attribute, error)
 	GetAttributeByPhone(ctx context.Context, areaCode string, phoneNumber string) (*table.Attribute, error)
 	GetAttributeByEmail(ctx context.Context, email string) (*table.Attribute, error)
-	LoginRecord(ctx context.Context, record *table.UserLoginRecord, verifyCodeID *uint) error
+	LoginRecord(ctx context.Context, record *table.UserLoginRecord, verifyCodeID *string) error
 	UpdatePassword(ctx context.Context, userID string, password string) error
-	UpdatePasswordAndDeleteVerifyCode(ctx context.Context, userID string, password string, code uint) error
+	UpdatePasswordAndDeleteVerifyCode(ctx context.Context, userID string, password string, codeID string) error
 	NewUserCountTotal(ctx context.Context, before *time.Time) (int64, error)
 	UserLoginCountTotal(ctx context.Context, before *time.Time) (int64, error)
 	UserLoginCountRangeEverydayTotal(ctx context.Context, start *time.Time, end *time.Time) (map[string]int64, int64, error)
@@ -250,7 +250,7 @@ func (o *ChatDatabase) GetAttributeByPhone(ctx context.Context, areaCode string,
 func (o *ChatDatabase) GetAttributeByEmail(ctx context.Context, email string) (*table.Attribute, error) {
 	return o.attribute.TakeEmail(ctx, email)
 }
-func (o *ChatDatabase) LoginRecord(ctx context.Context, record *table.UserLoginRecord, verifyCodeID *uint) error {
+func (o *ChatDatabase) LoginRecord(ctx context.Context, record *table.UserLoginRecord, verifyCodeID *string) error {
 	return o.tx.Transaction(ctx, func(ctx context.Context) error {
 		if err := o.userLoginRecord.Create(ctx, record); err != nil {
 			return err
@@ -268,12 +268,12 @@ func (o *ChatDatabase) UpdatePassword(ctx context.Context, userID string, passwo
 	return o.account.UpdatePassword(ctx, userID, password)
 }
 
-func (o *ChatDatabase) UpdatePasswordAndDeleteVerifyCode(ctx context.Context, userID string, password string, code uint) error {
+func (o *ChatDatabase) UpdatePasswordAndDeleteVerifyCode(ctx context.Context, userID string, password string, codeID string) error {
 	return o.tx.Transaction(ctx, func(ctx context.Context) error {
 		if err := o.account.UpdatePassword(ctx, userID, password); err != nil {
 			return err
 		}
-		if err := o.verifyCode.Delete(ctx, code); err != nil {
+		if err := o.verifyCode.Delete(ctx, codeID); err != nil {
 			return err
 		}
 		return nil

@@ -132,7 +132,7 @@ func (o *chatSvr) SendVerifyCode(ctx context.Context, req *chat.SendVerifyCodeRe
 	}
 	now := time.Now()
 
-	var count uint32
+	var count int64
 	var err error
 	if !isEmail {
 		count, err = o.Database.CountVerifyCodeRange(ctx, o.verifyCodeJoin(req.AreaCode, req.PhoneNumber), now.Add(-time.Duration(verifyCode.UintTime)*time.Second), now)
@@ -168,23 +168,23 @@ func (o *chatSvr) SendVerifyCode(ctx context.Context, req *chat.SendVerifyCodeRe
 	return &chat.SendVerifyCodeResp{}, nil
 }
 
-func (o *chatSvr) verifyCode(ctx context.Context, account string, verifyCode string) (uint, error) {
+func (o *chatSvr) verifyCode(ctx context.Context, account string, verifyCode string) (string, error) {
 	defer log.ZDebug(ctx, "return")
 	if verifyCode == "" {
-		return 0, errs.ErrArgs.Wrap("verify code is empty")
+		return "", errs.ErrArgs.Wrap("verify code is empty")
 	}
 	if config.Config.VerifyCode.Use == "" {
 		if verifyCode != config.Config.VerifyCode.SuperCode {
-			return 0, eerrs.ErrVerifyCodeNotMatch.Wrap()
+			return "", eerrs.ErrVerifyCodeNotMatch.Wrap()
 		}
-		return 0, nil
+		return "", nil
 	}
 	last, err := o.Database.TakeLastVerifyCode(ctx, account)
 	if err != nil {
 		if dbutil.IsGormNotFound(err) {
-			return 0, eerrs.ErrVerifyCodeExpired.Wrap()
+			return "", eerrs.ErrVerifyCodeExpired.Wrap()
 		}
-		return 0, err
+		return "", err
 	}
 	if last.CreateTime.Unix()+int64(last.Duration) < time.Now().Unix() {
 		return last.ID, eerrs.ErrVerifyCodeExpired.Wrap()
@@ -448,9 +448,9 @@ func (o *chatSvr) Login(ctx context.Context, req *chat.LoginReq) (*chat.LoginRes
 	if err := o.Admin.CheckLogin(ctx, attribute.UserID, req.Ip); err != nil {
 		return nil, err
 	}
-	var verifyCodeID *uint
+	var verifyCodeID *string
 	if req.Password == "" {
-		var id uint
+		var id string
 		var err error
 		if req.Email == "" {
 			id, err = o.verifyCode(ctx, o.verifyCodeJoin(req.AreaCode, req.PhoneNumber), req.VerifyCode)

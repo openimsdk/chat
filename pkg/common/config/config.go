@@ -58,7 +58,7 @@ var Config struct {
 		OpenImAdminName string `yaml:"openImAdminName"`
 		OpenImChatName  string `yaml:"openImChatName"`
 	} `yaml:"rpcRegisterName"`
-	Mysql struct {
+	Mysql *struct {
 		Address       *[]string `yaml:"address"`
 		Username      *string   `yaml:"username"`
 		Password      *string   `yaml:"password"`
@@ -69,6 +69,14 @@ var Config struct {
 		LogLevel      *int      `yaml:"logLevel"`
 		SlowThreshold *int      `yaml:"slowThreshold"`
 	} `yaml:"mysql"`
+	Mongo struct {
+		Uri         *string   `yaml:"uri"`
+		Address     *[]string `yaml:"address"`
+		Database    *string   `yaml:"database"`
+		Username    *string   `yaml:"username"`
+		Password    *string   `yaml:"password"`
+		MaxPoolSize *int      `yaml:"maxPoolSize"`
+	} `yaml:"mongo"`
 	Log struct {
 		StorageLocation     *string `yaml:"storageLocation"`
 		RotationTime        *uint   `yaml:"rotationTime"`
