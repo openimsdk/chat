@@ -184,6 +184,9 @@ $ make stop
 # OR use scripts stop
 $ ./scripts/stop_all.sh
 ```
+## Add REST RPC API
+
+Please refer to "[How to add REST RPC API for OpenIM Chat](./HOW_TO_ADD_REST_RPC_API.md)".
 
 ## Contributing
 
