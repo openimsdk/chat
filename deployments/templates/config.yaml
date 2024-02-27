@@ -132,3 +132,9 @@ redis:
   address: [ 172.28.0.1:16379 ] # REDIS_ADDRESS and REDIS_PORT, Redis server address and port
   username: # REDIS_USERNAME, Username for Redis authentication
   password: openIM123 # REDIS_PASSWORD, Password for Redis
+
+# LiveKit configuration - used for video and audio rtc
+liveKit:
+  liveKitUrl: "ws://172.28.0.1:7880" # LIVEKIT_URL, LiveKit server address and port
+  key: "APIDXJxJeCL8haY" # LIVEKIT_API_KEY
+  secret: "ak1qulJ3nfXeflQHWBdmQDc4js4ueMc5OnxoORVJC2xA" # LIVEKIT_API_SECRET

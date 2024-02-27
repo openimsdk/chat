@@ -259,6 +259,10 @@ func configGetEnv() error {
 	Config.Redis.Password = getEnv("REDIS_PASSWORD", Config.Redis.Password)
 	Config.Redis.Address = getArrPointEnv("REDIS_ADDRESS", "REDIS_PORT", *Config.Redis.Address)
 
+	Config.LiveKit.LiveKitUrl = getEnv("LIVEKIT_URL", Config.LiveKit.LiveKitUrl)
+	Config.LiveKit.Key = getEnv("LIVEKIT_API_KEY", Config.LiveKit.Key)
+	Config.LiveKit.Secret = getEnv("LIVEKIT_API_SECRET", Config.LiveKit.Secret)
+
 	var err error
 	Config.TokenPolicy.Expire, err = getEnvIntPoint("TOKEN_EXPIRE", Config.TokenPolicy.Expire)
 	if err != nil {
