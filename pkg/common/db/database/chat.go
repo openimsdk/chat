@@ -95,7 +95,7 @@ func NewChatDatabase(db *mongo.Database) (ChatDatabaseInterface, error) {
 		return nil, err
 	}
 	return &ChatDatabase{
-		tx:               tx.NewMongo(cli),
+		tx:               tx.NewMongo(db.Client()),
 		register:         register,
 		account:          account,
 		attribute:        attribute,
