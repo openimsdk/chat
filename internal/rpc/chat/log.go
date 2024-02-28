@@ -122,7 +122,7 @@ func (o *chatSvr) SearchLogs(ctx context.Context, req *chat.SearchLogsReq) (*cha
 	if req.StartTime > req.EndTime {
 		return nil, errs.ErrArgs.Wrap("startTime>endTime")
 	}
-	total, logs, err := o.Database.SearchLogs(ctx, req.Keyword, time.UnixMilli(req.StartTime), time.UnixMilli(req.EndTime), req.Pagination.PageNumber, req.Pagination.ShowNumber)
+	total, logs, err := o.Database.SearchLogs(ctx, req.Keyword, time.UnixMilli(req.StartTime), time.UnixMilli(req.EndTime), req.Pagination)
 	if err != nil {
 		return nil, err
 	}
@@ -142,6 +142,6 @@ func (o *chatSvr) SearchLogs(ctx context.Context, req *chat.SearchLogsReq) (*cha
 		pbLog.Nickname = IDtoName[pbLog.UserID]
 	}
 	resp.LogsInfos = pbLogs
-	resp.Total = total
+	resp.Total = uint32(total)
 	return &resp, nil
 }

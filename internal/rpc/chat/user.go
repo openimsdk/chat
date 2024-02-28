@@ -190,12 +190,12 @@ func (o *chatSvr) SearchUserPublicInfo(ctx context.Context, req *chat.SearchUser
 	if _, _, err := mctx.Check(ctx); err != nil {
 		return nil, err
 	}
-	total, list, err := o.Database.Search(ctx, constant.FinDAllUser, req.Keyword, req.Genders, req.Pagination.PageNumber, req.Pagination.ShowNumber)
+	total, list, err := o.Database.Search(ctx, constant.FinDAllUser, req.Keyword, req.Genders, req.Pagination)
 	if err != nil {
 		return nil, err
 	}
 	return &chat.SearchUserPublicInfoResp{
-		Total: total,
+		Total: uint32(total),
 		Users: DbToPbAttributes(list),
 	}, nil
 }
@@ -219,12 +219,12 @@ func (o *chatSvr) SearchUserFullInfo(ctx context.Context, req *chat.SearchUserFu
 	if _, _, err := mctx.Check(ctx); err != nil {
 		return nil, err
 	}
-	total, list, err := o.Database.Search(ctx, req.Normal, req.Keyword, req.Genders, req.Pagination.PageNumber, req.Pagination.ShowNumber)
+	total, list, err := o.Database.Search(ctx, req.Normal, req.Keyword, req.Genders, req.Pagination)
 	if err != nil {
 		return nil, err
 	}
 	return &chat.SearchUserFullInfoResp{
-		Total: total,
+		Total: uint32(total),
 		Users: DbToPbUserFullInfos(list),
 	}, nil
 }
@@ -271,12 +271,12 @@ func (o *chatSvr) SearchUserInfo(ctx context.Context, req *chat.SearchUserInfoRe
 	if _, _, err := mctx.Check(ctx); err != nil {
 		return nil, err
 	}
-	total, list, err := o.Database.SearchUser(ctx, req.Keyword, req.UserIDs, req.Genders, req.Pagination.PageNumber, req.Pagination.ShowNumber)
+	total, list, err := o.Database.SearchUser(ctx, req.Keyword, req.UserIDs, req.Genders, req.Pagination)
 	if err != nil {
 		return nil, err
 	}
 	return &chat.SearchUserInfoResp{
-		Total: total,
+		Total: uint32(total),
 		Users: DbToPbUserFullInfos(list),
 	}, nil
 }
