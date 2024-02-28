@@ -22,7 +22,6 @@ import (
 
 	"github.com/OpenIMSDK/chat/pkg/common/config"
 	"github.com/OpenIMSDK/chat/pkg/common/db/database"
-	chat2 "github.com/OpenIMSDK/chat/pkg/common/db/table/chat"
 	"github.com/OpenIMSDK/chat/pkg/common/dbconn"
 	"github.com/OpenIMSDK/chat/pkg/email"
 	"github.com/OpenIMSDK/chat/pkg/proto/chat"
@@ -31,34 +30,26 @@ import (
 )
 
 func Start(discov discoveryregistry.SvcDiscoveryRegistry, server *grpc.Server) error {
-	db, err := dbconn.NewGormDB()
+	mgodb, err := dbconn.NewMongo()
 	if err != nil {
-		return errs.Wrap(err)
-	}
-	tables := []any{
-		chat2.Account{},
-		chat2.Register{},
-		chat2.Attribute{},
-		chat2.VerifyCode{},
-		chat2.UserLoginRecord{},
-		chat2.Log{},
-	}
-	if err := db.AutoMigrate(tables...); err != nil {
-		return errs.Wrap(err)
+		return err
 	}
 	s, err := sms.New()
 	if err != nil {
 		return errs.Wrap(err)
 	}
-	email := email.NewMail()
+	db, err := database.NewChatDatabase(mgodb)
+	if err != nil {
+		return err
+	}
 	if err := discov.CreateRpcRootNodes([]string{config.Config.RpcRegisterName.OpenImAdminName, config.Config.RpcRegisterName.OpenImChatName}); err != nil {
-		panic(errs.Wrap(err, "CreateRpcRootNodes error"))
+		return err
 	}
 	chat.RegisterChatServer(server, &chatSvr{
-		Database:    database.NewChatDatabase(db),
+		Database:    db,
 		Admin:       chatClient.NewAdminClient(discov),
 		SMS:         s,
-		Mail:        email,
+		Mail:        email.NewMail(),
 		imApiCaller: apicall.NewCallerInterface(),
 	})
 	return nil

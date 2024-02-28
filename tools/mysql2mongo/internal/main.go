@@ -164,11 +164,6 @@ func Main(path string) error {
 		return err
 	}
 
-	orm, err := GetMysql()
-	if err != nil {
-		return err
-	}
-
 	var (
 		cc convertChat
 		ca convertAdmin

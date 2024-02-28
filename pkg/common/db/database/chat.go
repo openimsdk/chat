@@ -65,8 +65,7 @@ type ChatDatabaseInterface interface {
 	GetLogs(ctx context.Context, LogIDs []string, userID string) ([]*table.Log, error)
 }
 
-func NewChatDatabase(cli *mongo.Client) (ChatDatabaseInterface, error) {
-	db := cli.Database("chat")
+func NewChatDatabase(db *mongo.Database) (ChatDatabaseInterface, error) {
 	register, err := chat.NewRegister(db)
 	if err != nil {
 		return nil, err
