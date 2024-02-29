@@ -16,6 +16,7 @@ package admin
 
 import (
 	"context"
+	"github.com/OpenIMSDK/tools/pagination"
 	"time"
 )
 
@@ -36,6 +37,6 @@ type ForbiddenAccountInterface interface {
 	Take(ctx context.Context, userID string) (*ForbiddenAccount, error)
 	Delete(ctx context.Context, userIDs []string) error
 	Find(ctx context.Context, userIDs []string) ([]*ForbiddenAccount, error)
-	Search(ctx context.Context, keyword string, page int32, size int32) (uint32, []*ForbiddenAccount, error)
+	Search(ctx context.Context, keyword string, pagination pagination.Pagination) (int64, []*ForbiddenAccount, error)
 	FindAllIDs(ctx context.Context) ([]string, error)
 }

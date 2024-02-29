@@ -16,49 +16,70 @@ package admin
 
 import (
 	"context"
+	"github.com/OpenIMSDK/tools/mgoutil"
+	"github.com/OpenIMSDK/tools/pagination"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
-
-	"github.com/OpenIMSDK/tools/errs"
-	"github.com/OpenIMSDK/tools/ormutil"
-	"gorm.io/gorm"
+	"go.mongodb.org/mongo-driver/mongo/options"
 
 	"github.com/OpenIMSDK/chat/pkg/common/db/table/admin"
+	"github.com/OpenIMSDK/tools/errs"
 )
 
 func NewForbiddenAccount(db *mongo.Database) (admin.ForbiddenAccountInterface, error) {
-	return &ForbiddenAccount{db: db}, nil
+	coll := db.Collection("forbidden_account")
+	_, err := coll.Indexes().CreateOne(context.Background(), mongo.IndexModel{
+		Keys: bson.D{
+			{Key: "user_id", Value: 1},
+		},
+		Options: options.Index().SetUnique(true),
+	})
+	if err != nil {
+		return nil, errs.Wrap(err)
+	}
+	return &ForbiddenAccount{
+		coll: coll,
+	}, nil
 }
 
 type ForbiddenAccount struct {
-	db *gorm.DB
+	coll *mongo.Collection
 }
 
 func (o *ForbiddenAccount) Create(ctx context.Context, ms []*admin.ForbiddenAccount) error {
-	return errs.Wrap(o.db.WithContext(ctx).Create(&ms).Error)
+	return mgoutil.InsertMany(ctx, o.coll, ms)
 }
 
 func (o *ForbiddenAccount) Take(ctx context.Context, userID string) (*admin.ForbiddenAccount, error) {
-	var f admin.ForbiddenAccount
-	return &f, errs.Wrap(o.db.WithContext(ctx).Where("user_id = ?", userID).Take(&f).Error)
+	return mgoutil.FindOne[*admin.ForbiddenAccount](ctx, o.coll, bson.M{"user_id": userID})
 }
 
 func (o *ForbiddenAccount) Delete(ctx context.Context, userIDs []string) error {
-	return errs.Wrap(o.db.WithContext(ctx).Where("user_id in ?", userIDs).Delete(&admin.ForbiddenAccount{}).Error)
+	if len(userIDs) == 0 {
+		return nil
+	}
+	return mgoutil.DeleteMany(ctx, o.coll, bson.M{"user_id": bson.M{"$in": userIDs}})
 }
 
 func (o *ForbiddenAccount) Find(ctx context.Context, userIDs []string) ([]*admin.ForbiddenAccount, error) {
-	var ms []*admin.ForbiddenAccount
-	return ms, errs.Wrap(o.db.WithContext(ctx).Where("user_id in ?", userIDs).Find(&ms).Error)
+	return mgoutil.Find[*admin.ForbiddenAccount](ctx, o.coll, bson.M{"user_id": bson.M{"$in": userIDs}})
 }
 
-func (o *ForbiddenAccount) Search(ctx context.Context, keyword string, page int32, size int32) (uint32, []*admin.ForbiddenAccount, error) {
-	return ormutil.GormSearch[admin.ForbiddenAccount](o.db.WithContext(ctx), []string{"user_id", "reason", "operator_user_id"}, keyword, page, size)
+func (o *ForbiddenAccount) Search(ctx context.Context, keyword string, pagination pagination.Pagination) (int64, []*admin.ForbiddenAccount, error) {
+	var filter bson.M
+
+	if keyword != "" {
+		filter = bson.M{
+			"$or": []bson.M{
+				{"user_id": bson.M{"$regex": keyword, "$options": "i"}},
+				{"reason": bson.M{"$regex": keyword, "$options": "i"}},
+				{"operator_user_id": bson.M{"$regex": keyword, "$options": "i"}},
+			},
+		}
+	}
+	return mgoutil.FindPage[*admin.ForbiddenAccount](ctx, o.coll, filter, pagination)
 }
 
 func (o *ForbiddenAccount) FindAllIDs(ctx context.Context) ([]string, error) {
-	var userIDs []string
-	if err := o.db.WithContext(ctx).Model(&admin.ForbiddenAccount{}).Pluck("user_id", &userIDs).Error; err != nil {
-		return nil, errs.Wrap(err)
-	}
-	return userIDs, nil
+	return mgoutil.Find[string](ctx, o.coll, bson.M{}, options.Find().SetProjection(bson.M{"_id": 0, "user_id": 1}))
 }

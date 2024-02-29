@@ -16,6 +16,7 @@ package admin
 
 import (
 	"context"
+	"github.com/OpenIMSDK/tools/pagination"
 	"time"
 )
 
@@ -32,10 +33,9 @@ func (IPForbidden) IPForbidden() string {
 }
 
 type IPForbiddenInterface interface {
-	NewTx(tx any) IPForbiddenInterface
 	Take(ctx context.Context, ip string) (*IPForbidden, error)
 	Find(ctx context.Context, ips []string) ([]*IPForbidden, error)
-	Search(ctx context.Context, keyword string, state int32, page int32, size int32) (uint32, []*IPForbidden, error)
+	Search(ctx context.Context, keyword string, state int32, pagination pagination.Pagination) (int64, []*IPForbidden, error)
 	Create(ctx context.Context, ms []*IPForbidden) error
 	Delete(ctx context.Context, ips []string) error
 }

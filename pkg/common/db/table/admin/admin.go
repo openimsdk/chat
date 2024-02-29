@@ -16,6 +16,7 @@ package admin
 
 import (
 	"context"
+	"github.com/OpenIMSDK/tools/pagination"
 	"time"
 )
 
@@ -35,12 +36,12 @@ func (Admin) TableName() string {
 }
 
 type AdminInterface interface {
-	Create(ctx context.Context, admin *Admin) error
+	Create(ctx context.Context, admins []*Admin) error
 	Take(ctx context.Context, account string) (*Admin, error)
 	TakeUserID(ctx context.Context, userID string) (*Admin, error)
 	Update(ctx context.Context, account string, update map[string]any) error
 	ChangePassword(ctx context.Context, userID string, newPassword string) error
 	Delete(ctx context.Context, userIDs []string) error
-	Search(ctx context.Context, page, size int32) (uint32, []*Admin, error)
+	Search(ctx context.Context, pagination pagination.Pagination) (int64, []*Admin, error)
 	InitAdmin(ctx context.Context) error
 }

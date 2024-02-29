@@ -16,6 +16,7 @@ package admin
 
 import (
 	"context"
+	"github.com/OpenIMSDK/tools/pagination"
 	"time"
 )
 
@@ -35,5 +36,5 @@ type LimitUserLoginIPInterface interface {
 	Delete(ctx context.Context, ms []*LimitUserLoginIP) error
 	Count(ctx context.Context, userID string) (uint32, error)
 	Take(ctx context.Context, userID string, ip string) (*LimitUserLoginIP, error)
-	Search(ctx context.Context, keyword string, page int32, size int32) (uint32, []*LimitUserLoginIP, error)
+	Search(ctx context.Context, keyword string, pagination pagination.Pagination) (int64, []*LimitUserLoginIP, error)
 }

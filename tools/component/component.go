@@ -78,11 +78,11 @@ func checkZookeeper() (string, error) {
 		Password: config.Config.Zookeeper.Password,
 	}
 
-	str, err := component.CheckZookeeper(zk)
+	err := component.CheckZookeeper(zk)
 	if err != nil {
 		return "", err
 	}
-	return str, nil
+	return "", nil
 }
 
 // checkRedis checks the Redis connection
@@ -93,11 +93,11 @@ func checkRedis() (string, error) {
 		Password: config.Config.Redis.Password,
 	}
 
-	str, err := component.CheckRedis(redis)
+	err := component.CheckRedis(redis)
 	if err != nil {
 		return "", err
 	}
-	return str, nil
+	return "", nil
 }
 
 func checkMySQL() (string, error) {
@@ -108,9 +108,9 @@ func checkMySQL() (string, error) {
 		Password: *config.Config.Mysql.Password,
 		Database: *config.Config.Mysql.Database,
 	}
-	str, err := component.CheckMySQL(mysql)
+	err := component.CheckMySQL(mysql)
 	if err != nil {
 		return "", err
 	}
-	return str, nil
+	return "", nil
 }

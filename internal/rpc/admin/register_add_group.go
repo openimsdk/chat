@@ -109,9 +109,9 @@ func (o *adminServer) SearchDefaultGroup(ctx context.Context, req *admin.SearchD
 	if _, err := mctx.CheckAdmin(ctx); err != nil {
 		return nil, err
 	}
-	total, infos, err := o.Database.SearchDefaultGroup(ctx, req.Keyword, req.Pagination.PageNumber, req.Pagination.ShowNumber)
+	total, infos, err := o.Database.SearchDefaultGroup(ctx, req.Keyword, req.Pagination)
 	if err != nil {
 		return nil, err
 	}
-	return &admin.SearchDefaultGroupResp{Total: total, GroupIDs: utils.Slice(infos, func(info *admin2.RegisterAddGroup) string { return info.GroupID })}, nil
+	return &admin.SearchDefaultGroupResp{Total: uint32(total), GroupIDs: utils.Slice(infos, func(info *admin2.RegisterAddGroup) string { return info.GroupID })}, nil
 }

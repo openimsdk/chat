@@ -16,56 +16,57 @@ package admin
 
 import (
 	"context"
-
-	"github.com/OpenIMSDK/tools/errs"
-	"gorm.io/gorm"
+	"github.com/OpenIMSDK/tools/mgoutil"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 
 	"github.com/OpenIMSDK/chat/pkg/common/db/table/admin"
+	"github.com/OpenIMSDK/tools/errs"
 )
 
-func NewClientConfig(db *gorm.DB) admin.ClientConfigInterface {
-	return &ClientConfig{db: db}
+func NewClientConfig(db *mongo.Database) (admin.ClientConfigInterface, error) {
+	coll := db.Collection("ip_forbidden")
+	_, err := coll.Indexes().CreateOne(context.Background(), mongo.IndexModel{
+		Keys: bson.D{
+			{Key: "key", Value: 1},
+		},
+		Options: options.Index().SetUnique(true),
+	})
+	if err != nil {
+		return nil, errs.Wrap(err)
+	}
+	return &ClientConfig{
+		coll: coll,
+	}, nil
 }
 
 type ClientConfig struct {
-	db *gorm.DB
-}
-
-func (o *ClientConfig) NewTx(tx any) admin.ClientConfigInterface {
-	return &ClientConfig{db: tx.(*gorm.DB)}
+	coll *mongo.Collection
 }
 
 func (o *ClientConfig) Set(ctx context.Context, config map[string]string) error {
-	err := o.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		for key, value := range config {
-			var cc admin.ClientConfig
-			if err := tx.Where("`key` = ?", key).Take(&cc).Error; err == nil {
-				if cc.Value == value {
-					continue
-				}
-				if err := tx.Where("`key` = ?", key).Model(&admin.ClientConfig{}).Update("value", value).Error; err != nil {
-					return err
-				}
-			} else if err == gorm.ErrRecordNotFound {
-				if err := tx.Create(&admin.ClientConfig{Key: key, Value: value}).Error; err != nil {
-					return err
-				}
-			} else {
-				return err
-			}
+	for key, value := range config {
+		filter := bson.M{"key": key}
+		update := bson.M{
+			"value": value,
 		}
-		return nil
-	})
-	return errs.Wrap(err)
+		err := mgoutil.UpdateOne(ctx, o.coll, filter, bson.M{"$set": update}, false, options.Update().SetUpsert(true))
+		if err != nil {
+			return err
+		}
+
+	}
+	return nil
 }
 
 func (o *ClientConfig) Del(ctx context.Context, keys []string) error {
-	return errs.Wrap(o.db.WithContext(ctx).Where("`key` in ?", keys).Delete(&admin.ClientConfig{}).Error)
+	return mgoutil.DeleteMany(ctx, o.coll, bson.M{"key": bson.M{"$in": keys}})
 }
 
 func (o *ClientConfig) Get(ctx context.Context) (map[string]string, error) {
-	var cs []*admin.ClientConfig
-	if err := o.db.WithContext(ctx).Find(&cs).Error; err != nil {
+	cs, err := mgoutil.Find[*admin.ClientConfig](ctx, o.coll, bson.M{})
+	if err != nil {
 		return nil, err
 	}
 	cm := make(map[string]string)

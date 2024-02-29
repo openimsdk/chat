@@ -16,61 +16,82 @@ package admin
 
 import (
 	"context"
-
-	"github.com/OpenIMSDK/tools/errs"
-	"github.com/OpenIMSDK/tools/ormutil"
-	"gorm.io/gorm"
+	"github.com/OpenIMSDK/tools/mgoutil"
+	"github.com/OpenIMSDK/tools/pagination"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 
 	"github.com/OpenIMSDK/chat/pkg/common/constant"
 	"github.com/OpenIMSDK/chat/pkg/common/db/table/admin"
+	"github.com/OpenIMSDK/tools/errs"
 )
 
-func NewIPForbidden(db *gorm.DB) admin.IPForbiddenInterface {
-	return &IPForbidden{db: db}
+func NewIPForbidden(db *mongo.Database) (admin.IPForbiddenInterface, error) {
+	coll := db.Collection("ip_forbidden")
+	_, err := coll.Indexes().CreateOne(context.Background(), mongo.IndexModel{
+		Keys: bson.D{
+			{Key: "ip", Value: 1},
+		},
+		Options: options.Index().SetUnique(true),
+	})
+	if err != nil {
+		return nil, errs.Wrap(err)
+	}
+	return &IPForbidden{
+		coll: coll,
+	}, nil
 }
 
 type IPForbidden struct {
-	db *gorm.DB
-}
-
-func (o *IPForbidden) NewTx(tx any) admin.IPForbiddenInterface {
-	return &IPForbidden{db: tx.(*gorm.DB)}
+	coll *mongo.Collection
 }
 
 func (o *IPForbidden) Take(ctx context.Context, ip string) (*admin.IPForbidden, error) {
-	var f admin.IPForbidden
-	return &f, errs.Wrap(o.db.WithContext(ctx).Where("ip = ?", ip).Take(&f).Error)
+	return mgoutil.FindOne[*admin.IPForbidden](ctx, o.coll, bson.M{"ip": ip})
+
 }
 
 func (o *IPForbidden) Find(ctx context.Context, ips []string) ([]*admin.IPForbidden, error) {
-	var forbiddens []*admin.IPForbidden
-	return forbiddens, errs.Wrap(o.db.WithContext(ctx).Where("ip in ?", ips).Find(&forbiddens).Error)
+	return mgoutil.Find[*admin.IPForbidden](ctx, o.coll, bson.M{"ip": bson.M{"$in": ips}})
+
 }
 
-func (o *IPForbidden) Search(ctx context.Context, keyword string, state int32, page int32, size int32) (uint32, []*admin.IPForbidden, error) {
-	db := o.db.WithContext(ctx)
+func (o *IPForbidden) Search(ctx context.Context, keyword string, state int32, pagination pagination.Pagination) (int64, []*admin.IPForbidden, error) {
+	var filter bson.M
+
 	switch state {
 	case constant.LimitNil:
+		// 不添加额外的过滤条件
 	case constant.LimitEmpty:
-		db = db.Where("limit_register = 0 and limit_login = 0")
+		filter = bson.M{"limit_register": 0, "limit_login": 0}
 	case constant.LimitOnlyRegisterIP:
-		db = db.Where("limit_register = 1 and limit_login = 0")
+		filter = bson.M{"limit_register": 1, "limit_login": 0}
 	case constant.LimitOnlyLoginIP:
-		db = db.Where("limit_register = 0 and limit_login = 1")
+		filter = bson.M{"limit_register": 0, "limit_login": 1}
 	case constant.LimitRegisterIP:
-		db = db.Where("limit_register = 1")
+		filter = bson.M{"limit_register": 1}
 	case constant.LimitLoginIP:
-		db = db.Where("limit_login = 1")
+		filter = bson.M{"limit_login": 1}
 	case constant.LimitLoginRegisterIP:
-		db = db.Where("limit_register = 1 and limit_login = 1")
+		filter = bson.M{"limit_register": 1, "limit_login": 1}
 	}
-	return ormutil.GormSearch[admin.IPForbidden](db, []string{"ip"}, keyword, page, size)
+
+	if keyword != "" {
+		filter["$or"] = []bson.M{
+			{"ip": bson.M{"$regex": keyword, "$options": "i"}},
+		}
+	}
+	return mgoutil.FindPage[*admin.IPForbidden](ctx, o.coll, filter, pagination)
 }
 
 func (o *IPForbidden) Create(ctx context.Context, ms []*admin.IPForbidden) error {
-	return errs.Wrap(o.db.WithContext(ctx).Create(&ms).Error)
+	return mgoutil.InsertMany(ctx, o.coll, ms)
 }
 
 func (o *IPForbidden) Delete(ctx context.Context, ips []string) error {
-	return errs.Wrap(o.db.WithContext(ctx).Where("ip in ?", ips).Delete(&admin.IPForbidden{}).Error)
+	if len(ips) == 0 {
+		return nil
+	}
+	return mgoutil.DeleteMany(ctx, o.coll, bson.M{"ip": bson.M{"$in": ips}})
 }

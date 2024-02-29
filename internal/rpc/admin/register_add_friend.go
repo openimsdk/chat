@@ -118,7 +118,7 @@ func (o *adminServer) SearchDefaultFriend(ctx context.Context, req *admin.Search
 	if _, err := mctx.CheckAdmin(ctx); err != nil {
 		return nil, err
 	}
-	total, infos, err := o.Database.SearchDefaultFriend(ctx, req.Keyword, req.Pagination.PageNumber, req.Pagination.ShowNumber)
+	total, infos, err := o.Database.SearchDefaultFriend(ctx, req.Keyword, req.Pagination)
 	if err != nil {
 		return nil, err
 	}
@@ -136,5 +136,5 @@ func (o *adminServer) SearchDefaultFriend(ctx context.Context, req *admin.Search
 		}
 		attributes = append(attributes, attribute)
 	}
-	return &admin.SearchDefaultFriendResp{Total: total, Users: attributes}, nil
+	return &admin.SearchDefaultFriendResp{Total: uint32(total), Users: attributes}, nil
 }

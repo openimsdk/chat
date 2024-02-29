@@ -40,36 +40,25 @@ import (
 )
 
 func Start(discov discoveryregistry.SvcDiscoveryRegistry, server *grpc.Server) error {
-	db, err := dbconn.NewGormDB()
+	db, err := dbconn.NewMongo()
 	if err != nil {
-		return errs.Wrap(err)
-	}
-	tables := []any{
-		admin2.Admin{},
-		admin2.Applet{},
-		admin2.ForbiddenAccount{},
-		admin2.InvitationRegister{},
-		admin2.IPForbidden{},
-		admin2.LimitUserLoginIP{},
-		admin2.RegisterAddFriend{},
-		admin2.RegisterAddGroup{},
-		admin2.ClientConfig{},
-	}
-	if err := db.AutoMigrate(tables...); err != nil {
-		return errs.Wrap(err)
+		return err
 	}
 	rdb, err := cache.NewRedis()
 	if err != nil {
 		return errs.Wrap(err)
 	}
 
-	adminDatabase := database.NewAdminDatabase(db, rdb)
+	adminDatabase, err := database.NewAdminDatabase(db, rdb)
+	if err != nil {
+		return err
+	}
 
 	if err := adminDatabase.InitAdmin(context.Background()); err != nil {
 		return err
 	}
 	if err := discov.CreateRpcRootNodes([]string{config.Config.RpcRegisterName.OpenImAdminName, config.Config.RpcRegisterName.OpenImChatName}); err != nil {
-		panic(errs.Wrap(err, "CreateRpcRootNodes error"))
+		return errs.Wrap(err, "CreateRpcRootNodes error")
 	}
 
 	admin.RegisterAdminServer(server, &adminServer{Database: adminDatabase,
@@ -138,7 +127,7 @@ func (o *adminServer) AddAdminAccount(ctx context.Context, req *admin.AddAdminAc
 		Level:      80,
 		CreateTime: time.Now(),
 	}
-	if err = o.Database.AddAdminAccount(ctx, adm); err != nil {
+	if err = o.Database.AddAdminAccount(ctx, []*admin2.Admin{adm}); err != nil {
 		return nil, err
 	}
 	return &admin.AddAdminAccountResp{}, nil
@@ -177,7 +166,7 @@ func (o *adminServer) SearchAdminAccount(ctx context.Context, req *admin.SearchA
 		return nil, err
 	}
 
-	total, adminAccounts, err := o.Database.SearchAdminAccount(ctx, req.Pagination.PageNumber, req.Pagination.ShowNumber)
+	total, adminAccounts, err := o.Database.SearchAdminAccount(ctx, req.Pagination)
 	if err != nil {
 		return nil, err
 	}
@@ -193,7 +182,7 @@ func (o *adminServer) SearchAdminAccount(ctx context.Context, req *admin.SearchA
 		}
 		accounts = append(accounts, temp)
 	}
-	return &admin.SearchAdminAccountResp{Total: total, AdminAccounts: accounts}, nil
+	return &admin.SearchAdminAccountResp{Total: uint32(total), AdminAccounts: accounts}, nil
 }
 
 func (o *adminServer) AdminUpdateInfo(ctx context.Context, req *admin.AdminUpdateInfoReq) (*admin.AdminUpdateInfoResp, error) {

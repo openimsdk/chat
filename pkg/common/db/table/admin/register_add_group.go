@@ -16,6 +16,7 @@ package admin
 
 import (
 	"context"
+	"github.com/OpenIMSDK/tools/pagination"
 	"time"
 )
 
@@ -31,7 +32,7 @@ func (RegisterAddGroup) TableName() string {
 
 type RegisterAddGroupInterface interface {
 	Add(ctx context.Context, registerAddGroups []*RegisterAddGroup) error
-	Del(ctx context.Context, userIDs []string) error
-	FindGroupID(ctx context.Context, userIDs []string) ([]string, error)
-	Search(ctx context.Context, keyword string, page int32, size int32) (uint32, []*RegisterAddGroup, error)
+	Del(ctx context.Context, groupIDs []string) error
+	FindGroupID(ctx context.Context, groupIDs []string) ([]string, error)
+	Search(ctx context.Context, keyword string, pagination pagination.Pagination) (int64, []*RegisterAddGroup, error)
 }

@@ -16,6 +16,7 @@ package admin
 
 import (
 	"context"
+	"github.com/OpenIMSDK/tools/pagination"
 	"time"
 )
 
@@ -38,11 +39,11 @@ func (Applet) TableName() string {
 }
 
 type AppletInterface interface {
-	Create(ctx context.Context, applets ...*Applet) error
+	Create(ctx context.Context, applets []*Applet) error
 	Del(ctx context.Context, ids []string) error
 	Update(ctx context.Context, id string, data map[string]any) error
 	Take(ctx context.Context, id string) (*Applet, error)
-	Search(ctx context.Context, keyword string, page int32, size int32) (uint32, []*Applet, error)
+	Search(ctx context.Context, keyword string, pagination pagination.Pagination) (int64, []*Applet, error)
 	FindOnShelf(ctx context.Context) ([]*Applet, error)
 	FindID(ctx context.Context, ids []string) ([]*Applet, error)
 }

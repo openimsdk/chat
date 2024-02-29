@@ -16,42 +16,52 @@ package admin
 
 import (
 	"context"
-
-	"github.com/OpenIMSDK/tools/errs"
-	"github.com/OpenIMSDK/tools/ormutil"
-	"gorm.io/gorm"
+	"github.com/OpenIMSDK/tools/mgoutil"
+	"github.com/OpenIMSDK/tools/pagination"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 
 	"github.com/OpenIMSDK/chat/pkg/common/db/table/admin"
+	"github.com/OpenIMSDK/tools/errs"
 )
 
-func NewRegisterAddGroup(db *gorm.DB) admin.RegisterAddGroupInterface {
-	return &RegisterAddGroup{db: db}
+func NewRegisterAddGroup(db *mongo.Database) (admin.RegisterAddGroupInterface, error) {
+	coll := db.Collection("register_add_group")
+	_, err := coll.Indexes().CreateOne(context.Background(), mongo.IndexModel{
+		Keys: bson.D{
+			{Key: "group_id", Value: 1},
+		},
+		Options: options.Index().SetUnique(true),
+	})
+	if err != nil {
+		return nil, errs.Wrap(err)
+	}
+	return &RegisterAddGroup{
+		coll: coll,
+	}, nil
 }
 
 type RegisterAddGroup struct {
-	db *gorm.DB
+	coll *mongo.Collection
 }
 
 func (o *RegisterAddGroup) Add(ctx context.Context, registerAddGroups []*admin.RegisterAddGroup) error {
-	return errs.Wrap(o.db.WithContext(ctx).Create(registerAddGroups).Error)
+	return mgoutil.InsertMany(ctx, o.coll, registerAddGroups)
 }
 
-func (o *RegisterAddGroup) Del(ctx context.Context, userIDs []string) error {
-	return errs.Wrap(o.db.WithContext(ctx).Where("group_id in ?", userIDs).Delete(&admin.RegisterAddGroup{}).Error)
-}
-
-func (o *RegisterAddGroup) FindGroupID(ctx context.Context, userIDs []string) ([]string, error) {
-	db := o.db.WithContext(ctx).Model(&admin.RegisterAddGroup{})
-	if len(userIDs) > 0 {
-		db = db.Where("group_id in ?", userIDs)
+func (o *RegisterAddGroup) Del(ctx context.Context, groupIDs []string) error {
+	if len(groupIDs) == 0 {
+		return nil
 	}
-	var ms []string
-	if err := db.Pluck("group_id", &ms).Error; err != nil {
-		return nil, errs.Wrap(err)
-	}
-	return ms, nil
+	return mgoutil.DeleteMany(ctx, o.coll, bson.M{"group_id": bson.M{"$in": groupIDs}})
 }
 
-func (o *RegisterAddGroup) Search(ctx context.Context, keyword string, page int32, size int32) (uint32, []*admin.RegisterAddGroup, error) {
-	return ormutil.GormSearch[admin.RegisterAddGroup](o.db.WithContext(ctx), []string{"group_id"}, keyword, page, size)
+func (o *RegisterAddGroup) FindGroupID(ctx context.Context, groupIDs []string) ([]string, error) {
+	return mgoutil.Find[string](ctx, o.coll, bson.M{"group_id": bson.M{"$in": groupIDs}}, options.Find().SetProjection(bson.M{"_id": 0, "group_id": 1}))
+}
+
+func (o *RegisterAddGroup) Search(ctx context.Context, keyword string, pagination pagination.Pagination) (int64, []*admin.RegisterAddGroup, error) {
+	filter := bson.M{"group_id": bson.M{"$regex": keyword, "$options": "i"}}
+	return mgoutil.FindPage[*admin.RegisterAddGroup](ctx, o.coll, filter, pagination)
 }

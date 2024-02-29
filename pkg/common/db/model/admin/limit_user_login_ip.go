@@ -16,43 +16,78 @@ package admin
 
 import (
 	"context"
-
-	"github.com/OpenIMSDK/tools/errs"
-	"github.com/OpenIMSDK/tools/ormutil"
-	"gorm.io/gorm"
+	"github.com/OpenIMSDK/tools/mgoutil"
+	"github.com/OpenIMSDK/tools/pagination"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 
 	"github.com/OpenIMSDK/chat/pkg/common/db/table/admin"
+	"github.com/OpenIMSDK/tools/errs"
 )
 
-func NewLimitUserLoginIP(db *gorm.DB) admin.LimitUserLoginIPInterface {
-	return &LimitUserLoginIP{db: db}
+func NewLimitUserLoginIP(db *mongo.Database) (admin.LimitUserLoginIPInterface, error) {
+	coll := db.Collection("limit_user_login_ip")
+	_, err := coll.Indexes().CreateOne(context.Background(), mongo.IndexModel{
+		Keys: bson.D{
+			{Key: "user_id", Value: 1},
+			{Key: "ip", Value: 1},
+		},
+		Options: options.Index().SetUnique(true),
+	})
+	if err != nil {
+		return nil, errs.Wrap(err)
+	}
+	return &LimitUserLoginIP{
+		coll: coll,
+	}, nil
 }
 
 type LimitUserLoginIP struct {
-	db *gorm.DB
+	coll *mongo.Collection
 }
 
 func (o *LimitUserLoginIP) Create(ctx context.Context, ms []*admin.LimitUserLoginIP) error {
-	return errs.Wrap(o.db.WithContext(ctx).Create(&ms).Error)
+	return mgoutil.InsertMany(ctx, o.coll, ms)
 }
 
 func (o *LimitUserLoginIP) Delete(ctx context.Context, ms []*admin.LimitUserLoginIP) error {
-	return errs.Wrap(o.db.WithContext(ctx).Delete(&ms).Error)
+	return mgoutil.DeleteMany(ctx, o.coll, o.limitUserLoginIPFilter(ms))
 }
 
 func (o *LimitUserLoginIP) Count(ctx context.Context, userID string) (uint32, error) {
-	var count int64
-	if err := o.db.WithContext(ctx).Model(&admin.LimitUserLoginIP{}).Where("user_id = ?", userID).Count(&count).Error; err != nil {
-		return 0, errs.Wrap(err)
+	count, err := mgoutil.Count(ctx, o.coll, bson.M{"user_id": userID})
+	if err != nil {
+		return 0, err
 	}
 	return uint32(count), nil
 }
 
 func (o *LimitUserLoginIP) Take(ctx context.Context, userID string, ip string) (*admin.LimitUserLoginIP, error) {
-	var f admin.LimitUserLoginIP
-	return &f, errs.Wrap(o.db.WithContext(ctx).Where("user_id = ? and ip = ?", userID, ip).Take(&f).Error)
+	return mgoutil.FindOne[*admin.LimitUserLoginIP](ctx, o.coll, bson.M{"user_id": userID, "ip": ip})
 }
 
-func (o *LimitUserLoginIP) Search(ctx context.Context, keyword string, page int32, size int32) (uint32, []*admin.LimitUserLoginIP, error) {
-	return ormutil.GormSearch[admin.LimitUserLoginIP](o.db.WithContext(ctx), []string{"user_id", "ip"}, keyword, page, size)
+func (o *LimitUserLoginIP) Search(ctx context.Context, keyword string, pagination pagination.Pagination) (int64, []*admin.LimitUserLoginIP, error) {
+	filter := bson.M{
+		"$or": []bson.M{
+			{"user_id": bson.M{"$regex": keyword, "$options": "i"}},
+			{"ip": bson.M{"$regex": keyword, "$options": "i"}},
+		},
+	}
+	return mgoutil.FindPage[*admin.LimitUserLoginIP](ctx, o.coll, filter, pagination)
+
+}
+
+func (o *LimitUserLoginIP) limitUserLoginIPFilter(ips []*admin.LimitUserLoginIP) bson.M {
+	if len(ips) == 0 {
+		return nil
+	}
+	or := make(bson.A, 0, len(ips))
+	for _, ip := range ips {
+		or = append(or, bson.M{
+			"user_id": ip.UserID,
+			"ip":      ip.IP,
+		})
+	}
+	return bson.M{"$or": or}
 }

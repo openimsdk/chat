@@ -62,7 +62,7 @@ func (o *adminServer) AddApplet(ctx context.Context, req *admin.AddAppletReq) (*
 	if m.ID == "" {
 		m.ID = uuid.New().String()
 	}
-	if err := o.Database.CreateApplet(ctx, &m); err != nil {
+	if err := o.Database.CreateApplet(ctx, []*admin2.Applet{&m}); err != nil {
 		return nil, err
 	}
 	return &admin.AddAppletResp{}, nil
@@ -141,11 +141,11 @@ func (o *adminServer) SearchApplet(ctx context.Context, req *admin.SearchAppletR
 	if _, err := mctx.CheckAdmin(ctx); err != nil {
 		return nil, err
 	}
-	total, applets, err := o.Database.SearchApplet(ctx, req.Keyword, req.Pagination.PageNumber, req.Pagination.ShowNumber)
+	total, applets, err := o.Database.SearchApplet(ctx, req.Keyword, req.Pagination)
 	if err != nil {
 		return nil, err
 	}
-	resp := &admin.SearchAppletResp{Total: total, Applets: make([]*common.AppletInfo, 0, len(applets))}
+	resp := &admin.SearchAppletResp{Total: uint32(total), Applets: make([]*common.AppletInfo, 0, len(applets))}
 	for _, applet := range applets {
 		resp.Applets = append(resp.Applets, &common.AppletInfo{
 			Id:         applet.ID,

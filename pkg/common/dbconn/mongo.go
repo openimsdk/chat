@@ -39,9 +39,9 @@ func NewMongo() (*mongo.Database, error) {
 			time.Sleep(time.Second) // exponential backoff could be implemented here
 			continue
 		}
-		return nil, err
+		return nil, errs.Wrap(err)
 	}
-	return nil, err
+	return nil, errs.Wrap(err)
 }
 
 func buildMongoURI() string {

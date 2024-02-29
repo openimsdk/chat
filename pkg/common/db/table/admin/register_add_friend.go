@@ -16,6 +16,7 @@ package admin
 
 import (
 	"context"
+	"github.com/OpenIMSDK/tools/pagination"
 	"time"
 )
 
@@ -33,5 +34,5 @@ type RegisterAddFriendInterface interface {
 	Add(ctx context.Context, registerAddFriends []*RegisterAddFriend) error
 	Del(ctx context.Context, userIDs []string) error
 	FindUserID(ctx context.Context, userIDs []string) ([]string, error)
-	Search(ctx context.Context, keyword string, page int32, size int32) (uint32, []*RegisterAddFriend, error)
+	Search(ctx context.Context, keyword string, pagination pagination.Pagination) (int64, []*RegisterAddFriend, error)
 }

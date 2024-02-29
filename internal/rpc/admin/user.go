@@ -19,7 +19,6 @@ import (
 	"strings"
 	"time"
 
-
 	"github.com/OpenIMSDK/chat/pkg/common/constant"
 	"github.com/OpenIMSDK/tools/log"
 
@@ -116,7 +115,7 @@ func (o *adminServer) SearchBlockUser(ctx context.Context, req *admin.SearchBloc
 		return nil, err
 	}
 	log.ZInfo(ctx, "SearchBlockUser", "RpcOpUserID", ctx.Value(constant.RpcOpUserID), "RpcOpUserType", ctx.Value(constant.RpcOpUserType))
-	total, infos, err := o.Database.SearchBlockUser(ctx, req.Keyword, req.Pagination.PageNumber, req.Pagination.ShowNumber)
+	total, infos, err := o.Database.SearchBlockUser(ctx, req.Keyword, req.Pagination)
 	if err != nil {
 		return nil, err
 	}
@@ -144,7 +143,7 @@ func (o *adminServer) SearchBlockUser(ctx context.Context, req *admin.SearchBloc
 		}
 		users = append(users, user)
 	}
-	return &admin.SearchBlockUserResp{Total: total, Users: users}, nil
+	return &admin.SearchBlockUserResp{Total: uint32(total), Users: users}, nil
 }
 
 func (o *adminServer) FindUserBlockInfo(ctx context.Context, req *admin.FindUserBlockInfoReq) (*admin.FindUserBlockInfoResp, error) {

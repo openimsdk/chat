@@ -18,7 +18,6 @@ import (
 	"context"
 	"time"
 
-
 	"github.com/OpenIMSDK/tools/log"
 
 	admin2 "github.com/OpenIMSDK/chat/pkg/common/db/table/admin"
@@ -31,13 +30,13 @@ func (o *adminServer) SearchIPForbidden(ctx context.Context, req *admin.SearchIP
 	if _, err := mctx.CheckAdmin(ctx); err != nil {
 		return nil, err
 	}
-	total, forbiddens, err := o.Database.SearchIPForbidden(ctx, req.Keyword, req.Status, req.Pagination.PageNumber, req.Pagination.ShowNumber)
+	total, forbiddens, err := o.Database.SearchIPForbidden(ctx, req.Keyword, req.Status, req.Pagination)
 	if err != nil {
 		return nil, err
 	}
 	resp := &admin.SearchIPForbiddenResp{
 		Forbiddens: make([]*admin.IPForbidden, 0, len(forbiddens)),
-		Total:      total,
+		Total:      uint32(total),
 	}
 	for _, forbidden := range forbiddens {
 		resp.Forbiddens = append(resp.Forbiddens, &admin.IPForbidden{
