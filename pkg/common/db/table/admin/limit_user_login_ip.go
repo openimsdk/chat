@@ -22,9 +22,9 @@ import (
 
 // 限制userID只能在某些ip登录.
 type LimitUserLoginIP struct {
-	UserID     string    `gorm:"column:user_id;primary_key;type:char(64)"`
-	IP         string    `gorm:"column:ip;primary_key;type:char(32)"`
-	CreateTime time.Time `gorm:"column:create_time" `
+	UserID     string    `bson:"user_id"`
+	IP         string    `bson:"ip"`
+	CreateTime time.Time `bson:"create_time"`
 }
 
 func (LimitUserLoginIP) TableName() string {

@@ -22,9 +22,9 @@ import (
 
 // 邀请码被注册使用.
 type InvitationRegister struct {
-	InvitationCode string    `gorm:"column:invitation_code;primary_key;type:char(32)"`
-	UsedByUserID   string    `gorm:"column:user_id;index:userID;type:char(64)"`
-	CreateTime     time.Time `gorm:"column:create_time"`
+	InvitationCode string    `bson:"invitation_code"`
+	UsedByUserID   string    `bson:"used_by_user_id"`
+	CreateTime     time.Time `bson:"create_time"`
 }
 
 func (InvitationRegister) TableName() string {

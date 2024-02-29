@@ -22,8 +22,8 @@ import (
 
 // RegisterAddGroup 注册时默认群组.
 type RegisterAddGroup struct {
-	GroupID    string    `gorm:"column:group_id;primary_key;type:char(64)"`
-	CreateTime time.Time `gorm:"column:create_time"`
+	GroupID    string    `bson:"group_id"`
+	CreateTime time.Time `bson:"create_time"`
 }
 
 func (RegisterAddGroup) TableName() string {

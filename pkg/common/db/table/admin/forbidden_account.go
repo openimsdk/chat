@@ -22,10 +22,10 @@ import (
 
 // ForbiddenAccount 封号表.
 type ForbiddenAccount struct {
-	UserID         string    `gorm:"column:user_id;index:userID;primary_key;type:char(64)"`
-	Reason         string    `gorm:"column:reason;type:varchar(255)" `
-	OperatorUserID string    `gorm:"column:operator_user_id;type:varchar(255)"`
-	CreateTime     time.Time `gorm:"column:create_time" `
+	UserID         string    `bson:"user_id"`
+	Reason         string    `bson:"reason"`
+	OperatorUserID string    `bson:"operator_user_id"`
+	CreateTime     time.Time `bson:"create_time"`
 }
 
 func (ForbiddenAccount) TableName() string {

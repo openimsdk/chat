@@ -69,10 +69,17 @@ func (o *VerifyCode) Add(ctx context.Context, ms []*chat.VerifyCode) error {
 		CreateTime time.Time          `bson:"create_time"`
 	}
 	tmp := make([]MongoVerifyCode, 0, len(ms))
-	for _, m := range ms {
-		objID, err := o.parseID(m.ID)
-		if err != nil {
-			return err
+	for i, m := range ms {
+		var objID primitive.ObjectID
+		if m.ID == "" {
+			objID = primitive.NewObjectID()
+			ms[i].ID = objID.Hex()
+		} else {
+			var err error
+			objID, err = o.parseID(m.ID)
+			if err != nil {
+				return err
+			}
 		}
 		tmp = append(tmp, MongoVerifyCode{
 			ID:         objID,

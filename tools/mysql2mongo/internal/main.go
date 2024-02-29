@@ -80,7 +80,7 @@ func NewTask[A interface{ TableName() string }, B any, C any](gormDB *gorm.DB, m
 	}
 	var count int
 	defer func() {
-		log.Printf("completed convertChat %s total %d\n", tableName, count)
+		log.Printf("completed convert chat %s total %d\n", tableName, count)
 	}()
 	const batch = 100
 	for page := 0; ; page++ {
@@ -105,7 +105,7 @@ func NewTask[A interface{ TableName() string }, B any, C any](gormDB *gorm.DB, m
 		if len(res) < batch {
 			return nil
 		}
-		log.Printf("current convertChat %s completed %d\n", tableName, count)
+		log.Printf("current convert chat %s completed %d\n", tableName, count)
 	}
 }
 
@@ -145,9 +145,9 @@ func Main(path string) error {
 	}
 	switch mongoDB.Collection(versionTable).FindOne(context.Background(), bson.M{"key": versionKey}).Decode(&version) {
 	case nil:
-		if ver, _ := strconv.Atoi(version.Value); ver >= versionValue {
-			return nil
-		}
+		//if ver, _ := strconv.Atoi(version.Value); ver >= versionValue {
+		//	return nil
+		//}
 	case mongo.ErrNoDocuments:
 	default:
 		return err
@@ -168,6 +168,7 @@ func Main(path string) error {
 		cc convertChat
 		ca convertAdmin
 	)
+	_, _ = cc, ca
 
 	var tasks []func() error
 	tasks = append(tasks,

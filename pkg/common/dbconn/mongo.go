@@ -76,7 +76,7 @@ func buildMongoURI() string {
 		database = *config.Config.Mongo.Database
 	}
 	if maxPoolSize == "" {
-		maxPoolSize = fmt.Sprint(config.Config.Mongo.MaxPoolSize)
+		maxPoolSize = fmt.Sprint(*config.Config.Mongo.MaxPoolSize)
 	}
 
 	uriFormat := "mongodb://%s/%s?maxPoolSize=%s"

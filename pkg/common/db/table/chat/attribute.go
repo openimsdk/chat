@@ -22,23 +22,23 @@ import (
 
 // Attribute 用户属性表.
 type Attribute struct {
-	UserID           string    `gorm:"column:user_id;primary_key;type:char(64)"`
-	Account          string    `gorm:"column:account;type:char(64)"`
-	PhoneNumber      string    `gorm:"column:phone_number;type:varchar(32)"`
-	AreaCode         string    `gorm:"column:area_code;type:varchar(8)"`
-	Email            string    `gorm:"column:email;type:varchar(64)" `
-	Nickname         string    `gorm:"column:nickname;type:varchar(64)" `
-	FaceURL          string    `gorm:"column:face_url;type:varchar(255)" `
-	Gender           int32     `gorm:"column:gender"`
-	CreateTime       time.Time `gorm:"column:create_time"`
-	ChangeTime       time.Time `gorm:"column:change_time"`
-	BirthTime        time.Time `gorm:"column:birth_time"`
-	Level            int32     `gorm:"column:level;default:1"`
-	AllowVibration   int32     `gorm:"column:allow_vibration;default:1"`
-	AllowBeep        int32     `gorm:"column:allow_beep;default:1"`
-	AllowAddFriend   int32     `gorm:"column:allow_add_friend;default:1"`
-	GlobalRecvMsgOpt int32     `gorm:"column:global_recv_msg_opt;default:0"`
-	RegisterType     int32     `gorm:"column:register_type"`
+	UserID           string    `bson:"user_id"`
+	Account          string    `bson:"account"`
+	PhoneNumber      string    `bson:"phone_number"`
+	AreaCode         string    `bson:"area_code"`
+	Email            string    `bson:"email"`
+	Nickname         string    `bson:"nickname"`
+	FaceURL          string    `bson:"face_url"`
+	Gender           int32     `bson:"gender"`
+	CreateTime       time.Time `bson:"create_time"`
+	ChangeTime       time.Time `bson:"change_time"`
+	BirthTime        time.Time `bson:"birth_time"`
+	Level            int32     `bson:"level"`
+	AllowVibration   int32     `bson:"allow_vibration"`
+	AllowBeep        int32     `bson:"allow_beep"`
+	AllowAddFriend   int32     `bson:"allow_add_friend"`
+	GlobalRecvMsgOpt int32     `bson:"global_recv_msg_opt"`
+	RegisterType     int32     `bson:"register_type"`
 }
 
 func (Attribute) TableName() string {

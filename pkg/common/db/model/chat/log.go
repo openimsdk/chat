@@ -16,13 +16,11 @@ package chat
 
 import (
 	"context"
-	"fmt"
 	"github.com/OpenIMSDK/tools/errs"
 	"github.com/OpenIMSDK/tools/mgoutil"
 	"github.com/OpenIMSDK/tools/pagination"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
-	"net/http"
 	"time"
 
 	"github.com/OpenIMSDK/chat/pkg/common/db/table/chat"
@@ -50,10 +48,6 @@ func NewLogs(db *mongo.Database) (chat.LogInterface, error) {
 
 type Logs struct {
 	coll *mongo.Collection
-}
-
-func RequestToString(req *http.Request) string {
-	return fmt.Sprintf("%s %s", req.RemoteAddr, req.Header)
 }
 
 func (l *Logs) Create(ctx context.Context, log []*chat.Log) error {

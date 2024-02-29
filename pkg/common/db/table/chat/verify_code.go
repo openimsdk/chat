@@ -20,14 +20,14 @@ import (
 )
 
 type VerifyCode struct {
-	ID         string
-	Account    string
-	Platform   string
-	Code       string
-	Duration   uint
-	Count      int
-	Used       bool
-	CreateTime time.Time
+	ID         string    `bson:"id"`
+	Account    string    `bson:"account"`
+	Platform   string    `bson:"platform"`
+	Code       string    `bson:"code"`
+	Duration   uint      `bson:"duration"`
+	Count      int       `bson:"count"`
+	Used       bool      `bson:"used"`
+	CreateTime time.Time `bson:"create_time"`
 }
 
 func (VerifyCode) TableName() string {
@@ -35,7 +35,6 @@ func (VerifyCode) TableName() string {
 }
 
 type VerifyCodeInterface interface {
-	//NewTx(tx any) VerifyCodeInterface
 	Add(ctx context.Context, ms []*VerifyCode) error
 	RangeNum(ctx context.Context, account string, start time.Time, end time.Time) (int64, error)
 	TakeLast(ctx context.Context, account string) (*VerifyCode, error)

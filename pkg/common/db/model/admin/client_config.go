@@ -26,7 +26,7 @@ import (
 )
 
 func NewClientConfig(db *mongo.Database) (admin.ClientConfigInterface, error) {
-	coll := db.Collection("ip_forbidden")
+	coll := db.Collection("client_config")
 	_, err := coll.Indexes().CreateOne(context.Background(), mongo.IndexModel{
 		Keys: bson.D{
 			{Key: "key", Value: 1},

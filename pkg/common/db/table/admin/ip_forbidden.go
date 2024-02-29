@@ -22,10 +22,10 @@ import (
 
 // 禁止ip登录 注册.
 type IPForbidden struct {
-	IP            string    `gorm:"column:ip;primary_key;type:char(32)"`
-	LimitRegister bool      `gorm:"column:limit_register"`
-	LimitLogin    bool      `gorm:"column:limit_login"`
-	CreateTime    time.Time `gorm:"column:create_time"`
+	IP            string    `bson:"ip"`
+	LimitRegister bool      `bson:"limit_register"`
+	LimitLogin    bool      `bson:"limit_login"`
+	CreateTime    time.Time `bson:"create_time"`
 }
 
 func (IPForbidden) IPForbidden() string {
