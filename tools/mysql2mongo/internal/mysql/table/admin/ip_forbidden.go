@@ -27,7 +27,7 @@ type IPForbidden struct {
 	CreateTime    time.Time `gorm:"column:create_time"`
 }
 
-func (IPForbidden) IPForbidden() string {
+func (IPForbidden) TableName() string {
 	return "ip_forbiddens"
 }
 
