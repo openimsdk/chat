@@ -19,6 +19,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func IsGormNotFound(err error) bool {
+func IsDBNotFound(err error) bool {
 	return errs.Unwrap(err) == mongo.ErrNoDocuments
 }

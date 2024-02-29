@@ -145,9 +145,9 @@ func Main(path string) error {
 	}
 	switch mongoDB.Collection(versionTable).FindOne(context.Background(), bson.M{"key": versionKey}).Decode(&version) {
 	case nil:
-		//if ver, _ := strconv.Atoi(version.Value); ver >= versionValue {
-		//	return nil
-		//}
+		if ver, _ := strconv.Atoi(version.Value); ver >= versionValue {
+			return nil
+		}
 	case mongo.ErrNoDocuments:
 	default:
 		return err

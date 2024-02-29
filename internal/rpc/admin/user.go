@@ -68,7 +68,7 @@ func (o *adminServer) BlockUser(ctx context.Context, req *admin.BlockUserReq) (*
 	_, err = o.Database.GetBlockInfo(ctx, req.UserID)
 	if err == nil {
 		return nil, errs.ErrArgs.Wrap("user already blocked")
-	} else if !dbutil.IsGormNotFound(err) {
+	} else if !dbutil.IsDBNotFound(err) {
 		return nil, err
 	}
 

@@ -133,7 +133,7 @@ func (o *chatSvr) AddUserAccount(ctx context.Context, req *chat.AddUserAccountRe
 			_, err := o.Database.GetUser(ctx, userID)
 			if err == nil {
 				continue
-			} else if dbutil.IsGormNotFound(err) {
+			} else if dbutil.IsDBNotFound(err) {
 				req.User.UserID = userID
 				break
 			} else {

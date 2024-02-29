@@ -16,6 +16,7 @@ package database
 
 import (
 	"context"
+	"github.com/OpenIMSDK/chat/pkg/common/db/dbutil"
 	"github.com/OpenIMSDK/tools/pagination"
 	"go.mongodb.org/mongo-driver/mongo"
 	"time"
@@ -25,9 +26,7 @@ import (
 	"github.com/OpenIMSDK/chat/pkg/common/db/model/chat"
 	"github.com/OpenIMSDK/chat/pkg/common/db/table/admin"
 	table "github.com/OpenIMSDK/chat/pkg/common/db/table/chat"
-	"github.com/OpenIMSDK/tools/errs"
 	"github.com/OpenIMSDK/tools/tx"
-	"gorm.io/gorm"
 )
 
 type ChatDatabaseInterface interface {
@@ -134,7 +133,7 @@ func (o *ChatDatabase) UploadLogs(ctx context.Context, logs []*table.Log) error 
 }
 
 func (o *ChatDatabase) IsNotFound(err error) bool {
-	return errs.Unwrap(err) == gorm.ErrRecordNotFound
+	return dbutil.IsDBNotFound(err)
 }
 
 func (o *ChatDatabase) GetUser(ctx context.Context, userID string) (account *table.Account, err error) {
