@@ -27,6 +27,17 @@ import (
 	"github.com/OpenIMSDK/tools/errs"
 )
 
+type mongoVerifyCode struct {
+	ID         primitive.ObjectID `bson:"_id"`
+	Account    string             `bson:"account"`
+	Platform   string             `bson:"platform"`
+	Code       string             `bson:"code"`
+	Duration   uint               `bson:"duration"`
+	Count      int                `bson:"count"`
+	Used       bool               `bson:"used"`
+	CreateTime time.Time          `bson:"create_time"`
+}
+
 func NewVerifyCode(db *mongo.Database) (chat.VerifyCodeInterface, error) {
 	coll := db.Collection("verify_code")
 	_, err := coll.Indexes().CreateMany(context.Background(), []mongo.IndexModel{
@@ -58,17 +69,7 @@ func (o *VerifyCode) parseID(s string) (primitive.ObjectID, error) {
 }
 
 func (o *VerifyCode) Add(ctx context.Context, ms []*chat.VerifyCode) error {
-	type MongoVerifyCode struct {
-		ID         primitive.ObjectID `bson:"_id"`
-		Account    string             `bson:"account"`
-		Platform   string             `bson:"platform"`
-		Code       string             `bson:"code"`
-		Duration   uint               `bson:"duration"`
-		Count      int                `bson:"count"`
-		Used       bool               `bson:"used"`
-		CreateTime time.Time          `bson:"create_time"`
-	}
-	tmp := make([]MongoVerifyCode, 0, len(ms))
+	tmp := make([]mongoVerifyCode, 0, len(ms))
 	for i, m := range ms {
 		var objID primitive.ObjectID
 		if m.ID == "" {
@@ -81,7 +82,7 @@ func (o *VerifyCode) Add(ctx context.Context, ms []*chat.VerifyCode) error {
 				return err
 			}
 		}
-		tmp = append(tmp, MongoVerifyCode{
+		tmp = append(tmp, mongoVerifyCode{
 			ID:         objID,
 			Account:    m.Account,
 			Platform:   m.Platform,
@@ -111,7 +112,20 @@ func (o *VerifyCode) TakeLast(ctx context.Context, account string) (*chat.Verify
 		"account": account,
 	}
 	opt := options.FindOne().SetSort(bson.M{"id": -1})
-	return mgoutil.FindOne[*chat.VerifyCode](ctx, o.coll, filter, opt)
+	last, err := mgoutil.FindOne[*mongoVerifyCode](ctx, o.coll, filter, opt)
+	if err != nil {
+		return nil, err
+	}
+	return &chat.VerifyCode{
+		ID:         last.ID.Hex(),
+		Account:    last.Account,
+		Platform:   last.Platform,
+		Code:       last.Code,
+		Duration:   last.Duration,
+		Count:      last.Count,
+		Used:       last.Used,
+		CreateTime: last.CreateTime,
+	}, nil
 }
 
 func (o *VerifyCode) Incr(ctx context.Context, id string) error {
