@@ -10,7 +10,6 @@ func main() {
 	var path string
 	flag.StringVar(&path, "c", "", "path config file")
 	flag.Parse()
-	path = `C:\Users\openIM\Desktop\chatconfig\config.yaml`
 	if err := internal.Main(path); err != nil {
 		log.Fatal("chat mysql2mongo error", err)
 		return
