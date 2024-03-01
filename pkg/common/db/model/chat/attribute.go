@@ -44,14 +44,12 @@ func NewAttribute(db *mongo.Database) (chat.AttributeInterface, error) {
 			Keys: bson.D{
 				{Key: "email", Value: 1},
 			},
-			Options: options.Index().SetUnique(true),
 		},
 		{
 			Keys: bson.D{
 				{Key: "area_code", Value: 1},
 				{Key: "phone_number", Value: 1},
 			},
-			Options: options.Index().SetUnique(true),
 		},
 	})
 	if err != nil {
