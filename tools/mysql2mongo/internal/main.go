@@ -168,7 +168,6 @@ func Main(path string) error {
 		cc convertChat
 		ca convertAdmin
 	)
-	_, _ = cc, ca
 
 	var tasks []func() error
 	tasks = append(tasks,
