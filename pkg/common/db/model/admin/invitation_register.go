@@ -74,7 +74,7 @@ func (o *InvitationRegister) Update(ctx context.Context, code string, data map[s
 }
 
 func (o *InvitationRegister) Search(ctx context.Context, keyword string, state int32, userIDs []string, codes []string, pagination pagination.Pagination) (int64, []*admin.InvitationRegister, error) {
-	var filter bson.M
+	filter := bson.M{}
 	switch state {
 	case constant.InvitationCodeUsed:
 		filter = bson.M{"user_id": bson.M{"$ne": ""}}

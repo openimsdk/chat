@@ -66,7 +66,7 @@ func (o *ForbiddenAccount) Find(ctx context.Context, userIDs []string) ([]*admin
 }
 
 func (o *ForbiddenAccount) Search(ctx context.Context, keyword string, pagination pagination.Pagination) (int64, []*admin.ForbiddenAccount, error) {
-	var filter bson.M
+	filter := bson.M{}
 
 	if keyword != "" {
 		filter = bson.M{

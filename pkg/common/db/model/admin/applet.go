@@ -71,7 +71,7 @@ func (o *Applet) Take(ctx context.Context, id string) (*admin.Applet, error) {
 }
 
 func (o *Applet) Search(ctx context.Context, keyword string, pagination pagination.Pagination) (int64, []*admin.Applet, error) {
-	var filter bson.M
+	filter := bson.M{}
 
 	if keyword != "" {
 		filter = bson.M{

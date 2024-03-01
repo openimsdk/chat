@@ -58,7 +58,7 @@ func (o *IPForbidden) Find(ctx context.Context, ips []string) ([]*admin.IPForbid
 }
 
 func (o *IPForbidden) Search(ctx context.Context, keyword string, state int32, pagination pagination.Pagination) (int64, []*admin.IPForbidden, error) {
-	var filter bson.M
+	filter := bson.M{}
 
 	switch state {
 	case constant.LimitNil:
