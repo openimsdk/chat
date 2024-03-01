@@ -25,7 +25,7 @@ import (
 )
 
 func NewUserLoginRecord(db *mongo.Database) (chat.UserLoginRecordInterface, error) {
-	coll := db.Collection("register")
+	coll := db.Collection("user_login_record")
 	_, err := coll.Indexes().CreateMany(context.Background(), []mongo.IndexModel{
 		{
 			Keys: bson.D{
