@@ -128,6 +128,7 @@ func insertMany(coll *mongo.Collection, objs []any) error {
 }
 
 func Main(path string) error {
+	defer log.Println("mysql2mongo return")
 	if err := InitConfig(path); err != nil {
 		return err
 	}
@@ -143,7 +144,7 @@ func Main(path string) error {
 		Key   string `bson:"key"`
 		Value string `bson:"value"`
 	}
-	switch mongoDB.Collection(versionTable).FindOne(context.Background(), bson.M{"key": versionKey}).Decode(&version) {
+	switch err := mongoDB.Collection(versionTable).FindOne(context.Background(), bson.M{"key": versionKey}).Decode(&version); err {
 	case nil:
 		if ver, _ := strconv.Atoi(version.Value); ver >= versionValue {
 			return nil

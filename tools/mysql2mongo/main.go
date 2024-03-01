@@ -10,6 +10,7 @@ func main() {
 	var path string
 	flag.StringVar(&path, "c", "", "path config file")
 	flag.Parse()
+	log.SetFlags(log.Llongfile | log.Ldate | log.Ltime)
 	if err := internal.Main(path); err != nil {
 		log.Fatal("chat mysql2mongo error", err)
 		return

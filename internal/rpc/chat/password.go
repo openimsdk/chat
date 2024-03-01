@@ -16,8 +16,6 @@ package chat
 
 import (
 	"context"
-	"github.com/OpenIMSDK/chat/pkg/common/config"
-	constant2 "github.com/OpenIMSDK/protocol/constant"
 	"github.com/OpenIMSDK/tools/log"
 
 	"github.com/OpenIMSDK/tools/errs"
@@ -106,15 +104,15 @@ func (o *chatSvr) ChangePassword(ctx context.Context, req *chat.ChangePasswordRe
 		}
 	}
 
-	imToken, err := o.imApiCaller.UserToken(ctx, config.GetIMAdmin(mctx.GetOpUserID(ctx)), constant2.AdminPlatformID)
-	if err != nil {
-		return nil, err
-	}
-
-	err = o.imApiCaller.ForceOffLine(mctx.WithApiToken(ctx, imToken), req.UserID)
-	if err != nil {
-		return nil, err
-	}
+	//imToken, err := o.imApiCaller.UserToken(ctx, config.GetIMAdmin(mctx.GetOpUserID(ctx)), constant2.AdminPlatformID)
+	//if err != nil {
+	//	return nil, err
+	//}
+	//
+	//err = o.imApiCaller.ForceOffLine(mctx.WithApiToken(ctx, imToken), req.UserID)
+	//if err != nil {
+	//	return nil, err
+	//}
 
 	return &chat.ChangePasswordResp{}, nil
 }
