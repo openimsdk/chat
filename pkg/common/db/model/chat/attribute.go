@@ -21,6 +21,7 @@ import (
 	"github.com/OpenIMSDK/tools/pagination"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 
 	"github.com/OpenIMSDK/chat/pkg/common/db/table/chat"
 )
@@ -32,22 +33,26 @@ func NewAttribute(db *mongo.Database) (chat.AttributeInterface, error) {
 			Keys: bson.D{
 				{Key: "user_id", Value: 1},
 			},
+			Options: options.Index().SetUnique(true),
 		},
 		{
 			Keys: bson.D{
 				{Key: "account", Value: 1},
 			},
+			Options: options.Index().SetUnique(true),
 		},
 		{
 			Keys: bson.D{
 				{Key: "email", Value: 1},
 			},
+			Options: options.Index().SetUnique(true),
 		},
 		{
 			Keys: bson.D{
 				{Key: "area_code", Value: 1},
 				{Key: "phone_number", Value: 1},
 			},
+			Options: options.Index().SetUnique(true),
 		},
 	})
 	if err != nil {
@@ -135,7 +140,10 @@ func (o *Attribute) SearchNormalUser(ctx context.Context, keyword string, forbid
 			{"phone_number": bson.M{"$regex": keyword, "$options": "i"}},
 		}
 	}
-	return mgoutil.FindPage[*chat.Attribute](ctx, o.coll, filter, pagination)
+	total, res, err := mgoutil.FindPage[*chat.Attribute](ctx, o.coll, filter, pagination)
+
+	return total, res, err
+	//return mgoutil.FindPage[*chat.Attribute](ctx, o.coll, filter, pagination)
 }
 
 func (o *Attribute) SearchUser(ctx context.Context, keyword string, userIDs []string, genders []int32, pagination pagination.Pagination) (int64, []*chat.Attribute, error) {

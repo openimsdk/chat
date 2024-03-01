@@ -21,6 +21,7 @@ import (
 	"github.com/OpenIMSDK/tools/pagination"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"time"
 
 	"github.com/OpenIMSDK/chat/pkg/common/db/table/chat"
@@ -33,6 +34,7 @@ func NewLogs(db *mongo.Database) (chat.LogInterface, error) {
 			Keys: bson.D{
 				{Key: "log_id", Value: 1},
 			},
+			Options: options.Index().SetUnique(true),
 		},
 		{
 			Keys: bson.D{
