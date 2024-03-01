@@ -140,10 +140,7 @@ func (o *Attribute) SearchNormalUser(ctx context.Context, keyword string, forbid
 			{"phone_number": bson.M{"$regex": keyword, "$options": "i"}},
 		}
 	}
-	total, res, err := mgoutil.FindPage[*chat.Attribute](ctx, o.coll, filter, pagination)
-
-	return total, res, err
-	//return mgoutil.FindPage[*chat.Attribute](ctx, o.coll, filter, pagination)
+	return mgoutil.FindPage[*chat.Attribute](ctx, o.coll, filter, pagination)
 }
 
 func (o *Attribute) SearchUser(ctx context.Context, keyword string, userIDs []string, genders []int32, pagination pagination.Pagination) (int64, []*chat.Attribute, error) {
