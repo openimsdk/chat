@@ -68,12 +68,12 @@ func getColl(obj any) (_ *mongo.Collection, err error) {
 
 // NewTask A mysql table B mongodb model C mongodb table
 func NewTask[A interface{ TableName() string }, B any, C any](gormDB *gorm.DB, mongoDB *mongo.Database, mongoDBInit func(db *mongo.Database) (B, error), convert func(v A) C) error {
-	obj, err := mongoDBInit(mongoDB)
-	if err != nil {
-		return err
-	}
 	var zero A
 	tableName := zero.TableName()
+	obj, err := mongoDBInit(mongoDB)
+	if err != nil {
+		return fmt.Errorf("init mongo table %s failed, err: %w", tableName, err)
+	}
 	coll, err := getColl(obj)
 	if err != nil {
 		return fmt.Errorf("get mongo collection %s failed, err: %w", tableName, err)
