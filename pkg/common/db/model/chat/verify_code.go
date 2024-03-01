@@ -111,7 +111,7 @@ func (o *VerifyCode) TakeLast(ctx context.Context, account string) (*chat.Verify
 	filter := bson.M{
 		"account": account,
 	}
-	opt := options.FindOne().SetSort(bson.M{"id": -1})
+	opt := options.FindOne().SetSort(bson.M{"_id": -1})
 	last, err := mgoutil.FindOne[*mongoVerifyCode](ctx, o.coll, filter, opt)
 	if err != nil {
 		return nil, err
