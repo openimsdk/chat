@@ -19,7 +19,6 @@ import (
 	"github.com/OpenIMSDK/tools/mgoutil"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 	"time"
 
 	"github.com/OpenIMSDK/chat/pkg/common/db/table/chat"
@@ -33,7 +32,6 @@ func NewRegister(db *mongo.Database) (chat.RegisterInterface, error) {
 			Keys: bson.D{
 				{Key: "user_id", Value: 1},
 			},
-			Options: options.Index().SetUnique(true),
 		},
 	})
 	if err != nil {
