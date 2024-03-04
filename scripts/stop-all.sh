@@ -35,7 +35,7 @@ for binary_path in "${binary_full_paths[@]}"; do
     fi
 done
 
-
+echo "start check"
 
 
 all_services_stopped=true
