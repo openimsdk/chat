@@ -23,7 +23,7 @@ OPENIM_ROOT=$(dirname "${SCRIPTS_ROOT}")/..
 source $SCRIPTS_ROOT/style_info.sh
 source $SCRIPTS_ROOT/path_info.sh
 source $SCRIPTS_ROOT/function.sh
-source $SCRIPTS_ROOT/utils.sh
+source $SCRIPTS_ROOT/util.sh
 
 # if [ ! -d "${OPENIM_ROOT}/_output/bin/platforms" ]; then
 #   cd $OPENIM_ROOT
