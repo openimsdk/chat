@@ -46,7 +46,7 @@ source $SCRIPTS_ROOT/util.sh
 all_services_running=true
 
 for binary_path in "${binary_full_paths[@]}"; do
-    check_services_with_name "$binary_path"
+    result=$(check_services_with_name "$binary_path")
     if [ $? -ne 0 ]; then
         all_services_running=false
         # Print the binary path in red for not running services
