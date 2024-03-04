@@ -296,7 +296,7 @@ cover: test
 .PHONY: start
 start:
 	@echo "===========> Starting the service"
-	@$(ROOT_DIR)/scripts/start_all.sh
+	@$(ROOT_DIR)/scripts/start-all.sh
 
 ## check: Check the chat all service.
 .PHONY: check

@@ -166,7 +166,7 @@ $ make all
 ```bash
 $ make start_all
 # OR use scripts start
-$ ./scripts/start_all.sh
+$ ./scripts/start-all.sh
 ```
 
 ### Chat Detection
