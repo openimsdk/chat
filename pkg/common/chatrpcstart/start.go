@@ -20,7 +20,6 @@ import (
 	"fmt"
 	"github.com/OpenIMSDK/chat/pkg/util"
 	"net"
-	"net/http"
 	"os"
 	"os/signal"
 	"strconv"
@@ -74,9 +73,8 @@ func Start(rpcPort int, rpcRegisterName string, prometheusPort int, rpcFn func(c
 	defer listener.Close()
 
 	var (
-		netDone    = make(chan struct{}, 1)
-		netErr     error
-		httpServer *http.Server
+		netDone = make(chan struct{}, 1)
+		netErr  error
 	)
 
 	go func() {
@@ -96,12 +94,6 @@ func Start(rpcPort int, rpcRegisterName string, prometheusPort int, rpcFn func(c
 		defer cancel()
 		if err := gracefulStopWithCtx(ctx, srv.GracefulStop); err != nil {
 			return err
-		}
-		ctx, cancel = context.WithTimeout(context.Background(), 15*time.Second)
-		defer cancel()
-		err := httpServer.Shutdown(ctx)
-		if err != nil {
-			return errs.Wrap(err, "shutdown err")
 		}
 	case <-netDone:
 		close(netDone)
