@@ -72,8 +72,8 @@ jobs:
     - name: Build Chat
       run: |
         make build
-        chmod +x ./scripts/build_all_service.sh
-        ./scripts/build_all_service.sh
+        chmod +x ./scripts/build-all-service.sh
+        ./scripts/build-all-service.sh
       shell: bash
 
     - name: deploy all services

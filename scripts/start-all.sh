@@ -27,8 +27,8 @@ source $SCRIPTS_ROOT/util.sh
 
 # if [ ! -d "${OPENIM_ROOT}/_output/bin/platforms" ]; then
 #   cd $OPENIM_ROOT
-#   # exec build_all_service.sh
-#   "${SCRIPTS_ROOT}/build_all_service.sh"
+#   # exec build-all-service.sh
+#   "${SCRIPTS_ROOT}/build-all-service.sh"
 # fi
 
 bin_dir="$BIN_DIR"
@@ -105,7 +105,7 @@ for ((i = 0; i < ${#service_filename[*]}; i++)); do
     if [ ! -e "$bin_dir/${service_filename[$i]}" ]; then
       echo -e  ${RED_PREFIX}"Error: ${service_filename[$i]} does not exist,Start fail!"${COLOR_SUFFIX}
       echo "start build these binary"
-      "./build_all_service.sh"
+      "./build-all-service.sh"
     fi
     #Start the service in the background
     cmd="$bin_dir/${service_filename[$i]} -port ${service_ports[$j]} --config_folder_path ${config_path}"
