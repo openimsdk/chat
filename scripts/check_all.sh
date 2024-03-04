@@ -26,10 +26,10 @@ if [ "$1" == "--print-screen" ]; then
     PRINT_SCREEN=1
 fi
 
-mkdir -p ${SCRIPTS_ROOT}/../logs
+mkdir -p ${SCRIPTS_ROOT}/../_output/logs
 
 if [ -z "$PRINT_SCREEN" ]; then
-    exec >> ${SCRIPTS_ROOT}/../logs/chat_$(date '+%Y%m%d').log 2>&1
+    exec >> ${SCRIPTS_ROOT}/../_output/logs/chat_$(date '+%Y%m%d').log 2>&1
 fi
 
 #Include shell font styles and some basic information
@@ -125,7 +125,7 @@ for i in "${!service_ports[@]}"; do
 
   if [[ "$found_port" != true ]]; then
     echo -e "${YELLOW_PREFIX}${new_service_name}${COLOR_SUFFIX}${RED_PREFIX} service does not start normally, expected port is ${COLOR_SUFFIX}${YELLOW_PREFIX}${service_port}${COLOR_SUFFIX}"
-    echo -e "${RED_PREFIX}please check ${SCRIPTS_ROOT}/../logs/chat_$(date '+%Y%m%d').log ${COLOR_SUFFIX}"
+    echo -e "${RED_PREFIX}please check ${SCRIPTS_ROOT}/../_output/logs/chat_$(date '+%Y%m%d').log ${COLOR_SUFFIX}"
     cat ${logs_dir}/chat_err_$(date '+%Y%m%d').log
     exit -1
   fi
