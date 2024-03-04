@@ -22,26 +22,40 @@ source $OPENIM_ROOT/scripts/style_info.sh
 source $OPENIM_ROOT/scripts/path_info.sh
 source $SCRIPTS_ROOT/function.sh
 
-service_port_name=(
- openImChatApiPort
- openImAdminApiPort
-   #api port name
-   openImAdminPort
-   openImChatPort
-)
 
-for i in ${service_port_name[*]}; do
-  list=$(cat $OPENIM_ROOT/config/config.yaml | grep -w ${i} | awk -F '[:]' '{print $NF}')
-  list_to_string $list
-  for j in ${ports_array}; do
-      name="ps aux |grep -w $j |grep -v grep"
-      count="${name}| wc -l"
-      if [ $(eval ${count}) -gt 0 ]; then
-        pid="${name}| awk '{print \$2}'"
-        echo -e "${SKY_BLUE_PREFIX}Killing service:$i pid:$(eval $pid)${COLOR_SUFFIX}"
-        #kill the service that existed
-        kill -9 $(eval $pid)
-        echo -e "${SKY_BLUE_PREFIX}service:$i was killed ${COLOR_SUFFIX}"
-      fi
-  done
+
+
+
+# Loop through each binary full path and attempt to stop the service
+for binary_path in "${binary_full_paths[@]}"; do
+    stop_services_with_name "$binary_path"
+    ret_val=$?
+    if [ $ret_val -ne 0 ]; then
+        # Print detailed error log if stop_services_with_name function returns a non-zero value
+        echo "Error stopping service at path $binary_path"
+    fi
 done
+
+
+
+
+all_services_stopped=true
+
+for binary_path in "${binary_full_paths[@]}"; do
+    check_services_with_name "$binary_path"
+    if [ $? -eq 0 ]; then
+        all_services_stopped=false
+        # Print the binary path in red to indicate the service is still running
+        echo -e "\033[0;31mService still running: $binary_path\033[0m"
+    fi
+done
+
+if $all_services_stopped; then
+    # Print "All services stopped" in green to indicate success
+    echo -e "\033[0;32mAll services stopped\033[0m"
+else
+    # Print error message indicating not all services are stopped
+    echo -e "\033[0;31mError: Not all services have been stopped.\033[0m"
+fi
+
+

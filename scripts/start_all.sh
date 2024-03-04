@@ -113,11 +113,30 @@ for ((i = 0; i < ${#service_filename[*]}; i++)); do
     fi
     echo $cmd
     nohup $cmd >> ${logs_dir}/chat_$(date '+%Y%m%d').log 2> >(tee -a ${logs_dir}/chat_err_$(date '+%Y%m%d').log ${logs_dir}/chat_tmp_$(date '+%Y%m%d').log) &
-
-    sleep 2
-#    pid="netstat -ntlp|grep $j |awk '{printf \$7}'|cut -d/ -f1"
-#    echo -e "${GREEN_PREFIX}${service_filename[$i]} start success,port number:${service_ports[$j]} pid:$(eval $pid)$COLOR_SUFFIX"
   done
 done
 
-echo -e "${SKY_BLUE_PREFIX}All services have been started successfully${COLOR_SUFFIX}"
+
+
+all_services_running=true
+
+for binary_path in "${binary_full_paths[@]}"; do
+    check_services_with_name "$binary_path"
+    if [ $? -ne 0 ]; then
+        all_services_running=false
+        # Print the binary path in red for not running services
+        echo -e "\033[0;31mService not running: $binary_path\033[0m"
+    fi
+done
+
+if $all_services_running; then
+    # Print "Startup successful" in green
+    echo -e "\033[0;32mStartup successful\033[0m"
+else
+    echo "One or more services are not running."
+fi
+
+
+
+
+
