@@ -58,8 +58,11 @@ func (o *RegisterAddFriend) Del(ctx context.Context, userIDs []string) error {
 }
 
 func (o *RegisterAddFriend) FindUserID(ctx context.Context, userIDs []string) ([]string, error) {
-	return mgoutil.Find[string](ctx, o.coll, bson.M{"user_id": bson.M{"$in": userIDs}}, options.Find().SetProjection(bson.M{"_id": 0, "user_id": 1}))
-
+	filter := bson.M{}
+	if len(userIDs) > 0 {
+		filter["user_id"] = bson.M{"$in": userIDs}
+	}
+	return mgoutil.Find[string](ctx, o.coll, filter, options.Find().SetProjection(bson.M{"_id": 0, "user_id": 1}))
 }
 
 func (o *RegisterAddFriend) Search(ctx context.Context, keyword string, pagination pagination.Pagination) (int64, []*admin.RegisterAddFriend, error) {

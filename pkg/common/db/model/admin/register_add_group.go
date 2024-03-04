@@ -58,7 +58,11 @@ func (o *RegisterAddGroup) Del(ctx context.Context, groupIDs []string) error {
 }
 
 func (o *RegisterAddGroup) FindGroupID(ctx context.Context, groupIDs []string) ([]string, error) {
-	return mgoutil.Find[string](ctx, o.coll, bson.M{"group_id": bson.M{"$in": groupIDs}}, options.Find().SetProjection(bson.M{"_id": 0, "group_id": 1}))
+	filter := bson.M{}
+	if len(groupIDs) > 0 {
+		filter["group_id"] = bson.M{"$in": groupIDs}
+	}
+	return mgoutil.Find[string](ctx, o.coll, filter, options.Find().SetProjection(bson.M{"_id": 0, "group_id": 1}))
 }
 
 func (o *RegisterAddGroup) Search(ctx context.Context, keyword string, pagination pagination.Pagination) (int64, []*admin.RegisterAddGroup, error) {
