@@ -15,9 +15,17 @@
 package chatrpcstart
 
 import (
+	"context"
+	"errors"
 	"fmt"
+	"github.com/OpenIMSDK/chat/pkg/util"
 	"net"
+	"net/http"
+	"os"
+	"os/signal"
 	"strconv"
+	"syscall"
+	"time"
 
 	"github.com/OpenIMSDK/chat/pkg/common/config"
 	chatMw "github.com/OpenIMSDK/chat/pkg/common/mw"
@@ -26,7 +34,6 @@ import (
 	"github.com/OpenIMSDK/tools/errs"
 	"github.com/OpenIMSDK/tools/mw"
 	"github.com/OpenIMSDK/tools/network"
-	"github.com/OpenIMSDK/tools/utils"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -47,7 +54,7 @@ func Start(rpcPort int, rpcRegisterName string, prometheusPort int, rpcFn func(c
 	zkClient.AddOption(chatMw.AddUserType(), mw.GrpcClient(), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	registerIP, err := network.GetRpcRegisterIP(config.Config.Rpc.RegisterIP)
 	if err != nil {
-		return utils.Wrap1(err)
+		return errs.Wrap(err)
 	}
 	srv := grpc.NewServer(append(options, mw.GrpcServer())...)
 	defer srv.GracefulStop()
@@ -57,12 +64,62 @@ func Start(rpcPort int, rpcRegisterName string, prometheusPort int, rpcFn func(c
 	}
 	err = zkClient.Register(rpcRegisterName, registerIP, rpcPort, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		return utils.Wrap1(err)
+		return errs.Wrap(err)
 	}
-	listener, err := net.Listen("tcp", net.JoinHostPort(network.GetListenIP(config.Config.Rpc.ListenIP), strconv.Itoa(rpcPort)))
+	rpcTcpAddr := net.JoinHostPort(network.GetListenIP(config.Config.Rpc.ListenIP), strconv.Itoa(rpcPort))
+	listener, err := net.Listen("tcp", rpcTcpAddr)
 	if err != nil {
-		return utils.Wrap1(err)
+		return errs.Wrap(err)
 	}
 	defer listener.Close()
-	return utils.Wrap1(srv.Serve(listener))
+
+	var (
+		netDone    = make(chan struct{}, 1)
+		netErr     error
+		httpServer *http.Server
+	)
+
+	go func() {
+		err := srv.Serve(listener)
+		if err != nil {
+			netErr = errs.Wrap(err, "rpc start err: ", rpcTcpAddr)
+			netDone <- struct{}{}
+		}
+	}()
+
+	sigs := make(chan os.Signal, 1)
+	signal.Notify(sigs, syscall.SIGTERM)
+	select {
+	case <-sigs:
+		util.SIGTERMExit()
+		ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+		defer cancel()
+		if err := gracefulStopWithCtx(ctx, srv.GracefulStop); err != nil {
+			return err
+		}
+		ctx, cancel = context.WithTimeout(context.Background(), 15*time.Second)
+		defer cancel()
+		err := httpServer.Shutdown(ctx)
+		if err != nil {
+			return errs.Wrap(err, "shutdown err")
+		}
+	case <-netDone:
+		close(netDone)
+		return netErr
+	}
+	return nil
+}
+
+func gracefulStopWithCtx(ctx context.Context, f func()) error {
+	done := make(chan struct{}, 1)
+	go func() {
+		f()
+		close(done)
+	}()
+	select {
+	case <-ctx.Done():
+		return errs.Wrap(errors.New("timeout, ctx graceful stop"))
+	case <-done:
+		return nil
+	}
 }
