@@ -119,4 +119,5 @@ require (
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/square/go-jose.v2 v2.6.0 // indirect
 )
-replace github.com/OpenIMSDK/tools v0.0.31 => github.com/luhaoling/tools f80c9c52d62b9d1745859770fb08d5513117282b
+
+replace github.com/OpenIMSDK/tools v0.0.31 => github.com/luhaoling/tools v0.0.0-20240301084400-f80c9c52d62b
