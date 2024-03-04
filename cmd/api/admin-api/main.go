@@ -133,8 +133,8 @@ func main() {
 		util.ExitWithError(netErr)
 	}
 
-	if err := engine.Run(address); err != nil {
-		fmt.Fprintf(os.Stderr, "\n\nexit -1: \n%+v\n\n", err)
-		os.Exit(-1)
-	}
+	//if err := engine.Run(address); err != nil {
+	//	fmt.Fprintf(os.Stderr, "\n\nexit -1: \n%+v\n\n", err)
+	//	os.Exit(-1)
+	//}
 }
