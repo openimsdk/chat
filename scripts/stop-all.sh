@@ -41,7 +41,7 @@ echo "start check"
 all_services_stopped=true
 
 for binary_path in "${binary_full_paths[@]}"; do
-    check_services_with_name "$binary_path"
+  result=$(check_services_with_name "$binary_path")
     if [ $? -eq 0 ]; then
         all_services_stopped=false
         # Print the binary path in red to indicate the service is still running
