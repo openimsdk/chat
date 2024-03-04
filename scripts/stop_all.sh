@@ -21,8 +21,7 @@ OPENIM_ROOT=$(cd $(dirname "${BASH_SOURCE[0]}")/.. &&pwd)
 source $OPENIM_ROOT/scripts/style_info.sh
 source $OPENIM_ROOT/scripts/path_info.sh
 source $SCRIPTS_ROOT/function.sh
-
-
+source $SCRIPTS_ROOT/util.sh
 
 
 
