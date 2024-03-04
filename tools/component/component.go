@@ -16,6 +16,8 @@ package component
 
 import (
 	"fmt"
+	"github.com/OpenIMSDK/tools/errs"
+	"strings"
 	"time"
 
 	"github.com/OpenIMSDK/chat/pkg/common/config"
@@ -23,39 +25,45 @@ import (
 )
 
 var (
-	MaxConnectTimes = 200
+	MaxConnectTimes = 100
 )
 
 type checkFunc struct {
 	name     string
-	function func() (string, error)
+	function func() error
+	flag     bool
 }
 
 func ComponentCheck() error {
-	var err error
-	var strInfo string
 	if config.Config.Envs.Discovery != "k8s" {
 		checks := []checkFunc{
 			{name: "Zookeeper", function: checkZookeeper},
 			{name: "Redis", function: checkRedis},
-			{name: "MySQL", function: checkMySQL},
+			//{name: "Mongo", function: checkMongo, config: conf},
 		}
 
-		for i := 0; i < component.MaxRetry; i++ {
+		for i := 0; i < MaxConnectTimes; i++ {
 			if i != 0 {
 				time.Sleep(1 * time.Second)
 			}
 			fmt.Printf("Checking components Round %v...\n", i+1)
 
+			var err error
 			allSuccess := true
-			for _, check := range checks {
-				strInfo, err = check.function()
-				if err != nil {
-					component.ErrorPrint(fmt.Sprintf("Starting %s failed, %v", check.name, err))
-					allSuccess = false
-					break
-				} else {
-					component.SuccessPrint(fmt.Sprintf("%s connected successfully, %s", check.name, strInfo))
+			for index, check := range checks {
+				if !check.flag {
+					err = check.function()
+					if err != nil {
+						allSuccess = false
+						component.ErrorPrint(fmt.Sprintf("Starting %s failed:%v.", check.name, errs.Unwrap(err).Error()))
+						if !strings.Contains(errs.Unwrap(err).Error(), "connection refused") &&
+							!strings.Contains(errs.Unwrap(err).Error(), "timeout waiting") {
+							return err
+						}
+					} else {
+						checks[index].flag = true
+						component.SuccessPrint(fmt.Sprintf("%s connected successfully", check.name))
+					}
 				}
 			}
 
@@ -65,52 +73,43 @@ func ComponentCheck() error {
 			}
 		}
 	}
-	return err
+	return errs.Wrap(fmt.Errorf("components started failed"))
 }
 
 // checkZookeeper checks the Zookeeper connection
-func checkZookeeper() (string, error) {
-	// Prioritize environment variables
-	zk := &component.Zookeeper{
+func checkZookeeper() error {
+	zkStu := &component.Zookeeper{
 		Schema:   config.Config.Zookeeper.Schema,
 		ZkAddr:   config.Config.Zookeeper.ZkAddr,
 		Username: config.Config.Zookeeper.Username,
 		Password: config.Config.Zookeeper.Password,
 	}
-
-	str, err := component.CheckZookeeper(zk)
-	if err != nil {
-		return "", err
-	}
-	return str, nil
+	err := component.CheckZookeeper(zkStu)
+	return err
 }
 
 // checkRedis checks the Redis connection
-func checkRedis() (string, error) {
-	redis := &component.Redis{
+func checkRedis() error {
+	redisStu := &component.Redis{
 		Address:  *config.Config.Redis.Address,
 		Username: config.Config.Redis.Username,
 		Password: config.Config.Redis.Password,
 	}
-
-	str, err := component.CheckRedis(redis)
-	if err != nil {
-		return "", err
-	}
-	return str, nil
+	err := component.CheckRedis(redisStu)
+	return err
 }
 
-func checkMySQL() (string, error) {
-
-	mysql := &component.MySQL{
-		Address:  *config.Config.Mysql.Address,
-		Username: *config.Config.Mysql.Username,
-		Password: *config.Config.Mysql.Password,
-		Database: *config.Config.Mysql.Database,
-	}
-	str, err := component.CheckMySQL(mysql)
-	if err != nil {
-		return "", err
-	}
-	return str, nil
-}
+// checkMongo checks the MongoDB connection without retries
+//func checkMongo(config *config.GlobalConfig) error {
+//	mongoStu := &component.Mongo{
+//		URL:         config.Mongo.Uri,
+//		Address:     config.Mongo.Address,
+//		Database:    config.Mongo.Database,
+//		Username:    config.Mongo.Username,
+//		Password:    config.Mongo.Password,
+//		MaxPoolSize: config.Mongo.MaxPoolSize,
+//	}
+//	err := component.CheckMongo(mongoStu)
+//
+//	return err
+//}
