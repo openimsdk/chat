@@ -166,7 +166,7 @@ $ make all
 ```bash
 $ make start_all
 # OR use scripts start
-$ ./scripts/start_all.sh
+$ ./scripts/start-all.sh
 ```
 
 ### Chat Detection
@@ -174,7 +174,7 @@ $ ./scripts/start_all.sh
 ```bash
 $ make check
 # OR use scripts check
-$ ./scripts/check_all.sh --print-screen
+$ ./scripts/check-all.sh --print-screen
 ```
 
 ### Chat Stop
@@ -182,7 +182,7 @@ $ ./scripts/check_all.sh --print-screen
 ```bash
 $ make stop
 # OR use scripts stop
-$ ./scripts/stop_all.sh
+$ ./scripts/stop-all.sh
 ```
 ## Add REST RPC API
 

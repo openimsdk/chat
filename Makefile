@@ -296,19 +296,19 @@ cover: test
 .PHONY: start
 start:
 	@echo "===========> Starting the service"
-	@$(ROOT_DIR)/scripts/start_all.sh
+	@$(ROOT_DIR)/scripts/start-all.sh
 
 ## check: Check the chat all service.
 .PHONY: check
 check:
 	@echo "===========> Checking the service"
-	@$(ROOT_DIR)/scripts/check_all.sh --print-screen
+	@$(ROOT_DIR)/scripts/check-all.sh --print-screen
 
 ## stop: Stop the chat all service.
 .PHONY: stop
 stop:
 	@echo "===========> Stopping the service"
-	@$(ROOT_DIR)/scripts/stop_all.sh
+	@$(ROOT_DIR)/scripts/stop-all.sh
 
 ## restart: Restart openim chat
 .PHONY: restart
