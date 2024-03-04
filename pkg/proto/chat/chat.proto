@@ -313,6 +313,16 @@ message SearchUserInfoResp {
   repeated OpenIMChat.common.UserFullInfo users = 2;
 }
 
+message GetTokenForVideoMeetingReq {
+  string room = 1;
+  string identity = 2;
+}
+
+message GetTokenForVideoMeetingResp {
+  string serverUrl = 1;
+  string token = 2;
+}
+
 service chat {
   // Edit personal information - called by the user or an administrator
   rpc UpdateUserInfo(UpdateUserInfoReq) returns(UpdateUserInfoResp);
@@ -347,4 +357,7 @@ service chat {
   rpc SearchLogs(SearchLogsReq) returns (SearchLogsResp);
 
   rpc SearchUserInfo(SearchUserInfoReq)returns(SearchUserInfoResp);
+
+  // Audio/video call and video meeting
+  rpc GetTokenForVideoMeeting(GetTokenForVideoMeetingReq) returns (GetTokenForVideoMeetingResp);
 }

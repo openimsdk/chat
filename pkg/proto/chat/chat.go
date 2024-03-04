@@ -267,6 +267,16 @@ func (x *SearchLogsReq) Check() error {
 	return nil
 }
 
+func (x *GetTokenForVideoMeetingReq) Check() error {
+	if x.Room == "" {
+		errs.ErrArgs.Wrap("Room is empty")
+	}
+	if x.Identity == "" {
+		errs.ErrArgs.Wrap("User Identity is empty")
+	}
+	return nil
+}
+
 func EmailCheck(email string) error {
 	pattern := `^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`
 	if err := regexMatch(pattern, email); err != nil {
