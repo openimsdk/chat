@@ -26,7 +26,7 @@ source "$SCRIPTS_ROOT/path_info.sh"
 source "$SCRIPTS_ROOT/function.sh"
 
 bin_dir="$BIN_DIR"
-logs_dir="$SCRIPTS_ROOT/../logs"
+logs_dir="$SCRIPTS_ROOT/../_output/logs"
 
 if [ ! -d "$logs_dir" ]; then
     echo "mkdir -p $logs_dir"
