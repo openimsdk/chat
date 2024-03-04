@@ -63,7 +63,7 @@ mysql:
 
 # Log configuration - defines how logging is handled
 log:
-  storageLocation: ../logs/           # LOG_STORAGE_LOCATION, Directory for storing logs
+  storageLocation: ../_output/logs/           # LOG_STORAGE_LOCATION, Directory for storing logs
   rotationTime: 24                    # Log rotation time in hours
   remainRotationCount: 2              # Number of log files to retain
   remainLogLevel: 6                   # Log level (6 = all levels)
