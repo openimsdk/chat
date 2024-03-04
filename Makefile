@@ -308,7 +308,7 @@ check:
 .PHONY: stop
 stop:
 	@echo "===========> Stopping the service"
-	@$(ROOT_DIR)/scripts/stop_all.sh
+	@$(ROOT_DIR)/scripts/stop-all.sh
 
 ## restart: Restart openim chat
 .PHONY: restart

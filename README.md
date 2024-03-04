@@ -182,7 +182,7 @@ $ ./scripts/check-all.sh --print-screen
 ```bash
 $ make stop
 # OR use scripts stop
-$ ./scripts/stop_all.sh
+$ ./scripts/stop-all.sh
 ```
 ## Add REST RPC API
 
