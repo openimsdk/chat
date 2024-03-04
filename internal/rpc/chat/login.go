@@ -43,7 +43,6 @@ func (o *chatSvr) verifyCodeJoin(areaCode, phoneNumber string) string {
 }
 
 func (o *chatSvr) SendVerifyCode(ctx context.Context, req *chat.SendVerifyCodeReq) (*chat.SendVerifyCodeResp, error) {
-	defer log.ZDebug(ctx, "return")
 	switch int(req.UsedFor) {
 	case constant.VerificationCodeForRegister:
 		if err := o.Admin.CheckRegister(ctx, req.Ip); err != nil {
@@ -169,7 +168,6 @@ func (o *chatSvr) SendVerifyCode(ctx context.Context, req *chat.SendVerifyCodeRe
 }
 
 func (o *chatSvr) verifyCode(ctx context.Context, account string, verifyCode string) (string, error) {
-	defer log.ZDebug(ctx, "return")
 	if verifyCode == "" {
 		return "", errs.ErrArgs.Wrap("verify code is empty")
 	}
@@ -209,7 +207,6 @@ func (o *chatSvr) verifyCode(ctx context.Context, account string, verifyCode str
 }
 
 func (o *chatSvr) VerifyCode(ctx context.Context, req *chat.VerifyCodeReq) (*chat.VerifyCodeResp, error) {
-	defer log.ZDebug(ctx, "return")
 	var account string
 	if req.PhoneNumber != "" {
 		account = o.verifyCodeJoin(req.AreaCode, req.PhoneNumber)
@@ -258,7 +255,6 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 	if req.User == nil {
 		return nil, errs.ErrArgs.Wrap("user is nil")
 	}
-	log.ZDebug(ctx, "email", req.User.Email)
 	if req.User.Email == "" {
 		if (req.User.AreaCode == "" && req.User.PhoneNumber != "") || (req.User.AreaCode != "" && req.User.PhoneNumber == "") {
 			return nil, errs.ErrArgs.Wrap("area code or phone number error, no email provide")
@@ -296,7 +292,6 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 		}
 
 	}
-	log.ZDebug(ctx, "usedInvitationCode", usedInvitationCode)
 	if req.User.UserID == "" {
 		for i := 0; i < 20; i++ {
 			userID := o.genUserID()
@@ -414,7 +409,6 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 }
 
 func (o *chatSvr) Login(ctx context.Context, req *chat.LoginReq) (*chat.LoginResp, error) {
-	defer log.ZDebug(ctx, "return")
 	resp := &chat.LoginResp{}
 	if req.Password == "" && req.VerifyCode == "" {
 		return nil, errs.ErrArgs.Wrap("password or code must be set")

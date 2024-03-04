@@ -20,7 +20,6 @@ import (
 	"github.com/OpenIMSDK/chat/pkg/common/db/cache"
 	"github.com/OpenIMSDK/tools/discoveryregistry"
 	"github.com/OpenIMSDK/tools/errs"
-	"github.com/OpenIMSDK/tools/log"
 	"github.com/OpenIMSDK/tools/mcontext"
 	"github.com/OpenIMSDK/tools/utils"
 	"google.golang.org/grpc"
@@ -160,8 +159,6 @@ func (o *adminServer) DelAdminAccount(ctx context.Context, req *admin.DelAdminAc
 }
 
 func (o *adminServer) SearchAdminAccount(ctx context.Context, req *admin.SearchAdminAccountReq) (*admin.SearchAdminAccountResp, error) {
-	defer log.ZDebug(ctx, "return")
-
 	if err := o.CheckSuperAdmin(ctx); err != nil {
 		return nil, err
 	}

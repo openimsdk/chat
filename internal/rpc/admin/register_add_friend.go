@@ -19,8 +19,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/OpenIMSDK/tools/log"
-
 	"github.com/OpenIMSDK/tools/errs"
 	"github.com/OpenIMSDK/tools/utils"
 
@@ -31,7 +29,6 @@ import (
 )
 
 func (o *adminServer) AddDefaultFriend(ctx context.Context, req *admin.AddDefaultFriendReq) (*admin.AddDefaultFriendResp, error) {
-	defer log.ZDebug(ctx, "return")
 	if _, err := mctx.CheckAdmin(ctx); err != nil {
 		return nil, err
 	}
@@ -70,7 +67,6 @@ func (o *adminServer) AddDefaultFriend(ctx context.Context, req *admin.AddDefaul
 }
 
 func (o *adminServer) DelDefaultFriend(ctx context.Context, req *admin.DelDefaultFriendReq) (*admin.DelDefaultFriendResp, error) {
-	defer log.ZDebug(ctx, "return")
 	if _, err := mctx.CheckAdmin(ctx); err != nil {
 		return nil, err
 	}
@@ -102,7 +98,6 @@ func (o *adminServer) DelDefaultFriend(ctx context.Context, req *admin.DelDefaul
 }
 
 func (o *adminServer) FindDefaultFriend(ctx context.Context, req *admin.FindDefaultFriendReq) (*admin.FindDefaultFriendResp, error) {
-	defer log.ZDebug(ctx, "return")
 	if _, _, err := mctx.Check(ctx); err != nil {
 		return nil, err
 	}
@@ -114,7 +109,6 @@ func (o *adminServer) FindDefaultFriend(ctx context.Context, req *admin.FindDefa
 }
 
 func (o *adminServer) SearchDefaultFriend(ctx context.Context, req *admin.SearchDefaultFriendReq) (*admin.SearchDefaultFriendResp, error) {
-	defer log.ZDebug(ctx, "return")
 	if _, err := mctx.CheckAdmin(ctx); err != nil {
 		return nil, err
 	}

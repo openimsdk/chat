@@ -65,7 +65,6 @@ func (o *AdminApi) AdminLogin(c *gin.Context) {
 		apiresp.GinError(c, err)
 		return
 	}
-	log.ZInfo(c, "AdminLogin api", "req", &req)
 	if err := checker.Validate(&req); err != nil {
 		apiresp.GinError(c, err) // 参数校验失败
 		return
@@ -88,7 +87,6 @@ func (o *AdminApi) AdminLogin(c *gin.Context) {
 	}
 	resp.ImToken = imToken
 	resp.ImUserID = imAdminUserID
-	log.ZInfo(c, "AdminLogin api", "resp", resp)
 	apiresp.GinSuccess(c, resp)
 }
 
@@ -115,7 +113,7 @@ func (o *AdminApi) AdminUpdateInfo(c *gin.Context) {
 	imAdminUserID := config.GetIMAdmin(resp.UserID)
 	imToken, err := o.imApiCaller.UserToken(c, imAdminUserID, constant.AdminPlatformID)
 	if err != nil {
-		log.ZError(c, "AdminUpdateInfo ImAdminTokenWithDefaultAdmin", err)
+		log.ZError(c, "AdminUpdateInfo ImAdminTokenWithDefaultAdmin", err, "imAdminUserID", imAdminUserID)
 		return
 	}
 	if err := o.imApiCaller.UpdateUserInfo(mctx.WithApiToken(c, imToken), imAdminUserID, resp.Nickname, resp.FaceURL); err != nil {
@@ -327,7 +325,6 @@ func (o *AdminApi) BlockUser(c *gin.Context) {
 		apiresp.GinError(c, err)
 		return
 	}
-	log.ZInfo(c, "BlockUser api", "req", &req)
 	if err := checker.Validate(&req); err != nil {
 		apiresp.GinError(c, err) // 参数校验失败
 		return
@@ -397,7 +394,6 @@ func (o *AdminApi) NewUserCount(c *gin.Context) {
 		apiresp.GinError(c, err)
 		return
 	}
-	log.ZInfo(c, "NewUserCount api", "req", &req)
 	if err := checker.Validate(&req); err != nil {
 		apiresp.GinError(c, err) // 参数校验失败
 		return
@@ -455,7 +451,6 @@ func (o *AdminApi) checkSecretAdmin(c *gin.Context, secret string) error {
 }
 
 func (o *AdminApi) ImportUserByXlsx(c *gin.Context) {
-	defer log.ZDebug(c, "ImportUserByXlsx return")
 	formFile, err := c.FormFile("data")
 	if err != nil {
 		apiresp.GinError(c, err)

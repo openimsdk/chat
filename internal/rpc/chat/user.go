@@ -28,11 +28,9 @@ import (
 	"github.com/OpenIMSDK/chat/pkg/eerrs"
 	"github.com/OpenIMSDK/chat/pkg/proto/chat"
 	"github.com/OpenIMSDK/tools/errs"
-	"github.com/OpenIMSDK/tools/log"
 )
 
 func (o *chatSvr) UpdateUserInfo(ctx context.Context, req *chat.UpdateUserInfoReq) (*chat.UpdateUserInfoResp, error) {
-	defer log.ZDebug(ctx, "return")
 	resp := &chat.UpdateUserInfoResp{}
 	opUserID, userType, err := mctx.Check(ctx)
 	if err != nil {
@@ -106,7 +104,6 @@ func (o *chatSvr) UpdateUserInfo(ctx context.Context, req *chat.UpdateUserInfoRe
 }
 
 func (o *chatSvr) FindUserPublicInfo(ctx context.Context, req *chat.FindUserPublicInfoReq) (*chat.FindUserPublicInfoResp, error) {
-	defer log.ZDebug(ctx, "return")
 	if len(req.UserIDs) == 0 {
 		return nil, errs.ErrArgs.Wrap("UserIDs is empty")
 	}
@@ -187,7 +184,6 @@ func (o *chatSvr) AddUserAccount(ctx context.Context, req *chat.AddUserAccountRe
 }
 
 func (o *chatSvr) SearchUserPublicInfo(ctx context.Context, req *chat.SearchUserPublicInfoReq) (*chat.SearchUserPublicInfoResp, error) {
-	defer log.ZDebug(ctx, "return")
 	if _, _, err := mctx.Check(ctx); err != nil {
 		return nil, err
 	}
@@ -202,7 +198,6 @@ func (o *chatSvr) SearchUserPublicInfo(ctx context.Context, req *chat.SearchUser
 }
 
 func (o *chatSvr) FindUserFullInfo(ctx context.Context, req *chat.FindUserFullInfoReq) (*chat.FindUserFullInfoResp, error) {
-	defer log.ZDebug(ctx, "return")
 	if _, _, err := mctx.Check(ctx); err != nil {
 		return nil, err
 	}
@@ -231,7 +226,6 @@ func (o *chatSvr) SearchUserFullInfo(ctx context.Context, req *chat.SearchUserFu
 }
 
 func (o *chatSvr) FindUserAccount(ctx context.Context, req *chat.FindUserAccountReq) (*chat.FindUserAccountResp, error) {
-	defer log.ZDebug(ctx, "return")
 	if len(req.UserIDs) == 0 {
 		return nil, errs.ErrArgs.Wrap("user id list must be set")
 	}
@@ -250,7 +244,6 @@ func (o *chatSvr) FindUserAccount(ctx context.Context, req *chat.FindUserAccount
 }
 
 func (o *chatSvr) FindAccountUser(ctx context.Context, req *chat.FindAccountUserReq) (*chat.FindAccountUserResp, error) {
-	defer log.ZDebug(ctx, "return")
 	if len(req.Accounts) == 0 {
 		return nil, errs.ErrArgs.Wrap("account list must be set")
 	}

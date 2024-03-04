@@ -19,13 +19,11 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/OpenIMSDK/protocol/constant"
-	"github.com/OpenIMSDK/tools/errs"
-	"github.com/OpenIMSDK/tools/log"
-
 	constant2 "github.com/OpenIMSDK/chat/pkg/common/constant"
 	"github.com/OpenIMSDK/chat/pkg/eerrs"
 	"github.com/OpenIMSDK/chat/pkg/proto/chat"
+	"github.com/OpenIMSDK/protocol/constant"
+	"github.com/OpenIMSDK/tools/errs"
 )
 
 type CallbackBeforeAddFriendReq struct {
@@ -43,7 +41,6 @@ func (c CallbackCommand) GetCallbackCommand() string {
 }
 
 func (o *chatSvr) OpenIMCallback(ctx context.Context, req *chat.OpenIMCallbackReq) (*chat.OpenIMCallbackResp, error) {
-	defer log.ZDebug(ctx, "return")
 	switch req.Command {
 	case constant.CallbackBeforeAddFriendCommand:
 		var data CallbackBeforeAddFriendReq
@@ -54,7 +51,6 @@ func (o *chatSvr) OpenIMCallback(ctx context.Context, req *chat.OpenIMCallbackRe
 		if err != nil {
 			return nil, err
 		}
-		log.ZInfo(ctx, "OpenIMCallback", "user", user)
 		if user.AllowAddFriend != constant2.OrdinaryUserAddFriendEnable {
 			return nil, eerrs.ErrRefuseFriend.Wrap(fmt.Sprintf("state %d", user.AllowAddFriend))
 		}

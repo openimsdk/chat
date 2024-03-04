@@ -18,15 +18,12 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/OpenIMSDK/tools/log"
-
 	"github.com/OpenIMSDK/chat/pkg/common/db/dbutil"
 	"github.com/OpenIMSDK/chat/pkg/eerrs"
 	"github.com/OpenIMSDK/chat/pkg/proto/admin"
 )
 
 func (o *adminServer) CheckRegisterForbidden(ctx context.Context, req *admin.CheckRegisterForbiddenReq) (*admin.CheckRegisterForbiddenResp, error) {
-	defer log.ZDebug(ctx, "return")
 	forbiddens, err := o.Database.FindIPForbidden(ctx, []string{req.Ip})
 	if err != nil {
 		return nil, err
@@ -40,7 +37,6 @@ func (o *adminServer) CheckRegisterForbidden(ctx context.Context, req *admin.Che
 }
 
 func (o *adminServer) CheckLoginForbidden(ctx context.Context, req *admin.CheckLoginForbiddenReq) (*admin.CheckLoginForbiddenResp, error) {
-	defer log.ZDebug(ctx, "return")
 	forbiddens, err := o.Database.FindIPForbidden(ctx, []string{req.Ip})
 	if err != nil {
 		return nil, err

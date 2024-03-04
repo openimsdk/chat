@@ -35,7 +35,7 @@ func main() {
 
 	configFile, rpcPort, showVersion, err := config.FlagParse()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "\n\nexit -1: \n%+v\n\n", err)
+		fmt.Printf("\n\nexit -1: \n%+v\n\n", err)
 		os.Exit(-1)
 	}
 
@@ -54,23 +54,24 @@ func main() {
 	flag.Parse()
 
 	if err := config.InitConfig(configFile); err != nil {
-		fmt.Fprintf(os.Stderr, "\n\nexit -1: \n%+v\n\n", err)
+		fmt.Printf("\n\nexit -1: \n%+v\n\n", err)
 		os.Exit(-1)
 	}
 	err = component.ComponentCheck()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "\n\nexit -1: \n%+v\n\n", err)
+		fmt.Printf("\n\nexit -1: \n%+v\n\n", err)
 		os.Exit(-1)
 	}
 	if config.Config.Envs.Discovery == "k8s" {
 		rpcPort = 80
 	}
 	if err := log.InitFromConfig("chat.log", "admin-rpc", *config.Config.Log.RemainLogLevel, *config.Config.Log.IsStdout, *config.Config.Log.IsJson, *config.Config.Log.StorageLocation, *config.Config.Log.RemainRotationCount, *config.Config.Log.RotationTime); err != nil {
-		panic(fmt.Errorf("InitFromConfig failed:%w", err))
+		fmt.Printf("\n\nlog init exit -1: \n%+v\n\n", err)
+		os.Exit(-1)
 	}
 	err = chatrpcstart.Start(rpcPort, config.Config.RpcRegisterName.OpenImAdminName, 0, admin.Start)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "\n\nexit -1: \n%+v\n\n", err)
+		fmt.Printf("\n\nexit -1: \n%+v\n\n", err)
 		os.Exit(-1)
 	}
 }

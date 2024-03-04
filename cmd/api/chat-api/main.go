@@ -23,8 +23,6 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/OpenIMSDK/tools/errs"
-
 	"github.com/OpenIMSDK/chat/pkg/discovery_register"
 	"github.com/OpenIMSDK/tools/discoveryregistry"
 
@@ -53,7 +51,7 @@ func main() {
 
 	configFile, ginPort, showVersion, err := config.FlagParse()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "\n\nexit -1: \n%+v\n\n", err)
+		fmt.Printf("\n\nexit -1: \n%+v\n\n", err)
 		os.Exit(-1)
 	}
 
@@ -73,31 +71,30 @@ func main() {
 
 	err = config.InitConfig(configFile)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "\n\nexit -1: \n%+v\n\n", err)
+		fmt.Printf("\n\nexit -1: \n%+v\n\n", err)
 		os.Exit(-1)
 	}
 	err = component.ComponentCheck()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "\n\nexit -1: \n%+v\n\n", err)
+		fmt.Printf("\n\nexit -1: \n%+v\n\n", err)
 		os.Exit(-1)
 	}
 	if err := log.InitFromConfig("chat.log", "chat-api", *config.Config.Log.RemainLogLevel, *config.Config.Log.IsStdout, *config.Config.Log.IsJson, *config.Config.Log.StorageLocation, *config.Config.Log.RemainRotationCount, *config.Config.Log.RotationTime); err != nil {
-		panic(fmt.Errorf("InitFromConfig failed:%w", err))
+		fmt.Printf("\n\nlog init exit -1: \n%+v\n\n", err)
+		os.Exit(-1)
 	}
 	if config.Config.Envs.Discovery == "k8s" {
 		ginPort = 80
 	}
 	var zk discoveryregistry.SvcDiscoveryRegistry
 	zk, err = discovery_register.NewDiscoveryRegister(config.Config.Envs.Discovery)
-	/*zk, err := openKeeper.NewClient(config.Config.Zookeeper.ZkAddr, config.Config.Zookeeper.Schema,
-	openKeeper.WithFreq(time.Hour), openKeeper.WithUserNameAndPassword(config.Config.Zookeeper.Username,
-		config.Config.Zookeeper.Password), openKeeper.WithRoundRobin(), openKeeper.WithTimeout(10), openKeeper.WithLogger(log.NewZkLogger()))*/
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "\n\nexit -1: \n%+v\n\n", err)
+		fmt.Printf("\n\nexit -1: \n%+v\n\n", err)
 		os.Exit(-1)
 	}
 	if err := zk.CreateRpcRootNodes([]string{config.Config.RpcRegisterName.OpenImAdminName, config.Config.RpcRegisterName.OpenImChatName}); err != nil {
-		panic(errs.Wrap(err, "CreateRpcRootNodes error"))
+		fmt.Printf("\n\nzk exit -1: \n%+v\n\n", err)
+		os.Exit(-1)
 	}
 	zk.AddOption(mw.GrpcClient(), grpc.WithTransportCredentials(insecure.NewCredentials())) // 默认RPC中间件
 	engine := gin.Default()
@@ -106,7 +103,7 @@ func main() {
 
 	address := net.JoinHostPort(config.Config.ChatApi.ListenIP, strconv.Itoa(ginPort))
 	if err := engine.Run(address); err != nil {
-		fmt.Fprintf(os.Stderr, "\n\nexit -1: \n%+v\n\n", err)
+		fmt.Printf("\n\nexit -1: \n%+v\n\n", err)
 		os.Exit(-1)
 	}
 }
