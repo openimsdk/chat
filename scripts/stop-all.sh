@@ -27,7 +27,7 @@ source $SCRIPTS_ROOT/util.sh
 
 # Loop through each binary full path and attempt to stop the service
 for binary_path in "${binary_full_paths[@]}"; do
-    stop_services_with_name "$binary_path"
+  result=$(stop_services_with_name "$binary_path")
     ret_val=$?
     if [ $ret_val -ne 0 ]; then
         # Print detailed error log if stop_services_with_name function returns a non-zero value
