@@ -61,16 +61,18 @@ func Start(rpcPort int, rpcRegisterName string, prometheusPort int, rpcFn func(c
 	if err != nil {
 		return err
 	}
-	err = zkClient.Register(rpcRegisterName, registerIP, rpcPort, grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		return errs.Wrap(err)
-	}
+
 	rpcTcpAddr := net.JoinHostPort(network.GetListenIP(config.Config.Rpc.ListenIP), strconv.Itoa(rpcPort))
 	listener, err := net.Listen("tcp", rpcTcpAddr)
 	if err != nil {
 		return errs.Wrap(err)
 	}
 	defer listener.Close()
+
+	err = zkClient.Register(rpcRegisterName, registerIP, rpcPort, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		return errs.Wrap(err)
+	}
 
 	var (
 		netDone = make(chan struct{}, 1)
