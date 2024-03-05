@@ -53,10 +53,10 @@ stop_services_with_name() {
 
 check_services_with_name() {
     local binary_path="$1"
-
+  echo "ddddddddddd""$SUPPRESS_OUTPUT"
     pgrep -f "$binary_path" > /dev/null 2>&1
 
-  echo "ddddddddddd""$SUPPRESS_OUTPUT"
+
     if [ $? -eq 0 ]; then
         if [ -z "$SUPPRESS_OUTPUT" ]; then
             echo "A process with the path $binary_path is running."
