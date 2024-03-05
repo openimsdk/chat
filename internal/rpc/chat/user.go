@@ -28,11 +28,9 @@ import (
 	"github.com/OpenIMSDK/chat/pkg/eerrs"
 	"github.com/OpenIMSDK/chat/pkg/proto/chat"
 	"github.com/OpenIMSDK/tools/errs"
-	"github.com/OpenIMSDK/tools/log"
 )
 
 func (o *chatSvr) UpdateUserInfo(ctx context.Context, req *chat.UpdateUserInfoReq) (*chat.UpdateUserInfoResp, error) {
-	defer log.ZDebug(ctx, "return")
 	resp := &chat.UpdateUserInfoResp{}
 	opUserID, userType, err := mctx.Check(ctx)
 	if err != nil {
@@ -106,7 +104,6 @@ func (o *chatSvr) UpdateUserInfo(ctx context.Context, req *chat.UpdateUserInfoRe
 }
 
 func (o *chatSvr) FindUserPublicInfo(ctx context.Context, req *chat.FindUserPublicInfoReq) (*chat.FindUserPublicInfoResp, error) {
-	defer log.ZDebug(ctx, "return")
 	if len(req.UserIDs) == 0 {
 		return nil, errs.ErrArgs.Wrap("UserIDs is empty")
 	}
@@ -134,7 +131,7 @@ func (o *chatSvr) AddUserAccount(ctx context.Context, req *chat.AddUserAccountRe
 			_, err := o.Database.GetUser(ctx, userID)
 			if err == nil {
 				continue
-			} else if dbutil.IsGormNotFound(err) {
+			} else if dbutil.IsDBNotFound(err) {
 				req.User.UserID = userID
 				break
 			} else {
@@ -187,22 +184,20 @@ func (o *chatSvr) AddUserAccount(ctx context.Context, req *chat.AddUserAccountRe
 }
 
 func (o *chatSvr) SearchUserPublicInfo(ctx context.Context, req *chat.SearchUserPublicInfoReq) (*chat.SearchUserPublicInfoResp, error) {
-	defer log.ZDebug(ctx, "return")
 	if _, _, err := mctx.Check(ctx); err != nil {
 		return nil, err
 	}
-	total, list, err := o.Database.Search(ctx, constant.FinDAllUser, req.Keyword, req.Genders, req.Pagination.PageNumber, req.Pagination.ShowNumber)
+	total, list, err := o.Database.Search(ctx, constant.FinDAllUser, req.Keyword, req.Genders, req.Pagination)
 	if err != nil {
 		return nil, err
 	}
 	return &chat.SearchUserPublicInfoResp{
-		Total: total,
+		Total: uint32(total),
 		Users: DbToPbAttributes(list),
 	}, nil
 }
 
 func (o *chatSvr) FindUserFullInfo(ctx context.Context, req *chat.FindUserFullInfoReq) (*chat.FindUserFullInfoResp, error) {
-	defer log.ZDebug(ctx, "return")
 	if _, _, err := mctx.Check(ctx); err != nil {
 		return nil, err
 	}
@@ -220,18 +215,17 @@ func (o *chatSvr) SearchUserFullInfo(ctx context.Context, req *chat.SearchUserFu
 	if _, _, err := mctx.Check(ctx); err != nil {
 		return nil, err
 	}
-	total, list, err := o.Database.Search(ctx, req.Normal, req.Keyword, req.Genders, req.Pagination.PageNumber, req.Pagination.ShowNumber)
+	total, list, err := o.Database.Search(ctx, req.Normal, req.Keyword, req.Genders, req.Pagination)
 	if err != nil {
 		return nil, err
 	}
 	return &chat.SearchUserFullInfoResp{
-		Total: total,
+		Total: uint32(total),
 		Users: DbToPbUserFullInfos(list),
 	}, nil
 }
 
 func (o *chatSvr) FindUserAccount(ctx context.Context, req *chat.FindUserAccountReq) (*chat.FindUserAccountResp, error) {
-	defer log.ZDebug(ctx, "return")
 	if len(req.UserIDs) == 0 {
 		return nil, errs.ErrArgs.Wrap("user id list must be set")
 	}
@@ -250,7 +244,6 @@ func (o *chatSvr) FindUserAccount(ctx context.Context, req *chat.FindUserAccount
 }
 
 func (o *chatSvr) FindAccountUser(ctx context.Context, req *chat.FindAccountUserReq) (*chat.FindAccountUserResp, error) {
-	defer log.ZDebug(ctx, "return")
 	if len(req.Accounts) == 0 {
 		return nil, errs.ErrArgs.Wrap("account list must be set")
 	}
@@ -272,12 +265,12 @@ func (o *chatSvr) SearchUserInfo(ctx context.Context, req *chat.SearchUserInfoRe
 	if _, _, err := mctx.Check(ctx); err != nil {
 		return nil, err
 	}
-	total, list, err := o.Database.SearchUser(ctx, req.Keyword, req.UserIDs, req.Genders, req.Pagination.PageNumber, req.Pagination.ShowNumber)
+	total, list, err := o.Database.SearchUser(ctx, req.Keyword, req.UserIDs, req.Genders, req.Pagination)
 	if err != nil {
 		return nil, err
 	}
 	return &chat.SearchUserInfoResp{
-		Total: total,
+		Total: uint32(total),
 		Users: DbToPbUserFullInfos(list),
 	}, nil
 }

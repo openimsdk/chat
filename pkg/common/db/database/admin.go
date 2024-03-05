@@ -16,13 +16,14 @@ package database
 
 import (
 	"context"
+	"github.com/OpenIMSDK/tools/pagination"
+	"go.mongodb.org/mongo-driver/mongo"
 
 	"github.com/OpenIMSDK/chat/pkg/common/db/cache"
 	"github.com/OpenIMSDK/protocol/constant"
 	"github.com/redis/go-redis/v9"
 
 	"github.com/OpenIMSDK/tools/tx"
-	"gorm.io/gorm"
 
 	"github.com/OpenIMSDK/chat/pkg/common/db/model/admin"
 	table "github.com/OpenIMSDK/chat/pkg/common/db/table/admin"
@@ -34,14 +35,14 @@ type AdminDatabaseInterface interface {
 	GetAdminUserID(ctx context.Context, userID string) (*table.Admin, error)
 	UpdateAdmin(ctx context.Context, userID string, update map[string]any) error
 	ChangePassword(ctx context.Context, userID string, newPassword string) error
-	AddAdminAccount(ctx context.Context, admin *table.Admin) error
+	AddAdminAccount(ctx context.Context, admin []*table.Admin) error
 	DelAdminAccount(ctx context.Context, userIDs []string) error
-	SearchAdminAccount(ctx context.Context, page, size int32) (uint32, []*table.Admin, error)
-	CreateApplet(ctx context.Context, applets ...*table.Applet) error
+	SearchAdminAccount(ctx context.Context, pagination pagination.Pagination) (int64, []*table.Admin, error)
+	CreateApplet(ctx context.Context, applets []*table.Applet) error
 	DelApplet(ctx context.Context, appletIDs []string) error
 	GetApplet(ctx context.Context, appletID string) (*table.Applet, error)
 	FindApplet(ctx context.Context, appletIDs []string) ([]*table.Applet, error)
-	SearchApplet(ctx context.Context, keyword string, page int32, size int32) (uint32, []*table.Applet, error)
+	SearchApplet(ctx context.Context, keyword string, pagination pagination.Pagination) (int64, []*table.Applet, error)
 	FindOnShelf(ctx context.Context) ([]*table.Applet, error)
 	UpdateApplet(ctx context.Context, appletID string, update map[string]any) error
 	GetConfig(ctx context.Context) (map[string]string, error)
@@ -51,26 +52,26 @@ type AdminDatabaseInterface interface {
 	DelInvitationRegister(ctx context.Context, codes []string) error
 	UpdateInvitationRegister(ctx context.Context, code string, fields map[string]any) error
 	CreatInvitationRegister(ctx context.Context, invitationRegisters []*table.InvitationRegister) error
-	SearchInvitationRegister(ctx context.Context, keyword string, state int32, userIDs []string, codes []string, page int32, size int32) (uint32, []*table.InvitationRegister, error)
-	SearchIPForbidden(ctx context.Context, keyword string, state int32, page int32, size int32) (uint32, []*table.IPForbidden, error)
+	SearchInvitationRegister(ctx context.Context, keyword string, state int32, userIDs []string, codes []string, pagination pagination.Pagination) (int64, []*table.InvitationRegister, error)
+	SearchIPForbidden(ctx context.Context, keyword string, state int32, pagination pagination.Pagination) (int64, []*table.IPForbidden, error)
 	AddIPForbidden(ctx context.Context, ms []*table.IPForbidden) error
 	FindIPForbidden(ctx context.Context, ms []string) ([]*table.IPForbidden, error)
 	DelIPForbidden(ctx context.Context, ips []string) error
 	FindDefaultFriend(ctx context.Context, userIDs []string) ([]string, error)
 	AddDefaultFriend(ctx context.Context, ms []*table.RegisterAddFriend) error
 	DelDefaultFriend(ctx context.Context, userIDs []string) error
-	SearchDefaultFriend(ctx context.Context, keyword string, page int32, size int32) (uint32, []*table.RegisterAddFriend, error)
+	SearchDefaultFriend(ctx context.Context, keyword string, pagination pagination.Pagination) (int64, []*table.RegisterAddFriend, error)
 	FindDefaultGroup(ctx context.Context, groupIDs []string) ([]string, error)
 	AddDefaultGroup(ctx context.Context, ms []*table.RegisterAddGroup) error
 	DelDefaultGroup(ctx context.Context, groupIDs []string) error
-	SearchDefaultGroup(ctx context.Context, keyword string, page int32, size int32) (uint32, []*table.RegisterAddGroup, error)
+	SearchDefaultGroup(ctx context.Context, keyword string, pagination pagination.Pagination) (int64, []*table.RegisterAddGroup, error)
 	FindBlockInfo(ctx context.Context, userIDs []string) ([]*table.ForbiddenAccount, error)
 	GetBlockInfo(ctx context.Context, userID string) (*table.ForbiddenAccount, error)
 	BlockUser(ctx context.Context, f []*table.ForbiddenAccount) error
 	DelBlockUser(ctx context.Context, userID []string) error
-	SearchBlockUser(ctx context.Context, keyword string, page int32, size int32) (uint32, []*table.ForbiddenAccount, error)
+	SearchBlockUser(ctx context.Context, keyword string, pagination pagination.Pagination) (int64, []*table.ForbiddenAccount, error)
 	FindBlockUser(ctx context.Context, userIDs []string) ([]*table.ForbiddenAccount, error)
-	SearchUserLimitLogin(ctx context.Context, keyword string, page int32, size int32) (uint32, []*table.LimitUserLoginIP, error)
+	SearchUserLimitLogin(ctx context.Context, keyword string, pagination pagination.Pagination) (int64, []*table.LimitUserLoginIP, error)
 	AddUserLimitLogin(ctx context.Context, ms []*table.LimitUserLoginIP) error
 	DelUserLimitLogin(ctx context.Context, ms []*table.LimitUserLoginIP) error
 	CountLimitUserLoginIP(ctx context.Context, userID string) (uint32, error)
@@ -79,24 +80,61 @@ type AdminDatabaseInterface interface {
 	GetTokens(ctx context.Context, userID string) (map[string]int32, error)
 }
 
-func NewAdminDatabase(db *gorm.DB, rdb redis.UniversalClient) AdminDatabaseInterface {
-	return &AdminDatabase{
-		tx:                 tx.NewGorm(db),
-		admin:              admin.NewAdmin(db),
-		ipForbidden:        admin.NewIPForbidden(db),
-		forbiddenAccount:   admin.NewForbiddenAccount(db),
-		limitUserLoginIP:   admin.NewLimitUserLoginIP(db),
-		invitationRegister: admin.NewInvitationRegister(db),
-		registerAddFriend:  admin.NewRegisterAddFriend(db),
-		registerAddGroup:   admin.NewRegisterAddGroup(db),
-		applet:             admin.NewApplet(db),
-		clientConfig:       admin.NewClientConfig(db),
-		cache:              cache.NewTokenInterface(rdb),
+func NewAdminDatabase(db *mongo.Database, rdb redis.UniversalClient) (AdminDatabaseInterface, error) {
+	a, err := admin.NewAdmin(db)
+	if err != nil {
+		return nil, err
 	}
+	forbidden, err := admin.NewIPForbidden(db)
+	if err != nil {
+		return nil, err
+	}
+	forbiddenAccount, err := admin.NewForbiddenAccount(db)
+	if err != nil {
+		return nil, err
+	}
+	limitUserLoginIP, err := admin.NewLimitUserLoginIP(db)
+	if err != nil {
+		return nil, err
+	}
+	invitationRegister, err := admin.NewInvitationRegister(db)
+	if err != nil {
+		return nil, err
+	}
+	registerAddFriend, err := admin.NewRegisterAddFriend(db)
+	if err != nil {
+		return nil, err
+	}
+	registerAddGroup, err := admin.NewRegisterAddGroup(db)
+	if err != nil {
+		return nil, err
+	}
+	applet, err := admin.NewApplet(db)
+	if err != nil {
+		return nil, err
+	}
+	clientConfig, err := admin.NewClientConfig(db)
+	if err != nil {
+		return nil, err
+	}
+
+	return &AdminDatabase{
+		tx:                 tx.NewMongo(db.Client()),
+		admin:              a,
+		ipForbidden:        forbidden,
+		forbiddenAccount:   forbiddenAccount,
+		limitUserLoginIP:   limitUserLoginIP,
+		invitationRegister: invitationRegister,
+		registerAddFriend:  registerAddFriend,
+		registerAddGroup:   registerAddGroup,
+		applet:             applet,
+		clientConfig:       clientConfig,
+		cache:              cache.NewTokenInterface(rdb),
+	}, nil
 }
 
 type AdminDatabase struct {
-	tx                 tx.Tx
+	tx                 tx.CtxTx
 	admin              table.AdminInterface
 	ipForbidden        table.IPForbiddenInterface
 	forbiddenAccount   table.ForbiddenAccountInterface
@@ -128,20 +166,20 @@ func (o *AdminDatabase) UpdateAdmin(ctx context.Context, userID string, update m
 func (o *AdminDatabase) ChangePassword(ctx context.Context, userID string, newPassword string) error {
 	return o.admin.ChangePassword(ctx, userID, newPassword)
 }
-func (o *AdminDatabase) AddAdminAccount(ctx context.Context, admin *table.Admin) error {
-	return o.admin.Create(ctx, admin)
+func (o *AdminDatabase) AddAdminAccount(ctx context.Context, admins []*table.Admin) error {
+	return o.admin.Create(ctx, admins)
 }
 
 func (o *AdminDatabase) DelAdminAccount(ctx context.Context, userIDs []string) error {
 	return o.admin.Delete(ctx, userIDs)
 }
 
-func (o *AdminDatabase) SearchAdminAccount(ctx context.Context, page, size int32) (uint32, []*table.Admin, error) {
-	return o.admin.Search(ctx, page, size)
+func (o *AdminDatabase) SearchAdminAccount(ctx context.Context, pagination pagination.Pagination) (int64, []*table.Admin, error) {
+	return o.admin.Search(ctx, pagination)
 }
 
-func (o *AdminDatabase) CreateApplet(ctx context.Context, applets ...*table.Applet) error {
-	return o.applet.Create(ctx, applets...)
+func (o *AdminDatabase) CreateApplet(ctx context.Context, applets []*table.Applet) error {
+	return o.applet.Create(ctx, applets)
 }
 
 func (o *AdminDatabase) DelApplet(ctx context.Context, appletIDs []string) error {
@@ -156,8 +194,8 @@ func (o *AdminDatabase) FindApplet(ctx context.Context, appletIDs []string) ([]*
 	return o.applet.FindID(ctx, appletIDs)
 }
 
-func (o *AdminDatabase) SearchApplet(ctx context.Context, keyword string, page int32, size int32) (uint32, []*table.Applet, error) {
-	return o.applet.Search(ctx, keyword, page, size)
+func (o *AdminDatabase) SearchApplet(ctx context.Context, keyword string, pagination pagination.Pagination) (int64, []*table.Applet, error) {
+	return o.applet.Search(ctx, keyword, pagination)
 }
 
 func (o *AdminDatabase) FindOnShelf(ctx context.Context) ([]*table.Applet, error) {
@@ -193,15 +231,15 @@ func (o *AdminDatabase) UpdateInvitationRegister(ctx context.Context, code strin
 }
 
 func (o *AdminDatabase) CreatInvitationRegister(ctx context.Context, invitationRegisters []*table.InvitationRegister) error {
-	return o.invitationRegister.Create(ctx, invitationRegisters...)
+	return o.invitationRegister.Create(ctx, invitationRegisters)
 }
 
-func (o *AdminDatabase) SearchInvitationRegister(ctx context.Context, keyword string, state int32, userIDs []string, codes []string, page int32, size int32) (uint32, []*table.InvitationRegister, error) {
-	return o.invitationRegister.Search(ctx, keyword, state, userIDs, codes, page, size)
+func (o *AdminDatabase) SearchInvitationRegister(ctx context.Context, keyword string, state int32, userIDs []string, codes []string, pagination pagination.Pagination) (int64, []*table.InvitationRegister, error) {
+	return o.invitationRegister.Search(ctx, keyword, state, userIDs, codes, pagination)
 }
 
-func (o *AdminDatabase) SearchIPForbidden(ctx context.Context, keyword string, state int32, page int32, size int32) (uint32, []*table.IPForbidden, error) {
-	return o.ipForbidden.Search(ctx, keyword, state, page, size)
+func (o *AdminDatabase) SearchIPForbidden(ctx context.Context, keyword string, state int32, pagination pagination.Pagination) (int64, []*table.IPForbidden, error) {
+	return o.ipForbidden.Search(ctx, keyword, state, pagination)
 }
 
 func (o *AdminDatabase) AddIPForbidden(ctx context.Context, ms []*table.IPForbidden) error {
@@ -228,8 +266,8 @@ func (o *AdminDatabase) DelDefaultFriend(ctx context.Context, userIDs []string) 
 	return o.registerAddFriend.Del(ctx, userIDs)
 }
 
-func (o *AdminDatabase) SearchDefaultFriend(ctx context.Context, keyword string, page int32, size int32) (uint32, []*table.RegisterAddFriend, error) {
-	return o.registerAddFriend.Search(ctx, keyword, page, size)
+func (o *AdminDatabase) SearchDefaultFriend(ctx context.Context, keyword string, pagination pagination.Pagination) (int64, []*table.RegisterAddFriend, error) {
+	return o.registerAddFriend.Search(ctx, keyword, pagination)
 }
 
 func (o *AdminDatabase) FindDefaultGroup(ctx context.Context, groupIDs []string) ([]string, error) {
@@ -244,8 +282,8 @@ func (o *AdminDatabase) DelDefaultGroup(ctx context.Context, groupIDs []string) 
 	return o.registerAddGroup.Del(ctx, groupIDs)
 }
 
-func (o *AdminDatabase) SearchDefaultGroup(ctx context.Context, keyword string, page int32, size int32) (uint32, []*table.RegisterAddGroup, error) {
-	return o.registerAddGroup.Search(ctx, keyword, page, size)
+func (o *AdminDatabase) SearchDefaultGroup(ctx context.Context, keyword string, pagination pagination.Pagination) (int64, []*table.RegisterAddGroup, error) {
+	return o.registerAddGroup.Search(ctx, keyword, pagination)
 }
 
 func (o *AdminDatabase) FindBlockInfo(ctx context.Context, userIDs []string) ([]*table.ForbiddenAccount, error) {
@@ -264,16 +302,16 @@ func (o *AdminDatabase) DelBlockUser(ctx context.Context, userID []string) error
 	return o.forbiddenAccount.Delete(ctx, userID)
 }
 
-func (o *AdminDatabase) SearchBlockUser(ctx context.Context, keyword string, page int32, size int32) (uint32, []*table.ForbiddenAccount, error) {
-	return o.forbiddenAccount.Search(ctx, keyword, page, size)
+func (o *AdminDatabase) SearchBlockUser(ctx context.Context, keyword string, pagination pagination.Pagination) (int64, []*table.ForbiddenAccount, error) {
+	return o.forbiddenAccount.Search(ctx, keyword, pagination)
 }
 
 func (o *AdminDatabase) FindBlockUser(ctx context.Context, userIDs []string) ([]*table.ForbiddenAccount, error) {
 	return o.forbiddenAccount.Find(ctx, userIDs)
 }
 
-func (o *AdminDatabase) SearchUserLimitLogin(ctx context.Context, keyword string, page int32, size int32) (uint32, []*table.LimitUserLoginIP, error) {
-	return o.limitUserLoginIP.Search(ctx, keyword, page, size)
+func (o *AdminDatabase) SearchUserLimitLogin(ctx context.Context, keyword string, pagination pagination.Pagination) (int64, []*table.LimitUserLoginIP, error) {
+	return o.limitUserLoginIP.Search(ctx, keyword, pagination)
 }
 
 func (o *AdminDatabase) AddUserLimitLogin(ctx context.Context, ms []*table.LimitUserLoginIP) error {

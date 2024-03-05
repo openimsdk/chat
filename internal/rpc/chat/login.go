@@ -43,7 +43,6 @@ func (o *chatSvr) verifyCodeJoin(areaCode, phoneNumber string) string {
 }
 
 func (o *chatSvr) SendVerifyCode(ctx context.Context, req *chat.SendVerifyCodeReq) (*chat.SendVerifyCodeResp, error) {
-	defer log.ZDebug(ctx, "return")
 	switch int(req.UsedFor) {
 	case constant.VerificationCodeForRegister:
 		if err := o.Admin.CheckRegister(ctx, req.Ip); err != nil {
@@ -132,7 +131,7 @@ func (o *chatSvr) SendVerifyCode(ctx context.Context, req *chat.SendVerifyCodeRe
 	}
 	now := time.Now()
 
-	var count uint32
+	var count int64
 	var err error
 	if !isEmail {
 		count, err = o.Database.CountVerifyCodeRange(ctx, o.verifyCodeJoin(req.AreaCode, req.PhoneNumber), now.Add(-time.Duration(verifyCode.UintTime)*time.Second), now)
@@ -168,23 +167,22 @@ func (o *chatSvr) SendVerifyCode(ctx context.Context, req *chat.SendVerifyCodeRe
 	return &chat.SendVerifyCodeResp{}, nil
 }
 
-func (o *chatSvr) verifyCode(ctx context.Context, account string, verifyCode string) (uint, error) {
-	defer log.ZDebug(ctx, "return")
+func (o *chatSvr) verifyCode(ctx context.Context, account string, verifyCode string) (string, error) {
 	if verifyCode == "" {
-		return 0, errs.ErrArgs.Wrap("verify code is empty")
+		return "", errs.ErrArgs.Wrap("verify code is empty")
 	}
 	if config.Config.VerifyCode.Use == "" {
 		if verifyCode != config.Config.VerifyCode.SuperCode {
-			return 0, eerrs.ErrVerifyCodeNotMatch.Wrap()
+			return "", eerrs.ErrVerifyCodeNotMatch.Wrap()
 		}
-		return 0, nil
+		return "", nil
 	}
 	last, err := o.Database.TakeLastVerifyCode(ctx, account)
 	if err != nil {
-		if dbutil.IsGormNotFound(err) {
-			return 0, eerrs.ErrVerifyCodeExpired.Wrap()
+		if dbutil.IsDBNotFound(err) {
+			return "", eerrs.ErrVerifyCodeExpired.Wrap()
 		}
-		return 0, err
+		return "", err
 	}
 	if last.CreateTime.Unix()+int64(last.Duration) < time.Now().Unix() {
 		return last.ID, eerrs.ErrVerifyCodeExpired.Wrap()
@@ -209,7 +207,6 @@ func (o *chatSvr) verifyCode(ctx context.Context, account string, verifyCode str
 }
 
 func (o *chatSvr) VerifyCode(ctx context.Context, req *chat.VerifyCodeReq) (*chat.VerifyCodeResp, error) {
-	defer log.ZDebug(ctx, "return")
 	var account string
 	if req.PhoneNumber != "" {
 		account = o.verifyCodeJoin(req.AreaCode, req.PhoneNumber)
@@ -258,7 +255,6 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 	if req.User == nil {
 		return nil, errs.ErrArgs.Wrap("user is nil")
 	}
-	log.ZDebug(ctx, "email", req.User.Email)
 	if req.User.Email == "" {
 		if (req.User.AreaCode == "" && req.User.PhoneNumber != "") || (req.User.AreaCode != "" && req.User.PhoneNumber == "") {
 			return nil, errs.ErrArgs.Wrap("area code or phone number error, no email provide")
@@ -296,14 +292,13 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 		}
 
 	}
-	log.ZDebug(ctx, "usedInvitationCode", usedInvitationCode)
 	if req.User.UserID == "" {
 		for i := 0; i < 20; i++ {
 			userID := o.genUserID()
 			_, err := o.Database.GetUser(ctx, userID)
 			if err == nil {
 				continue
-			} else if dbutil.IsGormNotFound(err) {
+			} else if dbutil.IsDBNotFound(err) {
 				req.User.UserID = userID
 				break
 			} else {
@@ -317,7 +312,7 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 		_, err := o.Database.GetUser(ctx, req.User.UserID)
 		if err == nil {
 			return nil, errs.ErrArgs.Wrap("appoint user id already register")
-		} else if !dbutil.IsGormNotFound(err) {
+		} else if !dbutil.IsDBNotFound(err) {
 			return nil, err
 		}
 	}
@@ -414,7 +409,6 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 }
 
 func (o *chatSvr) Login(ctx context.Context, req *chat.LoginReq) (*chat.LoginResp, error) {
-	defer log.ZDebug(ctx, "return")
 	resp := &chat.LoginResp{}
 	if req.Password == "" && req.VerifyCode == "" {
 		return nil, errs.ErrArgs.Wrap("password or code must be set")
@@ -448,9 +442,9 @@ func (o *chatSvr) Login(ctx context.Context, req *chat.LoginReq) (*chat.LoginRes
 	if err := o.Admin.CheckLogin(ctx, attribute.UserID, req.Ip); err != nil {
 		return nil, err
 	}
-	var verifyCodeID *uint
+	var verifyCodeID *string
 	if req.Password == "" {
-		var id uint
+		var id string
 		var err error
 		if req.Email == "" {
 			id, err = o.verifyCode(ctx, o.verifyCodeJoin(req.AreaCode, req.PhoneNumber), req.VerifyCode)

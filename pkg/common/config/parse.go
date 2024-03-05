@@ -28,7 +28,6 @@ import (
 	"time"
 
 	Constant "github.com/OpenIMSDK/chat/pkg/common/constant"
-	"github.com/OpenIMSDK/tools/utils"
 	"gopkg.in/yaml.v3"
 )
 
@@ -41,7 +40,7 @@ var (
 func readConfig(configFile string) ([]byte, error) {
 	b, err := os.ReadFile(configFile)
 	if err != nil { // File exists and was read successfully
-		return nil, utils.Wrap(err, configFile)
+		return nil, errs.Wrap(err, configFile)
 	}
 	return b, nil
 
@@ -67,7 +66,7 @@ func readConfig(configFile string) ([]byte, error) {
 	//	defaultConfigPath := filepath.Join(Root, "config", "config.yaml")
 	//	b, err := os.ReadFile(defaultConfigPath)
 	//	if err != nil {
-	//		return nil, utils.Wrap(err, defaultConfigPath)
+	//		return nil, errs.Wrap(err, defaultConfigPath)
 	//	}
 	//	return b, nil
 }

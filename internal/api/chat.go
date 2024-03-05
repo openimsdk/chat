@@ -24,13 +24,11 @@ import (
 	"github.com/OpenIMSDK/chat/pkg/common/apistruct"
 	constant2 "github.com/OpenIMSDK/chat/pkg/common/constant"
 	"github.com/OpenIMSDK/chat/pkg/common/mctx"
-	"github.com/OpenIMSDK/protocol/sdkws"
-	"github.com/OpenIMSDK/tools/checker"
-	"github.com/OpenIMSDK/tools/log"
-
 	"github.com/OpenIMSDK/protocol/constant"
+	"github.com/OpenIMSDK/protocol/sdkws"
 	"github.com/OpenIMSDK/tools/a2r"
 	"github.com/OpenIMSDK/tools/apiresp"
+	"github.com/OpenIMSDK/tools/checker"
 	"github.com/OpenIMSDK/tools/errs"
 	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc"
@@ -86,7 +84,6 @@ func (o *ChatApi) RegisterUser(c *gin.Context) {
 		apiresp.GinError(c, err)
 		return
 	}
-	log.ZInfo(c, "registerUser", "req", &req)
 	if err := checker.Validate(&req); err != nil {
 		apiresp.GinError(c, err) // 参数校验失败
 		return
@@ -135,7 +132,6 @@ func (o *ChatApi) RegisterUser(c *gin.Context) {
 	}
 	resp.ChatToken = respRegisterUser.ChatToken
 	resp.UserID = respRegisterUser.UserID
-	log.ZInfo(c, "registerUser api", "resp", &resp)
 	apiresp.GinSuccess(c, &resp)
 }
 
@@ -193,7 +189,6 @@ func (o *ChatApi) UpdateUserInfo(c *gin.Context) {
 		apiresp.GinError(c, err)
 		return
 	}
-	log.ZInfo(c, "updateUserInfo", "req", &req)
 	if err := checker.Validate(&req); err != nil {
 		apiresp.GinError(c, err) // 参数校验失败
 		return
@@ -250,10 +245,6 @@ func (o *ChatApi) FindUserPublicInfo(c *gin.Context) {
 func (o *ChatApi) FindUserFullInfo(c *gin.Context) {
 	a2r.Call(chat.ChatClient.FindUserFullInfo, o.chatClient, c)
 }
-
-//func (o *ChatApi) GetUsersFullInfo(c *gin.Context) {
-//	a2r.Call(chat.ChatClient.GetUsersFullInfo, o.chatClient, c)
-//}
 
 func (o *ChatApi) SearchUserFullInfo(c *gin.Context) {
 	a2r.Call(chat.ChatClient.SearchUserFullInfo, o.chatClient, c)

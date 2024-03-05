@@ -16,9 +16,9 @@ package dbutil
 
 import (
 	"github.com/OpenIMSDK/tools/errs"
-	"gorm.io/gorm"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func IsGormNotFound(err error) bool {
-	return errs.Unwrap(err) == gorm.ErrRecordNotFound
+func IsDBNotFound(err error) bool {
+	return errs.Unwrap(err) == mongo.ErrNoDocuments
 }

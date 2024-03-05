@@ -16,45 +16,77 @@ package chat
 
 import (
 	"context"
+	"github.com/OpenIMSDK/tools/errs"
+	"github.com/OpenIMSDK/tools/mgoutil"
+	"github.com/OpenIMSDK/tools/pagination"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"time"
 
 	"github.com/OpenIMSDK/chat/pkg/common/db/table/chat"
-	"github.com/OpenIMSDK/tools/errs"
-	"github.com/OpenIMSDK/tools/ormutil"
-	"gorm.io/gorm"
 )
 
+func NewLogs(db *mongo.Database) (chat.LogInterface, error) {
+	coll := db.Collection("chat_logs")
+	_, err := coll.Indexes().CreateMany(context.Background(), []mongo.IndexModel{
+		{
+			Keys: bson.D{
+				{Key: "log_id", Value: 1},
+			},
+			Options: options.Index().SetUnique(true),
+		},
+		{
+			Keys: bson.D{
+				{Key: "user_id", Value: 1},
+			},
+		},
+	})
+	if err != nil {
+		return nil, errs.Wrap(err)
+	}
+	return &Logs{coll: coll}, nil
+}
+
 type Logs struct {
-	db *gorm.DB
+	coll *mongo.Collection
 }
 
 func (l *Logs) Create(ctx context.Context, log []*chat.Log) error {
-	return errs.Wrap(l.db.WithContext(ctx).Create(log).Error)
+	return mgoutil.InsertMany(ctx, l.coll, log)
 }
 
-func (l *Logs) Search(ctx context.Context, keyword string, start time.Time, end time.Time, pageNumber int32, showNumber int32) (uint32, []*chat.Log, error) {
-	db := l.db.WithContext(ctx).Where("create_time >= ?", start)
-	if end.UnixMilli() != 0 {
-		db = l.db.WithContext(ctx).Where("create_time <= ?", end)
+func (l *Logs) Search(ctx context.Context, keyword string, start time.Time, end time.Time, pagination pagination.Pagination) (int64, []*chat.Log, error) {
+	filter := bson.M{}
+	if end.UnixMilli() == 0 {
+		filter["create_time"] = bson.M{
+			"$gte": start,
+		}
+	} else {
+		filter["create_time"] = bson.M{
+			"$gte": start,
+			"$lte": end,
+		}
 	}
-	return ormutil.GormSearch[chat.Log](db, []string{"user_id"}, keyword, pageNumber, showNumber)
+	if keyword != "" {
+		filter["user_id"] = bson.M{"$regex": keyword, "$options": "i"}
+	}
+	return mgoutil.FindPage[*chat.Log](ctx, l.coll, filter, pagination)
 }
 
 func (l *Logs) Delete(ctx context.Context, logIDs []string, userID string) error {
-	if userID == "" {
-		return errs.Wrap(l.db.WithContext(ctx).Where("log_id in ?", logIDs).Delete(&chat.Log{}).Error)
+	if len(logIDs) == 0 {
+		return nil
 	}
-	return errs.Wrap(l.db.WithContext(ctx).Where("log_id in ? and user_id=?", logIDs, userID).Delete(&chat.Log{}).Error)
+	if userID == "" {
+		return mgoutil.DeleteMany(ctx, l.coll, bson.M{"log_id": bson.M{"$in": logIDs}})
+	}
+	return mgoutil.DeleteMany(ctx, l.coll, bson.M{"log_id": bson.M{"$in": logIDs}, "user_id": userID})
 }
 
 func (l *Logs) Get(ctx context.Context, logIDs []string, userID string) ([]*chat.Log, error) {
-	var logs []*chat.Log
 	if userID == "" {
-		return logs, errs.Wrap(l.db.WithContext(ctx).Where("log_id in ?", logIDs).Find(&logs).Error)
+		return mgoutil.Find[*chat.Log](ctx, l.coll, bson.M{"log_id": bson.M{"$in": logIDs}})
 	}
-	return logs, errs.Wrap(l.db.WithContext(ctx).Where("log_id in ? and user_id=?", logIDs, userID).Find(&logs).Error)
-}
-
-func NewLogs(db *gorm.DB) chat.LogInterface {
-	return &Logs{db: db}
+	return mgoutil.Find[*chat.Log](ctx, l.coll, bson.M{"log_id": bson.M{"$in": logIDs}, "user_id": userID})
 }
