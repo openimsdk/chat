@@ -72,7 +72,7 @@ service_source_root=(
   $OPENIM_ROOT/cmd/rpc/chat-rpc/
 )
 
-component_binary_full_paths= $OPENIM_ROOT/tools/component/component
+component_binary_full_paths= ${BIN_DIR}/component
 
 #service filename
 service_names=(
