@@ -65,7 +65,6 @@ service_filename=(
 service_port_name=(
 openImChatApiPort
 openImAdminApiPort
-  #api port name
   openImAdminPort
   openImChatPort
 )
@@ -139,6 +138,7 @@ fi
 
 
 
+
 # Automatically created when there is no bin, logs folder
 if [ ! -d $logs_dir ]; then
   mkdir -p $logs_dir
@@ -146,6 +146,15 @@ fi
 cd $SCRIPTS_ROOT
 
 rm -rf ${logs_dir}/chat_tmp_$(date '+%Y%m%d').log
+cmd="${component_binary_full_paths} --config_folder_path ${config_path}"
+nohup ${cmd} >> "${LOG_FILE}" 2> >(tee -a "${STDERR_LOG_FILE}" "$TMP_LOG_FILE" | while read line; do echo -e "\e[31m${line}\e[0m"; done >&2)
+if [ $? -eq 0 ]; then
+    echo "All components checked successfully"
+    # Add the commands that should be executed next if the binary component was successful
+else
+    echo "Component check failed, program exiting"
+    exit 1
+fi
 
 for ((i = 0; i < ${#service_filename[*]}; i++)); do
 
@@ -181,7 +190,7 @@ for ((i = 0; i < ${#service_filename[*]}; i++)); do
 done
 
 
-sleep 5
+
 
 all_services_running=true
 
@@ -198,6 +207,22 @@ if $all_services_running; then
     # Print "Startup successful" in green
     echo -e "\033[0;32mAll chat services startup successful\033[0m"
 fi
+
+all_ports_listening=true
+
+for port in "${ports[@]}"; do
+  if ! check_services_with_port "$port"; then
+    all_ports_listening=false
+    break
+  fi
+done
+
+if $all_ports_listening; then
+  echo "successful"
+else
+  echo "failed"
+fi
+
 
 
 

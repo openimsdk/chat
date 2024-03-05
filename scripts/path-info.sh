@@ -72,6 +72,7 @@ service_source_root=(
   $OPENIM_ROOT/cmd/rpc/chat-rpc/
 )
 
+component_binary_full_paths= $OPENIM_ROOT/tools/component/component
 
 #service filename
 service_names=(
@@ -83,6 +84,7 @@ service_names=(
 
 
 
+
 # Define the array to hold full paths
 binary_full_paths=()
 
@@ -90,5 +92,14 @@ binary_full_paths=()
 for service_name in "${service_names[@]}"; do
     binary_full_paths+=("${BIN_DIR}/${service_name}")
 done
+
+
+
+ports=(
+  $(yq e '.chatApi.openImChatApiPort[]' config.yaml)
+  $(yq e '.adminApi.openImAdminApiPort[]' config.yaml)
+  $(yq e '.rpcPort.openImAdminPort[]' config.yaml)
+  $(yq e '.rpcPort.openImChatPort[]' config.yaml)
+)
 
 

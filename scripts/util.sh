@@ -69,6 +69,25 @@ check_services_with_name() {
 }
 
 
+check_services_with_port() {
+    local port="$1"
+    lsof -i tcp:"$port" > /dev/null 2>&1
+
+    if [ $? -eq 0 ]; then
+        if [ -z "$SUPPRESS_OUTPUT" ]; then
+            echo "A service is listening on port $port."
+        fi
+        return 0
+    else
+        if [ -z "$SUPPRESS_OUTPUT" ]; then
+            echo "No service is listening on port $port."
+        fi
+        return 1
+    fi
+}
+
+
+
 # Example usage of check_services_with_name
 # Replace "/full/path/to/binary" with the actual full path of the binary you want to check
 # check_services_with_name "/full/path/to/binary"
