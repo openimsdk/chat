@@ -50,8 +50,8 @@ func buildMongoURI() string {
 		return uri
 	}
 
-	if *config.Config.Mongo.Uri != "" {
-		return *config.Config.Mongo.Uri
+	if config.Config.Mongo.Uri != "" {
+		return config.Config.Mongo.Uri
 	}
 
 	username := os.Getenv("MONGO_OPENIM_USERNAME")
@@ -62,21 +62,21 @@ func buildMongoURI() string {
 	maxPoolSize := os.Getenv("MONGO_MAX_POOL_SIZE")
 
 	if username == "" {
-		username = *config.Config.Mongo.Username
+		username = config.Config.Mongo.Username
 	}
 	if password == "" {
-		password = *config.Config.Mongo.Password
+		password = config.Config.Mongo.Password
 	}
 	if address == "" {
-		address = strings.Join(*config.Config.Mongo.Address, ",")
+		address = strings.Join(config.Config.Mongo.Address, ",")
 	} else if port != "" {
 		address = fmt.Sprintf("%s:%s", address, port)
 	}
 	if database == "" {
-		database = *config.Config.Mongo.Database
+		database = config.Config.Mongo.Database
 	}
 	if maxPoolSize == "" {
-		maxPoolSize = fmt.Sprint(*config.Config.Mongo.MaxPoolSize)
+		maxPoolSize = fmt.Sprint(config.Config.Mongo.MaxPoolSize)
 	}
 
 	if username != "" && password != "" {
@@ -86,7 +86,7 @@ func buildMongoURI() string {
 }
 
 func buildMongoDatabase() string {
-	return *config.Config.Mongo.Database
+	return config.Config.Mongo.Database
 }
 
 func shouldRetry(err error) bool {
