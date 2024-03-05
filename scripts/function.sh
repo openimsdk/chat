@@ -30,3 +30,5 @@ remove_space(){
   value=$*
   result=`echo $value | sed 's/ //g'`
 }
+
+
