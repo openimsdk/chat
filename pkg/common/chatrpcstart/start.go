@@ -41,8 +41,15 @@ import (
 func Start(rpcPort int, rpcRegisterName string, prometheusPort int, rpcFn func(client discoveryregistry.SvcDiscoveryRegistry, server *grpc.Server) error, options ...grpc.ServerOption) error {
 	fmt.Println("start", rpcRegisterName, "server, port: ", rpcPort, "prometheusPort:", prometheusPort, ", OpenIM version: ", config.Version)
 
+	rpcTcpAddr := net.JoinHostPort(network.GetListenIP(config.Config.Rpc.ListenIP), strconv.Itoa(rpcPort))
+	listener, err := net.Listen("tcp", rpcTcpAddr)
+	if err != nil {
+		return errs.Wrap(err)
+	}
+	defer listener.Close()
+
 	var zkClient discoveryregistry.SvcDiscoveryRegistry
-	zkClient, err := discovery_register.NewDiscoveryRegister(config.Config.Envs.Discovery)
+	zkClient, err = discovery_register.NewDiscoveryRegister(config.Config.Envs.Discovery)
 	if err != nil {
 		return errs.Wrap(err, fmt.Sprintf(";the addr is:%v", &config.Config.Zookeeper.ZkAddr))
 	}
@@ -64,13 +71,6 @@ func Start(rpcPort int, rpcRegisterName string, prometheusPort int, rpcFn func(c
 	if err != nil {
 		return err
 	}
-
-	rpcTcpAddr := net.JoinHostPort(network.GetListenIP(config.Config.Rpc.ListenIP), strconv.Itoa(rpcPort))
-	listener, err := net.Listen("tcp", rpcTcpAddr)
-	if err != nil {
-		return errs.Wrap(err)
-	}
-	defer listener.Close()
 
 	err = zkClient.Register(rpcRegisterName, registerIP, rpcPort, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
