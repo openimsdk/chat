@@ -75,7 +75,7 @@ func readConfig(configFile string) ([]byte, error) {
 func InitConfig(configFile string) error {
 	data, err := readConfig(configFile)
 	if err != nil {
-		return fmt.Errorf("read loacl config file error: %w", err)
+		return errs.Wrap(fmt.Errorf("read loacl config file error: %w", err), "configFile:"+configFile)
 	}
 
 	if err := yaml.NewDecoder(bytes.NewReader(data)).Decode(&Config); err != nil {
