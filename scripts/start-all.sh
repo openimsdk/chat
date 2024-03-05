@@ -72,26 +72,80 @@ service_prometheus_port_name=(
 
 )
 
+
+#!/bin/bash
+
+# Reusing stop_services_with_name and check_services_with_name functions as provided
+
+check_and_stop_services() {
+    local services=("$@")
+    local service_stopped=0
+    local attempts=0
+
+    # Step 1: Check and stop each service if running
+    for service in "${services[@]}"; do
+        check_services_with_name "$service"
+        if [ $? -eq 0 ]; then
+            echo "Service running: $service. Attempting to stop."
+            stop_services_with_name "$service"
+        fi
+    done
+
+    # Step 2: Verify all services are stopped, retry up to 15 times if necessary
+    while [ $attempts -lt 15 ]; do
+        service_stopped=1
+        for service in "${services[@]}"; do
+            check_services_with_name "$service" >/dev/null 2>&1
+            if [ $? -eq 0 ]; then
+                service_stopped=0
+                break
+            fi
+        done
+
+        if [ $service_stopped -eq 1 ]; then
+            echo "All services have been successfully stopped."
+            return 0
+        fi
+
+        sleep 1
+        ((attempts++))
+    done
+
+    if [ $service_stopped -eq 0 ]; then
+        echo "Failed to stop all services after 15 seconds."
+        return 1
+    fi
+}
+
+
+
+# Call the function with your full binary paths
+check_and_stop_services "${binary_full_paths[@]}"
+exit_status=$?
+
+# Check the exit status and proceed accordingly
+if [ $exit_status -eq 0 ]; then
+    echo "Execution can continue."
+else
+    echo "Exiting due to failure in stopping services."
+    exit 1
+fi
+
+
+
+
+
+
 # Automatically created when there is no bin, logs folder
 if [ ! -d $logs_dir ]; then
   mkdir -p $logs_dir
 fi
 cd $SCRIPTS_ROOT
 
+rm -rf ${logs_dir}/chat_tmp_$(date '+%Y%m%d').log
+
 for ((i = 0; i < ${#service_filename[*]}; i++)); do
-  rm -rf ${logs_dir}/chat_tmp_$(date '+%Y%m%d').log
-  #Check whether the service exists
-#  service_name="ps |grep -w ${service_filename[$i]} |grep -v grep"
-#  count="${service_name}| wc -l"
-#
-#  if [ $(eval ${count}) -gt 0 ]; then
-#    pid="${service_name}| awk '{print \$2}'"
-#    echo  "${service_filename[$i]} service has been started,pid:$(eval $pid)"
-#    echo  "killing the service ${service_filename[$i]} pid:$(eval $pid)"
-#    #kill the service that existed
-#    kill -9 $(eval $pid)
-#    sleep 0.5
-#  fi
+
   cd $SCRIPTS_ROOT
 
   #Get the rpc port in the configuration file
