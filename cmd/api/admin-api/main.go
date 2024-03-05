@@ -15,11 +15,16 @@
 package main
 
 import (
+	"context"
 	"fmt"
+	"github.com/OpenIMSDK/chat/pkg/util"
 	"math/rand"
 	"net"
+	"net/http"
 	"os"
+	"os/signal"
 	"strconv"
+	"syscall"
 	"time"
 
 	"github.com/OpenIMSDK/tools/errs"
@@ -95,8 +100,37 @@ func main() {
 	api.NewAdminRoute(engine, zk)
 
 	address := net.JoinHostPort(config.Config.AdminApi.ListenIP, strconv.Itoa(ginPort))
-	if err := engine.Run(address); err != nil {
-		fmt.Fprintf(os.Stderr, "\n\nexit -1: \n%+v\n\n", err)
-		os.Exit(-1)
+
+	server := http.Server{Addr: address, Handler: engine}
+
+	var (
+		netDone = make(chan struct{}, 1)
+		netErr  error
+	)
+
+	go func() {
+		err = server.ListenAndServe()
+		if err != nil && err != http.ErrServerClosed {
+			netErr = errs.Wrap(err, fmt.Sprintf("api start err: %s", server.Addr))
+			netDone <- struct{}{}
+		}
+	}()
+
+	sigs := make(chan os.Signal, 1)
+	signal.Notify(sigs, syscall.SIGTERM)
+
+	select {
+	case <-sigs:
+		util.SIGTERMExit()
+		ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+		defer cancel()
+		err = server.Shutdown(ctx)
+		if err != nil {
+			util.ExitWithError(errs.Wrap(err, "shutdown err"))
+		}
+	case <-netDone:
+		close(netDone)
+		util.ExitWithError(netErr)
 	}
+
 }
