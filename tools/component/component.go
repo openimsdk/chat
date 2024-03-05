@@ -39,7 +39,7 @@ func ComponentCheck() error {
 		checks := []checkFunc{
 			{name: "Zookeeper", function: checkZookeeper},
 			{name: "Redis", function: checkRedis},
-			//{name: "Mongo", function: checkMongo, config: conf},
+			//	{name: "Mongo", function: checkMongo, config: conf},
 		}
 
 		for i := 0; i < MaxConnectTimes; i++ {
