@@ -176,11 +176,10 @@ for ((i = 0; i < ${#service_filename[*]}; i++)); do
     STDERR_LOG_FILE=${logs_dir}/chat_err_$(date '+%Y%m%d').log
     $TMP_LOG_FILE=${logs_dir}/chat_tmp_$(date '+%Y%m%d').log
 
-{
 
-  nohup  $cmd >> $TMP_LOG_FILE 2>&1 1>&3 | tee -a $LOG_FILE $TMP_LOG_FILE
-} 3>&1 &
 
+
+    nohup bash -c "${cmd} > >(tee -a ${LOG_FILE} ${TMP_LOG_FILE}) 2> >(tee -a ${LOG_FILE} ${TMP_LOG_FILE} >&2)" &
 
     #nohup ${cmd} > >(tee -a "${LOG_FILE}" "${TMP_LOG_FILE}") 2> >(tee -a "${LOG_FILE}" "${STDERR_LOG_FILE}" >&2) &
     #nohup ${cmd} > >(tee -a "${LOG_FILE}") 2> >(tee -a "${LOG_FILE}" "${STDERR_LOG_FILE}" >&2) &
