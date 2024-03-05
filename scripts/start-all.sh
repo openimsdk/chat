@@ -149,10 +149,8 @@ rm -rf ${logs_dir}/chat_tmp_$(date '+%Y%m%d').log
 LOG_FILE=${logs_dir}/chat_$(date '+%Y%m%d').log
 STDERR_LOG_FILE=${logs_dir}/chat_err_$(date '+%Y%m%d').log
 TMP_LOG_FILE=${logs_dir}/chat_tmp_$(date '+%Y%m%d').log
-echo "${component_binary_full_path}" 11111111111111
 cmd="${component_binary_full_path} --config_folder_path ${config_path}"
-echo $cmd ...............
-nohup ${cmd} >> "${LOG_FILE}" 2> >(tee -a "${STDERR_LOG_FILE}" "$TMP_LOG_FILE" | while read line; do echo -e "\e[31m${line}\e[0m"; done >&2)
+${cmd} >> "${LOG_FILE}" 2> >(tee -a "${STDERR_LOG_FILE}" "$TMP_LOG_FILE" | while read line; do echo -e "\e[31m${line}\e[0m"; done >&2)
 if [ $? -eq 0 ]; then
     echo "All components checked successfully"
     # Add the commands that should be executed next if the binary component was successful
