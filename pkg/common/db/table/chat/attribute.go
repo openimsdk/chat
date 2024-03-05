@@ -16,28 +16,29 @@ package chat
 
 import (
 	"context"
+	"github.com/OpenIMSDK/tools/pagination"
 	"time"
 )
 
 // Attribute 用户属性表.
 type Attribute struct {
-	UserID           string    `gorm:"column:user_id;primary_key;type:char(64)"`
-	Account          string    `gorm:"column:account;type:char(64)"`
-	PhoneNumber      string    `gorm:"column:phone_number;type:varchar(32)"`
-	AreaCode         string    `gorm:"column:area_code;type:varchar(8)"`
-	Email            string    `gorm:"column:email;type:varchar(64)" `
-	Nickname         string    `gorm:"column:nickname;type:varchar(64)" `
-	FaceURL          string    `gorm:"column:face_url;type:varchar(255)" `
-	Gender           int32     `gorm:"column:gender"`
-	CreateTime       time.Time `gorm:"column:create_time"`
-	ChangeTime       time.Time `gorm:"column:change_time"`
-	BirthTime        time.Time `gorm:"column:birth_time"`
-	Level            int32     `gorm:"column:level;default:1"`
-	AllowVibration   int32     `gorm:"column:allow_vibration;default:1"`
-	AllowBeep        int32     `gorm:"column:allow_beep;default:1"`
-	AllowAddFriend   int32     `gorm:"column:allow_add_friend;default:1"`
-	GlobalRecvMsgOpt int32     `gorm:"column:global_recv_msg_opt;default:0"`
-	RegisterType     int32     `gorm:"column:register_type"`
+	UserID           string    `bson:"user_id"`
+	Account          string    `bson:"account"`
+	PhoneNumber      string    `bson:"phone_number"`
+	AreaCode         string    `bson:"area_code"`
+	Email            string    `bson:"email"`
+	Nickname         string    `bson:"nickname"`
+	FaceURL          string    `bson:"face_url"`
+	Gender           int32     `bson:"gender"`
+	CreateTime       time.Time `bson:"create_time"`
+	ChangeTime       time.Time `bson:"change_time"`
+	BirthTime        time.Time `bson:"birth_time"`
+	Level            int32     `bson:"level"`
+	AllowVibration   int32     `bson:"allow_vibration"`
+	AllowBeep        int32     `bson:"allow_beep"`
+	AllowAddFriend   int32     `bson:"allow_add_friend"`
+	GlobalRecvMsgOpt int32     `bson:"global_recv_msg_opt"`
+	RegisterType     int32     `bson:"register_type"`
 }
 
 func (Attribute) TableName() string {
@@ -45,16 +46,16 @@ func (Attribute) TableName() string {
 }
 
 type AttributeInterface interface {
-	NewTx(tx any) AttributeInterface
+	//NewTx(tx any) AttributeInterface
 	Create(ctx context.Context, attribute ...*Attribute) error
 	Update(ctx context.Context, userID string, data map[string]any) error
 	Find(ctx context.Context, userIds []string) ([]*Attribute, error)
 	FindAccount(ctx context.Context, accounts []string) ([]*Attribute, error)
-	Search(ctx context.Context, keyword string, genders []int32, page int32, size int32) (uint32, []*Attribute, error)
+	Search(ctx context.Context, keyword string, genders []int32, pagination pagination.Pagination) (int64, []*Attribute, error)
 	TakePhone(ctx context.Context, areaCode string, phoneNumber string) (*Attribute, error)
 	TakeEmail(ctx context.Context, email string) (*Attribute, error)
 	TakeAccount(ctx context.Context, account string) (*Attribute, error)
 	Take(ctx context.Context, userID string) (*Attribute, error)
-	SearchNormalUser(ctx context.Context, keyword string, forbiddenID []string, gender int32, page int32, size int32) (uint32, []*Attribute, error)
-	SearchUser(ctx context.Context, keyword string, userIDs []string, genders []int32, pageNumber int32, showNumber int32) (uint32, []*Attribute, error)
+	SearchNormalUser(ctx context.Context, keyword string, forbiddenID []string, gender int32, pagination pagination.Pagination) (int64, []*Attribute, error)
+	SearchUser(ctx context.Context, keyword string, userIDs []string, genders []int32, pagination pagination.Pagination) (int64, []*Attribute, error)
 }

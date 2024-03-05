@@ -16,37 +16,44 @@ package chat
 
 import (
 	"context"
+	"github.com/OpenIMSDK/tools/mgoutil"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"time"
 
-	"github.com/OpenIMSDK/tools/errs"
-	"gorm.io/gorm"
-
 	"github.com/OpenIMSDK/chat/pkg/common/db/table/chat"
+	"github.com/OpenIMSDK/tools/errs"
 )
 
-func NewRegister(db *gorm.DB) chat.RegisterInterface {
-	return &Register{db: db}
+func NewRegister(db *mongo.Database) (chat.RegisterInterface, error) {
+	coll := db.Collection("register")
+	_, err := coll.Indexes().CreateMany(context.Background(), []mongo.IndexModel{
+		{
+			Keys: bson.D{
+				{Key: "user_id", Value: 1},
+			},
+			Options: options.Index().SetUnique(true),
+		},
+	})
+	if err != nil {
+		return nil, errs.Wrap(err)
+	}
+	return &Register{coll: coll}, nil
 }
 
 type Register struct {
-	db *gorm.DB
-}
-
-func (o *Register) NewTx(tx any) chat.RegisterInterface {
-	return &Register{db: tx.(*gorm.DB)}
+	coll *mongo.Collection
 }
 
 func (o *Register) Create(ctx context.Context, registers ...*chat.Register) error {
-	return errs.Wrap(o.db.WithContext(ctx).Create(registers).Error)
+	return mgoutil.InsertMany(ctx, o.coll, registers)
 }
 
-func (o *Register) CountTotal(ctx context.Context, before *time.Time) (count int64, err error) {
-	db := o.db.WithContext(ctx).Model(&chat.Register{})
+func (o *Register) CountTotal(ctx context.Context, before *time.Time) (int64, error) {
+	filter := bson.M{}
 	if before != nil {
-		db.Where("create_time < ?", before)
+		filter["create_time"] = bson.M{"$lt": before}
 	}
-	if err := db.Count(&count).Error; err != nil {
-		return 0, errs.Wrap(err)
-	}
-	return count, nil
+	return mgoutil.Count(ctx, o.coll, filter)
 }

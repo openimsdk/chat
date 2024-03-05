@@ -63,7 +63,7 @@ var Config struct {
 		OpenImAdminName string `yaml:"openImAdminName"`
 		OpenImChatName  string `yaml:"openImChatName"`
 	} `yaml:"rpcRegisterName"`
-	Mysql struct {
+	Mysql *struct {
 		Address       *[]string `yaml:"address"`
 		Username      *string   `yaml:"username"`
 		Password      *string   `yaml:"password"`

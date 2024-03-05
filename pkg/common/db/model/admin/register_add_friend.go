@@ -16,42 +16,56 @@ package admin
 
 import (
 	"context"
-
-	"github.com/OpenIMSDK/tools/errs"
-	"github.com/OpenIMSDK/tools/ormutil"
-	"gorm.io/gorm"
+	"github.com/OpenIMSDK/tools/mgoutil"
+	"github.com/OpenIMSDK/tools/pagination"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 
 	"github.com/OpenIMSDK/chat/pkg/common/db/table/admin"
+	"github.com/OpenIMSDK/tools/errs"
 )
 
-func NewRegisterAddFriend(db *gorm.DB) admin.RegisterAddFriendInterface {
-	return &RegisterAddFriend{db: db}
+func NewRegisterAddFriend(db *mongo.Database) (admin.RegisterAddFriendInterface, error) {
+	coll := db.Collection("register_add_friend")
+	_, err := coll.Indexes().CreateOne(context.Background(), mongo.IndexModel{
+		Keys: bson.D{
+			{Key: "user_id", Value: 1},
+		},
+		Options: options.Index().SetUnique(true),
+	})
+	if err != nil {
+		return nil, errs.Wrap(err)
+	}
+	return &RegisterAddFriend{
+		coll: coll,
+	}, nil
 }
 
 type RegisterAddFriend struct {
-	db *gorm.DB
+	coll *mongo.Collection
 }
 
 func (o *RegisterAddFriend) Add(ctx context.Context, registerAddFriends []*admin.RegisterAddFriend) error {
-	return errs.Wrap(o.db.WithContext(ctx).Create(registerAddFriends).Error)
+	return mgoutil.InsertMany(ctx, o.coll, registerAddFriends)
 }
 
 func (o *RegisterAddFriend) Del(ctx context.Context, userIDs []string) error {
-	return errs.Wrap(o.db.WithContext(ctx).Where("user_id in ?", userIDs).Delete(&admin.RegisterAddFriend{}).Error)
+	if len(userIDs) == 0 {
+		return nil
+	}
+	return mgoutil.DeleteMany(ctx, o.coll, bson.M{"user_id": bson.M{"$in": userIDs}})
 }
 
 func (o *RegisterAddFriend) FindUserID(ctx context.Context, userIDs []string) ([]string, error) {
-	db := o.db.WithContext(ctx).Model(&admin.RegisterAddFriend{})
+	filter := bson.M{}
 	if len(userIDs) > 0 {
-		db = db.Where("user_id in (?)", userIDs)
+		filter["user_id"] = bson.M{"$in": userIDs}
 	}
-	var ms []string
-	if err := db.Pluck("user_id", &ms).Error; err != nil {
-		return nil, errs.Wrap(err)
-	}
-	return ms, nil
+	return mgoutil.Find[string](ctx, o.coll, filter, options.Find().SetProjection(bson.M{"_id": 0, "user_id": 1}))
 }
 
-func (o *RegisterAddFriend) Search(ctx context.Context, keyword string, page int32, size int32) (uint32, []*admin.RegisterAddFriend, error) {
-	return ormutil.GormSearch[admin.RegisterAddFriend](o.db.WithContext(ctx), []string{"user_id"}, keyword, page, size)
+func (o *RegisterAddFriend) Search(ctx context.Context, keyword string, pagination pagination.Pagination) (int64, []*admin.RegisterAddFriend, error) {
+	filter := bson.M{"user_id": bson.M{"$regex": keyword, "$options": "i"}}
+	return mgoutil.FindPage[*admin.RegisterAddFriend](ctx, o.coll, filter, pagination)
 }

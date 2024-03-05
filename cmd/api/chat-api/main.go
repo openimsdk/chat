@@ -19,7 +19,6 @@ import (
 	"flag"
 	"fmt"
 	"github.com/OpenIMSDK/chat/pkg/util"
-	"math/rand"
 	"net"
 	"net/http"
 	"os"
@@ -46,18 +45,11 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var rng *rand.Rand
-
-func init() {
-	rng = rand.New(rand.NewSource(time.Now().UnixNano()))
-}
-
 func main() {
 
 	configFile, ginPort, showVersion, err := config.FlagParse()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "\n\nexit -1: \n%+v\n\n", err)
-		os.Exit(-1)
+		util.ExitWithError(err)
 	}
 
 	// Check if the version flag was set
@@ -76,15 +68,13 @@ func main() {
 
 	err = config.InitConfig(configFile)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "\n\nexit -1: \n%+v\n\n", err)
-		os.Exit(-1)
+		util.ExitWithError(err)
 	}
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "\n\nexit -1: \n%+v\n\n", err)
-		os.Exit(-1)
+		util.ExitWithError(err)
 	}
 	if err := log.InitFromConfig("chat.log", "chat-api", *config.Config.Log.RemainLogLevel, *config.Config.Log.IsStdout, *config.Config.Log.IsJson, *config.Config.Log.StorageLocation, *config.Config.Log.RemainRotationCount, *config.Config.Log.RotationTime); err != nil {
-		panic(fmt.Errorf("InitFromConfig failed:%w", err))
+		util.ExitWithError(err)
 	}
 	if config.Config.Envs.Discovery == "k8s" {
 		ginPort = 80
@@ -95,11 +85,10 @@ func main() {
 	openKeeper.WithFreq(time.Hour), openKeeper.WithUserNameAndPassword(config.Config.Zookeeper.Username,
 		config.Config.Zookeeper.Password), openKeeper.WithRoundRobin(), openKeeper.WithTimeout(10), openKeeper.WithLogger(log.NewZkLogger()))*/
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "\n\nexit -1: \n%+v\n\n", err)
-		os.Exit(-1)
+		util.ExitWithError(err)
 	}
 	if err := zk.CreateRpcRootNodes([]string{config.Config.RpcRegisterName.OpenImAdminName, config.Config.RpcRegisterName.OpenImChatName}); err != nil {
-		panic(errs.Wrap(err, "CreateRpcRootNodes error"))
+		util.ExitWithError(err)
 	}
 	zk.AddOption(mw.GrpcClient(), grpc.WithTransportCredentials(insecure.NewCredentials())) // 默认RPC中间件
 	engine := gin.Default()

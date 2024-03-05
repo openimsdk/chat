@@ -50,8 +50,7 @@ func main() {
 	rand.Seed(time.Now().UnixNano())
 	configFile, ginPort, showVersion, err := config.FlagParse()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "\n\nexit -1: \n%+v\n\n", err)
-		os.Exit(-1)
+		util.ExitWithError(err)
 	}
 
 	// Check if the version flag was set
@@ -67,15 +66,13 @@ func main() {
 	}
 
 	if err := config.InitConfig(configFile); err != nil {
-		fmt.Fprintf(os.Stderr, "\n\nexit -1: \n%+v\n\n", err)
-		os.Exit(-1)
+		util.ExitWithError(err)
 	}
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "\n\nexit -1: \n%+v\n\n", err)
-		os.Exit(-1)
+		util.ExitWithError(err)
 	}
 	if err := log.InitFromConfig("chat.log", "admin-api", *config.Config.Log.RemainLogLevel, *config.Config.Log.IsStdout, *config.Config.Log.IsJson, *config.Config.Log.StorageLocation, *config.Config.Log.RemainRotationCount, *config.Config.Log.RotationTime); err != nil {
-		panic(fmt.Errorf("InitFromConfig failed:%w", err))
+		util.ExitWithError(err)
 	}
 	if config.Config.Envs.Discovery == "k8s" {
 		ginPort = 80
@@ -85,8 +82,7 @@ func main() {
 	//zk, err = openKeeper.NewClient(config.Config.Zookeeper.ZkAddr, config.Config.Zookeeper.Schema,
 	//		openKeeper.WithFreq(time.Hour), openKeeper.WithUserNameAndPassword(config.Config.Zookeeper.Username, config.Config.Zookeeper.Password), openKeeper.WithRoundRobin(), openKeeper.WithTimeout(10), openKeeper.WithLogger(log.NewZkLogger()))
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "\n\nexit -1: \n%+v\n\n", err)
-		os.Exit(-1)
+		util.ExitWithError(err)
 	}
 
 	if err := zk.CreateRpcRootNodes([]string{config.Config.RpcRegisterName.OpenImAdminName, config.Config.RpcRegisterName.OpenImChatName}); err != nil {

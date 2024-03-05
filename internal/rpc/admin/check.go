@@ -18,15 +18,12 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/OpenIMSDK/tools/log"
-
 	"github.com/OpenIMSDK/chat/pkg/common/db/dbutil"
 	"github.com/OpenIMSDK/chat/pkg/eerrs"
 	"github.com/OpenIMSDK/chat/pkg/proto/admin"
 )
 
 func (o *adminServer) CheckRegisterForbidden(ctx context.Context, req *admin.CheckRegisterForbiddenReq) (*admin.CheckRegisterForbiddenResp, error) {
-	defer log.ZDebug(ctx, "return")
 	forbiddens, err := o.Database.FindIPForbidden(ctx, []string{req.Ip})
 	if err != nil {
 		return nil, err
@@ -40,7 +37,6 @@ func (o *adminServer) CheckRegisterForbidden(ctx context.Context, req *admin.Che
 }
 
 func (o *adminServer) CheckLoginForbidden(ctx context.Context, req *admin.CheckLoginForbiddenReq) (*admin.CheckLoginForbiddenResp, error) {
-	defer log.ZDebug(ctx, "return")
 	forbiddens, err := o.Database.FindIPForbidden(ctx, []string{req.Ip})
 	if err != nil {
 		return nil, err
@@ -51,7 +47,7 @@ func (o *adminServer) CheckLoginForbidden(ctx context.Context, req *admin.CheckL
 		}
 	}
 	if _, err := o.Database.GetLimitUserLoginIP(ctx, req.UserID, req.Ip); err != nil {
-		if !dbutil.IsGormNotFound(err) {
+		if !dbutil.IsDBNotFound(err) {
 			return nil, err
 		}
 		count, err := o.Database.CountLimitUserLoginIP(ctx, req.UserID)
@@ -64,7 +60,7 @@ func (o *adminServer) CheckLoginForbidden(ctx context.Context, req *admin.CheckL
 	}
 	if forbiddenAccount, err := o.Database.GetBlockInfo(ctx, req.UserID); err == nil {
 		return nil, eerrs.ErrForbidden.Wrap(fmt.Sprintf("account forbidden: %s", forbiddenAccount.Reason))
-	} else if !dbutil.IsGormNotFound(err) {
+	} else if !dbutil.IsDBNotFound(err) {
 		return nil, err
 	}
 	return &admin.CheckLoginForbiddenResp{}, nil

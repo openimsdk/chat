@@ -16,10 +16,6 @@ package chat
 
 import (
 	"context"
-	"github.com/OpenIMSDK/chat/pkg/common/config"
-	constant2 "github.com/OpenIMSDK/protocol/constant"
-	"github.com/OpenIMSDK/tools/log"
-
 	"github.com/OpenIMSDK/tools/errs"
 
 	"github.com/OpenIMSDK/chat/pkg/common/constant"
@@ -28,11 +24,10 @@ import (
 )
 
 func (o *chatSvr) ResetPassword(ctx context.Context, req *chat.ResetPasswordReq) (*chat.ResetPasswordResp, error) {
-	defer log.ZDebug(ctx, "return")
 	if req.Password == "" {
 		return nil, errs.ErrArgs.Wrap("password must be set")
 	}
-	var verifyCodeID uint
+	var verifyCodeID string
 	var err error
 	if req.Email == "" {
 		verifyCodeID, err = o.verifyCode(ctx, o.verifyCodeJoin(req.AreaCode, req.PhoneNumber), req.VerifyCode)
@@ -65,7 +60,6 @@ func (o *chatSvr) ResetPassword(ctx context.Context, req *chat.ResetPasswordReq)
 }
 
 func (o *chatSvr) ChangePassword(ctx context.Context, req *chat.ChangePasswordReq) (*chat.ChangePasswordResp, error) {
-	defer log.ZDebug(ctx, "return")
 	if req.NewPassword == "" {
 		return nil, errs.ErrArgs.Wrap("new password must be set")
 	}
@@ -106,15 +100,15 @@ func (o *chatSvr) ChangePassword(ctx context.Context, req *chat.ChangePasswordRe
 		}
 	}
 
-	imToken, err := o.imApiCaller.UserToken(ctx, config.GetIMAdmin(mctx.GetOpUserID(ctx)), constant2.AdminPlatformID)
-	if err != nil {
-		return nil, err
-	}
-
-	err = o.imApiCaller.ForceOffLine(mctx.WithApiToken(ctx, imToken), req.UserID)
-	if err != nil {
-		return nil, err
-	}
+	//imToken, err := o.imApiCaller.UserToken(ctx, config.GetIMAdmin(mctx.GetOpUserID(ctx)), constant2.AdminPlatformID)
+	//if err != nil {
+	//	return nil, err
+	//}
+	//
+	//err = o.imApiCaller.ForceOffLine(mctx.WithApiToken(ctx, imToken), req.UserID)
+	//if err != nil {
+	//	return nil, err
+	//}
 
 	return &chat.ChangePasswordResp{}, nil
 }
