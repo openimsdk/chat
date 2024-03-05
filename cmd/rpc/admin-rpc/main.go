@@ -24,7 +24,6 @@ import (
 
 	"github.com/OpenIMSDK/chat/pkg/common/chatrpcstart"
 	"github.com/OpenIMSDK/chat/pkg/common/version"
-	"github.com/OpenIMSDK/chat/tools/component"
 	"github.com/OpenIMSDK/tools/log"
 
 	"github.com/OpenIMSDK/chat/internal/rpc/admin"
@@ -58,7 +57,6 @@ func main() {
 		fmt.Fprintf(os.Stderr, "\n\nexit -1: \n%+v\n\n", err)
 		os.Exit(-1)
 	}
-	err = component.ComponentCheck()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "\n\nexit -1: \n%+v\n\n", err)
 		os.Exit(-1)
