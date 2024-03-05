@@ -33,7 +33,7 @@ const (
 )
 
 var (
-	cfgPath = flag.String("--config_folder_path", defaultCfgPath, "Path to the configuration file")
+	cfgPath = flag.String("config_folder_path", defaultCfgPath, "Path to the configuration file")
 )
 
 type checkFunc struct {
