@@ -18,9 +18,6 @@ import (
 	"context"
 	"time"
 
-
-	"github.com/OpenIMSDK/tools/log"
-
 	"github.com/OpenIMSDK/tools/errs"
 	"github.com/OpenIMSDK/tools/utils"
 
@@ -30,11 +27,10 @@ import (
 )
 
 func (o *adminServer) SearchUserIPLimitLogin(ctx context.Context, req *admin.SearchUserIPLimitLoginReq) (*admin.SearchUserIPLimitLoginResp, error) {
-	defer log.ZDebug(ctx, "return")
 	if _, err := mctx.CheckAdmin(ctx); err != nil {
 		return nil, err
 	}
-	total, list, err := o.Database.SearchUserLimitLogin(ctx, req.Keyword, req.Pagination.PageNumber, req.Pagination.ShowNumber)
+	total, list, err := o.Database.SearchUserLimitLogin(ctx, req.Keyword, req.Pagination)
 	if err != nil {
 		return nil, err
 	}
@@ -52,11 +48,10 @@ func (o *adminServer) SearchUserIPLimitLogin(ctx context.Context, req *admin.Sea
 			User:       userMap[info.UserID],
 		})
 	}
-	return &admin.SearchUserIPLimitLoginResp{Total: total, Limits: limits}, nil
+	return &admin.SearchUserIPLimitLoginResp{Total: uint32(total), Limits: limits}, nil
 }
 
 func (o *adminServer) AddUserIPLimitLogin(ctx context.Context, req *admin.AddUserIPLimitLoginReq) (*admin.AddUserIPLimitLoginResp, error) {
-	defer log.ZDebug(ctx, "return")
 	if _, err := mctx.CheckAdmin(ctx); err != nil {
 		return nil, err
 	}

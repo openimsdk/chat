@@ -29,12 +29,12 @@ import (
 func NewChatRoute(router gin.IRouter, discov discoveryregistry.SvcDiscoveryRegistry) {
 	chatConn, err := discov.GetConn(context.Background(), config.Config.RpcRegisterName.OpenImChatName)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "\n\nexit -1: \n%+v\n\n", err)
+		fmt.Printf("\n\nexit -1: \n%+v\n\n", err)
 		os.Exit(-1)
 	}
 	adminConn, err := discov.GetConn(context.Background(), config.Config.RpcRegisterName.OpenImAdminName)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "\n\nexit -1: \n%+v\n\n", err)
+		fmt.Printf("\n\nexit -1: \n%+v\n\n", err)
 		os.Exit(-1)
 	}
 	mw := NewMW(adminConn)
@@ -72,12 +72,12 @@ func NewChatRoute(router gin.IRouter, discov discoveryregistry.SvcDiscoveryRegis
 func NewAdminRoute(router gin.IRouter, discov discoveryregistry.SvcDiscoveryRegistry) {
 	adminConn, err := discov.GetConn(context.Background(), config.Config.RpcRegisterName.OpenImAdminName)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "\n\nexit -1: \n%+v\n\n", err)
+		fmt.Printf("\n\nexit -1: \n%+v\n\n", err)
 		os.Exit(-1)
 	}
 	chatConn, err := discov.GetConn(context.Background(), config.Config.RpcRegisterName.OpenImChatName)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "\n\nexit -1: \n%+v\n\n", err)
+		fmt.Printf("\n\nexit -1: \n%+v\n\n", err)
 		os.Exit(-1)
 	}
 	mw := NewMW(adminConn)

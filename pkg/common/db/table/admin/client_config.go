@@ -18,8 +18,8 @@ import "context"
 
 // ClientConfig 客户端相关配置项.
 type ClientConfig struct {
-	Key   string `gorm:"column:key;primary_key;type:varchar(255)"`
-	Value string `gorm:"column:value;not null;type:text"`
+	Key   string `bson:"key"`
+	Value string `bson:"value"`
 }
 
 func (ClientConfig) TableName() string {
@@ -27,7 +27,6 @@ func (ClientConfig) TableName() string {
 }
 
 type ClientConfigInterface interface {
-	NewTx(tx any) ClientConfigInterface
 	Set(ctx context.Context, config map[string]string) error
 	Get(ctx context.Context) (map[string]string, error)
 	Del(ctx context.Context, keys []string) error

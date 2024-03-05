@@ -19,8 +19,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/OpenIMSDK/tools/log"
-
 	"github.com/OpenIMSDK/tools/errs"
 	"github.com/OpenIMSDK/tools/utils"
 	"github.com/google/uuid"
@@ -33,7 +31,6 @@ import (
 )
 
 func (o *adminServer) AddApplet(ctx context.Context, req *admin.AddAppletReq) (*admin.AddAppletResp, error) {
-	defer log.ZDebug(ctx, "return")
 	if _, err := mctx.CheckAdmin(ctx); err != nil {
 		return nil, err
 	}
@@ -62,14 +59,13 @@ func (o *adminServer) AddApplet(ctx context.Context, req *admin.AddAppletReq) (*
 	if m.ID == "" {
 		m.ID = uuid.New().String()
 	}
-	if err := o.Database.CreateApplet(ctx, &m); err != nil {
+	if err := o.Database.CreateApplet(ctx, []*admin2.Applet{&m}); err != nil {
 		return nil, err
 	}
 	return &admin.AddAppletResp{}, nil
 }
 
 func (o *adminServer) DelApplet(ctx context.Context, req *admin.DelAppletReq) (*admin.DelAppletResp, error) {
-	defer log.ZDebug(ctx, "return")
 	if _, err := mctx.CheckAdmin(ctx); err != nil {
 		return nil, err
 	}
@@ -90,7 +86,6 @@ func (o *adminServer) DelApplet(ctx context.Context, req *admin.DelAppletReq) (*
 }
 
 func (o *adminServer) UpdateApplet(ctx context.Context, req *admin.UpdateAppletReq) (*admin.UpdateAppletResp, error) {
-	defer log.ZDebug(ctx, "return")
 	if _, err := mctx.CheckAdmin(ctx); err != nil {
 		return nil, err
 	}
@@ -109,7 +104,6 @@ func (o *adminServer) UpdateApplet(ctx context.Context, req *admin.UpdateAppletR
 }
 
 func (o *adminServer) FindApplet(ctx context.Context, req *admin.FindAppletReq) (*admin.FindAppletResp, error) {
-	defer log.ZDebug(ctx, "return")
 	if _, _, err := mctx.Check(ctx); err != nil {
 		return nil, err
 	}
@@ -137,15 +131,14 @@ func (o *adminServer) FindApplet(ctx context.Context, req *admin.FindAppletReq) 
 }
 
 func (o *adminServer) SearchApplet(ctx context.Context, req *admin.SearchAppletReq) (*admin.SearchAppletResp, error) {
-	defer log.ZDebug(ctx, "return")
 	if _, err := mctx.CheckAdmin(ctx); err != nil {
 		return nil, err
 	}
-	total, applets, err := o.Database.SearchApplet(ctx, req.Keyword, req.Pagination.PageNumber, req.Pagination.ShowNumber)
+	total, applets, err := o.Database.SearchApplet(ctx, req.Keyword, req.Pagination)
 	if err != nil {
 		return nil, err
 	}
-	resp := &admin.SearchAppletResp{Total: total, Applets: make([]*common.AppletInfo, 0, len(applets))}
+	resp := &admin.SearchAppletResp{Total: uint32(total), Applets: make([]*common.AppletInfo, 0, len(applets))}
 	for _, applet := range applets {
 		resp.Applets = append(resp.Applets, &common.AppletInfo{
 			Id:         applet.ID,

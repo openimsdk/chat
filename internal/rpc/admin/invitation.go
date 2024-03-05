@@ -20,8 +20,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/OpenIMSDK/tools/log"
-
 	"github.com/OpenIMSDK/tools/errs"
 	"github.com/OpenIMSDK/tools/utils"
 
@@ -32,7 +30,6 @@ import (
 )
 
 func (o *adminServer) AddInvitationCode(ctx context.Context, req *admin.AddInvitationCodeReq) (*admin.AddInvitationCodeResp, error) {
-	defer log.ZDebug(ctx, "return")
 	if _, err := mctx.CheckAdmin(ctx); err != nil {
 		return nil, err
 	}
@@ -66,7 +63,6 @@ func (o *adminServer) AddInvitationCode(ctx context.Context, req *admin.AddInvit
 }
 
 func (o *adminServer) GenInvitationCode(ctx context.Context, req *admin.GenInvitationCodeReq) (*admin.GenInvitationCodeResp, error) {
-	defer log.ZDebug(ctx, "return")
 	if _, err := mctx.CheckAdmin(ctx); err != nil {
 		return nil, err
 	}
@@ -110,7 +106,6 @@ func (o *adminServer) GenInvitationCode(ctx context.Context, req *admin.GenInvit
 }
 
 func (o *adminServer) FindInvitationCode(ctx context.Context, req *admin.FindInvitationCodeReq) (*admin.FindInvitationCodeResp, error) {
-	defer log.ZDebug(ctx, "return")
 	if _, _, err := mctx.Check(ctx); err != nil {
 		return nil, err
 	}
@@ -144,7 +139,6 @@ func (o *adminServer) FindInvitationCode(ctx context.Context, req *admin.FindInv
 }
 
 func (o *adminServer) UseInvitationCode(ctx context.Context, req *admin.UseInvitationCodeReq) (*admin.UseInvitationCodeResp, error) {
-	defer log.ZDebug(ctx, "return")
 	if _, _, err := mctx.Check(ctx); err != nil {
 		return nil, err
 	}
@@ -165,7 +159,6 @@ func (o *adminServer) UseInvitationCode(ctx context.Context, req *admin.UseInvit
 }
 
 func (o *adminServer) DelInvitationCode(ctx context.Context, req *admin.DelInvitationCodeReq) (*admin.DelInvitationCodeResp, error) {
-	defer log.ZDebug(ctx, "return")
 	if _, err := mctx.CheckAdmin(ctx); err != nil {
 		return nil, err
 	}
@@ -190,11 +183,10 @@ func (o *adminServer) DelInvitationCode(ctx context.Context, req *admin.DelInvit
 }
 
 func (o *adminServer) SearchInvitationCode(ctx context.Context, req *admin.SearchInvitationCodeReq) (*admin.SearchInvitationCodeResp, error) {
-	defer log.ZDebug(ctx, "return")
 	if _, err := mctx.CheckAdmin(ctx); err != nil {
 		return nil, err
 	}
-	total, list, err := o.Database.SearchInvitationRegister(ctx, req.Keyword, req.Status, req.UserIDs, req.Codes, req.Pagination.PageNumber, req.Pagination.ShowNumber)
+	total, list, err := o.Database.SearchInvitationRegister(ctx, req.Keyword, req.Status, req.UserIDs, req.Codes, req.Pagination)
 	if err != nil {
 		return nil, err
 	}
@@ -218,7 +210,7 @@ func (o *adminServer) SearchInvitationCode(ctx context.Context, req *admin.Searc
 		})
 	}
 	return &admin.SearchInvitationCodeResp{
-		Total: total,
+		Total: uint32(total),
 		List:  invitationRegisters,
 	}, nil
 }
