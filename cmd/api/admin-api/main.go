@@ -31,7 +31,6 @@ import (
 
 	"github.com/OpenIMSDK/chat/pkg/discovery_register"
 
-	"github.com/OpenIMSDK/chat/tools/component"
 	"github.com/OpenIMSDK/tools/discoveryregistry"
 
 	mw2 "github.com/OpenIMSDK/chat/pkg/common/mw"
@@ -69,7 +68,6 @@ func main() {
 	if err := config.InitConfig(configFile); err != nil {
 		util.ExitWithError(err)
 	}
-	err = component.ComponentCheck()
 	if err != nil {
 		util.ExitWithError(err)
 	}

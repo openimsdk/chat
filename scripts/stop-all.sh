@@ -49,10 +49,10 @@ done
 
 if $all_services_stopped; then
     # Print "All services stopped" in green to indicate success
-    echo -e "\033[0;32mAll services stopped\033[0m"
+    echo -e "\033[0;32mAll chat services stopped\033[0m"
 else
     # Print error message indicating not all services are stopped
-    echo -e "\033[0;31mError: Not all services have been stopped.\033[0m"
+    echo -e "\033[0;31mError: Not all chat services have been stopped.\033[0m"
 fi
 
 

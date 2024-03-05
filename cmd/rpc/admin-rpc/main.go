@@ -23,7 +23,6 @@ import (
 
 	"github.com/OpenIMSDK/chat/pkg/common/chatrpcstart"
 	"github.com/OpenIMSDK/chat/pkg/common/version"
-	"github.com/OpenIMSDK/chat/tools/component"
 	"github.com/OpenIMSDK/tools/log"
 
 	"github.com/OpenIMSDK/chat/internal/rpc/admin"
@@ -55,7 +54,6 @@ func main() {
 	if err := config.InitConfig(configFile); err != nil {
 		util.ExitWithError(err)
 	}
-	err = component.ComponentCheck()
 	if err != nil {
 		util.ExitWithError(err)
 	}

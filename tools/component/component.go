@@ -12,11 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package component
+package main
 
 import (
+	"flag"
 	"fmt"
 	"github.com/OpenIMSDK/tools/errs"
+	"os"
 	"strings"
 	"time"
 
@@ -24,8 +26,14 @@ import (
 	component "github.com/OpenIMSDK/tools/component"
 )
 
-var (
+const (
+	// defaultCfgPath is the default path of the configuration file.
+	defaultCfgPath  = "../../../../../config/config.yaml"
 	MaxConnectTimes = 100
+)
+
+var (
+	cfgPath = flag.String("config_folder_path", defaultCfgPath, "Path to the configuration file")
 )
 
 type checkFunc struct {
@@ -34,12 +42,18 @@ type checkFunc struct {
 	flag     bool
 }
 
-func ComponentCheck() error {
+func main() {
+	flag.Parse()
+	if err := config.InitConfig(*cfgPath); err != nil {
+		fmt.Printf("Read config failed: %v\n", err)
+		return
+	}
+
 	if config.Config.Envs.Discovery != "k8s" {
 		checks := []checkFunc{
 			{name: "Zookeeper", function: checkZookeeper},
 			{name: "Redis", function: checkRedis},
-			//{name: "Mongo", function: checkMongo, config: conf},
+			{name: "Mongo", function: checkMongo},
 		}
 
 		for i := 0; i < MaxConnectTimes; i++ {
@@ -57,8 +71,8 @@ func ComponentCheck() error {
 						allSuccess = false
 						component.ErrorPrint(fmt.Sprintf("Starting %s failed:%v.", check.name, errs.Unwrap(err).Error()))
 						if !strings.Contains(errs.Unwrap(err).Error(), "connection refused") &&
-							!strings.Contains(errs.Unwrap(err).Error(), "timeout waiting") {
-							return err
+							!strings.Contains(errs.Unwrap(err).Error(), "timeout") {
+							os.Exit(-1)
 						}
 					} else {
 						checks[index].flag = true
@@ -69,11 +83,12 @@ func ComponentCheck() error {
 
 			if allSuccess {
 				component.SuccessPrint("All components started successfully!")
-				return nil
+				return
 			}
 		}
 	}
-	return errs.Wrap(fmt.Errorf("components started failed"))
+	component.ErrorPrint("Some components started failed!")
+	os.Exit(-1)
 }
 
 // checkZookeeper checks the Zookeeper connection
@@ -100,16 +115,16 @@ func checkRedis() error {
 }
 
 // checkMongo checks the MongoDB connection without retries
-//func checkMongo(config *config.GlobalConfig) error {
-//	mongoStu := &component.Mongo{
-//		URL:         config.Mongo.Uri,
-//		Address:     config.Mongo.Address,
-//		Database:    config.Mongo.Database,
-//		Username:    config.Mongo.Username,
-//		Password:    config.Mongo.Password,
-//		MaxPoolSize: config.Mongo.MaxPoolSize,
-//	}
-//	err := component.CheckMongo(mongoStu)
-//
-//	return err
-//}
+func checkMongo() error {
+	mongoStu := &component.Mongo{
+		URL:         config.Config.Mongo.Uri,
+		Address:     config.Config.Mongo.Address,
+		Database:    config.Config.Mongo.Database,
+		Username:    config.Config.Mongo.Username,
+		Password:    config.Config.Mongo.Password,
+		MaxPoolSize: config.Config.Mongo.MaxPoolSize,
+	}
+	err := component.CheckMongo(mongoStu)
+
+	return err
+}
