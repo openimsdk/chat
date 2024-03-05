@@ -96,6 +96,7 @@ check_and_stop_services() {
         service_stopped=1
         for service in "${services[@]}"; do
             result=$(check_services_with_name "$service")
+            echo "$result"!!!!!!!!!!!!
             if [ $? -eq 0 ]; then
                 service_stopped=0
                 break
