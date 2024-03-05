@@ -95,7 +95,7 @@ check_and_stop_services() {
     while [ $attempts -lt 15 ]; do
         service_stopped=1
         for service in "${services[@]}"; do
-            check_services_with_name "$service" >/dev/null 2>&1
+            result=$(check_services_with_name "$service")
             if [ $? -eq 0 ]; then
                 service_stopped=0
                 break
