@@ -105,7 +105,6 @@ check_and_stop_services() {
                 break
             fi
         done
-        unset SUPPRESS_OUTPUT
         if [ $service_stopped -eq 1 ]; then
             echo "All services have been successfully stopped."
             return 0
