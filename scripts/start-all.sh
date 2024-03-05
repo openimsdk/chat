@@ -214,10 +214,10 @@ all_ports_listening=true
 
 
 ports=(
-  $(sed -n 's/.*openImChatApiPort: \[\(.*\)\].*/\1/p' ${config_path})
-  $(sed -n 's/.*openImAdminApiPort: \[\(.*\)\].*/\1/p' ${config_path})
-  $(sed -n 's/.*openImAdminPort: \[\(.*\)\].*/\1/p' ${config_path})
-  $(sed -n 's/.*openImChatPort: \[\(.*\)\].*/\1/p' ${config_path})
+  $(sed -n 's/.*openImChatApiPort: \[\(.*\)\].*/\1/p' ${config_path}/config.yaml)
+  $(sed -n 's/.*openImAdminApiPort: \[\(.*\)\].*/\1/p' ${config_path}/config.yaml)
+  $(sed -n 's/.*openImAdminPort: \[\(.*\)\].*/\1/p' ${config_path}/config.yaml)
+  $(sed -n 's/.*openImChatPort: \[\(.*\)\].*/\1/p' ${config_path}/config.yaml)
 )
 
 
