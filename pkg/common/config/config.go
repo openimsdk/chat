@@ -75,12 +75,12 @@ var Config struct {
 		SlowThreshold *int      `yaml:"slowThreshold"`
 	} `yaml:"mysql"`
 	Mongo struct {
-		Uri         *string   `yaml:"uri"`
-		Address     *[]string `yaml:"address"`
-		Database    *string   `yaml:"database"`
-		Username    *string   `yaml:"username"`
-		Password    *string   `yaml:"password"`
-		MaxPoolSize *int      `yaml:"maxPoolSize"`
+		Uri         string   `yaml:"uri"`
+		Address     []string `yaml:"address"`
+		Database    string   `yaml:"database"`
+		Username    string   `yaml:"username"`
+		Password    string   `yaml:"password"`
+		MaxPoolSize int      `yaml:"maxPoolSize"`
 	} `yaml:"mongo"`
 	Log struct {
 		StorageLocation     *string `yaml:"storageLocation"`

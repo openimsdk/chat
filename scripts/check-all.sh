@@ -56,9 +56,9 @@ done
 
 if $all_services_running; then
     # Print "Startup successful" in green
-    echo -e "\033[0;32mStartup successful\033[0m"
+    echo -e "\033[0;32m all chat services Startup successful\033[0m"
 else
-    echo -e "\033[0;31mOne or more services are not running.\033[0m"
+    echo -e "\033[0;31mOne or more chat services are not running.\033[0m"
 fi
 
 

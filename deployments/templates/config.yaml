@@ -138,3 +138,25 @@ liveKit:
   liveKitUrl: "ws://172.28.0.1:7880" # LIVEKIT_URL, LiveKit server address and port
   key: "APIDXJxJeCL8haY" # LIVEKIT_API_KEY
   secret: "ak1qulJ3nfXeflQHWBdmQDc4js4ueMc5OnxoORVJC2xA" # LIVEKIT_API_SECRET
+
+# MongoDB configuration
+
+# If uri is not empty, it will be used directly for the MongoDB connection.
+# This is a complete MongoDB URI string.
+# Example: mongodb://user:password@host1:port1,host2:port2/dbname?options
+
+mongo:
+  uri: ''
+
+  # List of MongoDB server addresses.
+  # Used for constructing the MongoDB URI if 'uri' above is empty.
+  # For a standalone setup, specify the address of the single server.
+  # For a sharded cluster, specify the addresses of the Mongos servers.
+  # Example: [ '172.28.0.1:37017', '172.28.0.2:37017' ]
+  # Default MongoDB database name
+  # Maximum connection pool size
+  address: [ 172.28.0.1:37017 ]
+  database: openim_v3
+  username: openIM
+  password: openIM123
+  maxPoolSize: 100
