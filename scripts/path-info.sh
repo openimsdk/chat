@@ -96,10 +96,10 @@ done
 
 
 ports=(
-  $(yq e '.chatApi.openImChatApiPort[]' config.yaml)
-  $(yq e '.adminApi.openImAdminApiPort[]' config.yaml)
-  $(yq e '.rpcPort.openImAdminPort[]' config.yaml)
-  $(yq e '.rpcPort.openImChatPort[]' config.yaml)
+  $(sed -n 's/.*openImChatApiPort: \[\(.*\)\].*/\1/p' config.yaml)
+  $(sed -n 's/.*openImAdminApiPort: \[\(.*\)\].*/\1/p' config.yaml)
+  $(sed -n 's/.*openImAdminPort: \[\(.*\)\].*/\1/p' config.yaml)
+  $(sed -n 's/.*openImChatPort: \[\(.*\)\].*/\1/p' config.yaml)
 )
 
 
