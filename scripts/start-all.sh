@@ -178,8 +178,8 @@ for ((i = 0; i < ${#service_filename[*]}; i++)); do
 
 
 
+    nohup ${cmd} >> "${LOG_FILE}" 2> >(tee -a "$TMP_LOG_FILE" >&2) &
 
-    nohup bash -c "${cmd} > >(tee -a ${LOG_FILE} ${TMP_LOG_FILE}) 2> >(tee -a ${LOG_FILE} ${TMP_LOG_FILE} >&2)" &
 
     #nohup ${cmd} > >(tee -a "${LOG_FILE}" "${TMP_LOG_FILE}") 2> >(tee -a "${LOG_FILE}" "${STDERR_LOG_FILE}" >&2) &
     #nohup ${cmd} > >(tee -a "${LOG_FILE}") 2> >(tee -a "${LOG_FILE}" "${STDERR_LOG_FILE}" >&2) &
