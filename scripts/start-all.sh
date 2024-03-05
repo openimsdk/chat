@@ -23,6 +23,8 @@ OPENIM_ROOT=$(dirname "${SCRIPTS_ROOT}")/..
 source $SCRIPTS_ROOT/style-info.sh
 source $SCRIPTS_ROOT/path-info.sh
 source $SCRIPTS_ROOT/function.sh
+export SUPPRESS_OUTPUT=1
+
 source $SCRIPTS_ROOT/util.sh
 
 # if [ ! -d "${OPENIM_ROOT}/_output/bin/platforms" ]; then
@@ -95,7 +97,7 @@ check_and_stop_services() {
     # Step 2: Verify all services are stopped, retry up to 15 times if necessary
     while [ $attempts -lt 15 ]; do
         service_stopped=1
-        export SUPPRESS_OUTPUT=1
+
         for service in "${services[@]}"; do
             result=$(check_services_with_name "$service")
             if [ $? -eq 0 ]; then
