@@ -159,7 +159,7 @@ else
     exit 1
 fi
 
-cmd=cmd="${mysql2mongo_full_path} -c ${config_path}"
+cmd="${mysql2mongo_full_path} -c ${config_path}"
 ${cmd} >> "${LOG_FILE}" 2> >(tee -a "${STDERR_LOG_FILE}" "$TMP_LOG_FILE" | while read line; do echo -e "\e[31m${line}\e[0m"; done >&2)
 
 for ((i = 0; i < ${#service_filename[*]}; i++)); do
@@ -204,11 +204,14 @@ for binary_path in "${binary_full_paths[@]}"; do
         all_services_running=false
         # Print the binary path in red for not running services
         echo -e "\033[0;31mService not running: $binary_path\033[0m"
+        exit 1
     fi
 done
 
+is_all_running=false
 if $all_services_running; then
     # Print "Startup successful" in green
+    is_all_running=true
     echo -e "\033[0;32mAll chat services startup successful\033[0m"
 fi
 
@@ -223,19 +226,21 @@ ports=(
 )
 
 
-
+no_listen_port=0
 
 for port in "${ports[@]}"; do
   if ! check_services_with_port "$port"; then
     all_ports_listening=false
+    no_listen_port=$port
     break
   fi
 done
 
-if $all_ports_listening; then
-  echo "successful"
+
+if $all_ports_listening && $is_all_running; then
+    echo -e "\033[0;32mAll chat services startup successful\033[0m"
 else
-  echo "failed"
+  echo -e "\033[31m${no_listen_port} port not listen\033[0m"
 fi
 
 
