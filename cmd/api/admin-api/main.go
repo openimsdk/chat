@@ -31,7 +31,6 @@ import (
 
 	"github.com/OpenIMSDK/chat/pkg/discovery_register"
 
-	"github.com/OpenIMSDK/chat/tools/component"
 	"github.com/OpenIMSDK/tools/discoveryregistry"
 
 	mw2 "github.com/OpenIMSDK/chat/pkg/common/mw"
@@ -71,7 +70,6 @@ func main() {
 		fmt.Fprintf(os.Stderr, "\n\nexit -1: \n%+v\n\n", err)
 		os.Exit(-1)
 	}
-	err = component.ComponentCheck()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "\n\nexit -1: \n%+v\n\n", err)
 		os.Exit(-1)
