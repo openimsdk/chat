@@ -26,7 +26,7 @@ require (
 
 require (
 	github.com/OpenIMSDK/protocol v0.0.21
-	github.com/OpenIMSDK/tools v0.0.36
+	github.com/OpenIMSDK/tools v0.0.37
 	github.com/livekit/protocol v1.5.0
 	github.com/redis/go-redis/v9 v9.2.1
 	github.com/xuri/excelize/v2 v2.8.0
