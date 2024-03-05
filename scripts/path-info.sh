@@ -95,11 +95,4 @@ done
 
 
 
-ports=(
-  $(sed -n 's/.*openImChatApiPort: \[\(.*\)\].*/\1/p' config.yaml)
-  $(sed -n 's/.*openImAdminApiPort: \[\(.*\)\].*/\1/p' config.yaml)
-  $(sed -n 's/.*openImAdminPort: \[\(.*\)\].*/\1/p' config.yaml)
-  $(sed -n 's/.*openImChatPort: \[\(.*\)\].*/\1/p' config.yaml)
-)
-
 

@@ -212,6 +212,17 @@ fi
 
 all_ports_listening=true
 
+
+ports=(
+  $(sed -n 's/.*openImChatApiPort: \[\(.*\)\].*/\1/p' ${config_path}/config.yaml)
+  $(sed -n 's/.*openImAdminApiPort: \[\(.*\)\].*/\1/p' ${config_path}/config.yaml)
+  $(sed -n 's/.*openImAdminPort: \[\(.*\)\].*/\1/p' ${config_path}config.yaml)
+  $(sed -n 's/.*openImChatPort: \[\(.*\)\].*/\1/p' ${config_path}config.yaml)
+)
+
+
+
+
 for port in "${ports[@]}"; do
   if ! check_services_with_port "$port"; then
     all_ports_listening=false
