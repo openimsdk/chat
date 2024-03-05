@@ -26,7 +26,6 @@ import (
 	"github.com/OpenIMSDK/tools/errs"
 	"github.com/OpenIMSDK/tools/mw"
 	"github.com/OpenIMSDK/tools/network"
-	"github.com/OpenIMSDK/tools/utils"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -47,7 +46,7 @@ func Start(rpcPort int, rpcRegisterName string, prometheusPort int, rpcFn func(c
 	zkClient.AddOption(chatMw.AddUserType(), mw.GrpcClient(), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	registerIP, err := network.GetRpcRegisterIP(config.Config.Rpc.RegisterIP)
 	if err != nil {
-		return utils.Wrap1(err)
+		return errs.Wrap(err)
 	}
 	srv := grpc.NewServer(append(options, mw.GrpcServer())...)
 	defer srv.GracefulStop()
@@ -57,12 +56,12 @@ func Start(rpcPort int, rpcRegisterName string, prometheusPort int, rpcFn func(c
 	}
 	err = zkClient.Register(rpcRegisterName, registerIP, rpcPort, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		return utils.Wrap1(err)
+		return errs.Wrap(err)
 	}
 	listener, err := net.Listen("tcp", net.JoinHostPort(network.GetListenIP(config.Config.Rpc.ListenIP), strconv.Itoa(rpcPort)))
 	if err != nil {
-		return utils.Wrap1(err)
+		return errs.Wrap(err)
 	}
 	defer listener.Close()
-	return utils.Wrap1(srv.Serve(listener))
+	return errs.Wrap(srv.Serve(listener))
 }
