@@ -174,7 +174,7 @@ for ((i = 0; i < ${#service_filename[*]}; i++)); do
 
     LOG_FILE=${logs_dir}/chat_$(date '+%Y%m%d').log
     STDERR_LOG_FILE=${logs_dir}/chat_err_$(date '+%Y%m%d').log
-    $TMP_LOG_FILE=${logs_dir}/chat_tmp_$(date '+%Y%m%d').log
+    TMP_LOG_FILE=${logs_dir}/chat_tmp_$(date '+%Y%m%d').log
 
 
 
