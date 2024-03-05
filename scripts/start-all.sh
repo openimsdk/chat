@@ -146,6 +146,10 @@ fi
 cd $SCRIPTS_ROOT
 
 rm -rf ${logs_dir}/chat_tmp_$(date '+%Y%m%d').log
+LOG_FILE=${logs_dir}/chat_$(date '+%Y%m%d').log
+STDERR_LOG_FILE=${logs_dir}/chat_err_$(date '+%Y%m%d').log
+TMP_LOG_FILE=${logs_dir}/chat_tmp_$(date '+%Y%m%d').log
+
 cmd="${component_binary_full_paths} --config_folder_path ${config_path}"
 nohup ${cmd} >> "${LOG_FILE}" 2> >(tee -a "${STDERR_LOG_FILE}" "$TMP_LOG_FILE" | while read line; do echo -e "\e[31m${line}\e[0m"; done >&2)
 if [ $? -eq 0 ]; then
@@ -180,9 +184,7 @@ for ((i = 0; i < ${#service_filename[*]}; i++)); do
     fi
     echo $cmd
 
-    LOG_FILE=${logs_dir}/chat_$(date '+%Y%m%d').log
-    STDERR_LOG_FILE=${logs_dir}/chat_err_$(date '+%Y%m%d').log
-    TMP_LOG_FILE=${logs_dir}/chat_tmp_$(date '+%Y%m%d').log
+
     nohup ${cmd} >> "${LOG_FILE}" 2> >(tee -a "${STDERR_LOG_FILE}" "$TMP_LOG_FILE" | while read line; do echo -e "\e[31m${line}\e[0m"; done >&2) &
 
 
