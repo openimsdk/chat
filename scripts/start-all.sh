@@ -181,7 +181,7 @@ for ((i = 0; i < ${#service_filename[*]}; i++)); do
 done
 
 
-sleep 2
+sleep 5
 
 all_services_running=true
 
