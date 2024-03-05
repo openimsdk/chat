@@ -101,8 +101,6 @@ check_and_stop_services() {
                 service_stopped=0
                 break
             fi
-            echo "$result"!!!!!!!!!!!!
-
         done
 
         if [ $service_stopped -eq 1 ]; then
