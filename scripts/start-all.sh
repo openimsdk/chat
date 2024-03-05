@@ -91,6 +91,7 @@ check_and_stop_services() {
         fi
     done
 
+    export SUPPRESS_OUTPUT=1
     # Step 2: Verify all services are stopped, retry up to 15 times if necessary
     while [ $attempts -lt 15 ]; do
         service_stopped=1
@@ -118,7 +119,7 @@ check_and_stop_services() {
         return 1
     fi
 }
-
+    unset SUPPRESS_OUTPUT
 
 
 # Call the function with your full binary paths
