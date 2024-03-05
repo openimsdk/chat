@@ -23,6 +23,7 @@ import (
 	"os"
 	"os/signal"
 	"strconv"
+	"sync"
 	"syscall"
 	"time"
 
@@ -42,10 +43,7 @@ func Start(rpcPort int, rpcRegisterName string, prometheusPort int, rpcFn func(c
 
 	var zkClient discoveryregistry.SvcDiscoveryRegistry
 	zkClient, err := discovery_register.NewDiscoveryRegister(config.Config.Envs.Discovery)
-	/*
-		zkClient, err := openKeeper.NewClient(config.Config.Zookeeper.ZkAddr, config.Config.Zookeeper.Schema,
-			openKeeper.WithFreq(time.Hour), openKeeper.WithUserNameAndPassword(config.Config.Zookeeper.Username,
-				config.Config.Zookeeper.Password), openKeeper.WithRoundRobin(), openKeeper.WithTimeout(10), openKeeper.WithLogger(log.NewZkLogger()))*/if err != nil {
+	if err != nil {
 		return errs.Wrap(err, fmt.Sprintf(";the addr is:%v", &config.Config.Zookeeper.ZkAddr))
 	}
 	// defer zkClient.CloseZK()
@@ -55,8 +53,13 @@ func Start(rpcPort int, rpcRegisterName string, prometheusPort int, rpcFn func(c
 	if err != nil {
 		return errs.Wrap(err)
 	}
+
 	srv := grpc.NewServer(append(options, mw.GrpcServer())...)
-	defer srv.GracefulStop()
+	once := sync.Once{}
+	defer func() {
+		once.Do(srv.GracefulStop)
+	}()
+
 	err = rpcFn(zkClient, srv)
 	if err != nil {
 		return err
