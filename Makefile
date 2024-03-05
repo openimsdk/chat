@@ -137,12 +137,12 @@ ifeq ($(origin GOBIN), undefined)
 	GOBIN := $(GOPATH)/bin
 endif
 
-COMMANDS ?= $(filter-out %.md, $(wildcard ${ROOT_DIR}/cmd/*/*))
-BINS ?= $(foreach cmd,${COMMANDS},$(notdir ${cmd}))
-
+# COMMANDS is Specify all files under ${ROOT_DIR}/cmd/ and ${ROOT_DIR}/tools/ except those ending in.md
+COMMANDS ?= $(filter-out %.md, $(wildcard ${ROOT_DIR}/cmd/*/* ${ROOT_DIR}/tools/*))
 ifeq (${COMMANDS},)
   $(error Could not determine COMMANDS, set ROOT_DIR or run in source dir)
 endif
+BINS ?= $(foreach cmd,${COMMANDS},$(notdir ${cmd}))
 ifeq (${BINS},)
   $(error Could not determine BINS, set ROOT_DIR or run in source dir)
 endif
@@ -229,8 +229,10 @@ go.build.%:
 	@echo "=====> BIN_DIR=$(BIN_DIR)"
 	@echo "===========> Building binary $(COMMAND) $(VERSION) for $(OS)_$(ARCH)"
 	@mkdir -p $(BIN_DIR)/platforms/$(OS)/$(ARCH)
-	@cd $(ROOT_DIR)/cmd/*/$(COMMAND) && CGO_ENABLED=0 GOOS=$(OS) GOARCH=$(ARCH) $(GO) build $(GO_BUILD_FLAGS) -o \
+	$(eval CMD_PATH := $(shell find ${ROOT_DIR}/cmd ${ROOT_DIR}/tools -type d -name $(COMMAND)))
+	@cd $(CMD_PATH) && CGO_ENABLED=0 GOOS=$(OS) GOARCH=$(ARCH) $(GO) build $(GO_BUILD_FLAGS) -o \
 		$(BIN_DIR)/platforms/$(OS)/$(ARCH)/$(COMMAND)$(GO_OUT_EXT) .
+	@chmod +x $(BIN_DIR)/platforms/$(OS)/$(ARCH)/$(COMMAND)$(GO_OUT_EXT)
 
 ## build-multiarch: Build binaries for multiple platforms.
 .PHONY: build-multiarch

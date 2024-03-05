@@ -2,8 +2,9 @@ package main
 
 import (
 	"flag"
-	"github.com/OpenIMSDK/chat/tools/mysql2mongo/internal"
 	"log"
+
+	"github.com/OpenIMSDK/chat/tools/mysql2mongo/internal"
 )
 
 func main() {
