@@ -21,8 +21,8 @@
 SCRIPTS_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 OPENIM_ROOT=$(dirname "${BASH_SOURCE[0]}")/..
 
-source "$SCRIPTS_ROOT/style_info.sh"
-source "$SCRIPTS_ROOT/path_info.sh"
+source "$SCRIPTS_ROOT/style-info.sh"
+source "$SCRIPTS_ROOT/path-info.sh"
 source "$SCRIPTS_ROOT/function.sh"
 
 bin_dir="$BIN_DIR"
@@ -97,6 +97,6 @@ for ((i = 0; i < ${#service_filenames[*]}; i++)); do
 done
 
 sleep 50
-${OPENIM_ROOT}/scripts/check_all.sh
+${OPENIM_ROOT}/scripts/check-all.sh
 
 tail -f ${logs_dir}/chat_$(date '+%Y%m%d').log
