@@ -54,19 +54,21 @@ stop_services_with_name() {
 check_services_with_name() {
     local binary_path="$1"
 
-    # Use pgrep to find a process with the full path
-    # -f option allows matching against the full command line
     pgrep -f "$binary_path" > /dev/null 2>&1
 
-    # Check the exit status of pgrep
     if [ $? -eq 0 ]; then
-        echo "A process with the path $binary_path is running."
+        if [ -z "$SUPPRESS_OUTPUT" ]; then
+            echo "A process with the path $binary_path is running."
+        fi
         return 0
     else
-        echo "No process found with the path $binary_path."
+        if [ -z "$SUPPRESS_OUTPUT" ]; then
+            echo "No process found with the path $binary_path."
+        fi
         return 1
     fi
 }
+
 
 # Example usage of check_services_with_name
 # Replace "/full/path/to/binary" with the actual full path of the binary you want to check
