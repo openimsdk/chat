@@ -16,6 +16,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/OpenIMSDK/chat/pkg/util"
 	"math/rand"
 	"os"
 	"time"
@@ -67,7 +68,6 @@ func main() {
 	}
 	err = chatrpcstart.Start(rpcPort, config.Config.RpcRegisterName.OpenImChatName, 0, chat.Start)
 	if err != nil {
-		fmt.Printf("\n\nexit -1: \n%+v\n\n", err)
-		os.Exit(-1)
+		util.ExitWithError(err)
 	}
 }

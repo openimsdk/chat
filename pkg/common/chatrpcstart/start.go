@@ -15,9 +15,17 @@
 package chatrpcstart
 
 import (
+	"context"
+	"errors"
 	"fmt"
+	"github.com/OpenIMSDK/chat/pkg/util"
 	"net"
+	"os"
+	"os/signal"
 	"strconv"
+	"sync"
+	"syscall"
+	"time"
 
 	"github.com/OpenIMSDK/chat/pkg/common/config"
 	chatMw "github.com/OpenIMSDK/chat/pkg/common/mw"
@@ -35,10 +43,7 @@ func Start(rpcPort int, rpcRegisterName string, prometheusPort int, rpcFn func(c
 
 	var zkClient discoveryregistry.SvcDiscoveryRegistry
 	zkClient, err := discovery_register.NewDiscoveryRegister(config.Config.Envs.Discovery)
-	/*
-		zkClient, err := openKeeper.NewClient(config.Config.Zookeeper.ZkAddr, config.Config.Zookeeper.Schema,
-			openKeeper.WithFreq(time.Hour), openKeeper.WithUserNameAndPassword(config.Config.Zookeeper.Username,
-				config.Config.Zookeeper.Password), openKeeper.WithRoundRobin(), openKeeper.WithTimeout(10), openKeeper.WithLogger(log.NewZkLogger()))*/if err != nil {
+	if err != nil {
 		return errs.Wrap(err, fmt.Sprintf(";the addr is:%v", &config.Config.Zookeeper.ZkAddr))
 	}
 	// defer zkClient.CloseZK()
@@ -48,20 +53,70 @@ func Start(rpcPort int, rpcRegisterName string, prometheusPort int, rpcFn func(c
 	if err != nil {
 		return errs.Wrap(err)
 	}
-	srv := grpc.NewServer(append(options, mw.GrpcServer())...)
-	defer srv.GracefulStop()
-	err = rpcFn(zkClient, srv)
-	if err != nil {
-		return err
-	}
-	err = zkClient.Register(rpcRegisterName, registerIP, rpcPort, grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		return errs.Wrap(err)
-	}
-	listener, err := net.Listen("tcp", net.JoinHostPort(network.GetListenIP(config.Config.Rpc.ListenIP), strconv.Itoa(rpcPort)))
+
+	rpcTcpAddr := net.JoinHostPort(network.GetListenIP(config.Config.Rpc.ListenIP), strconv.Itoa(rpcPort))
+	listener, err := net.Listen("tcp", rpcTcpAddr)
 	if err != nil {
 		return errs.Wrap(err)
 	}
 	defer listener.Close()
-	return errs.Wrap(srv.Serve(listener))
+
+	srv := grpc.NewServer(append(options, mw.GrpcServer())...)
+	once := sync.Once{}
+	defer func() {
+		once.Do(srv.GracefulStop)
+	}()
+
+	err = rpcFn(zkClient, srv)
+	if err != nil {
+		return err
+	}
+
+	err = zkClient.Register(rpcRegisterName, registerIP, rpcPort, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		return errs.Wrap(err)
+	}
+
+	var (
+		netDone = make(chan struct{}, 1)
+		netErr  error
+	)
+
+	go func() {
+		err := srv.Serve(listener)
+		if err != nil {
+			netErr = errs.Wrap(err, "rpc start err: ", rpcTcpAddr)
+			netDone <- struct{}{}
+		}
+	}()
+
+	sigs := make(chan os.Signal, 1)
+	signal.Notify(sigs, syscall.SIGTERM)
+	select {
+	case <-sigs:
+		util.SIGTERMExit()
+		ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+		defer cancel()
+		if err := gracefulStopWithCtx(ctx, srv.GracefulStop); err != nil {
+			return err
+		}
+	case <-netDone:
+		close(netDone)
+		return netErr
+	}
+	return nil
+}
+
+func gracefulStopWithCtx(ctx context.Context, f func()) error {
+	done := make(chan struct{}, 1)
+	go func() {
+		f()
+		close(done)
+	}()
+	select {
+	case <-ctx.Done():
+		return errs.Wrap(errors.New("timeout, ctx graceful stop"))
+	case <-done:
+		return nil
+	}
 }

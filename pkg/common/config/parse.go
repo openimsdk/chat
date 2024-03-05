@@ -219,7 +219,7 @@ func FlagParse() (string, int, bool, error) {
 	var hide bool
 	flag.BoolVar(&hide, "hide", false, "hide the ComponentCheck result")
 
-	// Version flag
+	// Version flagqq
 	var showVersion bool
 	flag.BoolVar(&showVersion, "version", false, "show version and exit")
 
