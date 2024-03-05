@@ -24,7 +24,7 @@ architecture=$(uname -m)
 version=$(uname -s | tr '[:upper:]' '[:lower:]')
 
 #Include shell font styles and some basic information
-source $SCRIPTS_ROOT/style_info.sh
+source $SCRIPTS_ROOT/style-info.sh
 
 cd $SCRIPTS_ROOT
 
@@ -71,6 +71,8 @@ service_source_root=(
   $OPENIM_ROOT/cmd/rpc/admin-rpc/
   $OPENIM_ROOT/cmd/rpc/chat-rpc/
 )
+
+
 #service filename
 service_names=(
   chat-api
@@ -78,3 +80,15 @@ service_names=(
   chat-rpc
   admin-rpc
 )
+
+
+
+# Define the array to hold full paths
+binary_full_paths=()
+
+# Loop through each service name and append its full path to the binary_full_paths array
+for service_name in "${service_names[@]}"; do
+    binary_full_paths+=("${BIN_DIR}/${service_name}")
+done
+
+

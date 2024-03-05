@@ -14,21 +14,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-set -e
-set -o pipefail
+
 
 #Include shell font styles and some basic information
 SCRIPTS_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 OPENIM_ROOT=$(dirname "${SCRIPTS_ROOT}")/..
 
-source $SCRIPTS_ROOT/style_info.sh
-source $SCRIPTS_ROOT/path_info.sh
+source $SCRIPTS_ROOT/style-info.sh
+source $SCRIPTS_ROOT/path-info.sh
 source $SCRIPTS_ROOT/function.sh
+source $SCRIPTS_ROOT/util.sh
 
 # if [ ! -d "${OPENIM_ROOT}/_output/bin/platforms" ]; then
 #   cd $OPENIM_ROOT
-#   # exec build_all_service.sh
-#   "${SCRIPTS_ROOT}/build_all_service.sh"
+#   # exec build-all-service.sh
+#   "${SCRIPTS_ROOT}/build-all-service.sh"
 # fi
 
 bin_dir="$BIN_DIR"
@@ -105,7 +105,7 @@ for ((i = 0; i < ${#service_filename[*]}; i++)); do
     if [ ! -e "$bin_dir/${service_filename[$i]}" ]; then
       echo -e  ${RED_PREFIX}"Error: ${service_filename[$i]} does not exist,Start fail!"${COLOR_SUFFIX}
       echo "start build these binary"
-      "./build_all_service.sh"
+      "./build-all-service.sh"
     fi
     #Start the service in the background
     cmd="$bin_dir/${service_filename[$i]} -port ${service_ports[$j]} --config_folder_path ${config_path}"
@@ -114,11 +114,29 @@ for ((i = 0; i < ${#service_filename[*]}; i++)); do
     fi
     echo $cmd
     nohup $cmd >> ${logs_dir}/chat_$(date '+%Y%m%d').log 2> >(tee -a ${logs_dir}/chat_err_$(date '+%Y%m%d').log ${logs_dir}/chat_tmp_$(date '+%Y%m%d').log) &
-
-    sleep 2
-#    pid="netstat -ntlp|grep $j |awk '{printf \$7}'|cut -d/ -f1"
-#    echo -e "${GREEN_PREFIX}${service_filename[$i]} start success,port number:${service_ports[$j]} pid:$(eval $pid)$COLOR_SUFFIX"
   done
 done
 
-echo -e "${SKY_BLUE_PREFIX}All services have been started successfully${COLOR_SUFFIX}"
+
+sleep 1
+
+all_services_running=true
+
+for binary_path in "${binary_full_paths[@]}"; do
+    check_services_with_name "$binary_path"
+    if [ $? -ne 0 ]; then
+        all_services_running=false
+        # Print the binary path in red for not running services
+        echo -e "\033[0;31mService not running: $binary_path\033[0m"
+    fi
+done
+
+if $all_services_running; then
+    # Print "Startup successful" in green
+    echo -e "\033[0;32mStartup successful\033[0m"
+fi
+
+
+
+
+
