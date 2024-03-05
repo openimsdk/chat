@@ -84,7 +84,7 @@ check_and_stop_services() {
 
     # Step 1: Check and stop each service if running
     for service in "${services[@]}"; do
-        check_services_with_name "$service" >/dev/null 2>&1
+        stop_services_with_name "$service" >/dev/null 2>&1
         if [ $? -eq 0 ]; then
             echo "Service running: $service. Attempting to stop."
             stop_services_with_name "$service"
