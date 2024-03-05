@@ -74,6 +74,8 @@ service_source_root=(
 
 component_binary_full_path="${BIN_DIR}/component"
 
+mysql2mongo_full_path="${BIN_DIR}/mysql2mongo"
+
 #service filename
 service_names=(
   chat-api

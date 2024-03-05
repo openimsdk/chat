@@ -152,12 +152,15 @@ TMP_LOG_FILE=${logs_dir}/chat_tmp_$(date '+%Y%m%d').log
 cmd="${component_binary_full_path} --config_folder_path ${config_path}"
 ${cmd} >> "${LOG_FILE}" 2> >(tee -a "${STDERR_LOG_FILE}" "$TMP_LOG_FILE" | while read line; do echo -e "\e[31m${line}\e[0m"; done >&2)
 if [ $? -eq 0 ]; then
-    echo "All components checked successfully"
+    echo -e "\033[31mComponent check failed, program exiting\033[0m"
     # Add the commands that should be executed next if the binary component was successful
 else
-    echo "Component check failed, program exiting"
+    echo -e "\033[31mComponent check failed, program exiting\033[0m"
     exit 1
 fi
+
+cmd=cmd="${mysql2mongo_full_path} -c ${config_path}"
+${cmd} >> "${LOG_FILE}" 2> >(tee -a "${STDERR_LOG_FILE}" "$TMP_LOG_FILE" | while read line; do echo -e "\e[31m${line}\e[0m"; done >&2)
 
 for ((i = 0; i < ${#service_filename[*]}; i++)); do
 
