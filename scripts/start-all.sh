@@ -127,7 +127,7 @@ exit_status=$?
 
 # Check the exit status and proceed accordingly
 if [ $exit_status -eq 0 ]; then
-    echo "Start the chat api and rpc services"
+    echo "Start component check for Chat API and RPC services."
 else
     echo "Exiting due to failure in stopping services."
     exit 1
