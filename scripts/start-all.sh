@@ -211,7 +211,7 @@ for ((i = 0; i < ${#service_filename[*]}; i++)); do
   done
 done
 
-
+sleep 1
 
 
 all_services_running=true
