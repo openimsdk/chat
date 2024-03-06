@@ -17,6 +17,7 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 	"log"
+
 	"os"
 	"reflect"
 	"strconv"
@@ -80,7 +81,7 @@ func NewTask[A interface{ TableName() string }, B any, C any](gormDB *gorm.DB, m
 	}
 	var count int
 	defer func() {
-		log.Printf("completed convert chat %s total %d\n", tableName, count)
+		fmt.Printf("completed convert chat %s total %d\n", tableName, count)
 	}()
 	const batch = 100
 	for page := 0; ; page++ {
@@ -105,7 +106,7 @@ func NewTask[A interface{ TableName() string }, B any, C any](gormDB *gorm.DB, m
 		if len(res) < batch {
 			return nil
 		}
-		log.Printf("current convert chat %s completed %d\n", tableName, count)
+		fmt.Printf("current convert chat %s completed %d\n", tableName, count)
 	}
 }
 
