@@ -158,6 +158,7 @@ else
 fi
 
 
+
 print_blue "Starting MySQL to MongoDB data conversion"
 cmd="${mysql2mongo_full_path} -c ${config_path}"
 ${cmd} >> "${LOG_FILE}" 2> >(tee -a  "$TMP_LOG_FILE" | while read line; do echo -e "\e[31m${line}\e[0m"; done >&2)
@@ -169,6 +170,7 @@ else
 fi
 
 print_blue "Starting Chat API and RPC services."
+
 
 for ((i = 0; i < ${#service_filename[*]}; i++)); do
 
