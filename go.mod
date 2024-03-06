@@ -1,6 +1,8 @@
 module github.com/OpenIMSDK/chat
 
-go 1.19
+go 1.21
+toolchain go1.21.2
+
 
 require (
 	github.com/gin-gonic/gin v1.9.1
@@ -26,7 +28,7 @@ require (
 
 require (
 	github.com/OpenIMSDK/protocol v0.0.21
-	github.com/OpenIMSDK/tools v0.0.36
+	github.com/OpenIMSDK/tools v0.0.37
 	github.com/livekit/protocol v1.10.1
 	github.com/redis/go-redis/v9 v9.5.1
 	github.com/xuri/excelize/v2 v2.8.0

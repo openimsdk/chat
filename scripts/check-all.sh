@@ -25,7 +25,7 @@ OPENIM_ROOT=$(dirname "${SCRIPTS_ROOT}")/..
 DATA="$(date +%H:%M:%S)"
 echo "# Start Chat check-all.sh ${DATA}, For local deployments, use ./check-all.sh --print-screen"
 
-# 检查第一个参数是否为 --print-screen
+# --print-screen
 if [ "$1" == "--print-screen" ]; then
     PRINT_SCREEN=1
 fi
@@ -44,11 +44,13 @@ source $SCRIPTS_ROOT/util.sh
 
 
 all_services_running=true
+not_running_count=0 # Initialize a counter for not running services
 
 for binary_path in "${binary_full_paths[@]}"; do
     result=$(check_services_with_name "$binary_path")
     if [ $? -ne 0 ]; then
         all_services_running=false
+        not_running_count=$((not_running_count + 1)) # Increment the counter
         # Print the binary path in red for not running services
         echo -e "\033[0;31mService not running: $binary_path\033[0m"
     fi
@@ -56,9 +58,8 @@ done
 
 if $all_services_running; then
     # Print "Startup successful" in green
-    echo -e "\033[0;32m all chat services Startup successful\033[0m"
+    echo -e "\033[0;32mAll chat services startup successful\033[0m"
 else
-    echo -e "\033[0;31mOne or more chat services are not running.\033[0m"
+    # Print the number of services that are not running
+    echo -e "\033[0;31m$not_running_count chat service(s) are not running.\033[0m"
 fi
-
-
