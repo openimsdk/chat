@@ -1,8 +1,8 @@
 module github.com/OpenIMSDK/chat
 
 go 1.21
-
 toolchain go1.21.2
+
 
 require (
 	github.com/gin-gonic/gin v1.9.1
