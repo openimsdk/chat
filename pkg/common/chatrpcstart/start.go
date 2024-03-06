@@ -44,7 +44,7 @@ func Start(rpcPort int, rpcRegisterName string, prometheusPort int, rpcFn func(c
 	var zkClient discoveryregistry.SvcDiscoveryRegistry
 	zkClient, err := discovery_register.NewDiscoveryRegister(config.Config.Envs.Discovery)
 	if err != nil {
-		return errs.Wrap(err, fmt.Sprintf(";the addr is:%v", &config.Config.Zookeeper.ZkAddr))
+		return errs.Wrap(err, fmt.Sprintf("zookeeper addr: %v", &config.Config.Zookeeper.ZkAddr))
 	}
 	// defer zkClient.CloseZK()
 	defer zkClient.Close()
@@ -57,7 +57,7 @@ func Start(rpcPort int, rpcRegisterName string, prometheusPort int, rpcFn func(c
 	rpcTcpAddr := net.JoinHostPort(network.GetListenIP(config.Config.Rpc.ListenIP), strconv.Itoa(rpcPort))
 	listener, err := net.Listen("tcp", rpcTcpAddr)
 	if err != nil {
-		return errs.Wrap(err)
+		return errs.Wrap(err, fmt.Sprintf("Server address: %s", rpcTcpAddr))
 	}
 	defer listener.Close()
 

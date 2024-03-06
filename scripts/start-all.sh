@@ -85,7 +85,7 @@ check_and_stop_services() {
 
     # Step 1: Check and stop each service if running
     for service in "${services[@]}"; do
-        stop_services_with_name "$service" >/dev/null 2>&1
+        check_services_with_name "$service" >/dev/null 2>&1
         if [ $? -eq 0 ]; then
             echo "Service running: $service. Attempting to stop."
             stop_services_with_name "$service"
@@ -127,14 +127,11 @@ exit_status=$?
 
 # Check the exit status and proceed accordingly
 if [ $exit_status -eq 0 ]; then
-    echo "Execution can continue."
+    print_blue "Start component check for Chat services."
 else
     echo "Exiting due to failure in stopping services."
     exit 1
 fi
-
-
-
 
 
 
@@ -150,17 +147,30 @@ LOG_FILE=${logs_dir}/chat_$(date '+%Y%m%d').log
 STDERR_LOG_FILE=${logs_dir}/chat_err_$(date '+%Y%m%d').log
 TMP_LOG_FILE=${logs_dir}/chat_tmp_$(date '+%Y%m%d').log
 cmd="${component_binary_full_path} --config_folder_path ${config_path}"
-${cmd} >> "${LOG_FILE}" 2> >(tee -a "${STDERR_LOG_FILE}" "$TMP_LOG_FILE" | while read line; do echo -e "\e[31m${line}\e[0m"; done >&2)
+${cmd} >> "${LOG_FILE}" 2> >(tee -a  "$TMP_LOG_FILE" | while read line; do echo -e "\e[31m${line}\e[0m"; done >&2)
+
 if [ $? -eq 0 ]; then
-    echo -e "\033[32mAll components checked successfully\033[0m"
+    echo -e "\033[32mAll components checked successful\033[0m"
     # Add the commands that should be executed next if the binary component was successful
 else
     echo -e "\033[31mComponent check failed, program exiting\033[0m"
     exit 1
 fi
 
+
+
+print_blue "Starting MySQL to MongoDB data conversion"
 cmd="${mysql2mongo_full_path} -c ${config_path}"
-${cmd} >> "${LOG_FILE}" 2> >(tee -a "${STDERR_LOG_FILE}" "$TMP_LOG_FILE" | while read line; do echo -e "\e[31m${line}\e[0m"; done >&2)
+${cmd} >> "${LOG_FILE}" 2> >(tee -a  "$TMP_LOG_FILE" | while read line; do echo -e "\e[31m${line}\e[0m"; done >&2)
+if [ $? -eq 0 ]; then
+    print_green "conversion successful"
+else
+    print_red -e "Data conversion failed, program exiting"
+    exit 1
+fi
+
+print_blue "Starting Chat API and RPC services."
+
 
 for ((i = 0; i < ${#service_filename[*]}; i++)); do
 
@@ -187,13 +197,13 @@ for ((i = 0; i < ${#service_filename[*]}; i++)); do
     echo $cmd
 
 
-    nohup ${cmd} >> "${LOG_FILE}" 2> >(tee -a "${STDERR_LOG_FILE}" "$TMP_LOG_FILE" | while read line; do echo -e "\e[31m${line}\e[0m"; done >&2) &
+nohup ${cmd} >> "${LOG_FILE}" 2> >(tee -a  "$TMP_LOG_FILE" | while read line; do echo -e "\e[31m${line}\e[0m"; done >&2) >/dev/null &
 
-
+#nohup ${cmd} >>${LOG_FILE} 2> >(tee -a ${LOG_FILE} | while read line; do echo -e "\e[31m${line}\e[0m" >&2; done) >/dev/null &
   done
 done
 
-
+sleep 1
 
 
 all_services_running=true
@@ -207,9 +217,14 @@ for binary_path in "${binary_full_paths[@]}"; do
     fi
 done
 
+is_all_running=false
 if $all_services_running; then
     # Print "Startup successful" in green
-    echo -e "\033[0;32mAll chat services startup successful\033[0m"
+    is_all_running=true
+    print_blue "All chat services have been started, now beginning to check if the ports are listening properly."
+else
+  # Print "all stop" and exit with status code 1
+  exit 1
 fi
 
 all_ports_listening=true
@@ -223,19 +238,21 @@ ports=(
 )
 
 
-
+declare -a no_listen_ports=()
 
 for port in "${ports[@]}"; do
   if ! check_services_with_port "$port"; then
     all_ports_listening=false
-    break
+    no_listen_ports+=("$port")
   fi
 done
 
-if $all_ports_listening; then
-  echo "successful"
+if $all_ports_listening && $is_all_running; then
+  print_green "All chat services have started normally and the ports are listening properly"
 else
-  echo "failed"
+  if [ ${#no_listen_ports[@]} -gt 0 ]; then
+    echo -e "\033[31mThe following ports are not listening: ${no_listen_ports[*]}\033[0m"
+    fi
 fi
 
 

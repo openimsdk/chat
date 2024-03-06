@@ -16,7 +16,6 @@ import (
 	gormmysql "gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
-	"log"
 	"os"
 	"reflect"
 	"strconv"
@@ -80,7 +79,7 @@ func NewTask[A interface{ TableName() string }, B any, C any](gormDB *gorm.DB, m
 	}
 	var count int
 	defer func() {
-		log.Printf("completed convert chat %s total %d\n", tableName, count)
+		fmt.Printf("completed convert chat %s total %d\n", tableName, count)
 	}()
 	const batch = 100
 	for page := 0; ; page++ {
@@ -105,7 +104,7 @@ func NewTask[A interface{ TableName() string }, B any, C any](gormDB *gorm.DB, m
 		if len(res) < batch {
 			return nil
 		}
-		log.Printf("current convert chat %s completed %d\n", tableName, count)
+		fmt.Printf("current convert chat %s completed %d\n", tableName, count)
 	}
 }
 
@@ -128,12 +127,12 @@ func insertMany(coll *mongo.Collection, objs []any) error {
 }
 
 func Main(path string) error {
-	defer log.Println("mysql2mongo return")
+	defer fmt.Println("mysql2mongo return")
 	if err := InitConfig(path); err != nil {
 		return err
 	}
 	if config.Config.Mysql == nil {
-		log.Println("mysql config is nil")
+		fmt.Println("mysql config is nil")
 		return nil
 	}
 	mongoDB, err := dbconn.NewMongo()
@@ -159,7 +158,7 @@ func Main(path string) error {
 			if err := SetMongoDataVersion(mongoDB, version.Value); err != nil {
 				return err
 			}
-			log.Println("set chat version config")
+			fmt.Println("set chat version config")
 			return nil // database not exist
 		}
 		return err
