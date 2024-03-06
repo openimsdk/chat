@@ -164,7 +164,7 @@ fi
 
 cmd="${mysql2mongo_full_path} -c ${config_path}"
 
-nohup ${cmd} >>${LOG_FILE} 2> >(tee -a ${LOG_FILE} | while read line; do echo -e "\e[31m${line}\e[0m" >&2; done) >/dev/null &
+nohup ${cmd} >>${LOG_FILE} 2> >(tee -a ${LOG_FILE} | while read line; do echo -e "\e[31m${line}\e[0m" >&2; done)  &
 
 
 for ((i = 0; i < ${#service_filename[*]}; i++)); do
