@@ -194,9 +194,6 @@ for ((i = 0; i < ${#service_filename[*]}; i++)); do
 nohup ${cmd} >> "${LOG_FILE}" 2> >(tee -a  "$TMP_LOG_FILE" | while read line; do echo -e "\e[31m${line}\e[0m"; done >&2) >/dev/null &
 
 #nohup ${cmd} >>${LOG_FILE} 2> >(tee -a ${LOG_FILE} | while read line; do echo -e "\e[31m${line}\e[0m" >&2; done) >/dev/null &
-
-
-
   done
 done
 
@@ -211,7 +208,6 @@ for binary_path in "${binary_full_paths[@]}"; do
         all_services_running=false
         # Print the binary path in red for not running services
         echo -e "\033[0;31mService not running: $binary_path\033[0m"
-        exit 1
     fi
 done
 
@@ -219,7 +215,10 @@ is_all_running=false
 if $all_services_running; then
     # Print "Startup successful" in green
     is_all_running=true
-    echo -e "\033[0;32mAll chat services startup successful\033[0m"
+    echo -e "\033[0;32mAll chat services have been started; now beginning to check if the ports are listening properly.\033[0m"
+else
+  # Print "all stop" and exit with status code 1
+  exit 1
 fi
 
 all_ports_listening=true
