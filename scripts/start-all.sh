@@ -127,7 +127,7 @@ exit_status=$?
 
 # Check the exit status and proceed accordingly
 if [ $exit_status -eq 0 ]; then
-    print_yellow "Start component check for Chat services."
+    print_blue "Start component check for Chat services."
 else
     echo "Exiting due to failure in stopping services."
     exit 1
@@ -158,7 +158,7 @@ else
 fi
 
 
-print_yellow "Starting MySQL to MongoDB data conversion"
+print_blue "Starting MySQL to MongoDB data conversion"
 cmd="${mysql2mongo_full_path} -c ${config_path}"
 ${cmd} >> "${LOG_FILE}" 2> >(tee -a  "$TMP_LOG_FILE" | while read line; do echo -e "\e[31m${line}\e[0m"; done >&2)
 if [ $? -eq 0 ]; then
@@ -168,7 +168,7 @@ else
     exit 1
 fi
 
-print_yellow "Starting Chat API and RPC services."
+print_blue "Starting Chat API and RPC services."
 
 for ((i = 0; i < ${#service_filename[*]}; i++)); do
 
@@ -219,7 +219,7 @@ is_all_running=false
 if $all_services_running; then
     # Print "Startup successful" in green
     is_all_running=true
-    print_yellow "All chat services have been started, now beginning to check if the ports are listening properly."
+    print_blue "All chat services have been started, now beginning to check if the ports are listening properly."
 else
   # Print "all stop" and exit with status code 1
   exit 1
