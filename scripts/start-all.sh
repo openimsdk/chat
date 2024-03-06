@@ -155,7 +155,9 @@ cmd="${component_binary_full_path} --config_folder_path ${config_path}"
 #nohup bash -c "${cmd} >> ${LOG_FILE} 2>&1; exit 0" >/dev/null 2>&1 | tee -a "${LOG_FILE}" "${STDERR_LOG_FILE}" &
 #nohup bash -c "${cmd} >>${LOG_FILE} 2>&1; exit 0" 2> >(tee -a "${STDERR_LOG_FILE}" | while read line; do echo -e "\e[31m${line}\e[0m"; done >&2) &
 #nohup bash -c "${cmd} > >(tee -a \"${LOG_FILE}\") 2> >(tee -a \"${LOG_FILE}\" \"${STDERR_LOG_FILE}\" | while read line; do echo -e \"\e[31m${line}\e[0m\"; done >&2)" &
-nohup "${cmd} >>${LOG_FILE} 2> >(tee -a ${LOG_FILE} >(while read line; do echo -e \"\e[31m\${line}\e[0m\"; done >&2))" >/dev/null &
+
+nohup bash -c "${cmd} >>${LOG_FILE} 2> >(tee -a ${LOG_FILE} >(while read line; do echo -e \"\e[31m\${line}\e[0m\"; done >&2))" >/dev/null &
+
 
 if [ $? -eq 0 ]; then
     echo -e "\033[32mAll components checked successfully\033[0m"
@@ -171,7 +173,8 @@ cmd="${mysql2mongo_full_path} -c ${config_path}"
 #nohup bash -c "${cmd} >> ${LOG_FILE} 2>&1; exit 0" >/dev/null 2>&1 | tee -a "${LOG_FILE}" "${STDERR_LOG_FILE}" &
 #nohup bash -c "${cmd} >>${LOG_FILE} 2>&1; exit 0" 2> >(tee -a "${STDERR_LOG_FILE}" | while read line; do echo -e "\e[31m${line}\e[0m"; done >&2) &
 #nohup bash -c "${cmd} > >(tee -a \"${LOG_FILE}\") 2> >(tee -a \"${LOG_FILE}\" \"${STDERR_LOG_FILE}\" | while read line; do echo -e \"\e[31m${line}\e[0m\"; done >&2)" &
-nohup "${cmd} >>${LOG_FILE} 2> >(tee -a ${LOG_FILE} >(while read line; do echo -e \"\e[31m\${line}\e[0m\"; done >&2))" >/dev/null &
+nohup bash -c "${cmd} >>${LOG_FILE} 2> >(tee -a ${LOG_FILE} >(while read line; do echo -e \"\e[31m\${line}\e[0m\"; done >&2))" >/dev/null &
+
 
 for ((i = 0; i < ${#service_filename[*]}; i++)); do
 
@@ -201,7 +204,8 @@ for ((i = 0; i < ${#service_filename[*]}; i++)); do
     #nohup ${cmd} >> "${LOG_FILE}" 2> >(tee -a "${STDERR_LOG_FILE}" "$TMP_LOG_FILE" | while read line; do echo -e "\e[31m${line}\e[0m"; done >&2) &
     #nohup bash -c "${cmd} >>${LOG_FILE} 2>&1; exit 0" 2> >(tee -a "${STDERR_LOG_FILE}" | while read line; do echo -e "\e[31m${line}\e[0m"; done >&2) &
     #nohup bash -c "${cmd} > >(tee -a \"${LOG_FILE}\") 2> >(tee -a \"${LOG_FILE}\" \"${STDERR_LOG_FILE}\" | while read line; do echo -e \"\e[31m${line}\e[0m\"; done >&2)" &
-    nohup "${cmd} >>${LOG_FILE} 2> >(tee -a ${LOG_FILE} >(while read line; do echo -e \"\e[31m\${line}\e[0m\"; done >&2))" >/dev/null &
+    nohup bash -c "${cmd} >>${LOG_FILE} 2> >(tee -a ${LOG_FILE} >(while read line; do echo -e \"\e[31m\${line}\e[0m\"; done >&2))" >/dev/null &
+
 
 
   done
