@@ -151,6 +151,7 @@ STDERR_LOG_FILE=${logs_dir}/chat_err_$(date '+%Y%m%d').log
 TMP_LOG_FILE=${logs_dir}/chat_tmp_$(date '+%Y%m%d').log
 cmd="${component_binary_full_path} --config_folder_path ${config_path}"
 nohup bash -c "${cmd} >>${LOG_FILE} 2> >(tee -a ${LOG_FILE} >(while read line; do echo -e \"\e[31m\${line}\e[0m\"; done >&2))"  &
+nohup bash -c "${cmd} >>${LOG_FILE} 2> >(tee -a ${LOG_FILE} >(while read line; do echo -e \"\e[31m\${line}\e[0m\" >&2; done))" &
 
 
 if [ $? -eq 0 ]; then
@@ -158,6 +159,7 @@ if [ $? -eq 0 ]; then
     # Add the commands that should be executed next if the binary component was successful
 else
     echo -e "\033[31mComponent check failed, program exiting\033[0m"
+    sleep 1
     exit 1
 fi
 
