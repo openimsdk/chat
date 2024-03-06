@@ -127,7 +127,7 @@ exit_status=$?
 
 # Check the exit status and proceed accordingly
 if [ $exit_status -eq 0 ]; then
-    echo -e "\033[1;33mStart component check for Chat API and RPC services.\033[0m"
+    print_yellow "Start component check for Chat API and RPC services."
 else
     echo "Exiting due to failure in stopping services."
     exit 1
@@ -215,7 +215,7 @@ is_all_running=false
 if $all_services_running; then
     # Print "Startup successful" in green
     is_all_running=true
-    echo -e "\033[1;33mAll chat services have been started; now beginning to check if the ports are listening properly.\033[0m"
+    print_yellow "All chat services have been started; now beginning to check if the ports are listening properly."
 else
   # Print "all stop" and exit with status code 1
   exit 1

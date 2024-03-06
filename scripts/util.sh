@@ -86,6 +86,20 @@ check_services_with_port() {
     fi
 }
 
+# Function to print text in yellow
+print_yellow() {
+    echo -e "\033[1;33m$1\033[0m"
+}
+
+# Function to print text in green
+print_green() {
+    echo -e "\033[0;32m$1\033[0m"
+}
+
+# Function to print text in red
+print_red() {
+    echo -e "\033[0;31m$1\033[0m"
+}
 
 
 # Example usage of check_services_with_name
