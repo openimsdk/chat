@@ -215,7 +215,7 @@ is_all_running=false
 if $all_services_running; then
     # Print "Startup successful" in green
     is_all_running=true
-    print_yellow "All chat services have been started; now beginning to check if the ports are listening properly."
+    print_yellow "All chat services have been started, now beginning to check if the ports are listening properly."
 else
   # Print "all stop" and exit with status code 1
   exit 1
@@ -242,10 +242,10 @@ for port in "${ports[@]}"; do
 done
 
 if $all_ports_listening && $is_all_running; then
-    echo -e "\033[0;32mAll chat services startup successful\033[0m"
+  print_green "All chat services have started normally and the ports are listening properly"
 else
-    if [ ${#no_listen_ports[@]} -gt 0 ]; then
-        echo -e "\033[31mThe following ports are not listening: ${no_listen_ports[*]}\033[0m"
+  if [ ${#no_listen_ports[@]} -gt 0 ]; then
+    echo -e "\033[31mThe following ports are not listening: ${no_listen_ports[*]}\033[0m"
     fi
 fi
 
