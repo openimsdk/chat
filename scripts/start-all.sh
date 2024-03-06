@@ -85,7 +85,7 @@ check_and_stop_services() {
 
     # Step 1: Check and stop each service if running
     for service in "${services[@]}"; do
-        stop_services_with_name "$service" >/dev/null 2>&1
+        check_services_with_name "$service" >/dev/null 2>&1
         if [ $? -eq 0 ]; then
             echo "Service running: $service. Attempting to stop."
             stop_services_with_name "$service"
@@ -127,14 +127,11 @@ exit_status=$?
 
 # Check the exit status and proceed accordingly
 if [ $exit_status -eq 0 ]; then
-    echo "Execution can continue."
+    echo "Start the chat api and rpc services"
 else
     echo "Exiting due to failure in stopping services."
     exit 1
 fi
-
-
-
 
 
 
