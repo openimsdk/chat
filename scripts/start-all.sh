@@ -150,8 +150,9 @@ LOG_FILE=${logs_dir}/chat_$(date '+%Y%m%d').log
 STDERR_LOG_FILE=${logs_dir}/chat_err_$(date '+%Y%m%d').log
 TMP_LOG_FILE=${logs_dir}/chat_tmp_$(date '+%Y%m%d').log
 cmd="${component_binary_full_path} --config_folder_path ${config_path}"
+nohup ${cmd} >> "${LOG_FILE}" 2> >(tee -a  "$TMP_LOG_FILE" | while read line; do echo -e "\e[31m${line}\e[0m"; done >&2) &
 
-nohup ${cmd} >>${LOG_FILE} 2> >(tee -a ${LOG_FILE} | while read line; do echo -e "\e[31m${line}\e[0m" >&2; done) >/dev/null &
+#nohup ${cmd} >>${LOG_FILE} 2> >(tee -a ${LOG_FILE} | while read line; do echo -e "\e[31m${line}\e[0m" >&2; done) >/dev/null &
 
 
 if [ $? -eq 0 ]; then
@@ -163,8 +164,9 @@ else
 fi
 
 cmd="${mysql2mongo_full_path} -c ${config_path}"
+nohup ${cmd} >> "${LOG_FILE}" 2> >(tee -a  "$TMP_LOG_FILE" | while read line; do echo -e "\e[31m${line}\e[0m"; done >&2) &
 
-nohup ${cmd} >>${LOG_FILE} 2> >(tee -a ${LOG_FILE} | while read line; do echo -e "\e[31m${line}\e[0m" >&2; done)  &
+#nohup ${cmd} >>${LOG_FILE} 2> >(tee -a ${LOG_FILE} | while read line; do echo -e "\e[31m${line}\e[0m" >&2; done)  &
 
 
 for ((i = 0; i < ${#service_filename[*]}; i++)); do
@@ -192,8 +194,9 @@ for ((i = 0; i < ${#service_filename[*]}; i++)); do
     echo $cmd
 
 
+nohup ${cmd} >> "${LOG_FILE}" 2> >(tee -a  "$TMP_LOG_FILE" | while read line; do echo -e "\e[31m${line}\e[0m"; done >&2) &
 
-nohup ${cmd} >>${LOG_FILE} 2> >(tee -a ${LOG_FILE} | while read line; do echo -e "\e[31m${line}\e[0m" >&2; done) >/dev/null &
+#nohup ${cmd} >>${LOG_FILE} 2> >(tee -a ${LOG_FILE} | while read line; do echo -e "\e[31m${line}\e[0m" >&2; done) >/dev/null &
 
 
 
