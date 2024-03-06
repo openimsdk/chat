@@ -150,7 +150,9 @@ LOG_FILE=${logs_dir}/chat_$(date '+%Y%m%d').log
 STDERR_LOG_FILE=${logs_dir}/chat_err_$(date '+%Y%m%d').log
 TMP_LOG_FILE=${logs_dir}/chat_tmp_$(date '+%Y%m%d').log
 cmd="${component_binary_full_path} --config_folder_path ${config_path}"
-${cmd} >> "${LOG_FILE}" 2> >(tee -a "${STDERR_LOG_FILE}" "$TMP_LOG_FILE" | while read line; do echo -e "\e[31m${line}\e[0m"; done >&2)
+#${cmd} >> "${LOG_FILE}" 2> >(tee -a "${STDERR_LOG_FILE}" "$TMP_LOG_FILE" | while read line; do echo -e "\e[31m${line}\e[0m"; done >&2)
+nohup ${cmd} >> "${LOG_FILE}" 2> >(tee -a "${STDERR_LOG_FILE}" "$TMP_LOG_FILE" >&2) &
+
 if [ $? -eq 0 ]; then
     echo -e "\033[32mAll components checked successfully\033[0m"
     # Add the commands that should be executed next if the binary component was successful
@@ -160,8 +162,8 @@ else
 fi
 
 cmd="${mysql2mongo_full_path} -c ${config_path}"
-${cmd} >> "${LOG_FILE}" 2> >(tee -a "${STDERR_LOG_FILE}" "$TMP_LOG_FILE" | while read line; do echo -e "\e[31m${line}\e[0m"; done >&2)
-
+#${cmd} >> "${LOG_FILE}" 2> >(tee -a "${STDERR_LOG_FILE}" "$TMP_LOG_FILE" | while read line; do echo -e "\e[31m${line}\e[0m"; done >&2)
+nohup ${cmd} >> "${LOG_FILE}" 2> >(tee -a "${STDERR_LOG_FILE}" "$TMP_LOG_FILE" >&2) &
 for ((i = 0; i < ${#service_filename[*]}; i++)); do
 
   cd $SCRIPTS_ROOT
