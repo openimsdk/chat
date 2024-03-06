@@ -215,7 +215,7 @@ is_all_running=false
 if $all_services_running; then
     # Print "Startup successful" in green
     is_all_running=true
-    echo -e "\033[0;32mAll chat services have been started; now beginning to check if the ports are listening properly.\033[0m"
+    echo -e "\033[1;33mAll chat services have been started; now beginning to check if the ports are listening properly.\033[0m"
 else
   # Print "all stop" and exit with status code 1
   exit 1
