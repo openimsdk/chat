@@ -243,11 +243,6 @@ func configGetEnv() error {
 	Config.Rpc.RegisterIP = getEnv("RPC_REGISTER_IP", Config.Rpc.RegisterIP)
 	Config.Rpc.ListenIP = getEnv("RPC_LISTEN_IP", Config.Rpc.ListenIP)
 
-	Config.Mysql.Username = getEnvStringPoint("MYSQL_USERNAME", Config.Mysql.Username)
-	Config.Mysql.Password = getEnvStringPoint("MYSQL_PASSWORD", Config.Mysql.Password)
-	Config.Mysql.Database = getEnvStringPoint("MYSQL_DATABASE", Config.Mysql.Database)
-	Config.Mysql.Address = getArrPointEnv("MYSQL_ADDRESS", "MYSQL_PORT", *Config.Mysql.Address)
-
 	Config.Log.StorageLocation = getEnvStringPoint("LOG_STORAGE_LOCATION", Config.Log.StorageLocation)
 
 	Config.Secret = getEnvStringPoint("SECRET", Config.Secret)
