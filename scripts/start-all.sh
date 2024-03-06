@@ -127,7 +127,7 @@ exit_status=$?
 
 # Check the exit status and proceed accordingly
 if [ $exit_status -eq 0 ]; then
-    print_yellow "Start component check for Chat API and RPC services."
+    print_yellow "Start component check for Chat services."
 else
     echo "Exiting due to failure in stopping services."
     exit 1
@@ -147,10 +147,7 @@ LOG_FILE=${logs_dir}/chat_$(date '+%Y%m%d').log
 STDERR_LOG_FILE=${logs_dir}/chat_err_$(date '+%Y%m%d').log
 TMP_LOG_FILE=${logs_dir}/chat_tmp_$(date '+%Y%m%d').log
 cmd="${component_binary_full_path} --config_folder_path ${config_path}"
-nohup ${cmd} >> "${LOG_FILE}" 2> >(tee -a  "$TMP_LOG_FILE" | while read line; do echo -e "\e[31m${line}\e[0m"; done >&2) >/dev/null &
-
-#nohup ${cmd} >>${LOG_FILE} 2> >(tee -a ${LOG_FILE} | while read line; do echo -e "\e[31m${line}\e[0m" >&2; done) >/dev/null &
-
+${cmd} >> "${LOG_FILE}" 2> >(tee -a  "$TMP_LOG_FILE" | while read line; do echo -e "\e[31m${line}\e[0m"; done >&2)
 
 if [ $? -eq 0 ]; then
     echo -e "\033[32mAll components checked successfully\033[0m"
@@ -160,11 +157,18 @@ else
     exit 1
 fi
 
+
+print_yellow "Starting MySQL to MongoDB data conversion"
 cmd="${mysql2mongo_full_path} -c ${config_path}"
-nohup ${cmd} >> "${LOG_FILE}" 2> >(tee -a  "$TMP_LOG_FILE" | while read line; do echo -e "\e[31m${line}\e[0m"; done >&2) >/dev/null &
+${cmd} >> "${LOG_FILE}" 2> >(tee -a  "$TMP_LOG_FILE" | while read line; do echo -e "\e[31m${line}\e[0m"; done >&2)
+if [ $? -eq 0 ]; then
+    print_green "conversion successful"
+else
+    print_red -e "Data conversion failed, program exiting"
+    exit 1
+fi
 
-#nohup ${cmd} >>${LOG_FILE} 2> >(tee -a ${LOG_FILE} | while read line; do echo -e "\e[31m${line}\e[0m" >&2; done)  &
-
+print_yellow "Starting Chat API and RPC services."
 
 for ((i = 0; i < ${#service_filename[*]}; i++)); do
 
