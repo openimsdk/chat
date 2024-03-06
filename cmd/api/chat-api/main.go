@@ -107,7 +107,7 @@ func main() {
 	go func() {
 		err = server.ListenAndServe()
 		if err != nil && err != http.ErrServerClosed {
-			netErr = errs.Wrap(err, fmt.Sprintf("api start err: %s", server.Addr))
+			netErr = errs.Wrap(err, fmt.Sprintf("server addr: %s", server.Addr))
 			netDone <- struct{}{}
 		}
 	}()
