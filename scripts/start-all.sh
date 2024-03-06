@@ -232,21 +232,21 @@ ports=(
 )
 
 
-no_listen_port=0
+declare -a no_listen_ports=()
 
 for port in "${ports[@]}"; do
   if ! check_services_with_port "$port"; then
     all_ports_listening=false
-    no_listen_port=$port
-    break
+    no_listen_ports+=("$port")
   fi
 done
-
 
 if $all_ports_listening && $is_all_running; then
     echo -e "\033[0;32mAll chat services startup successful\033[0m"
 else
-  echo -e "\033[31m${no_listen_port} port not listen\033[0m"
+    if [ ${#no_listen_ports[@]} -gt 0 ]; then
+        echo -e "\033[31mThe following ports are not listening: ${no_listen_ports[*]}\033[0m"
+    fi
 fi
 
 
