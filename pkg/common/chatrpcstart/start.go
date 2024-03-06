@@ -57,7 +57,7 @@ func Start(rpcPort int, rpcRegisterName string, prometheusPort int, rpcFn func(c
 	rpcTcpAddr := net.JoinHostPort(network.GetListenIP(config.Config.Rpc.ListenIP), strconv.Itoa(rpcPort))
 	listener, err := net.Listen("tcp", rpcTcpAddr)
 	if err != nil {
-		return errs.Wrap(err, "server addr: %s", rpcTcpAddr)
+		return errs.Wrap(err, fmt.Sprintf("Server address: %s", rpcTcpAddr))
 	}
 	defer listener.Close()
 
