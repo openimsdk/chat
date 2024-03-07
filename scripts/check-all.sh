@@ -19,6 +19,8 @@ SCRIPTS_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 OPENIM_ROOT=$(dirname "${SCRIPTS_ROOT}")/..
 source $SCRIPTS_ROOT/util.sh
 
+
+logs_dir="$SCRIPTS_ROOT/../_output/logs"
 DOCKER_LOG_FILE="$logs_dir/chat-docker.log"
 
 if is_running_in_container; then
@@ -35,11 +37,11 @@ if [ "$1" == "--print-screen" ]; then
     PRINT_SCREEN=1
 fi
 
-mkdir -p ${SCRIPTS_ROOT}/../logs
+#mkdir -p ${SCRIPTS_ROOT}/../logs
 
-if [ -z "$PRINT_SCREEN" ]; then
-    exec >> ${SCRIPTS_ROOT}/../logs/chat_$(date '+%Y%m%d').log 2>&1
-fi
+#if [ -z "$PRINT_SCREEN" ]; then
+#    exec >> ${SCRIPTS_ROOT}/../logs/chat_$(date '+%Y%m%d').log 2>&1
+#fi
 
 #Include shell font styles and some basic information
 source $SCRIPTS_ROOT/style-info.sh
