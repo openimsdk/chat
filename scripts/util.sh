@@ -53,8 +53,6 @@ stop_services_with_name() {
 
 check_services_with_name() {
     local binary_path="$1"
-    echo "$binary_path" 111111111111
-
     pgrep -f "$binary_path" > /dev/null 2>&1
     if [ $? -eq 0 ]; then
         if [ -z "$SUPPRESS_OUTPUT" ]; then
@@ -65,7 +63,6 @@ check_services_with_name() {
         if [ -z "$SUPPRESS_OUTPUT" ]; then
             echo "No process found with the path $binary_path."
         fi
-        echo "$binary_path" 2222222222
         return 1
     fi
 }

@@ -52,9 +52,7 @@ source $SCRIPTS_ROOT/util.sh
 all_services_running=true
 not_running_count=0 # Initialize a counter for not running services
 
-echo 3333333333333
 for binary_path in "${binary_full_paths[@]}"; do
-  echo  "check " "$binary_path"
     result=$(check_services_with_name "$binary_path")
     if [ $? -ne 0 ]; then
         all_services_running=false
@@ -62,10 +60,11 @@ for binary_path in "${binary_full_paths[@]}"; do
         # Print the binary path in red for not running services
         echo -e "\033[0;31mService not running: $binary_path\033[0m"
     fi
-    echo "$?" 444444444444444444444 $result
-    exit 1
 done
-echo 5555555555555555
+
+
+
+
 
 if $all_services_running; then
     # Print "Startup successful" in green
