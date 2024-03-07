@@ -54,6 +54,7 @@ not_running_count=0 # Initialize a counter for not running services
 
 echo 3333333333333
 for binary_path in "${binary_full_paths[@]}"; do
+  echo  "check " "$binary_path"
     result=$(check_services_with_name "$binary_path")
     if [ $? -ne 0 ]; then
         all_services_running=false
