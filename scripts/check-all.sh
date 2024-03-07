@@ -65,6 +65,7 @@ for binary_path in "${binary_full_paths[@]}"; do
     fi
     exit 1
 done
+echo 44444444444444
 
 if $all_services_running; then
     # Print "Startup successful" in green
