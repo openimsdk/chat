@@ -26,7 +26,7 @@ echo 111111111111111111
 if is_running_in_container; then
   exec >> ${DOCKER_LOG_FILE} 2>&1
 fi
-echo 111111111111111111
+echo 222222222222222222
 
 
 DATA="$(date +%H:%M:%S)"
@@ -52,6 +52,8 @@ source $SCRIPTS_ROOT/util.sh
 
 all_services_running=true
 not_running_count=0 # Initialize a counter for not running services
+
+echo 3333333333333
 
 for binary_path in "${binary_full_paths[@]}"; do
     result=$(check_services_with_name "$binary_path")
