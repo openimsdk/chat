@@ -25,5 +25,7 @@ logs_dir="$SCRIPTS_ROOT/../_output/logs"
 DOCKER_LOG_FILE="$logs_dir/chat-docker.log"
 
 
+${OPENIM_ROOT}/scripts/init-config.sh --skip
+
 "${OPENIM_ROOT}"/scripts/start-all.sh
 tail -f ${DOCKER_LOG_FILE}

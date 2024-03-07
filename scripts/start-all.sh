@@ -64,7 +64,7 @@ if [ -f "$CONFIG_FILE" ]; then
 else
     echo ""
     # The file does not exist
-    echo "Error: Configuration file does not exist."
+    echo "Error: Configuration file does not exist." $CONFIG_FILE
     echo "+++ You need to execute 'make init' to generate the configuration file and then modify the configuration items."
     echo ""
     exit 1
