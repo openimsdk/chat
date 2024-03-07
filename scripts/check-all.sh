@@ -19,7 +19,6 @@ SCRIPTS_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 OPENIM_ROOT=$(dirname "${SCRIPTS_ROOT}")/..
 source $SCRIPTS_ROOT/util.sh
 
-
 logs_dir="$SCRIPTS_ROOT/../_output/logs"
 DOCKER_LOG_FILE="$logs_dir/chat-docker.log"
 echo 111111111111111111
@@ -63,7 +62,7 @@ for binary_path in "${binary_full_paths[@]}"; do
         # Print the binary path in red for not running services
         echo -e "\033[0;31mService not running: $binary_path\033[0m"
     fi
-    echo 444444444444444444444
+    echo 444444444444444444444 $result
     exit 1
 done
 echo 5555555555555555
