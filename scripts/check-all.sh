@@ -17,7 +17,7 @@
 
 SCRIPTS_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 OPENIM_ROOT=$(dirname "${SCRIPTS_ROOT}")/..
-
+source $SCRIPTS_ROOT/util.sh
 
 if is_running_in_container; then
   exec >> ${DOCKER_LOG_FILE} 2>&1
