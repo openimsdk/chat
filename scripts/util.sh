@@ -106,3 +106,27 @@ print_red() {
 # Replace "/full/path/to/binary" with the actual full path of the binary you want to check
 # check_services_with_name "/full/path/to/binary"
 
+create_log_directory_and_file() {
+  local base_path="$1"
+  local log_directory="${base_path}/_output/logs"
+  local log_file="${log_directory}/chat-docker.log"
+
+  if [[ ! -d "$log_directory" ]]; then
+    echo "Creating log directory: $log_directory"
+    mkdir -p "$log_directory"
+  fi
+
+  if [[ ! -f "$log_file" ]]; then
+    echo "Creating log file: $log_file"
+    touch "$log_file"
+  fi
+}
+
+
+function is_running_in_container() {
+  if grep -qE 'docker|kubepods' /proc/1/cgroup || [ -f /.dockerenv ]; then
+    return 0
+  else
+    return 1
+  fi
+}

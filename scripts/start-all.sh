@@ -39,6 +39,13 @@ logs_dir="$SCRIPTS_ROOT/../_output/logs"
 # Define the path to the configuration file
 CONFIG_FILE="${OPENIM_ROOT}/config/config.yaml"
 
+
+create_log_directory_and_file $OPENIM_ROOT
+
+if is_running_in_container; then
+  exec > ${DOCKER_LOG_FILE} 2>&1
+fi
+
 # Check if the configuration file exists
 if [ -f "$CONFIG_FILE" ]; then
     # The file exists
