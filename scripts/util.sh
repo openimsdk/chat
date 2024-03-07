@@ -63,6 +63,7 @@ check_services_with_name() {
         if [ -z "$SUPPRESS_OUTPUT" ]; then
             echo "No process found with the path $binary_path."
         fi
+        echo "$binary_path"
         return 1
     fi
 }
