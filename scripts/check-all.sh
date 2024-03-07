@@ -36,11 +36,11 @@ if [ "$1" == "--print-screen" ]; then
     PRINT_SCREEN=1
 fi
 
-mkdir -p ${SCRIPTS_ROOT}/../logs
+#mkdir -p ${SCRIPTS_ROOT}/../logs
 
-if [ -z "$PRINT_SCREEN" ]; then
-    exec >> ${SCRIPTS_ROOT}/../logs/chat_$(date '+%Y%m%d').log 2>&1
-fi
+#if [ -z "$PRINT_SCREEN" ]; then
+#    exec >> ${SCRIPTS_ROOT}/../logs/chat_$(date '+%Y%m%d').log 2>&1
+#fi
 
 #Include shell font styles and some basic information
 source $SCRIPTS_ROOT/style-info.sh
