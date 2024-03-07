@@ -21,11 +21,9 @@ source $SCRIPTS_ROOT/util.sh
 
 logs_dir="$SCRIPTS_ROOT/../_output/logs"
 DOCKER_LOG_FILE="$logs_dir/chat-docker.log"
-echo 111111111111111111
 if is_running_in_container; then
   exec >> ${DOCKER_LOG_FILE} 2>&1
 fi
-echo 222222222222222222
 
 
 DATA="$(date +%H:%M:%S)"
