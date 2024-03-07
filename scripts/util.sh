@@ -106,3 +106,14 @@ print_red() {
 # Replace "/full/path/to/binary" with the actual full path of the binary you want to check
 # check_services_with_name "/full/path/to/binary"
 
+
+
+function is_running_in_container() {
+  if grep -qE 'docker|kubepods' /proc/1/cgroup || [ -f /.dockerenv ]; then
+    return 0
+  else
+    return 1
+  fi
+}
+
+

@@ -20,6 +20,15 @@ You may use the OpenIM source code to create compiled versions not originally pr
 3. User related part includes some regular functions like user login, user register, user info update, etc.
 4. Background management provides api for admin to manage the im system containing functions like user management, message mangement,group management,etc.
 
+## :busts_in_silhouette: Community
+
++ 💬 [Follow our Twitter account](https://twitter.com/founder_im63606)
++ 👫 [Join our Reddit](https://www.reddit.com/r/OpenIMessaging)
++ 🚀 [Join our Slack community](https://join.slack.com/t/openimsdk/shared_invite/zt-22720d66b-o_FvKxMTGXtcnnnHiMqe9Q)
++ :eyes: [Join our wechat (微信群)](https://openim-1253691595.cos.ap-nanjing.myqcloud.com/WechatIMG20.jpeg)
++ 📚 [OpenIM Community](https://github.com/OpenIMSDK/community)
++ 💕 [OpenIM Interest Group](https://github.com/Openim-sigs)
+
 ## 🛫 Quick start 
 
 > **Note**: You can get started quickly with OpenIM Chat.
@@ -201,7 +210,6 @@ We take notes of each [biweekly meeting](https://github.com/openimsdk/open-im-se
 ## Who are using open-im-server
 The [user case studies](https://github.com/openimsdk/community/blob/main/ADOPTERS.md) page includes the user list of the project. You can leave a [📝comment](https://github.com/openimsdk/open-im-server/issues/379) to let us know your use case.
 
-![avatar](https://github.com/openimsdk/OpenIM-Docs/blob/main/docs/images/WechatIMG20.jpeg)
 
 ## 🚨 License
 
