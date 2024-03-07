@@ -35,16 +35,27 @@ source $SCRIPTS_ROOT/util.sh
 
 bin_dir="$BIN_DIR"
 logs_dir="$SCRIPTS_ROOT/../_output/logs"
+DOCKER_LOG_FILE="$logs_dir/chat-docker.log"
 
 # Define the path to the configuration file
 CONFIG_FILE="${OPENIM_ROOT}/config/config.yaml"
 
+# Automatically created when there is no bin, logs folder
+if [[ ! -d "$logs_dir" ]]; then
+    mkdir -p "$logs_dir"
+fi
 
-create_log_directory_and_file $OPENIM_ROOT
+if [[ ! -f "$DOCKER_LOG_FILE" ]]; then
+    touch "$DOCKER_LOG_FILE"
+fi
+
+
+
 
 if is_running_in_container; then
   exec > ${DOCKER_LOG_FILE} 2>&1
 fi
+
 
 # Check if the configuration file exists
 if [ -f "$CONFIG_FILE" ]; then
@@ -143,10 +154,9 @@ fi
 
 
 
-# Automatically created when there is no bin, logs folder
-if [ ! -d $logs_dir ]; then
-  mkdir -p $logs_dir
-fi
+
+
+
 cd $SCRIPTS_ROOT
 
 rm -rf ${logs_dir}/chat_tmp_$(date '+%Y%m%d').log
