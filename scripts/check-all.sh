@@ -19,6 +19,7 @@ SCRIPTS_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 OPENIM_ROOT=$(dirname "${SCRIPTS_ROOT}")/..
 source $SCRIPTS_ROOT/util.sh
 
+logs_dir="$SCRIPTS_ROOT/../_output/logs"
 DOCKER_LOG_FILE="$logs_dir/chat-docker.log"
 
 if is_running_in_container; then
