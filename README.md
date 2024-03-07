@@ -201,7 +201,6 @@ We take notes of each [biweekly meeting](https://github.com/openimsdk/open-im-se
 ## Who are using open-im-server
 The [user case studies](https://github.com/openimsdk/community/blob/main/ADOPTERS.md) page includes the user list of the project. You can leave a [📝comment](https://github.com/openimsdk/open-im-server/issues/379) to let us know your use case.
 
-![avatar](https://github.com/openimsdk/OpenIM-Docs/blob/main/docs/images/WechatIMG20.jpeg)
 
 ## 🚨 License
 
