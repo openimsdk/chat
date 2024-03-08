@@ -19,12 +19,12 @@ SCRIPTS_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 OPENIM_ROOT=$(dirname "${SCRIPTS_ROOT}")/..
 source $SCRIPTS_ROOT/util.sh
 
-DOCKER_LOG_FILE="$logs_dir/chat-docker.log"
 
+logs_dir="$SCRIPTS_ROOT/../_output/logs"
+DOCKER_LOG_FILE="$logs_dir/chat-docker.log"
 if is_running_in_container; then
   exec >> ${DOCKER_LOG_FILE} 2>&1
 fi
-
 
 
 DATA="$(date +%H:%M:%S)"
@@ -35,11 +35,11 @@ if [ "$1" == "--print-screen" ]; then
     PRINT_SCREEN=1
 fi
 
-mkdir -p ${SCRIPTS_ROOT}/../logs
+#mkdir -p ${SCRIPTS_ROOT}/../logs
 
-if [ -z "$PRINT_SCREEN" ]; then
-    exec >> ${SCRIPTS_ROOT}/../logs/chat_$(date '+%Y%m%d').log 2>&1
-fi
+#if [ -z "$PRINT_SCREEN" ]; then
+#    exec >> ${SCRIPTS_ROOT}/../logs/chat_$(date '+%Y%m%d').log 2>&1
+#fi
 
 #Include shell font styles and some basic information
 source $SCRIPTS_ROOT/style-info.sh
@@ -59,10 +59,17 @@ for binary_path in "${binary_full_paths[@]}"; do
         # Print the binary path in red for not running services
         echo -e "\033[0;31mService not running: $binary_path\033[0m"
     fi
-    exit 1
 done
 
+
+
+
+
 if $all_services_running; then
+    for binary_path in "${binary_full_paths[@]}"; do
+      echo -e "\033[0;32mService  running: $binary_path\033[0m"
+    done
+
     # Print "Startup successful" in green
     echo -e "\033[0;32mAll chat services startup successful\033[0m"
 else
