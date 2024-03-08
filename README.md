@@ -197,6 +197,10 @@ $ ./scripts/stop-all.sh
 
 Please refer to "[How to add REST RPC API for OpenIM Chat](./HOW_TO_ADD_REST_RPC_API.md)".
 
+## Setup LiveKit if you want to enable Audio and Video chat
+
+Please refer to "[How to setup LiveKit server](./HOW_TO_SETUP_LIVEKIT_SERVER.md)".
+
 ## Contributing
 
 Contributions to this project are welcome! Please see [CONTRIBUTING.md](./CONTRIBUTING.md) for details.
