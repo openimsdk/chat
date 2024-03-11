@@ -16,7 +16,7 @@ ARG GOARCH
 ARG GOOS
 
 # Use golang as the builder stage
-FROM golang:1.21 AS builder
+FROM golang:1.22 AS builder
 
 ARG GO111MODULE=on
 ARG GOPROXY=https://goproxy.io,direct
