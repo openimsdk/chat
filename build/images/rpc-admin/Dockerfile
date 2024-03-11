@@ -22,7 +22,7 @@ ARG GOOS
 FROM golang:1.20 AS builder
 
 ARG GO111MODULE=on
-ARG GOPROXY=https://goproxy.cn,direct
+ARG GOPROXY=https://goproxy.io,direct
 
 WORKDIR /openim/openim-chat
 
