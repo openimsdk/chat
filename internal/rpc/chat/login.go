@@ -409,6 +409,7 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 }
 
 func (o *chatSvr) Login(ctx context.Context, req *chat.LoginReq) (*chat.LoginResp, error) {
+	defer log.ZInfo(ctx, "Login")
 	resp := &chat.LoginResp{}
 	if req.Password == "" && req.VerifyCode == "" {
 		return nil, errs.ErrArgs.Wrap("password or code must be set")
@@ -444,17 +445,17 @@ func (o *chatSvr) Login(ctx context.Context, req *chat.LoginReq) (*chat.LoginRes
 	}
 	var verifyCodeID *string
 	if req.Password == "" {
-		var id string
-		var err error
+		var account string
 		if req.Email == "" {
-			id, err = o.verifyCode(ctx, o.verifyCodeJoin(req.AreaCode, req.PhoneNumber), req.VerifyCode)
+			account = o.verifyCodeJoin(req.AreaCode, req.PhoneNumber)
 		} else {
-			id, err = o.verifyCode(ctx, req.Email, req.VerifyCode)
+			account = req.Email
 		}
-
+		id, err := o.verifyCode(ctx, account, req.VerifyCode)
 		if err != nil {
 			return nil, err
 		}
+		log.ZInfo(ctx, "Login verifyCode", "id", id)
 		verifyCodeID = &id
 	} else {
 		account, err := o.Database.GetAccount(ctx, attribute.UserID)
