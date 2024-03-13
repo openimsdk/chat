@@ -109,7 +109,7 @@ func (o *AdminApi) AdminUpdateInfo(c *gin.Context) {
 		apiresp.GinError(c, err)
 		return
 	}
-	apiresp.GinSuccess(c, nil)
+
 	imAdminUserID := config.GetIMAdmin(resp.UserID)
 	imToken, err := o.imApiCaller.UserToken(c, imAdminUserID, constant.AdminPlatformID)
 	if err != nil {
@@ -119,6 +119,7 @@ func (o *AdminApi) AdminUpdateInfo(c *gin.Context) {
 	if err := o.imApiCaller.UpdateUserInfo(mctx.WithApiToken(c, imToken), imAdminUserID, resp.Nickname, resp.FaceURL); err != nil {
 		log.ZError(c, "AdminUpdateInfo UpdateUserInfo", err, "userID", resp.UserID, "nickName", resp.Nickname, "faceURL", resp.FaceURL)
 	}
+	apiresp.GinSuccess(c, nil)
 }
 
 func (o *AdminApi) AdminInfo(c *gin.Context) {
