@@ -1,6 +1,6 @@
 name: Language Check Workflow Test
 
-on: [push, pull_request]
+on: [pull_request]
 
 jobs:
   comment-language-detector:
