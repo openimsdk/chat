@@ -17,14 +17,15 @@ package admin
 import (
 	"context"
 	"fmt"
+	"math/rand"
+	"time"
+
 	"github.com/OpenIMSDK/chat/pkg/common/db/cache"
 	"github.com/OpenIMSDK/tools/discoveryregistry"
 	"github.com/OpenIMSDK/tools/errs"
 	"github.com/OpenIMSDK/tools/mcontext"
 	"github.com/OpenIMSDK/tools/utils"
 	"google.golang.org/grpc"
-	"math/rand"
-	"time"
 
 	"github.com/OpenIMSDK/chat/pkg/common/config"
 	"github.com/OpenIMSDK/chat/pkg/common/constant"
@@ -60,8 +61,9 @@ func Start(discov discoveryregistry.SvcDiscoveryRegistry, server *grpc.Server) e
 		return errs.Wrap(err, "CreateRpcRootNodes error")
 	}
 
-	admin.RegisterAdminServer(server, &adminServer{Database: adminDatabase,
-		Chat: chat.NewChatClient(discov),
+	admin.RegisterAdminServer(server, &adminServer{
+		Database: adminDatabase,
+		Chat:     chat.NewChatClient(discov),
 	})
 	return nil
 }

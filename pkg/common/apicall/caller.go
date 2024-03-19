@@ -16,9 +16,12 @@ package apicall
 
 import (
 	"context"
-	"github.com/OpenIMSDK/tools/log"
 	"sync"
 	"time"
+
+	"github.com/OpenIMSDK/tools/log"
+
+	"github.com/OpenIMSDK/tools/log"
 
 	"github.com/OpenIMSDK/chat/pkg/common/config"
 	"github.com/OpenIMSDK/protocol/auth"

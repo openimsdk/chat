@@ -2,9 +2,10 @@ package xlsx
 
 import (
 	"errors"
-	"github.com/xuri/excelize/v2"
 	"io"
 	"reflect"
+
+	"github.com/xuri/excelize/v2"
 )
 
 func ParseSheet(file *excelize.File, v interface{}) error {

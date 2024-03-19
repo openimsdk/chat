@@ -17,10 +17,13 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/OpenIMSDK/tools/errs"
 	"os"
 	"strings"
 	"time"
+
+	"github.com/OpenIMSDK/tools/errs"
+
+	"github.com/OpenIMSDK/tools/errs"
 
 	"github.com/OpenIMSDK/chat/pkg/common/config"
 	component "github.com/OpenIMSDK/tools/component"
@@ -32,9 +35,7 @@ const (
 	MaxConnectTimes = 100
 )
 
-var (
-	cfgPath = flag.String("config_folder_path", defaultCfgPath, "Path to the configuration file")
-)
+var cfgPath = flag.String("config_folder_path", defaultCfgPath, "Path to the configuration file")
 
 type checkFunc struct {
 	name     string
@@ -91,7 +92,7 @@ func main() {
 	os.Exit(-1)
 }
 
-// checkZookeeper checks the Zookeeper connection
+// checkZookeeper checks the Zookeeper connection.
 func checkZookeeper() error {
 	zkStu := &component.Zookeeper{
 		Schema:   config.Config.Zookeeper.Schema,
@@ -103,7 +104,7 @@ func checkZookeeper() error {
 	return err
 }
 
-// checkRedis checks the Redis connection
+// checkRedis checks the Redis connection.
 func checkRedis() error {
 	redisStu := &component.Redis{
 		Address:  *config.Config.Redis.Address,
@@ -114,7 +115,7 @@ func checkRedis() error {
 	return err
 }
 
-// checkMongo checks the MongoDB connection without retries
+// checkMongo checks the MongoDB connection without retries.
 func checkMongo() error {
 	mongoStu := &component.Mongo{
 		URL:         config.Config.Mongo.Uri,

@@ -18,7 +18,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/OpenIMSDK/chat/pkg/util"
 	"net"
 	"os"
 	"os/signal"
@@ -26,6 +25,10 @@ import (
 	"sync"
 	"syscall"
 	"time"
+
+	"github.com/OpenIMSDK/chat/pkg/util"
+
+	"github.com/OpenIMSDK/chat/pkg/util"
 
 	"github.com/OpenIMSDK/chat/pkg/common/config"
 	chatMw "github.com/OpenIMSDK/chat/pkg/common/mw"

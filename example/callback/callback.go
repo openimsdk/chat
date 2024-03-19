@@ -7,6 +7,12 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"errors"
+	"io"
+	"net/http"
+	"reflect"
+	"strings"
+	"time"
+
 	"github.com/OpenIMSDK/chat/pkg/common/apistruct"
 	"github.com/OpenIMSDK/chat/pkg/common/config"
 	"github.com/OpenIMSDK/chat/pkg/proto/admin"
@@ -17,11 +23,6 @@ import (
 	"github.com/OpenIMSDK/tools/log"
 	"github.com/OpenIMSDK/tools/utils"
 	"github.com/gin-gonic/gin"
-	"io"
-	"net/http"
-	"reflect"
-	"strings"
-	"time"
 )
 
 func CallbackExample(c *gin.Context) {
@@ -73,7 +74,7 @@ func CallbackExample(c *gin.Context) {
 	}
 }
 
-// struct to map
+// struct to map.
 func convertStructToMap(input interface{}) (map[string]interface{}, error) {
 	result := make(map[string]interface{})
 	inputType := reflect.TypeOf(input)
@@ -100,12 +101,11 @@ func convertStructToMap(input interface{}) (map[string]interface{}, error) {
 }
 
 func Post(ctx context.Context, url string, header map[string]string, data any, timeout int) (content []byte, err error) {
-	var (
-		// define http client.
-		client = &http.Client{
-			Timeout: 15 * time.Second, // max timeout is 15s
-		}
-	)
+
+	// define http client.
+	client := &http.Client{
+		Timeout: 15 * time.Second, // max timeout is 15s
+	}
 
 	if timeout > 0 {
 		var cancel func()
@@ -145,9 +145,8 @@ func Post(ctx context.Context, url string, header map[string]string, data any, t
 	return result, nil
 }
 
-// handlingCallbackAfterSendMsg Handling callbacks after sending a message
+// handlingCallbackAfterSendMsg Handling callbacks after sending a message.
 func handlingCallbackAfterSendMsg(c *gin.Context) (*apistruct.CallbackAfterSendSingleMsgReq, error) {
-
 	var req apistruct.CallbackAfterSendSingleMsgReq
 
 	if err := c.BindJSON(&req); err != nil {
@@ -200,7 +199,7 @@ func getAdminToken(c *gin.Context) (*apistruct.AdminLoginResp, error) {
 	return &apistruct.AdminLoginResp{AdminToken: adminOutput.Data.AdminToken, ImToken: adminOutput.Data.ImToken}, nil
 }
 
-// CheckRobotAccount Verify if the robot account exists
+// CheckRobotAccount Verify if the robot account exists.
 func getRobotAccountInfo(c *gin.Context, token, robotics string) (*common.UserPublicInfo, error) {
 	header := make(map[string]string)
 	header["token"] = token

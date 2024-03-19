@@ -4,6 +4,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"os"
+	"reflect"
+	"strconv"
+
 	"github.com/OpenIMSDK/chat/pkg/common/config"
 	"github.com/OpenIMSDK/chat/pkg/common/db/model/admin"
 	"github.com/OpenIMSDK/chat/pkg/common/db/model/chat"
@@ -16,9 +20,6 @@ import (
 	gormmysql "gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
-	"os"
-	"reflect"
-	"strconv"
 )
 
 const (
@@ -65,7 +66,7 @@ func getColl(obj any) (_ *mongo.Collection, err error) {
 	return nil, errors.New("not found model collection")
 }
 
-// NewTask A mysql table B mongodb model C mongodb table
+// NewTask A mysql table B mongodb model C mongodb table.
 func NewTask[A interface{ TableName() string }, B any, C any](gormDB *gorm.DB, mongoDB *mongo.Database, mongoDBInit func(db *mongo.Database) (B, error), convert func(v A) C) error {
 	var zero A
 	tableName := zero.TableName()

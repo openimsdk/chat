@@ -16,6 +16,7 @@ package admin
 
 import (
 	"context"
+
 	"github.com/OpenIMSDK/tools/mgoutil"
 	"github.com/OpenIMSDK/tools/pagination"
 	"go.mongodb.org/mongo-driver/bson"
@@ -67,7 +68,6 @@ func (o *Applet) Update(ctx context.Context, id string, data map[string]any) err
 
 func (o *Applet) Take(ctx context.Context, id string) (*admin.Applet, error) {
 	return mgoutil.FindOne[*admin.Applet](ctx, o.coll, bson.M{"id": id})
-
 }
 
 func (o *Applet) Search(ctx context.Context, keyword string, pagination pagination.Pagination) (int64, []*admin.Applet, error) {
@@ -88,10 +88,8 @@ func (o *Applet) Search(ctx context.Context, keyword string, pagination paginati
 
 func (o *Applet) FindOnShelf(ctx context.Context) ([]*admin.Applet, error) {
 	return mgoutil.Find[*admin.Applet](ctx, o.coll, bson.M{"status": constant.StatusOnShelf})
-
 }
 
 func (o *Applet) FindID(ctx context.Context, ids []string) ([]*admin.Applet, error) {
 	return mgoutil.Find[*admin.Applet](ctx, o.coll, bson.M{"id": bson.M{"$in": ids}})
-
 }

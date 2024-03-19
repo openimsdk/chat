@@ -18,13 +18,14 @@ import (
 	"context"
 	"crypto/md5"
 	"encoding/hex"
+	"time"
+
 	"github.com/OpenIMSDK/chat/pkg/common/constant"
 	"github.com/OpenIMSDK/tools/mgoutil"
 	"github.com/OpenIMSDK/tools/pagination"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"time"
 
 	"github.com/OpenIMSDK/chat/pkg/common/config"
 	"github.com/OpenIMSDK/chat/pkg/common/db/table/admin"
@@ -72,7 +73,6 @@ func (o *Admin) Create(ctx context.Context, admins []*admin.Admin) error {
 
 func (o *Admin) ChangePassword(ctx context.Context, userID string, newPassword string) error {
 	return mgoutil.UpdateOne(ctx, o.coll, bson.M{"user_id": userID}, bson.M{"$set": bson.M{"password": newPassword}}, false)
-
 }
 
 func (o *Admin) Delete(ctx context.Context, userIDs []string) error {

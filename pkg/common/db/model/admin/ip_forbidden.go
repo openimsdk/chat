@@ -16,6 +16,7 @@ package admin
 
 import (
 	"context"
+
 	"github.com/OpenIMSDK/tools/mgoutil"
 	"github.com/OpenIMSDK/tools/pagination"
 	"go.mongodb.org/mongo-driver/bson"
@@ -49,12 +50,10 @@ type IPForbidden struct {
 
 func (o *IPForbidden) Take(ctx context.Context, ip string) (*admin.IPForbidden, error) {
 	return mgoutil.FindOne[*admin.IPForbidden](ctx, o.coll, bson.M{"ip": ip})
-
 }
 
 func (o *IPForbidden) Find(ctx context.Context, ips []string) ([]*admin.IPForbidden, error) {
 	return mgoutil.Find[*admin.IPForbidden](ctx, o.coll, bson.M{"ip": bson.M{"$in": ips}})
-
 }
 
 func (o *IPForbidden) Search(ctx context.Context, keyword string, state int32, pagination pagination.Pagination) (int64, []*admin.IPForbidden, error) {

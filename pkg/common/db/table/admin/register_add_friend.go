@@ -16,8 +16,8 @@ package admin
 
 import (
 	"context"
-	"github.com/OpenIMSDK/tools/pagination"
 	"time"
+
 )
 
 // RegisterAddFriend 注册时默认好友.

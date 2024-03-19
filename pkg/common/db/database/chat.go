@@ -16,10 +16,11 @@ package database
 
 import (
 	"context"
+	"time"
+
 	"github.com/OpenIMSDK/chat/pkg/common/db/dbutil"
 	"github.com/OpenIMSDK/tools/pagination"
 	"go.mongodb.org/mongo-driver/mongo"
-	"time"
 
 	constant2 "github.com/OpenIMSDK/chat/pkg/common/constant"
 	admin2 "github.com/OpenIMSDK/chat/pkg/common/db/model/admin"
@@ -245,9 +246,11 @@ func (o *ChatDatabase) GetAttributeByAccount(ctx context.Context, account string
 func (o *ChatDatabase) GetAttributeByPhone(ctx context.Context, areaCode string, phoneNumber string) (*table.Attribute, error) {
 	return o.attribute.TakePhone(ctx, areaCode, phoneNumber)
 }
+
 func (o *ChatDatabase) GetAttributeByEmail(ctx context.Context, email string) (*table.Attribute, error) {
 	return o.attribute.TakeEmail(ctx, email)
 }
+
 func (o *ChatDatabase) LoginRecord(ctx context.Context, record *table.UserLoginRecord, verifyCodeID *string) error {
 	return o.tx.Transaction(ctx, func(ctx context.Context) error {
 		if err := o.userLoginRecord.Create(ctx, record); err != nil {

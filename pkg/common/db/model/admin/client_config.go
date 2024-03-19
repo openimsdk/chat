@@ -16,6 +16,7 @@ package admin
 
 import (
 	"context"
+
 	"github.com/OpenIMSDK/tools/mgoutil"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -55,7 +56,6 @@ func (o *ClientConfig) Set(ctx context.Context, config map[string]string) error 
 		if err != nil {
 			return err
 		}
-
 	}
 	return nil
 }
