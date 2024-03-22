@@ -112,7 +112,7 @@ SPACE +=
 # ==============================================================================
 # Build definition
 
-GO_SUPPORTED_VERSIONS ?= 1.19|1.20|1.21|1.22
+GO_SUPPORTED_VERSIONS ?= 1.21|1.22|1.23|1.24
 GO_LDFLAGS += -X $(VERSION_PACKAGE).gitVersion=$(VERSION) \
 	-X $(VERSION_PACKAGE).gitCommit=$(GIT_COMMIT) \
 	-X $(VERSION_PACKAGE).gitTreeState=$(GIT_TREE_STATE) \
