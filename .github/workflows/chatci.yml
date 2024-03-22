@@ -58,7 +58,10 @@ jobs:
         id: go
 
       - name: Check out code into the Go module directory
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+
+      - name: Code Typecheck Detector
+        uses: kubecub/typecheck@main
 
       - name: Run go modules tidy
         run: |
