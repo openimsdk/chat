@@ -74,6 +74,9 @@ jobs:
         run: |
           make generate
 
+      - name: Code Typecheck Detector
+        uses: kubecub/typecheck@main
+
       - name: Run unit test and get test coverage
         run: |
           make cover
