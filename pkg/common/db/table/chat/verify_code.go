@@ -20,7 +20,7 @@ import (
 )
 
 type VerifyCode struct {
-	ID         string    `bson:"id"`
+	ID         string    `bson:"_id"`
 	Account    string    `bson:"account"`
 	Platform   string    `bson:"platform"`
 	Code       string    `bson:"code"`
