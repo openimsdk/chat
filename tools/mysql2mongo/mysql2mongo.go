@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+
 	"github.com/OpenIMSDK/chat/pkg/util"
 	"github.com/OpenIMSDK/chat/tools/mysql2mongo/internal"
 )

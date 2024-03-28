@@ -16,6 +16,7 @@ package admin
 
 import (
 	"context"
+
 	"github.com/OpenIMSDK/tools/mgoutil"
 	"github.com/OpenIMSDK/tools/pagination"
 	"go.mongodb.org/mongo-driver/bson"
@@ -95,5 +96,4 @@ func (o *InvitationRegister) Search(ctx context.Context, keyword string, state i
 		}
 	}
 	return mgoutil.FindPage[*admin.InvitationRegister](ctx, o.coll, filter, pagination)
-
 }

@@ -18,7 +18,6 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"github.com/OpenIMSDK/chat/pkg/util"
 	"net"
 	"net/http"
 	"os"
@@ -26,6 +25,10 @@ import (
 	"strconv"
 	"syscall"
 	"time"
+
+	"github.com/OpenIMSDK/chat/pkg/util"
+
+	"github.com/OpenIMSDK/chat/pkg/util"
 
 	"github.com/OpenIMSDK/tools/errs"
 
@@ -46,7 +49,6 @@ import (
 )
 
 func main() {
-
 	configFile, ginPort, showVersion, err := config.FlagParse()
 	if err != nil {
 		util.ExitWithError(err)
@@ -83,8 +85,7 @@ func main() {
 	zk, err = discovery_register.NewDiscoveryRegister(config.Config.Envs.Discovery)
 	/*zk, err := openKeeper.NewClient(config.Config.Zookeeper.ZkAddr, config.Config.Zookeeper.Schema,
 	openKeeper.WithFreq(time.Hour), openKeeper.WithUserNameAndPassword(config.Config.Zookeeper.Username,
-		config.Config.Zookeeper.Password), openKeeper.WithRoundRobin(), openKeeper.WithTimeout(10), openKeeper.WithLogger(log.NewZkLogger()))*/
-	if err != nil {
+		config.Config.Zookeeper.Password), openKeeper.WithRoundRobin(), openKeeper.WithTimeout(10), openKeeper.WithLogger(log.NewZkLogger()))*/if err != nil {
 		util.ExitWithError(err)
 	}
 	if err := zk.CreateRpcRootNodes([]string{config.Config.RpcRegisterName.OpenImAdminName, config.Config.RpcRegisterName.OpenImChatName}); err != nil {

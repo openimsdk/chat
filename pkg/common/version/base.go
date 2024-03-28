@@ -29,7 +29,7 @@ package version
 // When releasing a new Kubernetes version, this file is updated by
 // build/mark_new_version.sh to reflect the new version, and then a
 // git annotated tag (using format vX.Y where X == Major version and Y
-// == Minor version) is created to point to the commit that updates
+// == Minor version) is created to point to the commit that updates.
 var (
 	// TODO: Deprecate gitMajor and gitMinor, use only gitVersion
 	// instead. First step in deprecation, keep the fields but make
@@ -55,7 +55,7 @@ var (
 	// directory.  See also https://git-scm.com/docs/gitattributes
 	gitVersion   string = "latest"
 	gitCommit    string = "" // sha1 from git, output of $(git rev-parse HEAD)
-	gitTreeState string = ""            // state of git tree, either "clean" or "dirty"
+	gitTreeState string = "" // state of git tree, either "clean" or "dirty"
 
 	buildDate string = "1970-01-01T00:00:00Z" // build date in ISO8601 format, output of $(date -u +'%Y-%m-%dT%H:%M:%SZ')
 )

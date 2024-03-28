@@ -36,17 +36,17 @@ func Get() Info {
 	}
 }
 
-// GetSingleVersion returns single version of sealer
+// GetSingleVersion returns single version of sealer.
 func GetSingleVersion() string {
 	return gitVersion
 }
 
 type Output struct {
-	OpenIMChatVersion     Info               `json:"OpenIMChatVersion,omitempty" yaml:"OpenIMChatVersion,omitempty"`
-	OpenIMServerVersion     *OpenIMServerVersion           `json:"OpenIMServerVersion,omitempty" yaml:"OpenIMServerVersion,omitempty"`
+	OpenIMChatVersion   Info                 `json:"OpenIMChatVersion,omitempty" yaml:"OpenIMChatVersion,omitempty"`
+	OpenIMServerVersion *OpenIMServerVersion `json:"OpenIMServerVersion,omitempty" yaml:"OpenIMServerVersion,omitempty"`
 }
 
 type OpenIMServerVersion struct {
 	ServerVersion string `json:"serverVersion,omitempty" yaml:"serverVersion,omitempty"`
-	ClientVersion string `json:"clientVersion,omitempty" yaml:"clientVersion,omitempty"`	//sdk core version
+	ClientVersion string `json:"clientVersion,omitempty" yaml:"clientVersion,omitempty"` //sdk core version
 }

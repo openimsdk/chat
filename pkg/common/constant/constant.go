@@ -16,7 +16,7 @@ package constant
 
 import "github.com/OpenIMSDK/protocol/constant"
 
-// config path
+// config path.
 const (
 	ConfigPath = "/config/config.yaml"
 
@@ -128,7 +128,7 @@ const (
 	NeedInvitationCodeRegister    = 1 // Invitation code required
 )
 
-// mini-app
+// mini-app.
 const (
 	StatusOnShelf = 1 // OnShelf
 	StatusUnShelf = 2 // UnShelf
@@ -155,7 +155,7 @@ const (
 	InvitationCodeUnused = 2 // Unused
 )
 
-// Default discovery page
+// Default discovery page.
 const DefaultDiscoverPageURL = "https://doc.rentsoft.cn/#/"
 
 // const OperationID = "operationID"

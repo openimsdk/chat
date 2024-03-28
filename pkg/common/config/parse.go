@@ -19,13 +19,16 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"github.com/OpenIMSDK/tools/errs"
 	"os"
 	"path/filepath"
 	"runtime"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/OpenIMSDK/tools/errs"
+
+	"github.com/OpenIMSDK/tools/errs"
 
 	Constant "github.com/OpenIMSDK/chat/pkg/common/constant"
 	"gopkg.in/yaml.v3"
@@ -154,7 +157,6 @@ func findConfigFile(paths []string) (string, error) {
 }
 
 func CreateCatalogPath(path string) []string {
-
 	path1 := filepath.Dir(path)
 	path1 = filepath.Dir(path1)
 	// the parent of  binary file
@@ -169,7 +171,6 @@ func CreateCatalogPath(path string) []string {
 	pa3 := filepath.Join(path3, Constant.ConfigPath)
 
 	return []string{pa1, pa2, pa3}
-
 }
 
 func findConfigPath(configFile string) (string, error) {
@@ -184,7 +185,7 @@ func findConfigPath(configFile string) (string, error) {
 	}
 
 	// Second, check for OPENIMCONFIG environment variable
-	//envConfigPath := os.Getenv(Constant.OpenIMConfig)
+	// envConfigPath := os.Getenv(Constant.OpenIMConfig)
 	envConfigPath := os.Getenv(Constant.OpenIMConfig)
 	if envConfigPath != "" {
 		if _, err := findConfigFile([]string{envConfigPath}); err != nil {

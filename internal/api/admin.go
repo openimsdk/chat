@@ -19,6 +19,12 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"fmt"
+	"net"
+	"net/http"
+	"strconv"
+	"strings"
+	"time"
+
 	"github.com/OpenIMSDK/chat/pkg/common/apicall"
 	"github.com/OpenIMSDK/chat/pkg/common/apistruct"
 	"github.com/OpenIMSDK/chat/pkg/common/config"
@@ -39,11 +45,6 @@ import (
 	"github.com/OpenIMSDK/tools/utils"
 	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc"
-	"net"
-	"net/http"
-	"strconv"
-	"strings"
-	"time"
 )
 
 func NewAdmin(chatConn, adminConn grpc.ClientConnInterface) *AdminApi {
@@ -160,7 +161,6 @@ func (o *AdminApi) AddUserAccount(c *gin.Context) {
 	}
 
 	apiresp.GinSuccess(c, nil)
-
 }
 
 func (o *AdminApi) DelAdminAccount(c *gin.Context) {

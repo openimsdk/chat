@@ -16,6 +16,7 @@ package database
 
 import (
 	"context"
+
 	"github.com/OpenIMSDK/tools/pagination"
 	"go.mongodb.org/mongo-driver/mongo"
 
@@ -166,6 +167,7 @@ func (o *AdminDatabase) UpdateAdmin(ctx context.Context, userID string, update m
 func (o *AdminDatabase) ChangePassword(ctx context.Context, userID string, newPassword string) error {
 	return o.admin.ChangePassword(ctx, userID, newPassword)
 }
+
 func (o *AdminDatabase) AddAdminAccount(ctx context.Context, admins []*table.Admin) error {
 	return o.admin.Create(ctx, admins)
 }

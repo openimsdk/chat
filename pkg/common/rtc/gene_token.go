@@ -19,7 +19,7 @@ func GetLiveKitToken(room string, identity string) (string, error) {
 
 	token, err := geneLiveKitToken(apiKey, apiSecret, room, identity)
 
-	//fmt.Printf("livekit token=%s\n", token)
+	// fmt.Printf("livekit token=%s\n", token)
 
 	return token, err
 }

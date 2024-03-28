@@ -290,7 +290,6 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 				return nil, err
 			}
 		}
-
 	}
 	if req.User.UserID == "" {
 		for i := 0; i < 20; i++ {
