@@ -16,8 +16,8 @@ package chat
 
 import (
 	"context"
-	"github.com/OpenIMSDK/tools/pagination"
 	"time"
+
 )
 
 type Log struct {

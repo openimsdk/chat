@@ -17,7 +17,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/OpenIMSDK/chat/pkg/util"
 	"math/rand"
 	"net"
 	"net/http"
@@ -26,6 +25,10 @@ import (
 	"strconv"
 	"syscall"
 	"time"
+
+	"github.com/OpenIMSDK/chat/pkg/util"
+
+	"github.com/OpenIMSDK/chat/pkg/util"
 
 	"github.com/OpenIMSDK/tools/errs"
 
@@ -79,7 +82,7 @@ func main() {
 	}
 	var zk discoveryregistry.SvcDiscoveryRegistry
 	zk, err = discovery_register.NewDiscoveryRegister(config.Config.Envs.Discovery)
-	//zk, err = openKeeper.NewClient(config.Config.Zookeeper.ZkAddr, config.Config.Zookeeper.Schema,
+	// zk, err = openKeeper.NewClient(config.Config.Zookeeper.ZkAddr, config.Config.Zookeeper.Schema,
 	//		openKeeper.WithFreq(time.Hour), openKeeper.WithUserNameAndPassword(config.Config.Zookeeper.Username, config.Config.Zookeeper.Password), openKeeper.WithRoundRobin(), openKeeper.WithTimeout(10), openKeeper.WithLogger(log.NewZkLogger()))
 	if err != nil {
 		util.ExitWithError(err)
@@ -126,5 +129,4 @@ func main() {
 		close(netDone)
 		util.ExitWithError(netErr)
 	}
-
 }

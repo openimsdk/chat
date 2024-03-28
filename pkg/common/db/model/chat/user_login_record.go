@@ -16,10 +16,11 @@ package chat
 
 import (
 	"context"
+	"time"
+
 	"github.com/OpenIMSDK/tools/mgoutil"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
-	"time"
 
 	"github.com/OpenIMSDK/chat/pkg/common/db/table/chat"
 )

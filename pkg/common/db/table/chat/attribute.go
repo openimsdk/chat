@@ -16,8 +16,8 @@ package chat
 
 import (
 	"context"
-	"github.com/OpenIMSDK/tools/pagination"
 	"time"
+
 )
 
 // Attribute 用户属性表.
@@ -46,7 +46,7 @@ func (Attribute) TableName() string {
 }
 
 type AttributeInterface interface {
-	//NewTx(tx any) AttributeInterface
+	// NewTx(tx any) AttributeInterface
 	Create(ctx context.Context, attribute ...*Attribute) error
 	Update(ctx context.Context, userID string, data map[string]any) error
 	Find(ctx context.Context, userIds []string) ([]*Attribute, error)

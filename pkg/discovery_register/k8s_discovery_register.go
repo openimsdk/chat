@@ -18,9 +18,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/OpenIMSDK/tools/errs"
 	"strings"
 	"time"
+
+	"github.com/OpenIMSDK/tools/errs"
+
+	"github.com/OpenIMSDK/tools/errs"
 
 	"github.com/OpenIMSDK/chat/pkg/common/config"
 	"github.com/OpenIMSDK/tools/discoveryregistry"
@@ -61,7 +64,7 @@ type K8sDR struct {
 }
 
 func (cli *K8sDR) GetUserIdHashGatewayHost(ctx context.Context, userId string) (string, error) {
-	//TODO implement me
+	// TODO implement me
 	panic("implement me")
 }
 

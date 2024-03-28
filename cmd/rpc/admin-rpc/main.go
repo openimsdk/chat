@@ -17,9 +17,12 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/OpenIMSDK/chat/pkg/util"
 	"math/rand"
 	"time"
+
+	"github.com/OpenIMSDK/chat/pkg/util"
+
+	"github.com/OpenIMSDK/chat/pkg/util"
 
 	"github.com/OpenIMSDK/chat/pkg/common/chatrpcstart"
 	"github.com/OpenIMSDK/chat/pkg/common/version"
