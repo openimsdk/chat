@@ -16,15 +16,15 @@ package admin
 
 import (
 	"context"
-	"github.com/OpenIMSDK/tools/mgoutil"
-	"github.com/OpenIMSDK/tools/pagination"
+	"github.com/openimsdk/tools/mgoutil"
+	"github.com/openimsdk/tools/pagination"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 
-	"github.com/OpenIMSDK/chat/pkg/common/constant"
-	"github.com/OpenIMSDK/chat/pkg/common/db/table/admin"
-	"github.com/OpenIMSDK/tools/errs"
+	"github.com/openimsdk/chat/pkg/common/constant"
+	"github.com/openimsdk/chat/pkg/common/db/table/admin"
+	"github.com/openimsdk/tools/errs"
 )
 
 func NewIPForbidden(db *mongo.Database) (admin.IPForbiddenInterface, error) {

@@ -18,12 +18,12 @@ import (
 	"context"
 	"time"
 
-	"github.com/OpenIMSDK/tools/errs"
-	"github.com/OpenIMSDK/tools/utils"
+	"github.com/openimsdk/tools/errs"
+	"github.com/openimsdk/tools/utils"
 
-	admin2 "github.com/OpenIMSDK/chat/pkg/common/db/table/admin"
-	"github.com/OpenIMSDK/chat/pkg/common/mctx"
-	"github.com/OpenIMSDK/chat/pkg/proto/admin"
+	admin2 "github.com/openimsdk/chat/pkg/common/db/table/admin"
+	"github.com/openimsdk/chat/pkg/common/mctx"
+	"github.com/openimsdk/chat/pkg/proto/admin"
 )
 
 func (o *adminServer) SearchUserIPLimitLogin(ctx context.Context, req *admin.SearchUserIPLimitLoginReq) (*admin.SearchUserIPLimitLoginResp, error) {
@@ -56,7 +56,7 @@ func (o *adminServer) AddUserIPLimitLogin(ctx context.Context, req *admin.AddUse
 		return nil, err
 	}
 	if len(req.Limits) == 0 {
-		return nil, errs.ErrArgs.Wrap("limits is empty")
+		return nil, errs.ErrArgs.WrapMsg("limits is empty")
 	}
 	now := time.Now()
 	ts := make([]*admin2.LimitUserLoginIP, 0, len(req.Limits))
@@ -78,12 +78,12 @@ func (o *adminServer) DelUserIPLimitLogin(ctx context.Context, req *admin.DelUse
 		return nil, err
 	}
 	if len(req.Limits) == 0 {
-		return nil, errs.ErrArgs.Wrap("limits is empty")
+		return nil, errs.ErrArgs.WrapMsg("limits is empty")
 	}
 	ts := make([]*admin2.LimitUserLoginIP, 0, len(req.Limits))
 	for _, limit := range req.Limits {
 		if limit.UserID == "" || limit.Ip == "" {
-			return nil, errs.ErrArgs.Wrap("user_id or ip is empty")
+			return nil, errs.ErrArgs.WrapMsg("user_id or ip is empty")
 		}
 		ts = append(ts, &admin2.LimitUserLoginIP{
 			UserID: limit.UserID,

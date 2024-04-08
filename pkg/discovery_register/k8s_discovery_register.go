@@ -18,14 +18,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/OpenIMSDK/tools/errs"
+	"github.com/openimsdk/tools/errs"
 	"strings"
 	"time"
 
-	"github.com/OpenIMSDK/chat/pkg/common/config"
-	"github.com/OpenIMSDK/tools/discoveryregistry"
-	openkeeper "github.com/OpenIMSDK/tools/discoveryregistry/zookeeper"
-	"github.com/OpenIMSDK/tools/log"
+	"github.com/openimsdk/chat/pkg/common/config"
+	"github.com/openimsdk/tools/discoveryregistry"
+	openkeeper "github.com/openimsdk/tools/discoveryregistry/zookeeper"
+	"github.com/openimsdk/tools/log"
 	"google.golang.org/grpc"
 )
 

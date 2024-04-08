@@ -20,22 +20,22 @@ import (
 	"net"
 	"time"
 
-	"github.com/OpenIMSDK/chat/pkg/common/apicall"
-	"github.com/OpenIMSDK/chat/pkg/common/apistruct"
-	constant2 "github.com/OpenIMSDK/chat/pkg/common/constant"
-	"github.com/OpenIMSDK/chat/pkg/common/mctx"
-	"github.com/OpenIMSDK/protocol/constant"
-	"github.com/OpenIMSDK/protocol/sdkws"
-	"github.com/OpenIMSDK/tools/a2r"
-	"github.com/OpenIMSDK/tools/apiresp"
-	"github.com/OpenIMSDK/tools/checker"
-	"github.com/OpenIMSDK/tools/errs"
 	"github.com/gin-gonic/gin"
+	"github.com/openimsdk/chat/pkg/common/apicall"
+	"github.com/openimsdk/chat/pkg/common/apistruct"
+	constant2 "github.com/openimsdk/chat/pkg/common/constant"
+	"github.com/openimsdk/chat/pkg/common/mctx"
+	"github.com/openimsdk/protocol/constant"
+	"github.com/openimsdk/protocol/sdkws"
+	"github.com/openimsdk/tools/a2r"
+	"github.com/openimsdk/tools/apiresp"
+	"github.com/openimsdk/tools/checker"
+	"github.com/openimsdk/tools/errs"
 	"google.golang.org/grpc"
 
-	"github.com/OpenIMSDK/chat/pkg/common/config"
-	"github.com/OpenIMSDK/chat/pkg/proto/admin"
-	"github.com/OpenIMSDK/chat/pkg/proto/chat"
+	"github.com/openimsdk/chat/pkg/common/config"
+	"github.com/openimsdk/chat/pkg/proto/admin"
+	"github.com/openimsdk/chat/pkg/proto/chat"
 )
 
 func NewChat(chatConn, adminConn grpc.ClientConnInterface) *ChatApi {
@@ -209,7 +209,7 @@ func (o *ChatApi) UpdateUserInfo(c *gin.Context) {
 	} else if opUserType == constant2.AdminUser {
 		imToken, err = o.imApiCaller.UserToken(c, config.GetIMAdmin(mctx.GetOpUserID(c)), constant.AdminPlatformID)
 	} else {
-		apiresp.GinError(c, errs.ErrArgs.Wrap("opUserType unknown"))
+		apiresp.GinError(c, errs.ErrArgs.WrapMsg("opUserType unknown"))
 		return
 	}
 	if err != nil {

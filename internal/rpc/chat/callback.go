@@ -19,11 +19,11 @@ import (
 	"encoding/json"
 	"fmt"
 
-	constant2 "github.com/OpenIMSDK/chat/pkg/common/constant"
-	"github.com/OpenIMSDK/chat/pkg/eerrs"
-	"github.com/OpenIMSDK/chat/pkg/proto/chat"
-	"github.com/OpenIMSDK/protocol/constant"
-	"github.com/OpenIMSDK/tools/errs"
+	constant2 "github.com/openimsdk/chat/pkg/common/constant"
+	"github.com/openimsdk/chat/pkg/eerrs"
+	"github.com/openimsdk/chat/pkg/proto/chat"
+	"github.com/openimsdk/protocol/constant"
+	"github.com/openimsdk/tools/errs"
 )
 
 type CallbackBeforeAddFriendReq struct {

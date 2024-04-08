@@ -16,18 +16,18 @@ package chat
 
 import (
 	"context"
-	"github.com/OpenIMSDK/chat/pkg/common/db/dbutil"
-	chat2 "github.com/OpenIMSDK/chat/pkg/common/db/table/chat"
-	"github.com/OpenIMSDK/chat/pkg/common/rtc"
-	constant2 "github.com/OpenIMSDK/protocol/constant"
-	"github.com/OpenIMSDK/tools/mcontext"
+	"github.com/openimsdk/chat/pkg/common/db/dbutil"
+	chat2 "github.com/openimsdk/chat/pkg/common/db/table/chat"
+	"github.com/openimsdk/chat/pkg/common/rtc"
+	constant2 "github.com/openimsdk/protocol/constant"
+	"github.com/openimsdk/tools/mcontext"
 	"time"
 
-	"github.com/OpenIMSDK/chat/pkg/common/constant"
-	"github.com/OpenIMSDK/chat/pkg/common/mctx"
-	"github.com/OpenIMSDK/chat/pkg/eerrs"
-	"github.com/OpenIMSDK/chat/pkg/proto/chat"
-	"github.com/OpenIMSDK/tools/errs"
+	"github.com/openimsdk/chat/pkg/common/constant"
+	"github.com/openimsdk/chat/pkg/common/mctx"
+	"github.com/openimsdk/chat/pkg/eerrs"
+	"github.com/openimsdk/chat/pkg/proto/chat"
+	"github.com/openimsdk/tools/errs"
 )
 
 func (o *chatSvr) UpdateUserInfo(ctx context.Context, req *chat.UpdateUserInfoReq) (*chat.UpdateUserInfoResp, error) {
@@ -37,7 +37,7 @@ func (o *chatSvr) UpdateUserInfo(ctx context.Context, req *chat.UpdateUserInfoRe
 		return nil, err
 	}
 	if req.UserID == "" {
-		return nil, errs.ErrArgs.Wrap("user id is empty")
+		return nil, errs.ErrArgs.WrapMsg("user id is empty")
 	}
 	switch userType {
 	case constant.NormalUser:
@@ -45,23 +45,23 @@ func (o *chatSvr) UpdateUserInfo(ctx context.Context, req *chat.UpdateUserInfoRe
 		//	req.UserID = opUserID
 		//}
 		if req.UserID != opUserID {
-			return nil, errs.ErrNoPermission.Wrap("only admin can update other user info")
+			return nil, errs.ErrNoPermission.WrapMsg("only admin can update other user info")
 		}
 		if req.AreaCode != nil {
-			return nil, errs.ErrNoPermission.Wrap("areaCode can not be updated")
+			return nil, errs.ErrNoPermission.WrapMsg("areaCode can not be updated")
 		}
 		if req.PhoneNumber != nil {
-			return nil, errs.ErrNoPermission.Wrap("phoneNumber can not be updated")
+			return nil, errs.ErrNoPermission.WrapMsg("phoneNumber can not be updated")
 		}
 		if req.Account != nil {
-			return nil, errs.ErrNoPermission.Wrap("account can not be updated")
+			return nil, errs.ErrNoPermission.WrapMsg("account can not be updated")
 		}
 		if req.Level != nil {
-			return nil, errs.ErrNoPermission.Wrap("level can not be updated")
+			return nil, errs.ErrNoPermission.WrapMsg("level can not be updated")
 		}
 	case constant.AdminUser:
 	default:
-		return nil, errs.ErrNoPermission.Wrap("user type error")
+		return nil, errs.ErrNoPermission.WrapMsg("user type error")
 	}
 	update, err := ToDBAttributeUpdate(req)
 	if err != nil {
@@ -105,7 +105,7 @@ func (o *chatSvr) UpdateUserInfo(ctx context.Context, req *chat.UpdateUserInfoRe
 
 func (o *chatSvr) FindUserPublicInfo(ctx context.Context, req *chat.FindUserPublicInfoReq) (*chat.FindUserPublicInfoResp, error) {
 	if len(req.UserIDs) == 0 {
-		return nil, errs.ErrArgs.Wrap("UserIDs is empty")
+		return nil, errs.ErrArgs.WrapMsg("UserIDs is empty")
 	}
 	attributes, err := o.Database.FindAttribute(ctx, req.UserIDs)
 	if err != nil {
@@ -139,7 +139,7 @@ func (o *chatSvr) AddUserAccount(ctx context.Context, req *chat.AddUserAccountRe
 			}
 		}
 		if req.User.UserID == "" {
-			return nil, errs.ErrInternalServer.Wrap("gen user id failed")
+			return nil, errs.ErrInternalServer.WrapMsg("gen user id failed")
 		}
 	}
 
@@ -202,7 +202,7 @@ func (o *chatSvr) FindUserFullInfo(ctx context.Context, req *chat.FindUserFullIn
 		return nil, err
 	}
 	if len(req.UserIDs) == 0 {
-		return nil, errs.ErrArgs.Wrap("UserIDs is empty")
+		return nil, errs.ErrArgs.WrapMsg("UserIDs is empty")
 	}
 	attributes, err := o.Database.FindAttribute(ctx, req.UserIDs)
 	if err != nil {
@@ -227,7 +227,7 @@ func (o *chatSvr) SearchUserFullInfo(ctx context.Context, req *chat.SearchUserFu
 
 func (o *chatSvr) FindUserAccount(ctx context.Context, req *chat.FindUserAccountReq) (*chat.FindUserAccountResp, error) {
 	if len(req.UserIDs) == 0 {
-		return nil, errs.ErrArgs.Wrap("user id list must be set")
+		return nil, errs.ErrArgs.WrapMsg("user id list must be set")
 	}
 	if _, _, err := mctx.CheckAdminOrUser(ctx); err != nil {
 		return nil, err
@@ -245,7 +245,7 @@ func (o *chatSvr) FindUserAccount(ctx context.Context, req *chat.FindUserAccount
 
 func (o *chatSvr) FindAccountUser(ctx context.Context, req *chat.FindAccountUserReq) (*chat.FindAccountUserResp, error) {
 	if len(req.Accounts) == 0 {
-		return nil, errs.ErrArgs.Wrap("account list must be set")
+		return nil, errs.ErrArgs.WrapMsg("account list must be set")
 	}
 	if _, _, err := mctx.CheckAdminOrUser(ctx); err != nil {
 		return nil, err

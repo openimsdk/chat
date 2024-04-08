@@ -17,8 +17,8 @@ package email
 import (
 	"context"
 	"fmt"
-	"github.com/OpenIMSDK/chat/pkg/common/config"
-	"github.com/OpenIMSDK/tools/errs"
+	"github.com/openimsdk/chat/pkg/common/config"
+	"github.com/openimsdk/tools/errs"
 	"gopkg.in/gomail.v2"
 )
 

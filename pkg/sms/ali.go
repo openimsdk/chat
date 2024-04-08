@@ -18,12 +18,12 @@ import (
 	"context"
 	"encoding/json"
 
-	"github.com/OpenIMSDK/tools/errs"
 	aliconf "github.com/alibabacloud-go/darabonba-openapi/client"
 	dysmsapi "github.com/alibabacloud-go/dysmsapi-20170525/v2/client"
 	"github.com/alibabacloud-go/tea/tea"
+	"github.com/openimsdk/tools/errs"
 
-	"github.com/OpenIMSDK/chat/pkg/common/config"
+	"github.com/openimsdk/chat/pkg/common/config"
 )
 
 func newAli() (SMS, error) {

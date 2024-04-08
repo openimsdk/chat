@@ -13,11 +13,11 @@
 // limitations under the License.
 
 syntax = "proto3";
-package OpenIMChat.admin;
-import "pub/wrapperspb.proto";
-import "pub/sdkws.proto";
+package openim.admin;
+import "google/wrappers.proto";
+import "sdkws/sdkws.proto";
 import "common/common.proto";
-option go_package = "github.com/OpenIMSDK/chat/pkg/proto/admin";
+option go_package = "github.com/openimsdk/chat/pkg/proto/admin";
 
 //登录
 message LoginReq  {
@@ -45,11 +45,11 @@ message AddAdminAccountResp{
 }
 
 message AdminUpdateInfoReq {
-  OpenIMServer.protobuf.StringValue account = 1;
-  OpenIMServer.protobuf.StringValue password = 2;
-  OpenIMServer.protobuf.StringValue faceURL = 3;
-  OpenIMServer.protobuf.StringValue nickname = 4;
-  OpenIMServer.protobuf.Int32Value level = 6;
+  google.protobuf.StringValue account = 1;
+  google.protobuf.StringValue password = 2;
+  google.protobuf.StringValue faceURL = 3;
+  google.protobuf.StringValue nickname = 4;
+  google.protobuf.Int32Value level = 6;
 }
 
 message AdminUpdateInfoResp {
@@ -85,7 +85,7 @@ message DelAdminAccountResp{
 }
 
 message SearchAdminAccountReq{
-  OpenIMServer.sdkws.RequestPagination pagination = 2;
+  openim.sdkws.RequestPagination pagination = 2;
 }
 
 message SearchAdminAccountResp{
@@ -125,13 +125,13 @@ message FindDefaultFriendResp {
 
 message SearchDefaultFriendReq {
   string keyword = 1;
-  OpenIMServer.sdkws.RequestPagination pagination = 2;
+  openim.sdkws.RequestPagination pagination = 2;
 }
 
 message DefaultFriendAttribute {
   string userID = 1;
   int64 createTime = 2;
-  OpenIMChat.common.UserPublicInfo user = 3;
+  openim.chat.common.UserPublicInfo user = 3;
 }
 
 message SearchDefaultFriendResp {
@@ -162,13 +162,13 @@ message FindDefaultGroupResp {
 
 message SearchDefaultGroupReq {
   string keyword = 1;
-  OpenIMServer.sdkws.RequestPagination pagination = 2;
+  openim.sdkws.RequestPagination pagination = 2;
 }
 
 message GroupAttribute {
   string groupID = 1;
   int64 createTime = 2;
-  OpenIMServer.sdkws.GroupInfo group = 3;
+  openim.sdkws.GroupInfo group = 3;
 }
 
 message SearchDefaultGroupResp {
@@ -219,7 +219,7 @@ message InvitationRegister {
   string invitationCode = 1;
   int64 createTime = 2;
   string usedUserID = 3;
-  OpenIMChat.common.UserPublicInfo usedUser = 4;
+  openim.chat.common.UserPublicInfo usedUser = 4;
 }
 
 
@@ -229,7 +229,7 @@ message SearchInvitationCodeReq {
   repeated string userIDs = 2;
   repeated string codes = 3;
   string keyword = 4;
-  OpenIMServer.sdkws.RequestPagination pagination = 5;
+  openim.sdkws.RequestPagination pagination = 5;
 }
 
 message SearchInvitationCodeResp {
@@ -241,14 +241,14 @@ message SearchInvitationCodeResp {
 
 message SearchUserIPLimitLoginReq {
   string keyword = 1;
-  OpenIMServer.sdkws.RequestPagination pagination = 2;
+  openim.sdkws.RequestPagination pagination = 2;
 }
 
 message LimitUserLoginIP {
   string userID = 1;
   string ip = 2;
   int64 createTime = 3;
-  OpenIMChat.common.UserPublicInfo user = 4;
+  openim.chat.common.UserPublicInfo user = 4;
 }
 
 message SearchUserIPLimitLoginResp {
@@ -294,7 +294,7 @@ message IPForbiddenAdd {
 message SearchIPForbiddenReq {
   string keyword = 1;
   int32 status = 2;
-  OpenIMServer.sdkws.RequestPagination pagination = 3;
+  openim.sdkws.RequestPagination pagination = 3;
 }
 
 message SearchIPForbiddenResp{
@@ -354,7 +354,7 @@ message UnblockUserResp {}
 
 message SearchBlockUserReq{
   string keyword = 1;
-  OpenIMServer.sdkws.RequestPagination pagination = 2;
+  openim.sdkws.RequestPagination pagination = 2;
 }
 
 message BlockUserInfo {
@@ -443,16 +443,16 @@ message DelAppletResp  {
 
 message UpdateAppletReq  {
   string id = 1;
-  OpenIMServer.protobuf.StringValue name = 2;
-  OpenIMServer.protobuf.StringValue appID = 3;
-  OpenIMServer.protobuf.StringValue icon = 4;
-  OpenIMServer.protobuf.StringValue url = 5;
-  OpenIMServer.protobuf.StringValue md5 = 6;
-  OpenIMServer.protobuf.Int64Value size = 7;
-  OpenIMServer.protobuf.StringValue version = 8;
-  OpenIMServer.protobuf.UInt32Value priority = 9;
-  OpenIMServer.protobuf.UInt32Value status = 10;
-  OpenIMServer.protobuf.Int64Value createTime = 11;
+  google.protobuf.StringValue name = 2;
+  google.protobuf.StringValue appID = 3;
+  google.protobuf.StringValue icon = 4;
+  google.protobuf.StringValue url = 5;
+  google.protobuf.StringValue md5 = 6;
+  google.protobuf.Int64Value size = 7;
+  google.protobuf.StringValue version = 8;
+  google.protobuf.UInt32Value priority = 9;
+  google.protobuf.UInt32Value status = 10;
+  google.protobuf.Int64Value createTime = 11;
 }
 
 message UpdateAppletResp  {
@@ -462,17 +462,17 @@ message FindAppletReq {
 }
 
 message FindAppletResp {
-  repeated OpenIMChat.common.AppletInfo applets = 1;
+  repeated openim.chat.common.AppletInfo applets = 1;
 }
 
 message SearchAppletReq {
   string keyword = 1;
-  OpenIMServer.sdkws.RequestPagination pagination = 2;
+  openim.sdkws.RequestPagination pagination = 2;
 }
 
 message SearchAppletResp {
   uint32 total = 1;
-  repeated OpenIMChat.common.AppletInfo applets = 2;
+  repeated openim.chat.common.AppletInfo applets = 2;
 }
 
 

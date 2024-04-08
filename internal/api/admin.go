@@ -19,25 +19,25 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"fmt"
-	"github.com/OpenIMSDK/chat/pkg/common/apicall"
-	"github.com/OpenIMSDK/chat/pkg/common/apistruct"
-	"github.com/OpenIMSDK/chat/pkg/common/config"
-	constant2 "github.com/OpenIMSDK/chat/pkg/common/constant"
-	"github.com/OpenIMSDK/chat/pkg/common/mctx"
-	"github.com/OpenIMSDK/chat/pkg/common/xlsx"
-	"github.com/OpenIMSDK/chat/pkg/common/xlsx/model"
-	"github.com/OpenIMSDK/chat/pkg/proto/admin"
-	"github.com/OpenIMSDK/chat/pkg/proto/chat"
-	"github.com/OpenIMSDK/protocol/constant"
-	"github.com/OpenIMSDK/protocol/sdkws"
-	"github.com/OpenIMSDK/protocol/user"
-	"github.com/OpenIMSDK/tools/a2r"
-	"github.com/OpenIMSDK/tools/apiresp"
-	"github.com/OpenIMSDK/tools/checker"
-	"github.com/OpenIMSDK/tools/errs"
-	"github.com/OpenIMSDK/tools/log"
-	"github.com/OpenIMSDK/tools/utils"
 	"github.com/gin-gonic/gin"
+	"github.com/openimsdk/chat/pkg/common/apicall"
+	"github.com/openimsdk/chat/pkg/common/apistruct"
+	"github.com/openimsdk/chat/pkg/common/config"
+	constant2 "github.com/openimsdk/chat/pkg/common/constant"
+	"github.com/openimsdk/chat/pkg/common/mctx"
+	"github.com/openimsdk/chat/pkg/common/xlsx"
+	"github.com/openimsdk/chat/pkg/common/xlsx/model"
+	"github.com/openimsdk/chat/pkg/proto/admin"
+	"github.com/openimsdk/chat/pkg/proto/chat"
+	"github.com/openimsdk/protocol/constant"
+	"github.com/openimsdk/protocol/sdkws"
+	"github.com/openimsdk/protocol/user"
+	"github.com/openimsdk/tools/a2r"
+	"github.com/openimsdk/tools/apiresp"
+	"github.com/openimsdk/tools/checker"
+	"github.com/openimsdk/tools/errs"
+	"github.com/openimsdk/tools/log"
+	"github.com/openimsdk/tools/utils"
 	"google.golang.org/grpc"
 	"net"
 	"net/http"
@@ -208,7 +208,7 @@ func (o *AdminApi) AddDefaultGroup(c *gin.Context) {
 		return
 	}
 	if len(req.GroupIDs) != len(groups) {
-		apiresp.GinError(c, errs.ErrArgs.Wrap("group id not found"))
+		apiresp.GinError(c, errs.ErrArgs.WrapMsg("group id not found"))
 		return
 	}
 	resp, err := o.adminClient.AddDefaultGroup(c, &admin.AddDefaultGroupReq{
@@ -442,10 +442,10 @@ func (o *AdminApi) checkSecretAdmin(c *gin.Context, secret string) error {
 		return nil
 	}
 	if config.Config.ChatSecret == "" {
-		return errs.ErrNoPermission.Wrap("not config chat secret")
+		return errs.ErrNoPermission.WrapMsg("not config chat secret")
 	}
 	if config.Config.ChatSecret != secret {
-		return errs.ErrNoPermission.Wrap("secret error")
+		return errs.ErrNoPermission.WrapMsg("secret error")
 	}
 	SetToken(c, config.GetDefaultIMAdmin(), constant2.AdminUser)
 	return nil
@@ -475,7 +475,7 @@ func (o *AdminApi) ImportUserByXlsx(c *gin.Context) {
 	defer file.Close()
 	var users []model.User
 	if err := xlsx.ParseAll(file, &users); err != nil {
-		apiresp.GinError(c, errs.ErrArgs.Wrap("xlsx file parse error "+err.Error()))
+		apiresp.GinError(c, errs.ErrArgs.WrapMsg("xlsx file parse error "+err.Error()))
 		return
 	}
 	us, err := o.xlsx2user(users)
@@ -524,19 +524,19 @@ func (o *AdminApi) xlsx2user(users []model.User) ([]*chat.RegisterUserInfo, erro
 	chatUsers := make([]*chat.RegisterUserInfo, len(users))
 	for i, info := range users {
 		if info.Nickname == "" {
-			return nil, errs.ErrArgs.Wrap("nickname is empty")
+			return nil, errs.ErrArgs.WrapMsg("nickname is empty")
 		}
 		if info.AreaCode == "" || info.PhoneNumber == "" {
-			return nil, errs.ErrArgs.Wrap("areaCode or phoneNumber is empty")
+			return nil, errs.ErrArgs.WrapMsg("areaCode or phoneNumber is empty")
 		}
 		if info.Password == "" {
-			return nil, errs.ErrArgs.Wrap("password is empty")
+			return nil, errs.ErrArgs.WrapMsg("password is empty")
 		}
 		if !strings.HasPrefix(info.AreaCode, "+") {
-			return nil, errs.ErrArgs.Wrap("areaCode format error")
+			return nil, errs.ErrArgs.WrapMsg("areaCode format error")
 		}
 		if _, err := strconv.ParseUint(info.AreaCode[1:], 10, 16); err != nil {
-			return nil, errs.ErrArgs.Wrap("areaCode format error")
+			return nil, errs.ErrArgs.WrapMsg("areaCode format error")
 		}
 		gender, _ := strconv.Atoi(info.Gender)
 		chatUsers[i] = &chat.RegisterUserInfo{
@@ -581,7 +581,7 @@ func (o *AdminApi) xlsxBirth(s string) time.Time {
 
 func (o *AdminApi) registerChatUser(ctx context.Context, ip string, users []*chat.RegisterUserInfo) error {
 	if len(users) == 0 {
-		return errs.ErrArgs.Wrap("users is empty")
+		return errs.ErrArgs.WrapMsg("users is empty")
 	}
 	for _, info := range users {
 		respRegisterUser, err := o.chatClient.RegisterUser(ctx, &chat.RegisterUserReq{Ip: ip, User: info, Platform: constant.AdminPlatformID})

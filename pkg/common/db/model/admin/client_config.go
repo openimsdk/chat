@@ -16,13 +16,13 @@ package admin
 
 import (
 	"context"
-	"github.com/OpenIMSDK/tools/mgoutil"
+	"github.com/openimsdk/tools/mgoutil"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 
-	"github.com/OpenIMSDK/chat/pkg/common/db/table/admin"
-	"github.com/OpenIMSDK/tools/errs"
+	"github.com/openimsdk/chat/pkg/common/db/table/admin"
+	"github.com/openimsdk/tools/errs"
 )
 
 func NewClientConfig(db *mongo.Database) (admin.ClientConfigInterface, error) {

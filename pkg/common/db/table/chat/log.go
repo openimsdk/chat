@@ -16,7 +16,7 @@ package chat
 
 import (
 	"context"
-	"github.com/OpenIMSDK/tools/pagination"
+	"github.com/openimsdk/tools/pagination"
 	"time"
 )
 

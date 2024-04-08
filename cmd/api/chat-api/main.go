@@ -18,7 +18,7 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"github.com/OpenIMSDK/chat/pkg/util"
+	"github.com/openimsdk/chat/pkg/util"
 	"net"
 	"net/http"
 	"os"
@@ -27,18 +27,18 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/OpenIMSDK/tools/errs"
+	"github.com/openimsdk/tools/errs"
 
-	"github.com/OpenIMSDK/chat/pkg/discovery_register"
-	"github.com/OpenIMSDK/tools/discoveryregistry"
+	"github.com/openimsdk/chat/pkg/discovery_register"
+	"github.com/openimsdk/tools/discoveryregistry"
 
-	mw2 "github.com/OpenIMSDK/chat/pkg/common/mw"
-	"github.com/OpenIMSDK/chat/pkg/common/version"
+	mw2 "github.com/openimsdk/chat/pkg/common/mw"
+	"github.com/openimsdk/chat/pkg/common/version"
 
-	"github.com/OpenIMSDK/chat/internal/api"
-	"github.com/OpenIMSDK/chat/pkg/common/config"
-	"github.com/OpenIMSDK/tools/log"
-	"github.com/OpenIMSDK/tools/mw"
+	"github.com/openimsdk/chat/internal/api"
+	"github.com/openimsdk/chat/pkg/common/config"
+	"github.com/openimsdk/tools/log"
+	"github.com/openimsdk/tools/mw"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 

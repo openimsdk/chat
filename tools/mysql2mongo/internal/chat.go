@@ -15,8 +15,8 @@
 package internal
 
 import (
-	"github.com/OpenIMSDK/chat/pkg/common/db/table/chat"
-	oldchat "github.com/OpenIMSDK/chat/tools/mysql2mongo/internal/mysql/table/chat"
+	"github.com/openimsdk/chat/pkg/common/db/table/chat"
+	oldchat "github.com/openimsdk/chat/tools/mysql2mongo/internal/mysql/table/chat"
 )
 
 type convertChat struct{}

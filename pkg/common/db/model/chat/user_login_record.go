@@ -16,12 +16,12 @@ package chat
 
 import (
 	"context"
-	"github.com/OpenIMSDK/tools/mgoutil"
+	"github.com/openimsdk/tools/mgoutil"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"time"
 
-	"github.com/OpenIMSDK/chat/pkg/common/db/table/chat"
+	"github.com/openimsdk/chat/pkg/common/db/table/chat"
 )
 
 func NewUserLoginRecord(db *mongo.Database) (chat.UserLoginRecordInterface, error) {

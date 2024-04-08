@@ -15,11 +15,11 @@
 package apicall
 
 import (
-	"github.com/OpenIMSDK/chat/pkg/common/config"
-	"github.com/OpenIMSDK/protocol/auth"
-	"github.com/OpenIMSDK/protocol/friend"
-	"github.com/OpenIMSDK/protocol/group"
-	"github.com/OpenIMSDK/protocol/user"
+	"github.com/openimsdk/chat/pkg/common/config"
+	"github.com/openimsdk/protocol/auth"
+	"github.com/openimsdk/protocol/friend"
+	"github.com/openimsdk/protocol/group"
+	"github.com/openimsdk/protocol/user"
 )
 
 func imApi() string {

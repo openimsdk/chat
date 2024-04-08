@@ -3,8 +3,8 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/OpenIMSDK/chat/pkg/util"
-	"github.com/OpenIMSDK/chat/tools/mysql2mongo/internal"
+	"github.com/openimsdk/chat/pkg/util"
+	"github.com/openimsdk/chat/tools/mysql2mongo/internal"
 )
 
 func main() {

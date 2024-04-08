@@ -13,11 +13,11 @@
 // limitations under the License.
 
 syntax = "proto3";
-package OpenIMChat.chat;
-import "pub/wrapperspb.proto";
-import "pub/sdkws.proto";
+package openim.chat;
+import "google/wrappers.proto";
+import "sdkws/sdkws.proto";
 import "common/common.proto";
-option go_package = "github.com/OpenIMSDK/chat/pkg/proto/chat";
+option go_package = "github.com/openimsdk/chat/pkg/proto/chat";
 
 message UserIdentity {
   string email = 1;
@@ -31,20 +31,20 @@ message UserIdentity {
 
 message UpdateUserInfoReq{
   string  userID = 1;
-  OpenIMServer.protobuf.StringValue  account = 2;
-  OpenIMServer.protobuf.StringValue  phoneNumber = 3;
-  OpenIMServer.protobuf.StringValue  areaCode = 4;
-  OpenIMServer.protobuf.StringValue  email = 5;
-  OpenIMServer.protobuf.StringValue  nickname = 6;
-  OpenIMServer.protobuf.StringValue  faceURL = 7;
-  OpenIMServer.protobuf.Int32Value  gender = 8;
-  OpenIMServer.protobuf.Int32Value  level = 9;
-  OpenIMServer.protobuf.Int64Value birth = 10;
-  OpenIMServer.protobuf.Int32Value  allowAddFriend = 11;
-  OpenIMServer.protobuf.Int32Value  allowBeep = 12;
-  OpenIMServer.protobuf.Int32Value  allowVibration = 13;
-  OpenIMServer.protobuf.Int32Value  globalRecvMsgOpt = 14;
-  OpenIMServer.protobuf.Int32Value RegisterType = 15;
+  google.protobuf.StringValue  account = 2;
+  google.protobuf.StringValue  phoneNumber = 3;
+  google.protobuf.StringValue  areaCode = 4;
+  google.protobuf.StringValue  email = 5;
+  google.protobuf.StringValue  nickname = 6;
+  google.protobuf.StringValue  faceURL = 7;
+  google.protobuf.Int32Value  gender = 8;
+  google.protobuf.Int32Value  level = 9;
+  google.protobuf.Int64Value birth = 10;
+  google.protobuf.Int32Value  allowAddFriend = 11;
+  google.protobuf.Int32Value  allowBeep = 12;
+  google.protobuf.Int32Value  allowVibration = 13;
+  google.protobuf.Int32Value  globalRecvMsgOpt = 14;
+  google.protobuf.Int32Value RegisterType = 15;
 }
 
 message UpdateUserInfoResp{
@@ -57,18 +57,18 @@ message FindUserPublicInfoReq{
 }
 
 message FindUserPublicInfoResp{
-  repeated OpenIMChat.common.UserPublicInfo users = 1;
+  repeated openim.chat.common.UserPublicInfo users = 1;
 }
 
 message SearchUserPublicInfoReq{
   string keyword = 1;
-  OpenIMServer.sdkws.RequestPagination pagination = 2;
+  openim.sdkws.RequestPagination pagination = 2;
   int32 genders = 3;
 }
 
 message SearchUserPublicInfoResp{
   uint32 total = 1;
-  repeated OpenIMChat.common.UserPublicInfo users = 2;
+  repeated openim.chat.common.UserPublicInfo users = 2;
 }
 
 message FindUserFullInfoReq{
@@ -76,7 +76,7 @@ message FindUserFullInfoReq{
 }
 
 message FindUserFullInfoResp{
-  repeated OpenIMChat.common.UserFullInfo users = 1;
+  repeated openim.chat.common.UserFullInfo users = 1;
 }
 
 message SendVerifyCodeReq {
@@ -206,7 +206,7 @@ message SignalRecord {
   string recvNickname = 7;
   string groupID = 8;
   string groupName = 9;
-  repeated OpenIMChat.common.UserPublicInfo inviterUserList = 10;
+  repeated openim.chat.common.UserPublicInfo inviterUserList = 10;
   int32 duration = 11;
   int64 createTime = 12;
   string size = 13;
@@ -222,7 +222,7 @@ message AddSignalRecordResp {
 }
 
 message GetSignalRecordsReq {
-  OpenIMServer.sdkws.RequestPagination pagination = 1;
+  openim.sdkws.RequestPagination pagination = 1;
   string senderID = 2;
   string recvID = 3;
   string mediaType = 4;
@@ -246,14 +246,14 @@ message OpenIMCallbackResp {
 
 message SearchUserFullInfoReq{
   string keyword = 1;
-  OpenIMServer.sdkws.RequestPagination pagination = 2;
+  openim.sdkws.RequestPagination pagination = 2;
   int32 genders = 3;
   int32 normal = 4;
 }
 
 message SearchUserFullInfoResp{
   uint32 total = 1;
-  repeated OpenIMChat.common.UserFullInfo users = 2;
+  repeated openim.chat.common.UserFullInfo users = 2;
 }
 
 message UserLoginCountReq{
@@ -293,24 +293,24 @@ message SearchLogsReq{
   string keyword = 1;
   int64 startTime = 2;
   int64 endTime = 3;
-  OpenIMServer.sdkws.RequestPagination pagination = 4;
+  openim.sdkws.RequestPagination pagination = 4;
 }
 
 message SearchLogsResp{
-  repeated OpenIMChat.common.LogInfo LogsInfos = 1;
+  repeated openim.chat.common.LogInfo LogsInfos = 1;
   uint32 total = 2;
 }
 
 message SearchUserInfoReq{
   string keyword = 1;
-  OpenIMServer.sdkws.RequestPagination pagination = 2;
+  openim.sdkws.RequestPagination pagination = 2;
   repeated int32 genders = 3;
   repeated string userIDs = 4;
 }
 
 message SearchUserInfoResp {
   uint32 total = 1;
-  repeated OpenIMChat.common.UserFullInfo users = 2;
+  repeated openim.chat.common.UserFullInfo users = 2;
 }
 
 message GetTokenForVideoMeetingReq {

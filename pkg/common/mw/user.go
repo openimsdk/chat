@@ -17,8 +17,8 @@ package mw
 import (
 	"context"
 
-	"github.com/OpenIMSDK/chat/pkg/common/constant"
-	"github.com/OpenIMSDK/tools/log"
+	"github.com/openimsdk/chat/pkg/common/constant"
+	"github.com/openimsdk/tools/log"
 	"google.golang.org/grpc"
 )
 

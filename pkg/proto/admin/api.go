@@ -14,7 +14,7 @@
 
 package admin
 
-import "github.com/OpenIMSDK/tools/utils"
+import "github.com/openimsdk/tools/utils"
 
 func (x *GetClientConfigResp) ApiFormat() {
 	utils.InitMap(&x.Config)

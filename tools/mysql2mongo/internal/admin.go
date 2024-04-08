@@ -15,8 +15,8 @@
 package internal
 
 import (
-	"github.com/OpenIMSDK/chat/pkg/common/db/table/admin"
-	oldadmin "github.com/OpenIMSDK/chat/tools/mysql2mongo/internal/mysql/table/admin"
+	"github.com/openimsdk/chat/pkg/common/db/table/admin"
+	oldadmin "github.com/openimsdk/chat/tools/mysql2mongo/internal/mysql/table/admin"
 )
 
 type convertAdmin struct{}

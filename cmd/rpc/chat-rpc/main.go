@@ -16,16 +16,16 @@ package main
 
 import (
 	"fmt"
-	"github.com/OpenIMSDK/chat/pkg/util"
+	"github.com/openimsdk/chat/pkg/util"
 	"math/rand"
 	"time"
 
-	"github.com/OpenIMSDK/chat/pkg/common/chatrpcstart"
-	"github.com/OpenIMSDK/tools/log"
+	"github.com/openimsdk/chat/pkg/common/chatrpcstart"
+	"github.com/openimsdk/tools/log"
 
-	"github.com/OpenIMSDK/chat/internal/rpc/chat"
-	"github.com/OpenIMSDK/chat/pkg/common/config"
-	"github.com/OpenIMSDK/chat/pkg/common/version"
+	"github.com/openimsdk/chat/internal/rpc/chat"
+	"github.com/openimsdk/chat/pkg/common/config"
+	"github.com/openimsdk/chat/pkg/common/version"
 )
 
 func main() {

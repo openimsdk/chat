@@ -7,7 +7,7 @@
 # get the repo root and output path
 ROOT_PACKAGE=github.com/OpenIM/chat
 OUT_DIR=$(REPO_ROOT)/_output
-VERSION_PACKAGE=github.com/OpenIMSDK/chat/pkg/common/version
+VERSION_PACKAGE=github.com/openimsdk/chat/pkg/common/version
 # ==============================================================================
 
 
@@ -147,7 +147,7 @@ ifeq (${BINS},)
   $(error Could not determine BINS, set ROOT_DIR or run in source dir)
 endif
 
-EXCLUDE_TESTS=github.com/OpenIMSDK/chat/test
+EXCLUDE_TESTS=github.com/openimsdk/chat/test
 
 # ==============================================================================
 # Docker build definition

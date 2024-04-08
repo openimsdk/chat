@@ -16,17 +16,17 @@ package database
 
 import (
 	"context"
-	"github.com/OpenIMSDK/tools/pagination"
+	"github.com/openimsdk/tools/pagination"
 	"go.mongodb.org/mongo-driver/mongo"
 
-	"github.com/OpenIMSDK/chat/pkg/common/db/cache"
-	"github.com/OpenIMSDK/protocol/constant"
+	"github.com/openimsdk/chat/pkg/common/db/cache"
+	"github.com/openimsdk/protocol/constant"
 	"github.com/redis/go-redis/v9"
 
-	"github.com/OpenIMSDK/tools/tx"
+	"github.com/openimsdk/tools/tx"
 
-	"github.com/OpenIMSDK/chat/pkg/common/db/model/admin"
-	table "github.com/OpenIMSDK/chat/pkg/common/db/table/admin"
+	"github.com/openimsdk/chat/pkg/common/db/model/admin"
+	table "github.com/openimsdk/chat/pkg/common/db/table/admin"
 )
 
 type AdminDatabaseInterface interface {

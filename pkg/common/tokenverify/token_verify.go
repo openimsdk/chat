@@ -17,10 +17,10 @@ package tokenverify
 import (
 	"time"
 
-	"github.com/OpenIMSDK/chat/pkg/common/config"
-	"github.com/OpenIMSDK/chat/pkg/common/constant"
-	"github.com/OpenIMSDK/tools/errs"
 	"github.com/golang-jwt/jwt/v4"
+	"github.com/openimsdk/chat/pkg/common/config"
+	"github.com/openimsdk/chat/pkg/common/constant"
+	"github.com/openimsdk/tools/errs"
 )
 
 const (
@@ -51,7 +51,7 @@ func buildClaims(userID string, userType int32, ttl int64) claims {
 
 func CreateToken(UserID string, userType int32, ttl int64) (string, error) {
 	if !(userType == TokenUser || userType == TokenAdmin) {
-		return "", errs.ErrTokenUnknown.Wrap("token type unknown")
+		return "", errs.ErrTokenUnknown.WrapMsg("token type unknown")
 	}
 	claims := buildClaims(UserID, userType, ttl)
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
@@ -102,7 +102,7 @@ func GetToken(token string) (string, int32, error) {
 		return "", 0, err
 	}
 	if !(userType == TokenUser || userType == TokenAdmin) {
-		return "", 0, errs.ErrTokenUnknown.Wrap("token type unknown")
+		return "", 0, errs.ErrTokenUnknown.WrapMsg("token type unknown")
 	}
 	return userID, userType, nil
 }
@@ -113,7 +113,7 @@ func GetAdminToken(token string) (string, error) {
 		return "", err
 	}
 	if userType != TokenAdmin {
-		return "", errs.ErrTokenInvalid.Wrap("token type error")
+		return "", errs.ErrTokenInvalid.WrapMsg("token type error")
 	}
 	return userID, nil
 }
@@ -124,7 +124,7 @@ func GetUserToken(token string) (string, error) {
 		return "", err
 	}
 	if userType != TokenUser {
-		return "", errs.ErrTokenInvalid.Wrap("token type error")
+		return "", errs.ErrTokenInvalid.WrapMsg("token type error")
 	}
 	return userID, nil
 }

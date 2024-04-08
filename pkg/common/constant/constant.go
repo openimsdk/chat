@@ -14,7 +14,7 @@
 
 package constant
 
-import "github.com/OpenIMSDK/protocol/constant"
+import "github.com/openimsdk/protocol/constant"
 
 // config path
 const (

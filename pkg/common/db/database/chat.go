@@ -16,17 +16,17 @@ package database
 
 import (
 	"context"
-	"github.com/OpenIMSDK/chat/pkg/common/db/dbutil"
-	"github.com/OpenIMSDK/tools/pagination"
+	"github.com/openimsdk/chat/pkg/common/db/dbutil"
+	"github.com/openimsdk/tools/pagination"
 	"go.mongodb.org/mongo-driver/mongo"
 	"time"
 
-	constant2 "github.com/OpenIMSDK/chat/pkg/common/constant"
-	admin2 "github.com/OpenIMSDK/chat/pkg/common/db/model/admin"
-	"github.com/OpenIMSDK/chat/pkg/common/db/model/chat"
-	"github.com/OpenIMSDK/chat/pkg/common/db/table/admin"
-	table "github.com/OpenIMSDK/chat/pkg/common/db/table/chat"
-	"github.com/OpenIMSDK/tools/tx"
+	constant2 "github.com/openimsdk/chat/pkg/common/constant"
+	admin2 "github.com/openimsdk/chat/pkg/common/db/model/admin"
+	"github.com/openimsdk/chat/pkg/common/db/model/chat"
+	"github.com/openimsdk/chat/pkg/common/db/table/admin"
+	table "github.com/openimsdk/chat/pkg/common/db/table/chat"
+	"github.com/openimsdk/tools/tx"
 )
 
 type ChatDatabaseInterface interface {

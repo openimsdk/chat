@@ -20,8 +20,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/OpenIMSDK/tools/log"
 	"github.com/gin-gonic/gin"
+	"github.com/openimsdk/tools/log"
 )
 
 type responseWriter struct {

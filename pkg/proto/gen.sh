@@ -12,6 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-protoc --go_out=plugins=grpc:./common --go_opt=module=github.com/OpenIMSDK/chat/pkg/proto/common common/common.proto
-protoc --go_out=plugins=grpc:./admin --go_opt=module=github.com/OpenIMSDK/chat/pkg/proto/admin admin/admin.proto
-protoc --go_out=plugins=grpc:./chat --go_opt=module=github.com/OpenIMSDK/chat/pkg/proto/chat chat/chat.proto
+PROTO_NAMES=(
+    "admin"
+    "chat"
+    "common"
+)
+
+for name in "${PROTO_NAMES[@]}"; do
+  protoc --go_out=plugins=grpc:./${name} --go_opt=module=github.com/openimsdk/chat/pkg/proto/${name} ${name}/${name}.proto
+done

@@ -15,10 +15,10 @@
 package chat
 
 import (
-	"github.com/OpenIMSDK/tools/utils"
+	"github.com/openimsdk/tools/utils"
 
-	"github.com/OpenIMSDK/chat/pkg/common/db/table/chat"
-	"github.com/OpenIMSDK/chat/pkg/proto/common"
+	"github.com/openimsdk/chat/pkg/common/db/table/chat"
+	"github.com/openimsdk/chat/pkg/proto/common"
 )
 
 func DbToPbAttribute(attribute *chat.Attribute) *common.UserPublicInfo {

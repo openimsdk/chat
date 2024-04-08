@@ -20,12 +20,12 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/OpenIMSDK/chat/pkg/common/config"
+	"github.com/openimsdk/chat/pkg/common/config"
 
 	"github.com/redis/go-redis/v9"
 
-	"github.com/OpenIMSDK/tools/errs"
-	"github.com/OpenIMSDK/tools/mw/specialerror"
+	"github.com/openimsdk/tools/errs"
+	"github.com/openimsdk/tools/mw/specialerror"
 )
 
 const (

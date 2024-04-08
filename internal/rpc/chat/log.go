@@ -20,13 +20,13 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/OpenIMSDK/chat/pkg/common/constant"
-	table "github.com/OpenIMSDK/chat/pkg/common/db/table/chat"
-	"github.com/OpenIMSDK/chat/pkg/common/mctx"
-	"github.com/OpenIMSDK/chat/pkg/proto/chat"
-	"github.com/OpenIMSDK/tools/errs"
-	"github.com/OpenIMSDK/tools/mw/specialerror"
-	utils2 "github.com/OpenIMSDK/tools/utils"
+	"github.com/openimsdk/chat/pkg/common/constant"
+	table "github.com/openimsdk/chat/pkg/common/db/table/chat"
+	"github.com/openimsdk/chat/pkg/common/mctx"
+	"github.com/openimsdk/chat/pkg/proto/chat"
+	"github.com/openimsdk/tools/errs"
+	"github.com/openimsdk/tools/mw/specialerror"
+	utils2 "github.com/openimsdk/tools/utils"
 	"gorm.io/gorm/utils"
 )
 
@@ -77,7 +77,7 @@ func (o *chatSvr) UploadLogs(ctx context.Context, req *chat.UploadLogsReq) (*cha
 			}
 		}
 		if log.LogID == "" {
-			return nil, errs.ErrData.Wrap("Log id gen error")
+			return nil, errs.ErrData.WrapMsg("Log id gen error")
 		}
 		DBlogs = append(DBlogs, &log)
 	}
@@ -120,7 +120,7 @@ func (o *chatSvr) SearchLogs(ctx context.Context, req *chat.SearchLogsReq) (*cha
 		userIDs []string
 	)
 	if req.StartTime > req.EndTime {
-		return nil, errs.ErrArgs.Wrap("startTime>endTime")
+		return nil, errs.ErrArgs.WrapMsg("startTime>endTime")
 	}
 	total, logs, err := o.Database.SearchLogs(ctx, req.Keyword, time.UnixMilli(req.StartTime), time.UnixMilli(req.EndTime), req.Pagination)
 	if err != nil {

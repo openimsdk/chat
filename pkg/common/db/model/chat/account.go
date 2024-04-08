@@ -16,14 +16,14 @@ package chat
 
 import (
 	"context"
-	"github.com/OpenIMSDK/tools/errs"
-	"github.com/OpenIMSDK/tools/mgoutil"
+	"github.com/openimsdk/tools/errs"
+	"github.com/openimsdk/tools/mgoutil"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"time"
 
-	"github.com/OpenIMSDK/chat/pkg/common/db/table/chat"
+	"github.com/openimsdk/chat/pkg/common/db/table/chat"
 )
 
 func NewAccount(db *mongo.Database) (chat.AccountInterface, error) {

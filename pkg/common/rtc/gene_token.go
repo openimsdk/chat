@@ -3,8 +3,8 @@ package rtc
 import (
 	"time"
 
-	"github.com/OpenIMSDK/chat/pkg/common/config"
 	"github.com/livekit/protocol/auth"
+	"github.com/openimsdk/chat/pkg/common/config"
 )
 
 func GetLiveKitToken(room string, identity string) (string, error) {

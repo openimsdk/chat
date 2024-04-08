@@ -26,7 +26,7 @@ You may use the OpenIM source code to create compiled versions not originally pr
 + 👫 [Join our Reddit](https://www.reddit.com/r/OpenIMessaging)
 + 🚀 [Join our Slack community](https://join.slack.com/t/openimsdk/shared_invite/zt-22720d66b-o_FvKxMTGXtcnnnHiMqe9Q)
 + :eyes: [Join our wechat (微信群)](https://openim-1253691595.cos.ap-nanjing.myqcloud.com/WechatIMG20.jpeg)
-+ 📚 [OpenIM Community](https://github.com/OpenIMSDK/community)
++ 📚 [OpenIM Community](https://github.com/openimsdk/community)
 + 💕 [OpenIM Interest Group](https://github.com/Openim-sigs)
 
 ## 🛫 Quick start 
@@ -50,7 +50,7 @@ If you wish to deploy chat, then you should first install and deploy OpenIM, thi
 First, install openim-server in a new directory or location repository
 
 ```bash
-git clone -b release-v3.5 https://github.com/OpenIMSDK/Open-IM-Server.git openim && export openim=$(pwd)/openim && cd $openim
+git clone -b release-v3.5 https://github.com/openimsdk/Open-IM-Server.git openim && export openim=$(pwd)/openim && cd $openim
 sudo docker compose up -d
 ```
 

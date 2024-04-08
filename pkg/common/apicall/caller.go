@@ -16,17 +16,17 @@ package apicall
 
 import (
 	"context"
-	"github.com/OpenIMSDK/tools/log"
+	"github.com/openimsdk/tools/log"
 	"sync"
 	"time"
 
-	"github.com/OpenIMSDK/chat/pkg/common/config"
-	"github.com/OpenIMSDK/protocol/auth"
-	"github.com/OpenIMSDK/protocol/constant"
-	"github.com/OpenIMSDK/protocol/friend"
-	"github.com/OpenIMSDK/protocol/group"
-	"github.com/OpenIMSDK/protocol/sdkws"
-	"github.com/OpenIMSDK/protocol/user"
+	"github.com/openimsdk/chat/pkg/common/config"
+	"github.com/openimsdk/protocol/auth"
+	"github.com/openimsdk/protocol/constant"
+	"github.com/openimsdk/protocol/friend"
+	"github.com/openimsdk/protocol/group"
+	"github.com/openimsdk/protocol/sdkws"
+	"github.com/openimsdk/protocol/user"
 )
 
 type CallerInterface interface {

@@ -19,13 +19,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/OpenIMSDK/tools/errs"
-	"github.com/OpenIMSDK/tools/utils"
+	"github.com/openimsdk/tools/errs"
+	"github.com/openimsdk/tools/utils"
 
-	admin2 "github.com/OpenIMSDK/chat/pkg/common/db/table/admin"
-	"github.com/OpenIMSDK/chat/pkg/common/mctx"
-	"github.com/OpenIMSDK/chat/pkg/proto/admin"
-	"github.com/OpenIMSDK/chat/pkg/proto/common"
+	admin2 "github.com/openimsdk/chat/pkg/common/db/table/admin"
+	"github.com/openimsdk/chat/pkg/common/mctx"
+	"github.com/openimsdk/chat/pkg/proto/admin"
+	"github.com/openimsdk/chat/pkg/proto/common"
 )
 
 func (o *adminServer) AddDefaultFriend(ctx context.Context, req *admin.AddDefaultFriendReq) (*admin.AddDefaultFriendResp, error) {
@@ -33,10 +33,10 @@ func (o *adminServer) AddDefaultFriend(ctx context.Context, req *admin.AddDefaul
 		return nil, err
 	}
 	if len(req.UserIDs) == 0 {
-		return nil, errs.ErrArgs.Wrap("user ids is empty")
+		return nil, errs.ErrArgs.WrapMsg("user ids is empty")
 	}
 	if utils.Duplicate(req.UserIDs) {
-		return nil, errs.ErrArgs.Wrap("user ids is duplicate")
+		return nil, errs.ErrArgs.WrapMsg("user ids is duplicate")
 	}
 	users, err := o.Chat.FindUserPublicInfo(ctx, req.UserIDs)
 	if err != nil {
@@ -71,10 +71,10 @@ func (o *adminServer) DelDefaultFriend(ctx context.Context, req *admin.DelDefaul
 		return nil, err
 	}
 	if len(req.UserIDs) == 0 {
-		return nil, errs.ErrArgs.Wrap("user ids is empty")
+		return nil, errs.ErrArgs.WrapMsg("user ids is empty")
 	}
 	if utils.Duplicate(req.UserIDs) {
-		return nil, errs.ErrArgs.Wrap("user ids is duplicate")
+		return nil, errs.ErrArgs.WrapMsg("user ids is duplicate")
 	}
 	exists, err := o.Database.FindDefaultFriend(ctx, req.UserIDs)
 	if err != nil {

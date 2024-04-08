@@ -19,12 +19,12 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/OpenIMSDK/tools/discoveryregistry"
+	"github.com/openimsdk/tools/discoveryregistry"
 
-	"github.com/OpenIMSDK/chat/pkg/common/config"
-	"github.com/OpenIMSDK/chat/pkg/common/mctx"
-	"github.com/OpenIMSDK/chat/pkg/eerrs"
-	"github.com/OpenIMSDK/chat/pkg/proto/admin"
+	"github.com/openimsdk/chat/pkg/common/config"
+	"github.com/openimsdk/chat/pkg/common/mctx"
+	"github.com/openimsdk/chat/pkg/eerrs"
+	"github.com/openimsdk/chat/pkg/proto/admin"
 )
 
 func NewAdminClient(discov discoveryregistry.SvcDiscoveryRegistry) *AdminClient {

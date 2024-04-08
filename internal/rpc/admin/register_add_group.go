@@ -19,12 +19,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/OpenIMSDK/tools/errs"
-	"github.com/OpenIMSDK/tools/utils"
+	"github.com/openimsdk/tools/errs"
+	"github.com/openimsdk/tools/utils"
 
-	admin2 "github.com/OpenIMSDK/chat/pkg/common/db/table/admin"
-	"github.com/OpenIMSDK/chat/pkg/common/mctx"
-	"github.com/OpenIMSDK/chat/pkg/proto/admin"
+	admin2 "github.com/openimsdk/chat/pkg/common/db/table/admin"
+	"github.com/openimsdk/chat/pkg/common/mctx"
+	"github.com/openimsdk/chat/pkg/proto/admin"
 )
 
 func (o *adminServer) AddDefaultGroup(ctx context.Context, req *admin.AddDefaultGroupReq) (*admin.AddDefaultGroupResp, error) {
@@ -32,10 +32,10 @@ func (o *adminServer) AddDefaultGroup(ctx context.Context, req *admin.AddDefault
 		return nil, err
 	}
 	if len(req.GroupIDs) == 0 {
-		return nil, errs.ErrArgs.Wrap("group ids is empty")
+		return nil, errs.ErrArgs.WrapMsg("group ids is empty")
 	}
 	if utils.Duplicate(req.GroupIDs) {
-		return nil, errs.ErrArgs.Wrap("group ids is duplicate")
+		return nil, errs.ErrArgs.WrapMsg("group ids is duplicate")
 	}
 	exists, err := o.Database.FindDefaultGroup(ctx, req.GroupIDs)
 	if err != nil {
@@ -63,10 +63,10 @@ func (o *adminServer) DelDefaultGroup(ctx context.Context, req *admin.DelDefault
 		return nil, err
 	}
 	if len(req.GroupIDs) == 0 {
-		return nil, errs.ErrArgs.Wrap("group ids is empty")
+		return nil, errs.ErrArgs.WrapMsg("group ids is empty")
 	}
 	if utils.Duplicate(req.GroupIDs) {
-		return nil, errs.ErrArgs.Wrap("group ids is duplicate")
+		return nil, errs.ErrArgs.WrapMsg("group ids is duplicate")
 	}
 	exists, err := o.Database.FindDefaultGroup(ctx, req.GroupIDs)
 	if err != nil {

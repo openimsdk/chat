@@ -19,7 +19,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"github.com/OpenIMSDK/tools/errs"
+	"github.com/openimsdk/tools/errs"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -27,7 +27,7 @@ import (
 	"strings"
 	"time"
 
-	Constant "github.com/OpenIMSDK/chat/pkg/common/constant"
+	Constant "github.com/openimsdk/chat/pkg/common/constant"
 	"gopkg.in/yaml.v3"
 )
 

@@ -19,11 +19,11 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/OpenIMSDK/chat/example/callback"
+	"github.com/openimsdk/chat/example/callback"
 
-	"github.com/OpenIMSDK/chat/pkg/common/config"
-	"github.com/OpenIMSDK/tools/discoveryregistry"
 	"github.com/gin-gonic/gin"
+	"github.com/openimsdk/chat/pkg/common/config"
+	"github.com/openimsdk/tools/discoveryregistry"
 )
 
 func NewChatRoute(router gin.IRouter, discov discoveryregistry.SvcDiscoveryRegistry) {

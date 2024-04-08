@@ -19,13 +19,13 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/OpenIMSDK/tools/discoveryregistry"
-	"github.com/OpenIMSDK/tools/errs"
-	"github.com/OpenIMSDK/tools/utils"
+	"github.com/openimsdk/tools/discoveryregistry"
+	"github.com/openimsdk/tools/errs"
+	"github.com/openimsdk/tools/utils"
 
-	"github.com/OpenIMSDK/chat/pkg/common/config"
-	"github.com/OpenIMSDK/chat/pkg/proto/chat"
-	"github.com/OpenIMSDK/chat/pkg/proto/common"
+	"github.com/openimsdk/chat/pkg/common/config"
+	"github.com/openimsdk/chat/pkg/proto/chat"
+	"github.com/openimsdk/chat/pkg/proto/common"
 )
 
 func NewChatClient(discov discoveryregistry.SvcDiscoveryRegistry) *ChatClient {

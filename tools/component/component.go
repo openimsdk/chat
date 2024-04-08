@@ -17,13 +17,13 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/OpenIMSDK/tools/errs"
+	"github.com/openimsdk/tools/errs"
 	"os"
 	"strings"
 	"time"
 
-	"github.com/OpenIMSDK/chat/pkg/common/config"
-	component "github.com/OpenIMSDK/tools/component"
+	"github.com/openimsdk/chat/pkg/common/config"
+	component "github.com/openimsdk/tools/component"
 )
 
 const (

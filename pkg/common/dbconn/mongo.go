@@ -3,9 +3,9 @@ package dbconn
 import (
 	"context"
 	"fmt"
-	"github.com/OpenIMSDK/chat/pkg/common/config"
-	"github.com/OpenIMSDK/tools/errs"
-	"github.com/OpenIMSDK/tools/mw/specialerror"
+	"github.com/openimsdk/chat/pkg/common/config"
+	"github.com/openimsdk/tools/errs"
+	"github.com/openimsdk/tools/mw/specialerror"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"os"

@@ -15,18 +15,18 @@
 package chat
 
 import (
-	"github.com/OpenIMSDK/chat/pkg/common/apicall"
-	"github.com/OpenIMSDK/tools/discoveryregistry"
-	"github.com/OpenIMSDK/tools/errs"
+	"github.com/openimsdk/chat/pkg/common/apicall"
+	"github.com/openimsdk/tools/discoveryregistry"
+	"github.com/openimsdk/tools/errs"
 	"google.golang.org/grpc"
 
-	"github.com/OpenIMSDK/chat/pkg/common/config"
-	"github.com/OpenIMSDK/chat/pkg/common/db/database"
-	"github.com/OpenIMSDK/chat/pkg/common/dbconn"
-	"github.com/OpenIMSDK/chat/pkg/email"
-	"github.com/OpenIMSDK/chat/pkg/proto/chat"
-	chatClient "github.com/OpenIMSDK/chat/pkg/rpclient/chat"
-	"github.com/OpenIMSDK/chat/pkg/sms"
+	"github.com/openimsdk/chat/pkg/common/config"
+	"github.com/openimsdk/chat/pkg/common/db/database"
+	"github.com/openimsdk/chat/pkg/common/dbconn"
+	"github.com/openimsdk/chat/pkg/email"
+	"github.com/openimsdk/chat/pkg/proto/chat"
+	chatClient "github.com/openimsdk/chat/pkg/rpclient/chat"
+	"github.com/openimsdk/chat/pkg/sms"
 )
 
 func Start(discov discoveryregistry.SvcDiscoveryRegistry, server *grpc.Server) error {

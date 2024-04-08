@@ -23,10 +23,10 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/OpenIMSDK/chat/pkg/common/constant"
-	constant2 "github.com/OpenIMSDK/protocol/constant"
-	"github.com/OpenIMSDK/tools/errs"
-	"github.com/OpenIMSDK/tools/log"
+	"github.com/openimsdk/chat/pkg/common/constant"
+	constant2 "github.com/openimsdk/protocol/constant"
+	"github.com/openimsdk/tools/errs"
+	"github.com/openimsdk/tools/log"
 	"gorm.io/gorm/utils"
 )
 

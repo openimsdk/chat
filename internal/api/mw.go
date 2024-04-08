@@ -17,15 +17,14 @@ package api
 import (
 	"strconv"
 
-	"github.com/OpenIMSDK/chat/pkg/common/constant"
-	constant2 "github.com/OpenIMSDK/protocol/constant"
-	"github.com/OpenIMSDK/tools/apiresp"
-	"github.com/OpenIMSDK/tools/errs"
-	"github.com/OpenIMSDK/tools/log"
 	"github.com/gin-gonic/gin"
+	"github.com/openimsdk/chat/pkg/common/constant"
+	constant2 "github.com/openimsdk/protocol/constant"
+	"github.com/openimsdk/tools/apiresp"
+	"github.com/openimsdk/tools/errs"
 	"google.golang.org/grpc"
 
-	"github.com/OpenIMSDK/chat/pkg/proto/admin"
+	"github.com/openimsdk/chat/pkg/proto/admin"
 )
 
 func NewMW(adminConn grpc.ClientConnInterface) *MW {
@@ -39,7 +38,7 @@ type MW struct {
 func (o *MW) parseToken(c *gin.Context) (string, int32, string, error) {
 	token := c.GetHeader("token")
 	if token == "" {
-		return "", 0, "", errs.ErrArgs.Wrap("token is empty")
+		return "", 0, "", errs.ErrArgs.WrapMsg("token is empty")
 	}
 	resp, err := o.client.ParseToken(c, &admin.ParseTokenReq{Token: token})
 	if err != nil {
@@ -54,34 +53,29 @@ func (o *MW) parseTokenType(c *gin.Context, userType int32) (string, string, err
 		return "", "", err
 	}
 	if t != userType {
-		return "", "", errs.ErrArgs.Wrap("token type error")
+		return "", "", errs.ErrArgs.WrapMsg("token type error")
 	}
 	return userID, token, nil
 }
 
 func (o *MW) isValidToken(c *gin.Context, userID string, token string) error {
 	resp, err := o.client.GetUserToken(c, &admin.GetUserTokenReq{UserID: userID})
-	m := resp.TokensMap
 	if err != nil {
-		log.ZWarn(c, "cache get token error", errs.ErrTokenNotExist.Wrap())
 		return err
 	}
-	if len(m) == 0 {
-		log.ZWarn(c, "cache do not exist token error", errs.ErrTokenNotExist.Wrap())
-		return errs.ErrTokenNotExist.Wrap()
+	if len(resp.TokensMap) == 0 {
+		return errs.ErrTokenExpired.Wrap()
 	}
-	if v, ok := m[token]; ok {
+	if v, ok := resp.TokensMap[token]; ok {
 		switch v {
 		case constant2.NormalToken:
 		case constant2.KickedToken:
-			log.ZWarn(c, "cache kicked token error", errs.ErrTokenKicked.Wrap())
-			return errs.ErrTokenKicked.Wrap()
+			return errs.ErrTokenExpired.Wrap()
 		default:
-			log.ZWarn(c, "cache unknown token error", errs.ErrTokenUnknown.Wrap())
-			return err
+			return errs.ErrTokenUnknown.Wrap()
 		}
 	} else {
-		return errs.ErrTokenNotExist.Wrap()
+		return errs.ErrTokenExpired.Wrap()
 	}
 	return nil
 }

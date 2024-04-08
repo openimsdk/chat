@@ -17,9 +17,9 @@ package admin
 import (
 	"context"
 
-	"github.com/OpenIMSDK/chat/pkg/common/config"
-	"github.com/OpenIMSDK/chat/pkg/common/tokenverify"
-	"github.com/OpenIMSDK/chat/pkg/proto/admin"
+	"github.com/openimsdk/chat/pkg/common/config"
+	"github.com/openimsdk/chat/pkg/common/tokenverify"
+	"github.com/openimsdk/chat/pkg/proto/admin"
 )
 
 func (o *adminServer) CreateToken(ctx context.Context, req *admin.CreateTokenReq) (*admin.CreateTokenResp, error) {

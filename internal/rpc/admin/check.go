@@ -18,9 +18,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/OpenIMSDK/chat/pkg/common/db/dbutil"
-	"github.com/OpenIMSDK/chat/pkg/eerrs"
-	"github.com/OpenIMSDK/chat/pkg/proto/admin"
+	"github.com/openimsdk/chat/pkg/common/db/dbutil"
+	"github.com/openimsdk/chat/pkg/eerrs"
+	"github.com/openimsdk/chat/pkg/proto/admin"
 )
 
 func (o *adminServer) CheckRegisterForbidden(ctx context.Context, req *admin.CheckRegisterForbiddenReq) (*admin.CheckRegisterForbiddenResp, error) {
@@ -43,7 +43,7 @@ func (o *adminServer) CheckLoginForbidden(ctx context.Context, req *admin.CheckL
 	}
 	for _, forbidden := range forbiddens {
 		if forbidden.LimitLogin {
-			return nil, eerrs.ErrForbidden.Wrap("ip forbidden")
+			return nil, eerrs.ErrForbidden.WrapMsg("ip forbidden")
 		}
 	}
 	if _, err := o.Database.GetLimitUserLoginIP(ctx, req.UserID, req.Ip); err != nil {
@@ -55,7 +55,7 @@ func (o *adminServer) CheckLoginForbidden(ctx context.Context, req *admin.CheckL
 			return nil, err
 		}
 		if count > 0 {
-			return nil, eerrs.ErrForbidden.Wrap("user ip forbidden")
+			return nil, eerrs.ErrForbidden.WrapMsg("user ip forbidden")
 		}
 	}
 	if forbiddenAccount, err := o.Database.GetBlockInfo(ctx, req.UserID); err == nil {
