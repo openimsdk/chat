@@ -4,7 +4,7 @@
 package main
 
 import (
-	"github.com/openimsdk/chat/pkg/util/mageutil"
+	"github.com/openimsdk/tools/utils/mageutil"
 	"syscall"
 )
 
