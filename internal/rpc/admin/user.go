@@ -16,27 +16,22 @@ package admin
 
 import (
 	"context"
+	"github.com/openimsdk/tools/utils/datautil"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 	"strings"
 	"time"
-
-	"github.com/openimsdk/protocol/wrapperspb"
-	"github.com/openimsdk/tools/errs"
-	"github.com/openimsdk/tools/mcontext"
-	"github.com/openimsdk/tools/utils"
 
 	"github.com/openimsdk/chat/pkg/common/db/dbutil"
 	admin2 "github.com/openimsdk/chat/pkg/common/db/table/admin"
 	"github.com/openimsdk/chat/pkg/common/mctx"
 	"github.com/openimsdk/chat/pkg/proto/admin"
 	"github.com/openimsdk/chat/pkg/proto/chat"
+	"github.com/openimsdk/tools/errs"
+	"github.com/openimsdk/tools/mcontext"
 )
 
 func (o *adminServer) CancellationUser(ctx context.Context, req *admin.CancellationUserReq) (*admin.CancellationUserResp, error) {
-	_, err := mctx.CheckAdmin(ctx)
-	if err != nil {
-		return nil, err
-	}
-	if err != nil {
+	if _, err := mctx.CheckAdmin(ctx); err != nil {
 		return nil, err
 	}
 	empty := wrapperspb.String("")
@@ -78,7 +73,7 @@ func (o *adminServer) UnblockUser(ctx context.Context, req *admin.UnblockUserReq
 	if len(req.UserIDs) == 0 {
 		return nil, errs.ErrArgs.WrapMsg("empty user id")
 	}
-	if utils.Duplicate(req.UserIDs) {
+	if datautil.Duplicate(req.UserIDs) {
 		return nil, errs.ErrArgs.WrapMsg("duplicate user id")
 	}
 	bs, err := o.Database.FindBlockInfo(ctx, req.UserIDs)
@@ -86,7 +81,7 @@ func (o *adminServer) UnblockUser(ctx context.Context, req *admin.UnblockUserReq
 		return nil, err
 	}
 	if len(req.UserIDs) != len(bs) {
-		ids := utils.Single(req.UserIDs, utils.Slice(bs, func(info *admin2.ForbiddenAccount) string { return info.UserID }))
+		ids := datautil.Single(req.UserIDs, datautil.Slice(bs, func(info *admin2.ForbiddenAccount) string { return info.UserID }))
 		return nil, errs.ErrArgs.WrapMsg("user not blocked " + strings.Join(ids, ", "))
 	}
 	if err := o.Database.DelBlockUser(ctx, req.UserIDs); err != nil {
@@ -103,7 +98,7 @@ func (o *adminServer) SearchBlockUser(ctx context.Context, req *admin.SearchBloc
 	if err != nil {
 		return nil, err
 	}
-	userIDs := utils.Slice(infos, func(info *admin2.ForbiddenAccount) string { return info.UserID })
+	userIDs := datautil.Slice(infos, func(info *admin2.ForbiddenAccount) string { return info.UserID })
 	userMap, err := o.Chat.MapUserFullInfo(ctx, userIDs)
 	if err != nil {
 		return nil, err

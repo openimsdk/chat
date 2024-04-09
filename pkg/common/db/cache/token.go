@@ -16,9 +16,9 @@ package cache
 
 import (
 	"context"
+	"github.com/openimsdk/tools/utils/stringutil"
 
 	"github.com/openimsdk/tools/errs"
-	"github.com/openimsdk/tools/utils"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -52,7 +52,7 @@ func (t *TokenCacheRedis) GetTokensWithoutError(ctx context.Context, userID stri
 	}
 	mm := make(map[string]int32)
 	for k, v := range m {
-		mm[k] = utils.StringToInt32(v)
+		mm[k] = stringutil.StringToInt32(v)
 	}
 	return mm, nil
 }

@@ -37,7 +37,8 @@ import (
 	"github.com/openimsdk/tools/checker"
 	"github.com/openimsdk/tools/errs"
 	"github.com/openimsdk/tools/log"
-	"github.com/openimsdk/tools/utils"
+	"github.com/openimsdk/tools/utils/datautil"
+	"github.com/openimsdk/tools/utils/encrypt"
 	"google.golang.org/grpc"
 	"net"
 	"net/http"
@@ -80,8 +81,7 @@ func (o *AdminApi) AdminLogin(c *gin.Context) {
 		apiresp.GinError(c, err)
 		return
 	}
-	err = utils.CopyStructFields(&resp, loginResp)
-	if err != nil {
+	if err := datautil.CopyStructFields(&resp, loginResp); err != nil {
 		apiresp.GinError(c, err)
 		return
 	}
@@ -432,7 +432,7 @@ func (o *AdminApi) getClientIP(c *gin.Context) (string, error) {
 		return "", errs.ErrInternalServer.Wrap()
 	}
 	if ip := net.ParseIP(ip); ip == nil {
-		return "", errs.ErrInternalServer.Wrap(fmt.Sprintf("parse proxy ip header %s failed", ip))
+		return "", errs.ErrInternalServer.WrapMsg(fmt.Sprintf("parse proxy ip header %s failed", ip))
 	}
 	return ip, nil
 }
@@ -549,7 +549,7 @@ func (o *AdminApi) xlsx2user(users []model.User) ([]*chat.RegisterUserInfo, erro
 			PhoneNumber: info.PhoneNumber,
 			Email:       info.Email,
 			Account:     info.Account,
-			Password:    utils.Md5(info.Password),
+			Password:    encrypt.Md5(info.Password),
 		}
 	}
 	return chatUsers, nil

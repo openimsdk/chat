@@ -17,15 +17,14 @@ package chat
 import (
 	"context"
 	"fmt"
+	"github.com/openimsdk/tools/utils/datautil"
 	"os"
-
-	"github.com/openimsdk/tools/discoveryregistry"
-	"github.com/openimsdk/tools/errs"
-	"github.com/openimsdk/tools/utils"
 
 	"github.com/openimsdk/chat/pkg/common/config"
 	"github.com/openimsdk/chat/pkg/proto/chat"
 	"github.com/openimsdk/chat/pkg/proto/common"
+	"github.com/openimsdk/tools/discoveryregistry"
+	"github.com/openimsdk/tools/errs"
 )
 
 func NewChatClient(discov discoveryregistry.SvcDiscoveryRegistry) *ChatClient {
@@ -59,7 +58,7 @@ func (o *ChatClient) MapUserPublicInfo(ctx context.Context, userIDs []string) (m
 	if err != nil {
 		return nil, err
 	}
-	return utils.SliceToMap(users, func(user *common.UserPublicInfo) string {
+	return datautil.SliceToMap(users, func(user *common.UserPublicInfo) string {
 		return user.UserID
 	}), nil
 }
@@ -93,7 +92,7 @@ func (o *ChatClient) GetUserFullInfo(ctx context.Context, userID string) (*commo
 		return nil, err
 	}
 	if len(users) == 0 {
-		return nil, errs.ErrUserIDNotFound.Wrap()
+		return nil, errs.ErrRecordNotFound.WrapMsg("user id not found")
 	}
 	return users[0], nil
 }

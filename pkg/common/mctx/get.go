@@ -16,10 +16,10 @@ package mctx
 
 import (
 	"context"
+	"github.com/openimsdk/tools/utils/datautil"
 	"strconv"
 
 	"github.com/openimsdk/chat/pkg/common/config"
-	"github.com/openimsdk/tools/utils"
 
 	constant2 "github.com/openimsdk/protocol/constant"
 	"github.com/openimsdk/tools/errs"
@@ -122,7 +122,7 @@ func WithOpUserID(ctx context.Context, opUserID string, userType int) context.Co
 	headers, _ := ctx.Value(constant.RpcCustomHeader).([]string)
 	ctx = context.WithValue(ctx, constant.RpcOpUserID, opUserID)
 	ctx = context.WithValue(ctx, constant.RpcOpUserType, []string{strconv.Itoa(userType)})
-	if utils.IndexOf(constant.RpcOpUserType, headers...) < 0 {
+	if datautil.IndexOf(constant.RpcOpUserType, headers...) < 0 {
 		ctx = context.WithValue(ctx, constant.RpcCustomHeader, append(headers, constant.RpcOpUserType))
 	}
 	return ctx

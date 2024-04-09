@@ -17,59 +17,19 @@ package admin
 import (
 	"context"
 	"fmt"
-	"github.com/openimsdk/chat/pkg/common/db/cache"
-	"github.com/openimsdk/tools/discoveryregistry"
 	"github.com/openimsdk/tools/errs"
 	"github.com/openimsdk/tools/mcontext"
 	"github.com/openimsdk/tools/utils/datautil"
-	"google.golang.org/grpc"
 	"math/rand"
 	"time"
 
-	"github.com/openimsdk/chat/pkg/common/config"
 	"github.com/openimsdk/chat/pkg/common/constant"
-	"github.com/openimsdk/chat/pkg/common/db/database"
 	"github.com/openimsdk/chat/pkg/common/db/dbutil"
 	admin2 "github.com/openimsdk/chat/pkg/common/db/table/admin"
-	"github.com/openimsdk/chat/pkg/common/dbconn"
 	"github.com/openimsdk/chat/pkg/common/mctx"
 	"github.com/openimsdk/chat/pkg/eerrs"
 	"github.com/openimsdk/chat/pkg/proto/admin"
-	"github.com/openimsdk/chat/pkg/rpclient/chat"
 )
-
-func Start(discov discoveryregistry.SvcDiscoveryRegistry, server *grpc.Server) error {
-	db, err := dbconn.NewMongo()
-	if err != nil {
-		return err
-	}
-	rdb, err := cache.NewRedis()
-	if err != nil {
-		return errs.Wrap(err)
-	}
-
-	adminDatabase, err := database.NewAdminDatabase(db, rdb)
-	if err != nil {
-		return err
-	}
-
-	if err := adminDatabase.InitAdmin(context.Background()); err != nil {
-		return err
-	}
-	if err := discov.CreateRpcRootNodes([]string{config.Config.RpcRegisterName.OpenImAdminName, config.Config.RpcRegisterName.OpenImChatName}); err != nil {
-		return errs.Wrap(err, "CreateRpcRootNodes error")
-	}
-
-	admin.RegisterAdminServer(server, &adminServer{Database: adminDatabase,
-		Chat: chat.NewChatClient(discov),
-	})
-	return nil
-}
-
-type adminServer struct {
-	Database database.AdminDatabaseInterface
-	Chat     *chat.ChatClient
-}
 
 func (o *adminServer) GetAdminInfo(ctx context.Context, req *admin.GetAdminInfoReq) (*admin.GetAdminInfoResp, error) {
 	userID, err := mctx.CheckAdmin(ctx)

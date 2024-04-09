@@ -57,7 +57,7 @@ func CreateToken(UserID string, userType int32, ttl int64) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := token.SignedString([]byte(*config.Config.Secret))
 	if err != nil {
-		return "", errs.Wrap(err, "")
+		return "", errs.Wrap(err)
 	}
 	return tokenString, nil
 }
@@ -87,7 +87,7 @@ func getToken(t string) (string, int32, error) {
 	} else {
 		claims, ok := token.Claims.(*claims)
 		if claims.PlatformID != 0 {
-			return "", 0, errs.ErrTokenNotExist.Wrap()
+			return "", 0, errs.ErrTokenExpired.Wrap()
 		}
 		if ok && token.Valid {
 			return claims.UserID, claims.UserType, nil
@@ -113,7 +113,7 @@ func GetAdminToken(token string) (string, error) {
 		return "", err
 	}
 	if userType != TokenAdmin {
-		return "", errs.ErrTokenInvalid.WrapMsg("token type error")
+		return "", errs.ErrTokenUnknown.WrapMsg("token type error")
 	}
 	return userID, nil
 }
@@ -124,7 +124,7 @@ func GetUserToken(token string) (string, error) {
 		return "", err
 	}
 	if userType != TokenUser {
-		return "", errs.ErrTokenInvalid.WrapMsg("token type error")
+		return "", errs.ErrTokenUnknown.WrapMsg("token type error")
 	}
 	return userID, nil
 }

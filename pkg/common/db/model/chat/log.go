@@ -16,9 +16,9 @@ package chat
 
 import (
 	"context"
+	"github.com/openimsdk/tools/db/mongoutil"
+	"github.com/openimsdk/tools/db/pagination"
 	"github.com/openimsdk/tools/errs"
-	"github.com/openimsdk/tools/mgoutil"
-	"github.com/openimsdk/tools/pagination"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -53,7 +53,7 @@ type Logs struct {
 }
 
 func (l *Logs) Create(ctx context.Context, log []*chat.Log) error {
-	return mgoutil.InsertMany(ctx, l.coll, log)
+	return mongoutil.InsertMany(ctx, l.coll, log)
 }
 
 func (l *Logs) Search(ctx context.Context, keyword string, start time.Time, end time.Time, pagination pagination.Pagination) (int64, []*chat.Log, error) {
@@ -71,7 +71,7 @@ func (l *Logs) Search(ctx context.Context, keyword string, start time.Time, end 
 	if keyword != "" {
 		filter["user_id"] = bson.M{"$regex": keyword, "$options": "i"}
 	}
-	return mgoutil.FindPage[*chat.Log](ctx, l.coll, filter, pagination)
+	return mongoutil.FindPage[*chat.Log](ctx, l.coll, filter, pagination)
 }
 
 func (l *Logs) Delete(ctx context.Context, logIDs []string, userID string) error {
@@ -79,14 +79,14 @@ func (l *Logs) Delete(ctx context.Context, logIDs []string, userID string) error
 		return nil
 	}
 	if userID == "" {
-		return mgoutil.DeleteMany(ctx, l.coll, bson.M{"log_id": bson.M{"$in": logIDs}})
+		return mongoutil.DeleteMany(ctx, l.coll, bson.M{"log_id": bson.M{"$in": logIDs}})
 	}
-	return mgoutil.DeleteMany(ctx, l.coll, bson.M{"log_id": bson.M{"$in": logIDs}, "user_id": userID})
+	return mongoutil.DeleteMany(ctx, l.coll, bson.M{"log_id": bson.M{"$in": logIDs}, "user_id": userID})
 }
 
 func (l *Logs) Get(ctx context.Context, logIDs []string, userID string) ([]*chat.Log, error) {
 	if userID == "" {
-		return mgoutil.Find[*chat.Log](ctx, l.coll, bson.M{"log_id": bson.M{"$in": logIDs}})
+		return mongoutil.Find[*chat.Log](ctx, l.coll, bson.M{"log_id": bson.M{"$in": logIDs}})
 	}
-	return mgoutil.Find[*chat.Log](ctx, l.coll, bson.M{"log_id": bson.M{"$in": logIDs}, "user_id": userID})
+	return mongoutil.Find[*chat.Log](ctx, l.coll, bson.M{"log_id": bson.M{"$in": logIDs}, "user_id": userID})
 }

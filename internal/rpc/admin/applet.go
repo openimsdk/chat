@@ -16,12 +16,12 @@ package admin
 
 import (
 	"context"
+	"github.com/openimsdk/tools/utils/datautil"
 	"strings"
 	"time"
 
 	"github.com/google/uuid"
 	"github.com/openimsdk/tools/errs"
-	"github.com/openimsdk/tools/utils"
 
 	"github.com/openimsdk/chat/pkg/common/constant"
 	admin2 "github.com/openimsdk/chat/pkg/common/db/table/admin"
@@ -76,7 +76,7 @@ func (o *adminServer) DelApplet(ctx context.Context, req *admin.DelAppletReq) (*
 	if err != nil {
 		return nil, err
 	}
-	if ids := utils.Single(req.AppletIds, utils.Slice(applets, func(e *admin2.Applet) string { return e.ID })); len(ids) > 0 {
+	if ids := datautil.Single(req.AppletIds, datautil.Slice(applets, func(e *admin2.Applet) string { return e.ID })); len(ids) > 0 {
 		return nil, errs.ErrArgs.WrapMsg("ids not found: " + strings.Join(ids, ", "))
 	}
 	if err := o.Database.DelApplet(ctx, req.AppletIds); err != nil {

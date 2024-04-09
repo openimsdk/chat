@@ -10,18 +10,7 @@ import (
 func GetLiveKitToken(room string, identity string) (string, error) {
 	apiKey := config.Config.LiveKit.Key
 	apiSecret := config.Config.LiveKit.Secret
-
-	//fmt.Printf("livekit apiKey=%s\n", apiKey)
-	//fmt.Printf("livekit apiSecret=%s\n", apiSecret)
-	//
-	//fmt.Printf("room=%s\n", room)
-	//fmt.Printf("identity=%s\n", identity)
-
-	token, err := geneLiveKitToken(apiKey, apiSecret, room, identity)
-
-	//fmt.Printf("livekit token=%s\n", token)
-
-	return token, err
+	return geneLiveKitToken(apiKey, apiSecret, room, identity)
 }
 
 func geneLiveKitToken(key string, secret string, room string, identity string) (string, error) {
@@ -30,10 +19,7 @@ func geneLiveKitToken(key string, secret string, room string, identity string) (
 		RoomJoin: true,
 		Room:     room,
 	}
-	at.AddGrant(grant).
-		SetIdentity(identity).
-		SetValidFor(time.Hour)
-
+	at.AddGrant(grant).SetIdentity(identity).SetValidFor(time.Hour)
 	return at.ToJWT()
 }
 

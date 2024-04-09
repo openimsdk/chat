@@ -16,14 +16,13 @@ package admin
 
 import (
 	"context"
+	"github.com/openimsdk/tools/utils/datautil"
 	"time"
-
-	"github.com/openimsdk/tools/errs"
-	"github.com/openimsdk/tools/utils"
 
 	admin2 "github.com/openimsdk/chat/pkg/common/db/table/admin"
 	"github.com/openimsdk/chat/pkg/common/mctx"
 	"github.com/openimsdk/chat/pkg/proto/admin"
+	"github.com/openimsdk/tools/errs"
 )
 
 func (o *adminServer) SearchUserIPLimitLogin(ctx context.Context, req *admin.SearchUserIPLimitLoginReq) (*admin.SearchUserIPLimitLoginResp, error) {
@@ -34,8 +33,8 @@ func (o *adminServer) SearchUserIPLimitLogin(ctx context.Context, req *admin.Sea
 	if err != nil {
 		return nil, err
 	}
-	userIDs := utils.Slice(list, func(info *admin2.LimitUserLoginIP) string { return info.UserID })
-	userMap, err := o.Chat.MapUserPublicInfo(ctx, utils.Distinct(userIDs))
+	userIDs := datautil.Slice(list, func(info *admin2.LimitUserLoginIP) string { return info.UserID })
+	userMap, err := o.Chat.MapUserPublicInfo(ctx, datautil.Distinct(userIDs))
 	if err != nil {
 		return nil, err
 	}

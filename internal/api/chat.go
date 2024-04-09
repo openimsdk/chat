@@ -299,7 +299,7 @@ func (o *ChatApi) getClientIP(c *gin.Context) (string, error) {
 		return "", errs.ErrInternalServer.Wrap()
 	}
 	if ip := net.ParseIP(ip); ip == nil {
-		return "", errs.ErrInternalServer.Wrap(fmt.Sprintf("parse proxy ip header %s failed", ip))
+		return "", errs.ErrInternalServer.WrapMsg(fmt.Sprintf("parse proxy ip header %s failed", ip))
 	}
 	return ip, nil
 }

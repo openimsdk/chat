@@ -16,7 +16,7 @@ package chat
 
 import (
 	"context"
-	"fmt"
+	"github.com/openimsdk/tools/utils/datautil"
 	"math/rand"
 	"time"
 
@@ -26,7 +26,6 @@ import (
 	"github.com/openimsdk/chat/pkg/proto/chat"
 	"github.com/openimsdk/tools/errs"
 	"github.com/openimsdk/tools/mw/specialerror"
-	utils2 "github.com/openimsdk/tools/utils"
 	"gorm.io/gorm/utils"
 )
 
@@ -77,7 +76,7 @@ func (o *chatSvr) UploadLogs(ctx context.Context, req *chat.UploadLogsReq) (*cha
 			}
 		}
 		if log.LogID == "" {
-			return nil, errs.ErrData.WrapMsg("Log id gen error")
+			return nil, errs.ErrInternalServer.WrapMsg("log id gen error")
 		}
 		DBlogs = append(DBlogs, &log)
 	}
@@ -104,8 +103,8 @@ func (o *chatSvr) DeleteLogs(ctx context.Context, req *chat.DeleteLogsReq) (*cha
 	for _, log := range logs {
 		logIDs = append(logIDs, log.LogID)
 	}
-	if ids := utils2.Single(req.LogIDs, logIDs); len(ids) > 0 {
-		return nil, errs.ErrRecordNotFound.Wrap(fmt.Sprintf("logIDs not found%#v", ids))
+	if ids := datautil.Single(req.LogIDs, logIDs); len(ids) > 0 {
+		return nil, errs.ErrRecordNotFound.WrapMsg("logIDs not found", "logIDs", ids)
 	}
 	err = o.Database.DeleteLogs(ctx, req.LogIDs, userID)
 	if err != nil {

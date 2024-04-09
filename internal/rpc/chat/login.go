@@ -16,6 +16,7 @@ package chat
 
 import (
 	"context"
+	"github.com/openimsdk/tools/utils/datautil"
 	"math/rand"
 	"strconv"
 	"strings"
@@ -28,7 +29,6 @@ import (
 	"github.com/openimsdk/tools/errs"
 	"github.com/openimsdk/tools/log"
 	"github.com/openimsdk/tools/mcontext"
-	"github.com/openimsdk/tools/utils"
 
 	"github.com/openimsdk/chat/pkg/common/config"
 	"github.com/openimsdk/chat/pkg/common/constant"
@@ -82,7 +82,7 @@ func (o *chatSvr) SendVerifyCode(ctx context.Context, req *chat.SendVerifyCodeRe
 		if err != nil {
 			return nil, err
 		}
-		if val := conf[constant.NeedInvitationCodeRegisterConfigKey]; utils.Contain(strings.ToLower(val), "1", "true", "yes") {
+		if val := conf[constant.NeedInvitationCodeRegisterConfigKey]; datautil.Contain(strings.ToLower(val), "1", "true", "yes") {
 			if req.InvitationCode == "" {
 				return nil, errs.ErrArgs.WrapMsg("invitation code is empty")
 			}
@@ -272,7 +272,7 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 		if err != nil {
 			return nil, err
 		}
-		if val := conf[constant.NeedInvitationCodeRegisterConfigKey]; utils.Contain(strings.ToLower(val), "1", "true", "yes") {
+		if val := conf[constant.NeedInvitationCodeRegisterConfigKey]; datautil.Contain(strings.ToLower(val), "1", "true", "yes") {
 			usedInvitationCode = true
 			if req.InvitationCode == "" {
 				return nil, errs.ErrArgs.WrapMsg("invitation code is empty")

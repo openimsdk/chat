@@ -16,11 +16,10 @@ package admin
 
 import (
 	"context"
-	"strings"
+	"github.com/openimsdk/tools/utils/datautil"
 	"time"
 
 	"github.com/openimsdk/tools/errs"
-	"github.com/openimsdk/tools/utils"
 
 	admin2 "github.com/openimsdk/chat/pkg/common/db/table/admin"
 	"github.com/openimsdk/chat/pkg/common/mctx"
@@ -34,7 +33,7 @@ func (o *adminServer) AddDefaultGroup(ctx context.Context, req *admin.AddDefault
 	if len(req.GroupIDs) == 0 {
 		return nil, errs.ErrArgs.WrapMsg("group ids is empty")
 	}
-	if utils.Duplicate(req.GroupIDs) {
+	if datautil.Duplicate(req.GroupIDs) {
 		return nil, errs.ErrArgs.WrapMsg("group ids is duplicate")
 	}
 	exists, err := o.Database.FindDefaultGroup(ctx, req.GroupIDs)
@@ -42,7 +41,7 @@ func (o *adminServer) AddDefaultGroup(ctx context.Context, req *admin.AddDefault
 		return nil, err
 	}
 	if len(exists) > 0 {
-		return nil, errs.ErrGroupIDExisted.Wrap(strings.Join(exists, ", "))
+		return nil, errs.ErrDuplicateKey.WrapMsg("group id existed", "groupID", exists)
 	}
 	now := time.Now()
 	ms := make([]*admin2.RegisterAddGroup, 0, len(req.GroupIDs))
@@ -65,15 +64,15 @@ func (o *adminServer) DelDefaultGroup(ctx context.Context, req *admin.DelDefault
 	if len(req.GroupIDs) == 0 {
 		return nil, errs.ErrArgs.WrapMsg("group ids is empty")
 	}
-	if utils.Duplicate(req.GroupIDs) {
+	if datautil.Duplicate(req.GroupIDs) {
 		return nil, errs.ErrArgs.WrapMsg("group ids is duplicate")
 	}
 	exists, err := o.Database.FindDefaultGroup(ctx, req.GroupIDs)
 	if err != nil {
 		return nil, err
 	}
-	if ids := utils.Single(req.GroupIDs, exists); len(ids) > 0 {
-		return nil, errs.ErrGroupIDNotFound.Wrap(strings.Join(ids, ", "))
+	if ids := datautil.Single(req.GroupIDs, exists); len(ids) > 0 {
+		return nil, errs.ErrRecordNotFound.WrapMsg("group id not found", "groupID", ids)
 	}
 	now := time.Now()
 	ms := make([]*admin2.RegisterAddGroup, 0, len(req.GroupIDs))
@@ -108,5 +107,5 @@ func (o *adminServer) SearchDefaultGroup(ctx context.Context, req *admin.SearchD
 	if err != nil {
 		return nil, err
 	}
-	return &admin.SearchDefaultGroupResp{Total: uint32(total), GroupIDs: utils.Slice(infos, func(info *admin2.RegisterAddGroup) string { return info.GroupID })}, nil
+	return &admin.SearchDefaultGroupResp{Total: uint32(total), GroupIDs: datautil.Slice(infos, func(info *admin2.RegisterAddGroup) string { return info.GroupID })}, nil
 }

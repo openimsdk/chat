@@ -16,8 +16,8 @@ package admin
 
 import (
 	"context"
-	"github.com/openimsdk/tools/mgoutil"
-	"github.com/openimsdk/tools/pagination"
+	"github.com/openimsdk/tools/db/mongoutil"
+	"github.com/openimsdk/tools/db/pagination"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -47,14 +47,14 @@ type RegisterAddGroup struct {
 }
 
 func (o *RegisterAddGroup) Add(ctx context.Context, registerAddGroups []*admin.RegisterAddGroup) error {
-	return mgoutil.InsertMany(ctx, o.coll, registerAddGroups)
+	return mongoutil.InsertMany(ctx, o.coll, registerAddGroups)
 }
 
 func (o *RegisterAddGroup) Del(ctx context.Context, groupIDs []string) error {
 	if len(groupIDs) == 0 {
 		return nil
 	}
-	return mgoutil.DeleteMany(ctx, o.coll, bson.M{"group_id": bson.M{"$in": groupIDs}})
+	return mongoutil.DeleteMany(ctx, o.coll, bson.M{"group_id": bson.M{"$in": groupIDs}})
 }
 
 func (o *RegisterAddGroup) FindGroupID(ctx context.Context, groupIDs []string) ([]string, error) {
@@ -62,10 +62,10 @@ func (o *RegisterAddGroup) FindGroupID(ctx context.Context, groupIDs []string) (
 	if len(groupIDs) > 0 {
 		filter["group_id"] = bson.M{"$in": groupIDs}
 	}
-	return mgoutil.Find[string](ctx, o.coll, filter, options.Find().SetProjection(bson.M{"_id": 0, "group_id": 1}))
+	return mongoutil.Find[string](ctx, o.coll, filter, options.Find().SetProjection(bson.M{"_id": 0, "group_id": 1}))
 }
 
 func (o *RegisterAddGroup) Search(ctx context.Context, keyword string, pagination pagination.Pagination) (int64, []*admin.RegisterAddGroup, error) {
 	filter := bson.M{"group_id": bson.M{"$regex": keyword, "$options": "i"}}
-	return mgoutil.FindPage[*admin.RegisterAddGroup](ctx, o.coll, filter, pagination)
+	return mongoutil.FindPage[*admin.RegisterAddGroup](ctx, o.coll, filter, pagination)
 }

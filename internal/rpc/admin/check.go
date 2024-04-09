@@ -16,8 +16,6 @@ package admin
 
 import (
 	"context"
-	"fmt"
-
 	"github.com/openimsdk/chat/pkg/common/db/dbutil"
 	"github.com/openimsdk/chat/pkg/eerrs"
 	"github.com/openimsdk/chat/pkg/proto/admin"
@@ -59,7 +57,7 @@ func (o *adminServer) CheckLoginForbidden(ctx context.Context, req *admin.CheckL
 		}
 	}
 	if forbiddenAccount, err := o.Database.GetBlockInfo(ctx, req.UserID); err == nil {
-		return nil, eerrs.ErrForbidden.Wrap(fmt.Sprintf("account forbidden: %s", forbiddenAccount.Reason))
+		return nil, eerrs.ErrForbidden.WrapMsg("account forbidden", "reason", forbiddenAccount.Reason)
 	} else if !dbutil.IsDBNotFound(err) {
 		return nil, err
 	}

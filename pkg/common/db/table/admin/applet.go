@@ -16,7 +16,7 @@ package admin
 
 import (
 	"context"
-	"github.com/openimsdk/tools/pagination"
+	"github.com/openimsdk/tools/db/pagination"
 	"time"
 )
 

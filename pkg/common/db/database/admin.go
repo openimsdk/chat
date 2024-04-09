@@ -16,14 +16,12 @@ package database
 
 import (
 	"context"
-	"github.com/openimsdk/tools/pagination"
-	"go.mongodb.org/mongo-driver/mongo"
-
 	"github.com/openimsdk/chat/pkg/common/db/cache"
 	"github.com/openimsdk/protocol/constant"
+	"github.com/openimsdk/tools/db/mongoutil"
+	"github.com/openimsdk/tools/db/pagination"
+	"github.com/openimsdk/tools/db/tx"
 	"github.com/redis/go-redis/v9"
-
-	"github.com/openimsdk/tools/tx"
 
 	"github.com/openimsdk/chat/pkg/common/db/model/admin"
 	table "github.com/openimsdk/chat/pkg/common/db/table/admin"
@@ -80,46 +78,45 @@ type AdminDatabaseInterface interface {
 	GetTokens(ctx context.Context, userID string) (map[string]int32, error)
 }
 
-func NewAdminDatabase(db *mongo.Database, rdb redis.UniversalClient) (AdminDatabaseInterface, error) {
-	a, err := admin.NewAdmin(db)
+func NewAdminDatabase(cli *mongoutil.Client, rdb redis.UniversalClient) (AdminDatabaseInterface, error) {
+	a, err := admin.NewAdmin(cli.GetDB())
 	if err != nil {
 		return nil, err
 	}
-	forbidden, err := admin.NewIPForbidden(db)
+	forbidden, err := admin.NewIPForbidden(cli.GetDB())
 	if err != nil {
 		return nil, err
 	}
-	forbiddenAccount, err := admin.NewForbiddenAccount(db)
+	forbiddenAccount, err := admin.NewForbiddenAccount(cli.GetDB())
 	if err != nil {
 		return nil, err
 	}
-	limitUserLoginIP, err := admin.NewLimitUserLoginIP(db)
+	limitUserLoginIP, err := admin.NewLimitUserLoginIP(cli.GetDB())
 	if err != nil {
 		return nil, err
 	}
-	invitationRegister, err := admin.NewInvitationRegister(db)
+	invitationRegister, err := admin.NewInvitationRegister(cli.GetDB())
 	if err != nil {
 		return nil, err
 	}
-	registerAddFriend, err := admin.NewRegisterAddFriend(db)
+	registerAddFriend, err := admin.NewRegisterAddFriend(cli.GetDB())
 	if err != nil {
 		return nil, err
 	}
-	registerAddGroup, err := admin.NewRegisterAddGroup(db)
+	registerAddGroup, err := admin.NewRegisterAddGroup(cli.GetDB())
 	if err != nil {
 		return nil, err
 	}
-	applet, err := admin.NewApplet(db)
+	applet, err := admin.NewApplet(cli.GetDB())
 	if err != nil {
 		return nil, err
 	}
-	clientConfig, err := admin.NewClientConfig(db)
+	clientConfig, err := admin.NewClientConfig(cli.GetDB())
 	if err != nil {
 		return nil, err
 	}
-
 	return &AdminDatabase{
-		tx:                 tx.NewMongo(db.Client()),
+		tx:                 cli.GetTx(),
 		admin:              a,
 		ipForbidden:        forbidden,
 		forbiddenAccount:   forbiddenAccount,
@@ -134,7 +131,7 @@ func NewAdminDatabase(db *mongo.Database, rdb redis.UniversalClient) (AdminDatab
 }
 
 type AdminDatabase struct {
-	tx                 tx.CtxTx
+	tx                 tx.Tx
 	admin              table.AdminInterface
 	ipForbidden        table.IPForbiddenInterface
 	forbiddenAccount   table.ForbiddenAccountInterface

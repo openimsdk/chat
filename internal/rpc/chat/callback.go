@@ -52,10 +52,10 @@ func (o *chatSvr) OpenIMCallback(ctx context.Context, req *chat.OpenIMCallbackRe
 			return nil, err
 		}
 		if user.AllowAddFriend != constant2.OrdinaryUserAddFriendEnable {
-			return nil, eerrs.ErrRefuseFriend.Wrap(fmt.Sprintf("state %d", user.AllowAddFriend))
+			return nil, eerrs.ErrRefuseFriend.WrapMsg(fmt.Sprintf("state %d", user.AllowAddFriend))
 		}
 		return &chat.OpenIMCallbackResp{}, nil
 	default:
-		return nil, errs.ErrArgs.Wrap(fmt.Sprintf("invalid command %s", req.Command))
+		return nil, errs.ErrArgs.WrapMsg(fmt.Sprintf("invalid command %s", req.Command))
 	}
 }
