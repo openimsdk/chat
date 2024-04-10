@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package api
+package admin
 
 import (
 	"context"
@@ -20,6 +20,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/openimsdk/chat/internal/api"
 	"github.com/openimsdk/chat/pkg/common/apicall"
 	"github.com/openimsdk/chat/pkg/common/apistruct"
 	"github.com/openimsdk/chat/pkg/common/config"
@@ -46,6 +47,16 @@ import (
 	"strings"
 	"time"
 )
+
+type Config struct {
+	ApiConfig       config.API
+	ZookeeperConfig config.ZooKeeper
+	Share           config.Share
+}
+
+func Start(ctx context.Context, index int, config *Config) error {
+	return errs.New("todo")
+}
 
 func NewAdmin(chatConn, adminConn grpc.ClientConnInterface) *AdminApi {
 	return &AdminApi{chatClient: chat.NewChatClient(chatConn), adminClient: admin.NewAdminClient(adminConn), imApiCaller: apicall.NewCallerInterface()}
@@ -447,7 +458,7 @@ func (o *AdminApi) checkSecretAdmin(c *gin.Context, secret string) error {
 	if config.Config.ChatSecret != secret {
 		return errs.ErrNoPermission.WrapMsg("secret error")
 	}
-	SetToken(c, config.GetDefaultIMAdmin(), constant2.AdminUser)
+	api.SetToken(c, config.GetDefaultIMAdmin(), constant2.AdminUser)
 	return nil
 }
 

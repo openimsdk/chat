@@ -17,6 +17,8 @@ package api
 import (
 	"context"
 	"fmt"
+	admin2 "github.com/openimsdk/chat/internal/api/admin"
+	chat2 "github.com/openimsdk/chat/internal/api/chat"
 	"os"
 
 	"github.com/openimsdk/chat/example/callback"
@@ -38,7 +40,7 @@ func NewChatRoute(router gin.IRouter, discov discoveryregistry.SvcDiscoveryRegis
 		os.Exit(-1)
 	}
 	mw := NewMW(adminConn)
-	chat := NewChat(chatConn, adminConn)
+	chat := chat2.NewChat(chatConn, adminConn)
 	account := router.Group("/account")
 	account.POST("/code/send", chat.SendVerifyCode)                      // Send verification code
 	account.POST("/code/verify", chat.VerifyCode)                        // Verify the verification code
@@ -81,7 +83,7 @@ func NewAdminRoute(router gin.IRouter, discov discoveryregistry.SvcDiscoveryRegi
 		os.Exit(-1)
 	}
 	mw := NewMW(adminConn)
-	admin := NewAdmin(chatConn, adminConn)
+	admin := admin2.NewAdmin(chatConn, adminConn)
 	adminRouterGroup := router.Group("/account")
 	adminRouterGroup.POST("/login", admin.AdminLogin)                                   // Login
 	adminRouterGroup.POST("/update", mw.CheckAdmin, admin.AdminUpdateInfo)              // Modify information

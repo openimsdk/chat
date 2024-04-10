@@ -2,16 +2,30 @@ package admin
 
 import (
 	"context"
+	"github.com/openimsdk/chat/pkg/common/config"
 	"github.com/openimsdk/chat/pkg/common/db/database"
 	"github.com/openimsdk/chat/pkg/proto/admin"
 	"github.com/openimsdk/chat/pkg/rpclient/chat"
 	"github.com/openimsdk/tools/db/mongoutil"
 	"github.com/openimsdk/tools/db/redisutil"
+	"github.com/openimsdk/tools/discovery"
 	"github.com/openimsdk/tools/errs"
 	"google.golang.org/grpc"
 )
 
-func Start(discov discoveryregistry.SvcDiscoveryRegistry, server *grpc.Server) error {
+type Config struct {
+	RpcConfig       config.Admin
+	RedisConfig     config.Redis
+	MongodbConfig   config.Mongo
+	ZookeeperConfig config.ZooKeeper
+	Share           config.Share
+}
+
+func Start(ctx context.Context, config *Config, client discovery.SvcDiscoveryRegistry, server *grpc.Server) error {
+	return nil
+}
+
+func start(discov discoveryregistry.SvcDiscoveryRegistry, server *grpc.Server) error {
 	mgocli, err := mongoutil.NewMongoDB(ctx, config.MongodbConfig.Build())
 	if err != nil {
 		return err

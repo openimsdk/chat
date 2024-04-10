@@ -12,9 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package api
+package chat
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"net"
@@ -37,6 +38,16 @@ import (
 	"github.com/openimsdk/chat/pkg/proto/admin"
 	"github.com/openimsdk/chat/pkg/proto/chat"
 )
+
+type Config struct {
+	ApiConfig       config.API
+	ZookeeperConfig config.ZooKeeper
+	Share           config.Share
+}
+
+func Start(ctx context.Context, index int, config *Config) error {
+	return errs.New("todo")
+}
 
 func NewChat(chatConn, adminConn grpc.ClientConnInterface) *ChatApi {
 	return &ChatApi{chatClient: chat.NewChatClient(chatConn), adminClient: admin.NewAdminClient(adminConn), imApiCaller: apicall.NewCallerInterface()}

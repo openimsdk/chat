@@ -1,0 +1,8 @@
+secret: openIM123
+env: zookeeper
+rpcRegisterName:
+  chat: chat
+  admin: admin
+
+
+

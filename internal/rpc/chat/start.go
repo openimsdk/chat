@@ -1,7 +1,9 @@
 package chat
 
 import (
+	"context"
 	"github.com/openimsdk/chat/pkg/common/apicall"
+	"github.com/openimsdk/tools/discovery"
 	"github.com/openimsdk/tools/discoveryregistry"
 	"github.com/openimsdk/tools/errs"
 	"google.golang.org/grpc"
@@ -15,7 +17,19 @@ import (
 	"github.com/openimsdk/chat/pkg/sms"
 )
 
-func Start(discov discoveryregistry.SvcDiscoveryRegistry, server *grpc.Server) error {
+type Config struct {
+	RpcConfig       config.Admin
+	RedisConfig     config.Redis
+	MongodbConfig   config.Mongo
+	ZookeeperConfig config.ZooKeeper
+	Share           config.Share
+}
+
+func Start(ctx context.Context, config *Config, client discovery.SvcDiscoveryRegistry, server *grpc.Server) error {
+	return nil
+}
+
+func start(discov discoveryregistry.SvcDiscoveryRegistry, server *grpc.Server) error {
 	mgodb, err := dbconn.NewMongo()
 	if err != nil {
 		return err
