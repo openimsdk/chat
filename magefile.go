@@ -21,7 +21,7 @@ func Build() {
 		mageutil.CompileForPlatform(platform)
 	}
 
-	mageutil.PrintGreen("Compilation complete.")
+	mageutil.PrintGreen("All binaries under cmd and tools were successfully compiled.")
 }
 
 func Start() {
