@@ -4,9 +4,6 @@
 
 Refer to `config/config.yaml` for configuration instructions
 
-## 🧩 Awesome features
-
-
 ## 🛫 Quick start 
 
 > **Note**: You can get started quickly with OpenIM Chat.
