@@ -1,4 +1,4 @@
-schema: openim
+schema: chat
 address: [ localhost:12181 ]
 username: ''
 password: ''

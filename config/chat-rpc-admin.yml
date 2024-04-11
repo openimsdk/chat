@@ -1,4 +1,4 @@
-rpc:
+rpc
   registerIP: ''
   listenIP: 0.0.0.0
   ports: [ 30200 ]
@@ -6,3 +6,9 @@ rpc:
 tokenPolicy:
   expire: 90
 
+chatSecret: openIM123
+
+
+chatAdmin:
+  - adminID: chatAdmin
+  - nickname: chatAdmin

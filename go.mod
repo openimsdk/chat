@@ -29,7 +29,7 @@ require (
 require (
 	github.com/livekit/protocol v1.10.1
 	github.com/openimsdk/protocol v0.0.60
-	github.com/openimsdk/tools v0.0.47-alpha.14
+	github.com/openimsdk/tools v0.0.47-alpha.18
 	github.com/redis/go-redis/v9 v9.5.1
 	github.com/xuri/excelize/v2 v2.8.0
 	go.mongodb.org/mongo-driver v1.12.0

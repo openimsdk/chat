@@ -16,7 +16,7 @@ import (
 	"github.com/openimsdk/protocol/constant"
 	"github.com/openimsdk/tools/errs"
 	"github.com/openimsdk/tools/log"
-	"github.com/openimsdk/tools/utils"
+
 	"io"
 	"net/http"
 	"reflect"

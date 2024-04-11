@@ -1,8 +1,12 @@
-secret: openIM123
+
 env: zookeeper
 rpcRegisterName:
   chat: chat
   admin: admin
 
 
+openIMAPIURL: http://127.0.0.1:10002
+openIMSecret: chatIM123
+openIMAdmin:
+  userID: [ "imAdmin" ]
 

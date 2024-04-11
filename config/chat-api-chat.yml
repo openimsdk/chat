@@ -2,7 +2,3 @@ api:
   listenIP: 0.0.0.0
   ports: [ 10008 ]
 
-prometheus:
-  enable: true
-  ports: [ 20113 ]
-  grafanaURL: http://127.0.0.1:13000/
