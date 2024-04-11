@@ -6,5 +6,6 @@ rpcRegisterName:
 openIM:
   apiURL: http://127.0.0.1:10002
   secret: chatIM123
-  adminUserID: [ "imAdmin" ]
+  adminUserID: imAdmin
 
+# proxyHeader: "X-Forwarded-For"

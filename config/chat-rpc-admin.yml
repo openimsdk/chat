@@ -1,10 +1,10 @@
-rpc
+rpc:
   registerIP: ''
   listenIP: 0.0.0.0
   ports: [ 30200 ]
 
 tokenPolicy:
-  expire: 90
+  expire: 90 # todo：过期时间改为天
 
 chatSecret: chat123
 

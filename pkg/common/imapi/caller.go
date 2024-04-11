@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package apicall
+package imapi
 
 import (
 	"context"
@@ -20,7 +20,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/openimsdk/chat/pkg/common/config"
 	"github.com/openimsdk/protocol/auth"
 	"github.com/openimsdk/protocol/constant"
 	"github.com/openimsdk/protocol/friend"
@@ -43,20 +42,27 @@ type CallerInterface interface {
 }
 
 type Caller struct {
-	token   string
-	timeout time.Time
-	lock    sync.Mutex
+	imApi           string
+	imSecret        string
+	defaultIMUserID string
+	token           string
+	timeout         time.Time
+	lock            sync.Mutex
 }
 
-func NewCallerInterface() CallerInterface {
-	return &Caller{}
+func New(imApi string, imSecret string, defaultIMUserID string) CallerInterface {
+	return &Caller{
+		imApi:           imApi,
+		imSecret:        imSecret,
+		defaultIMUserID: defaultIMUserID,
+	}
 }
 
 func (c *Caller) ImportFriend(ctx context.Context, ownerUserID string, friendUserIDs []string) error {
 	if len(friendUserIDs) == 0 {
 		return nil
 	}
-	_, err := importFriend.Call(ctx, &friend.ImportFriendReq{
+	_, err := importFriend.Call(ctx, c.imApi, &friend.ImportFriendReq{
 		OwnerUserID:   ownerUserID,
 		FriendUserIDs: friendUserIDs,
 	})
@@ -67,8 +73,8 @@ func (c *Caller) ImAdminTokenWithDefaultAdmin(ctx context.Context) (string, erro
 	c.lock.Lock()
 	defer c.lock.Unlock()
 	if c.token == "" || c.timeout.Before(time.Now()) {
-		userID := config.GetDefaultIMAdmin()
-		token, err := c.UserToken(ctx, config.GetDefaultIMAdmin(), constant.AdminPlatformID)
+		userID := c.defaultIMUserID
+		token, err := c.UserToken(ctx, userID, constant.AdminPlatformID)
 		if err != nil {
 			log.ZError(ctx, "get im admin token", err, "userID", userID)
 			return "", err
@@ -81,8 +87,8 @@ func (c *Caller) ImAdminTokenWithDefaultAdmin(ctx context.Context) (string, erro
 }
 
 func (c *Caller) UserToken(ctx context.Context, userID string, platformID int32) (string, error) {
-	resp, err := userToken.Call(ctx, &auth.UserTokenReq{
-		Secret:     *config.Config.Secret,
+	resp, err := userToken.Call(ctx, c.imApi, &auth.UserTokenReq{
+		Secret:     c.imSecret,
 		PlatformID: platformID,
 		UserID:     userID,
 	})
@@ -94,7 +100,7 @@ func (c *Caller) UserToken(ctx context.Context, userID string, platformID int32)
 
 func (c *Caller) InviteToGroup(ctx context.Context, userID string, groupIDs []string) error {
 	for _, groupID := range groupIDs {
-		_, _ = inviteToGroup.Call(ctx, &group.InviteUserToGroupReq{
+		_, _ = inviteToGroup.Call(ctx, c.imApi, &group.InviteUserToGroupReq{
 			GroupID:        groupID,
 			Reason:         "",
 			InvitedUserIDs: []string{userID},
@@ -104,7 +110,7 @@ func (c *Caller) InviteToGroup(ctx context.Context, userID string, groupIDs []st
 }
 
 func (c *Caller) UpdateUserInfo(ctx context.Context, userID string, nickName string, faceURL string) error {
-	_, err := updateUserInfo.Call(ctx, &user.UpdateUserInfoReq{UserInfo: &sdkws.UserInfo{
+	_, err := updateUserInfo.Call(ctx, c.imApi, &user.UpdateUserInfoReq{UserInfo: &sdkws.UserInfo{
 		UserID:   userID,
 		Nickname: nickName,
 		FaceURL:  faceURL,
@@ -113,8 +119,8 @@ func (c *Caller) UpdateUserInfo(ctx context.Context, userID string, nickName str
 }
 
 func (c *Caller) RegisterUser(ctx context.Context, users []*sdkws.UserInfo) error {
-	_, err := registerUser.Call(ctx, &user.UserRegisterReq{
-		Secret: *config.Config.Secret,
+	_, err := registerUser.Call(ctx, c.imApi, &user.UserRegisterReq{
+		Secret: c.imSecret,
 		Users:  users,
 	})
 	return err
@@ -122,7 +128,7 @@ func (c *Caller) RegisterUser(ctx context.Context, users []*sdkws.UserInfo) erro
 
 func (c *Caller) ForceOffLine(ctx context.Context, userID string) error {
 	for id := range constant.PlatformID2Name {
-		_, _ = forceOffLine.Call(ctx, &auth.ForceLogoutReq{
+		_, _ = forceOffLine.Call(ctx, c.imApi, &auth.ForceLogoutReq{
 			PlatformID: int32(id),
 			UserID:     userID,
 		})
@@ -131,7 +137,7 @@ func (c *Caller) ForceOffLine(ctx context.Context, userID string) error {
 }
 
 func (c *Caller) FindGroupInfo(ctx context.Context, groupIDs []string) ([]*sdkws.GroupInfo, error) {
-	resp, err := getGroupsInfo.Call(ctx, &group.GetGroupsInfoReq{
+	resp, err := getGroupsInfo.Call(ctx, c.imApi, &group.GetGroupsInfoReq{
 		GroupIDs: groupIDs,
 	})
 	if err != nil {
@@ -141,7 +147,7 @@ func (c *Caller) FindGroupInfo(ctx context.Context, groupIDs []string) ([]*sdkws
 }
 
 func (c *Caller) UserRegisterCount(ctx context.Context, start int64, end int64) (map[string]int64, int64, error) {
-	resp, err := registerUserCount.Call(ctx, &user.UserRegisterCountReq{
+	resp, err := registerUserCount.Call(ctx, c.imApi, &user.UserRegisterCountReq{
 		Start: start,
 		End:   end,
 	})
@@ -152,7 +158,7 @@ func (c *Caller) UserRegisterCount(ctx context.Context, start int64, end int64) 
 }
 
 func (c *Caller) FriendUserIDs(ctx context.Context, userID string) ([]string, error) {
-	resp, err := friendUserIDs.Call(ctx, &friend.GetFriendIDsReq{UserID: userID})
+	resp, err := friendUserIDs.Call(ctx, c.imApi, &friend.GetFriendIDsReq{UserID: userID})
 	if err != nil {
 		return nil, err
 	}

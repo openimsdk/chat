@@ -10,14 +10,16 @@ verifyCode:
   maxCount: 10
   superCode: "666666"
   len: 6
-  use: ""
-  ali:
-    endpoint: ""
-    accessKeyId: ""
-    accessKeySecret: ""
-    signName: ""
-    verificationCodeTemplateCode: ""
+  phone:
+    use: ""
+    ali:
+      endpoint: ""
+      accessKeyId: ""
+      accessKeySecret: ""
+      signName: ""
+      verificationCodeTemplateCode: ""
   mail:
+    enable: false
     title: ""
     senderMail: ""
     senderAuthorizationCode: ""

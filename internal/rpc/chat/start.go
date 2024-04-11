@@ -2,23 +2,20 @@ package chat
 
 import (
 	"context"
-	"github.com/openimsdk/chat/pkg/common/apicall"
+	"github.com/openimsdk/chat/pkg/proto/admin"
+	"github.com/openimsdk/tools/db/mongoutil"
 	"github.com/openimsdk/tools/discovery"
-	"github.com/openimsdk/tools/discoveryregistry"
-	"github.com/openimsdk/tools/errs"
 	"google.golang.org/grpc"
 
 	"github.com/openimsdk/chat/pkg/common/config"
 	"github.com/openimsdk/chat/pkg/common/db/database"
-	"github.com/openimsdk/chat/pkg/common/dbconn"
 	"github.com/openimsdk/chat/pkg/email"
-	"github.com/openimsdk/chat/pkg/proto/chat"
 	chatClient "github.com/openimsdk/chat/pkg/rpclient/chat"
 	"github.com/openimsdk/chat/pkg/sms"
 )
 
 type Config struct {
-	RpcConfig       config.Admin
+	RpcConfig       config.Chat
 	RedisConfig     config.Redis
 	MongodbConfig   config.Mongo
 	ZookeeperConfig config.ZooKeeper
@@ -26,39 +23,37 @@ type Config struct {
 }
 
 func Start(ctx context.Context, config *Config, client discovery.SvcDiscoveryRegistry, server *grpc.Server) error {
-	return nil
-}
-
-func start(discov discoveryregistry.SvcDiscoveryRegistry, server *grpc.Server) error {
-	mgodb, err := dbconn.NewMongo()
+	mgocli, err := mongoutil.NewMongoDB(ctx, config.MongodbConfig.Build())
 	if err != nil {
 		return err
 	}
-	s, err := sms.New()
-	if err != nil {
-		return errs.Wrap(err)
+	var srv chatSvr
+	switch config.RpcConfig.VerifyCode.Phone.Use {
+	case "ali":
+		ali := config.RpcConfig.VerifyCode.Phone.Ali
+		srv.SMS, err = sms.NewAli(ali.Endpoint, ali.AccessKeyID, ali.AccessKeySecret, ali.SignName, ali.VerificationCodeTemplateCode)
+		if err != nil {
+			return err
+		}
 	}
-	db, err := database.NewChatDatabase(mgodb)
+	if mail := config.RpcConfig.VerifyCode.Mail; mail.Enable {
+		srv.Mail = email.NewMail(mail.SMTPAddr, mail.SMTPPort, mail.SenderMail, mail.SenderAuthorizationCode, mail.Title)
+	}
+	srv.Database, err = database.NewChatDatabase(mgocli.GetDB())
 	if err != nil {
 		return err
 	}
-	if err := discov.CreateRpcRootNodes([]string{config.Config.RpcRegisterName.OpenImAdminName, config.Config.RpcRegisterName.OpenImChatName}); err != nil {
+	conn, err := client.GetConn(ctx, config.Share.RpcRegisterName.Admin)
+	if err != nil {
 		return err
 	}
-	chat.RegisterChatServer(server, &chatSvr{
-		Database:    db,
-		Admin:       chatClient.NewAdminClient(discov),
-		SMS:         s,
-		Mail:        email.NewMail(),
-		imApiCaller: apicall.NewCallerInterface(),
-	})
+	srv.Admin = chatClient.NewAdminClient(admin.NewAdminClient(conn))
 	return nil
 }
 
 type chatSvr struct {
-	Database    database.ChatDatabaseInterface
-	Admin       *chatClient.AdminClient
-	SMS         sms.SMS
-	Mail        email.Mail
-	imApiCaller apicall.CallerInterface
+	Database database.ChatDatabaseInterface
+	Admin    *chatClient.AdminClient
+	SMS      sms.SMS
+	Mail     email.Mail
 }

@@ -15,60 +15,51 @@
 package chat
 
 import (
-	"context"
-	"fmt"
+	"github.com/openimsdk/chat/internal/api/util"
 	"io"
-	"net"
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/openimsdk/chat/pkg/common/apicall"
 	"github.com/openimsdk/chat/pkg/common/apistruct"
-	constant2 "github.com/openimsdk/chat/pkg/common/constant"
+	chatconstant "github.com/openimsdk/chat/pkg/common/constant"
+	"github.com/openimsdk/chat/pkg/common/imapi"
 	"github.com/openimsdk/chat/pkg/common/mctx"
+	"github.com/openimsdk/chat/pkg/proto/admin"
+	"github.com/openimsdk/chat/pkg/proto/chat"
 	"github.com/openimsdk/protocol/constant"
 	"github.com/openimsdk/protocol/sdkws"
 	"github.com/openimsdk/tools/a2r"
 	"github.com/openimsdk/tools/apiresp"
 	"github.com/openimsdk/tools/checker"
 	"github.com/openimsdk/tools/errs"
-	"google.golang.org/grpc"
-
-	"github.com/openimsdk/chat/pkg/common/config"
-	"github.com/openimsdk/chat/pkg/proto/admin"
-	"github.com/openimsdk/chat/pkg/proto/chat"
 )
 
-type Config struct {
-	ApiConfig       config.API
-	ZookeeperConfig config.ZooKeeper
-	Share           config.Share
+func New(chatClient chat.ChatClient, adminClient admin.AdminClient, imApiCaller imapi.CallerInterface, api *util.Api) *Api {
+	return &Api{
+		Api:         api,
+		chatClient:  chatClient,
+		adminClient: adminClient,
+		imApiCaller: imApiCaller,
+	}
 }
 
-func Start(ctx context.Context, index int, config *Config) error {
-	return errs.New("todo")
-}
-
-func NewChat(chatConn, adminConn grpc.ClientConnInterface) *ChatApi {
-	return &ChatApi{chatClient: chat.NewChatClient(chatConn), adminClient: admin.NewAdminClient(adminConn), imApiCaller: apicall.NewCallerInterface()}
-}
-
-type ChatApi struct {
+type Api struct {
+	*util.Api
 	chatClient  chat.ChatClient
 	adminClient admin.AdminClient
-	imApiCaller apicall.CallerInterface
+	imApiCaller imapi.CallerInterface
 }
 
 // ################## ACCOUNT ##################
 
-func (o *ChatApi) SendVerifyCode(c *gin.Context) {
+func (o *Api) SendVerifyCode(c *gin.Context) {
 	req := chat.SendVerifyCodeReq{}
 
 	if err := c.BindJSON(&req); err != nil {
 		apiresp.GinError(c, err)
 		return
 	}
-	ip, err := o.getClientIP(c)
+	ip, err := o.GetClientIP(c)
 	if err != nil {
 		apiresp.GinError(c, err)
 		return
@@ -82,11 +73,11 @@ func (o *ChatApi) SendVerifyCode(c *gin.Context) {
 	apiresp.GinSuccess(c, resp)
 }
 
-func (o *ChatApi) VerifyCode(c *gin.Context) {
+func (o *Api) VerifyCode(c *gin.Context) {
 	a2r.Call(chat.ChatClient.VerifyCode, o.chatClient, c)
 }
 
-func (o *ChatApi) RegisterUser(c *gin.Context) {
+func (o *Api) RegisterUser(c *gin.Context) {
 	var (
 		req  chat.RegisterUserReq
 		resp apistruct.UserRegisterResp
@@ -99,7 +90,7 @@ func (o *ChatApi) RegisterUser(c *gin.Context) {
 		apiresp.GinError(c, err) // 参数校验失败
 		return
 	}
-	ip, err := o.getClientIP(c)
+	ip, err := o.GetClientIP(c)
 	if err != nil {
 		apiresp.GinError(c, err)
 		return
@@ -146,7 +137,7 @@ func (o *ChatApi) RegisterUser(c *gin.Context) {
 	apiresp.GinSuccess(c, &resp)
 }
 
-func (o *ChatApi) Login(c *gin.Context) {
+func (o *Api) Login(c *gin.Context) {
 	var (
 		req  chat.LoginReq
 		resp apistruct.LoginResp
@@ -159,7 +150,7 @@ func (o *ChatApi) Login(c *gin.Context) {
 		apiresp.GinError(c, err) // 参数校验失败
 		return
 	}
-	ip, err := o.getClientIP(c)
+	ip, err := o.GetClientIP(c)
 	if err != nil {
 		apiresp.GinError(c, err)
 		return
@@ -181,17 +172,17 @@ func (o *ChatApi) Login(c *gin.Context) {
 	apiresp.GinSuccess(c, resp)
 }
 
-func (o *ChatApi) ResetPassword(c *gin.Context) {
+func (o *Api) ResetPassword(c *gin.Context) {
 	a2r.Call(chat.ChatClient.ResetPassword, o.chatClient, c)
 }
 
-func (o *ChatApi) ChangePassword(c *gin.Context) {
+func (o *Api) ChangePassword(c *gin.Context) {
 	a2r.Call(chat.ChatClient.ChangePassword, o.chatClient, c)
 }
 
 // ################## USER ##################
 
-func (o *ChatApi) UpdateUserInfo(c *gin.Context) {
+func (o *Api) UpdateUserInfo(c *gin.Context) {
 	var (
 		req  chat.UpdateUserInfoReq
 		resp apistruct.UpdateUserInfoResp
@@ -215,10 +206,10 @@ func (o *ChatApi) UpdateUserInfo(c *gin.Context) {
 		return
 	}
 	var imToken string
-	if opUserType == constant2.NormalUser {
+	if opUserType == chatconstant.NormalUser {
 		imToken, err = o.imApiCaller.ImAdminTokenWithDefaultAdmin(c)
-	} else if opUserType == constant2.AdminUser {
-		imToken, err = o.imApiCaller.UserToken(c, config.GetIMAdmin(mctx.GetOpUserID(c)), constant.AdminPlatformID)
+	} else if opUserType == chatconstant.AdminUser {
+		imToken, err = o.imApiCaller.UserToken(c, o.GetDefaultIMAdminUserID(), constant.AdminPlatformID)
 	} else {
 		apiresp.GinError(c, errs.ErrArgs.WrapMsg("opUserType unknown"))
 		return
@@ -249,41 +240,41 @@ func (o *ChatApi) UpdateUserInfo(c *gin.Context) {
 	apiresp.GinSuccess(c, resp)
 }
 
-func (o *ChatApi) FindUserPublicInfo(c *gin.Context) {
+func (o *Api) FindUserPublicInfo(c *gin.Context) {
 	a2r.Call(chat.ChatClient.FindUserPublicInfo, o.chatClient, c)
 }
 
-func (o *ChatApi) FindUserFullInfo(c *gin.Context) {
+func (o *Api) FindUserFullInfo(c *gin.Context) {
 	a2r.Call(chat.ChatClient.FindUserFullInfo, o.chatClient, c)
 }
 
-func (o *ChatApi) SearchUserFullInfo(c *gin.Context) {
+func (o *Api) SearchUserFullInfo(c *gin.Context) {
 	a2r.Call(chat.ChatClient.SearchUserFullInfo, o.chatClient, c)
 }
 
-func (o *ChatApi) SearchUserPublicInfo(c *gin.Context) {
+func (o *Api) SearchUserPublicInfo(c *gin.Context) {
 	a2r.Call(chat.ChatClient.SearchUserPublicInfo, o.chatClient, c)
 }
 
-func (o *ChatApi) GetTokenForVideoMeeting(c *gin.Context) {
+func (o *Api) GetTokenForVideoMeeting(c *gin.Context) {
 	a2r.Call(chat.ChatClient.GetTokenForVideoMeeting, o.chatClient, c)
 }
 
 // ################## APPLET ##################
 
-func (o *ChatApi) FindApplet(c *gin.Context) {
+func (o *Api) FindApplet(c *gin.Context) {
 	a2r.Call(admin.AdminClient.FindApplet, o.adminClient, c)
 }
 
 // ################## CONFIG ##################
 
-func (o *ChatApi) GetClientConfig(c *gin.Context) {
+func (o *Api) GetClientConfig(c *gin.Context) {
 	a2r.Call(admin.AdminClient.GetClientConfig, o.adminClient, c)
 }
 
 // ################## CALLBACK ##################
 
-func (o *ChatApi) OpenIMCallback(c *gin.Context) {
+func (o *Api) OpenIMCallback(c *gin.Context) {
 	body, err := io.ReadAll(c.Request.Body)
 	if err != nil {
 		apiresp.GinError(c, err)
@@ -300,26 +291,11 @@ func (o *ChatApi) OpenIMCallback(c *gin.Context) {
 	apiresp.GinSuccess(c, nil)
 }
 
-func (o *ChatApi) getClientIP(c *gin.Context) (string, error) {
-	if config.Config.ProxyHeader == "" {
-		ip, _, err := net.SplitHostPort(c.Request.RemoteAddr)
-		return ip, err
-	}
-	ip := c.Request.Header.Get(config.Config.ProxyHeader)
-	if ip == "" {
-		return "", errs.ErrInternalServer.Wrap()
-	}
-	if ip := net.ParseIP(ip); ip == nil {
-		return "", errs.ErrInternalServer.WrapMsg(fmt.Sprintf("parse proxy ip header %s failed", ip))
-	}
-	return ip, nil
-}
-
-func (o *ChatApi) UploadLogs(c *gin.Context) {
+func (o *Api) UploadLogs(c *gin.Context) {
 	a2r.Call(chat.ChatClient.UploadLogs, o.chatClient, c)
 }
 
-func (o *ChatApi) SearchFriend(c *gin.Context) {
+func (o *Api) SearchFriend(c *gin.Context) {
 	var req struct {
 		UserID string `json:"userID"`
 		chat.SearchUserInfoReq

@@ -18,9 +18,9 @@ type AdminApiCmd struct {
 func NewAdminApiCmd() *AdminApiCmd {
 	var ret AdminApiCmd
 	ret.configMap = map[string]any{
+		ShareFileName:           &ret.apiConfig.Share,
 		ChatAPIAdminCfgFileName: &ret.apiConfig.ApiConfig,
 		ZookeeperConfigFileName: &ret.apiConfig.ZookeeperConfig,
-		ShareFileName:           &ret.apiConfig.Share,
 	}
 	ret.RootCmd = NewRootCmd(program.GetProcessName(), WithConfigMap(ret.configMap))
 	ret.ctx = context.WithValue(context.Background(), "version", config.Version)

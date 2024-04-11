@@ -151,19 +151,26 @@ func (o *chatSvr) SendVerifyCode(ctx context.Context, req *chat.SendVerifyCodeRe
 		Duration:   uint(config.Config.VerifyCode.ValidTime),
 		CreateTime: time.Now(),
 	}
-	if !isEmail {
-		err = o.Database.AddVerifyCode(ctx, t, func() error {
-			return o.SMS.SendCode(ctx, req.AreaCode, req.PhoneNumber, t.Code)
-		})
-	} else {
+	if isEmail {
 		// 发送邮件验证码
+		if o.Mail == nil {
+			return nil, errs.ErrInternalServer.WrapMsg("email verification is not enabled")
+		}
 		err = o.Database.AddVerifyCode(ctx, t, func() error {
 			return o.Mail.SendMail(ctx, req.Email, t.Code)
 		})
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		err := o.Database.AddVerifyCode(ctx, t, func() error {
+			return o.SMS.SendCode(ctx, req.AreaCode, req.PhoneNumber, t.Code)
+		})
+		if err != nil {
+			return nil, err
+		}
 	}
-	if err != nil {
-		return nil, err
-	}
+
 	return &chat.SendVerifyCodeResp{}, nil
 }
 

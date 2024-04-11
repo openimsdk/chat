@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package apicall
+package imapi
 
 import (
 	"bytes"
@@ -42,23 +42,21 @@ var client = &http.Client{
 }
 
 type ApiCaller[Req, Resp any] interface {
-	Call(ctx context.Context, req *Req) (*Resp, error)
+	Call(ctx context.Context, apiPrefix string, req *Req) (*Resp, error)
 }
 
-func NewApiCaller[Req, Resp any](api string, prefix func() string) ApiCaller[Req, Resp] {
+func NewApiCaller[Req, Resp any](api string) ApiCaller[Req, Resp] {
 	return &caller[Req, Resp]{
-		api:    api,
-		prefix: prefix,
+		api: api,
 	}
 }
 
 type caller[Req, Resp any] struct {
-	api    string
-	prefix func() string
+	api string
 }
 
-func (a caller[Req, Resp]) Call(ctx context.Context, req *Req) (*Resp, error) {
-	resp, err := a.call(ctx, req)
+func (a caller[Req, Resp]) Call(ctx context.Context, apiPrefix string, req *Req) (*Resp, error) {
+	resp, err := a.call(ctx, apiPrefix, req)
 	if err != nil {
 		log.ZError(ctx, "caller resp", err)
 		return nil, err
@@ -67,8 +65,8 @@ func (a caller[Req, Resp]) Call(ctx context.Context, req *Req) (*Resp, error) {
 	return resp, nil
 }
 
-func (a caller[Req, Resp]) call(ctx context.Context, req *Req) (*Resp, error) {
-	url := a.prefix() + a.api
+func (a caller[Req, Resp]) call(ctx context.Context, apiPrefix string, req *Req) (*Resp, error) {
+	url := apiPrefix + a.api
 	defer func(start time.Time) {
 		log.ZDebug(ctx, "api call caller time", "api", a.api, "cost", time.Since(start).String())
 	}(time.Now())

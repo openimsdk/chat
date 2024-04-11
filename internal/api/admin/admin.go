@@ -18,13 +18,11 @@ import (
 	"context"
 	"crypto/md5"
 	"encoding/hex"
-	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/openimsdk/chat/internal/api"
-	"github.com/openimsdk/chat/pkg/common/apicall"
+	"github.com/openimsdk/chat/internal/api/util"
 	"github.com/openimsdk/chat/pkg/common/apistruct"
 	"github.com/openimsdk/chat/pkg/common/config"
-	constant2 "github.com/openimsdk/chat/pkg/common/constant"
+	"github.com/openimsdk/chat/pkg/common/imapi"
 	"github.com/openimsdk/chat/pkg/common/mctx"
 	"github.com/openimsdk/chat/pkg/common/xlsx"
 	"github.com/openimsdk/chat/pkg/common/xlsx/model"
@@ -40,35 +38,29 @@ import (
 	"github.com/openimsdk/tools/log"
 	"github.com/openimsdk/tools/utils/datautil"
 	"github.com/openimsdk/tools/utils/encrypt"
-	"google.golang.org/grpc"
-	"net"
 	"net/http"
 	"strconv"
 	"strings"
 	"time"
 )
 
-type Config struct {
-	ApiConfig       config.API
-	ZookeeperConfig config.ZooKeeper
-	Share           config.Share
+func New(chatClient chat.ChatClient, adminClient admin.AdminClient, imApiCaller imapi.CallerInterface, api *util.Api) *Api {
+	return &Api{
+		Api:         api,
+		chatClient:  chatClient,
+		adminClient: adminClient,
+		imApiCaller: imApiCaller,
+	}
 }
 
-func Start(ctx context.Context, index int, config *Config) error {
-	return errs.New("todo")
-}
-
-func NewAdmin(chatConn, adminConn grpc.ClientConnInterface) *AdminApi {
-	return &AdminApi{chatClient: chat.NewChatClient(chatConn), adminClient: admin.NewAdminClient(adminConn), imApiCaller: apicall.NewCallerInterface()}
-}
-
-type AdminApi struct {
+type Api struct {
+	*util.Api
 	chatClient  chat.ChatClient
 	adminClient admin.AdminClient
-	imApiCaller apicall.CallerInterface
+	imApiCaller imapi.CallerInterface
 }
 
-func (o *AdminApi) AdminLogin(c *gin.Context) {
+func (o *Api) AdminLogin(c *gin.Context) {
 	var (
 		req  admin.LoginReq
 		resp apistruct.AdminLoginResp
@@ -86,7 +78,7 @@ func (o *AdminApi) AdminLogin(c *gin.Context) {
 		apiresp.GinError(c, err)
 		return
 	}
-	imAdminUserID := config.GetIMAdmin(loginResp.AdminUserID)
+	imAdminUserID := o.GetDefaultIMAdminUserID()
 	imToken, err := o.imApiCaller.UserToken(c, imAdminUserID, constant.AdminPlatformID)
 	if err != nil {
 		apiresp.GinError(c, err)
@@ -101,11 +93,11 @@ func (o *AdminApi) AdminLogin(c *gin.Context) {
 	apiresp.GinSuccess(c, resp)
 }
 
-func (o *AdminApi) ResetUserPassword(c *gin.Context) {
+func (o *Api) ResetUserPassword(c *gin.Context) {
 	a2r.Call(chat.ChatClient.ChangePassword, o.chatClient, c)
 }
 
-func (o *AdminApi) AdminUpdateInfo(c *gin.Context) {
+func (o *Api) AdminUpdateInfo(c *gin.Context) {
 	var req admin.AdminUpdateInfoReq
 	if err := c.BindJSON(&req); err != nil {
 		apiresp.GinError(c, err)
@@ -121,7 +113,7 @@ func (o *AdminApi) AdminUpdateInfo(c *gin.Context) {
 		return
 	}
 
-	imAdminUserID := config.GetIMAdmin(resp.UserID)
+	imAdminUserID := o.GetDefaultIMAdminUserID()
 	imToken, err := o.imApiCaller.UserToken(c, imAdminUserID, constant.AdminPlatformID)
 	if err != nil {
 		log.ZError(c, "AdminUpdateInfo ImAdminTokenWithDefaultAdmin", err, "imAdminUserID", imAdminUserID)
@@ -133,19 +125,19 @@ func (o *AdminApi) AdminUpdateInfo(c *gin.Context) {
 	apiresp.GinSuccess(c, nil)
 }
 
-func (o *AdminApi) AdminInfo(c *gin.Context) {
+func (o *Api) AdminInfo(c *gin.Context) {
 	a2r.Call(admin.AdminClient.GetAdminInfo, o.adminClient, c)
 }
 
-func (o *AdminApi) ChangeAdminPassword(c *gin.Context) {
+func (o *Api) ChangeAdminPassword(c *gin.Context) {
 	a2r.Call(admin.AdminClient.ChangeAdminPassword, o.adminClient, c)
 }
 
-func (o *AdminApi) AddAdminAccount(c *gin.Context) {
+func (o *Api) AddAdminAccount(c *gin.Context) {
 	a2r.Call(admin.AdminClient.AddAdminAccount, o.adminClient, c)
 }
 
-func (o *AdminApi) AddUserAccount(c *gin.Context) {
+func (o *Api) AddUserAccount(c *gin.Context) {
 	var req chat.AddUserAccountReq
 	if err := c.BindJSON(&req); err != nil {
 		apiresp.GinError(c, err)
@@ -174,31 +166,31 @@ func (o *AdminApi) AddUserAccount(c *gin.Context) {
 
 }
 
-func (o *AdminApi) DelAdminAccount(c *gin.Context) {
+func (o *Api) DelAdminAccount(c *gin.Context) {
 	a2r.Call(admin.AdminClient.DelAdminAccount, o.adminClient, c)
 }
 
-func (o *AdminApi) SearchAdminAccount(c *gin.Context) {
+func (o *Api) SearchAdminAccount(c *gin.Context) {
 	a2r.Call(admin.AdminClient.SearchAdminAccount, o.adminClient, c)
 }
 
-func (o *AdminApi) AddDefaultFriend(c *gin.Context) {
+func (o *Api) AddDefaultFriend(c *gin.Context) {
 	a2r.Call(admin.AdminClient.AddDefaultFriend, o.adminClient, c)
 }
 
-func (o *AdminApi) DelDefaultFriend(c *gin.Context) {
+func (o *Api) DelDefaultFriend(c *gin.Context) {
 	a2r.Call(admin.AdminClient.DelDefaultFriend, o.adminClient, c)
 }
 
-func (o *AdminApi) SearchDefaultFriend(c *gin.Context) {
+func (o *Api) SearchDefaultFriend(c *gin.Context) {
 	a2r.Call(admin.AdminClient.SearchDefaultFriend, o.adminClient, c)
 }
 
-func (o *AdminApi) FindDefaultFriend(c *gin.Context) {
+func (o *Api) FindDefaultFriend(c *gin.Context) {
 	a2r.Call(admin.AdminClient.FindDefaultFriend, o.adminClient, c)
 }
 
-func (o *AdminApi) AddDefaultGroup(c *gin.Context) {
+func (o *Api) AddDefaultGroup(c *gin.Context) {
 	var req admin.AddDefaultGroupReq
 	if err := c.BindJSON(&req); err != nil {
 		apiresp.GinError(c, err)
@@ -208,7 +200,7 @@ func (o *AdminApi) AddDefaultGroup(c *gin.Context) {
 		apiresp.GinError(c, err)
 		return
 	}
-	imToken, err := o.imApiCaller.UserToken(c, config.GetIMAdmin(mctx.GetOpUserID(c)), constant.AdminPlatformID)
+	imToken, err := o.imApiCaller.UserToken(c, o.GetDefaultIMAdminUserID(), constant.AdminPlatformID)
 	if err != nil {
 		apiresp.GinError(c, err)
 		return
@@ -232,15 +224,15 @@ func (o *AdminApi) AddDefaultGroup(c *gin.Context) {
 	apiresp.GinSuccess(c, resp)
 }
 
-func (o *AdminApi) DelDefaultGroup(c *gin.Context) {
+func (o *Api) DelDefaultGroup(c *gin.Context) {
 	a2r.Call(admin.AdminClient.DelDefaultGroup, o.adminClient, c)
 }
 
-func (o *AdminApi) FindDefaultGroup(c *gin.Context) {
+func (o *Api) FindDefaultGroup(c *gin.Context) {
 	a2r.Call(admin.AdminClient.FindDefaultGroup, o.adminClient, c)
 }
 
-func (o *AdminApi) SearchDefaultGroup(c *gin.Context) {
+func (o *Api) SearchDefaultGroup(c *gin.Context) {
 	var req admin.SearchDefaultGroupReq
 	if err := c.BindJSON(&req); err != nil {
 		apiresp.GinError(c, err)
@@ -260,7 +252,7 @@ func (o *AdminApi) SearchDefaultGroup(c *gin.Context) {
 		Groups: make([]*sdkws.GroupInfo, 0, len(searchResp.GroupIDs)),
 	}
 	if len(searchResp.GroupIDs) > 0 {
-		imToken, err := o.imApiCaller.UserToken(c, config.GetIMAdmin(mctx.GetOpUserID(c)), constant.AdminPlatformID)
+		imToken, err := o.imApiCaller.UserToken(c, o.GetDefaultIMAdminUserID(), constant.AdminPlatformID)
 		if err != nil {
 			apiresp.GinError(c, err)
 			return
@@ -287,51 +279,51 @@ func (o *AdminApi) SearchDefaultGroup(c *gin.Context) {
 	apiresp.GinSuccess(c, resp)
 }
 
-func (o *AdminApi) AddInvitationCode(c *gin.Context) {
+func (o *Api) AddInvitationCode(c *gin.Context) {
 	a2r.Call(admin.AdminClient.AddInvitationCode, o.adminClient, c)
 }
 
-func (o *AdminApi) GenInvitationCode(c *gin.Context) {
+func (o *Api) GenInvitationCode(c *gin.Context) {
 	a2r.Call(admin.AdminClient.GenInvitationCode, o.adminClient, c)
 }
 
-func (o *AdminApi) DelInvitationCode(c *gin.Context) {
+func (o *Api) DelInvitationCode(c *gin.Context) {
 	a2r.Call(admin.AdminClient.DelInvitationCode, o.adminClient, c)
 }
 
-func (o *AdminApi) SearchInvitationCode(c *gin.Context) {
+func (o *Api) SearchInvitationCode(c *gin.Context) {
 	a2r.Call(admin.AdminClient.SearchInvitationCode, o.adminClient, c)
 }
 
-func (o *AdminApi) AddUserIPLimitLogin(c *gin.Context) {
+func (o *Api) AddUserIPLimitLogin(c *gin.Context) {
 	a2r.Call(admin.AdminClient.AddUserIPLimitLogin, o.adminClient, c)
 }
 
-func (o *AdminApi) SearchUserIPLimitLogin(c *gin.Context) {
+func (o *Api) SearchUserIPLimitLogin(c *gin.Context) {
 	a2r.Call(admin.AdminClient.SearchUserIPLimitLogin, o.adminClient, c)
 }
 
-func (o *AdminApi) DelUserIPLimitLogin(c *gin.Context) {
+func (o *Api) DelUserIPLimitLogin(c *gin.Context) {
 	a2r.Call(admin.AdminClient.DelUserIPLimitLogin, o.adminClient, c)
 }
 
-func (o *AdminApi) SearchIPForbidden(c *gin.Context) {
+func (o *Api) SearchIPForbidden(c *gin.Context) {
 	a2r.Call(admin.AdminClient.SearchIPForbidden, o.adminClient, c)
 }
 
-func (o *AdminApi) AddIPForbidden(c *gin.Context) {
+func (o *Api) AddIPForbidden(c *gin.Context) {
 	a2r.Call(admin.AdminClient.AddIPForbidden, o.adminClient, c)
 }
 
-func (o *AdminApi) DelIPForbidden(c *gin.Context) {
+func (o *Api) DelIPForbidden(c *gin.Context) {
 	a2r.Call(admin.AdminClient.DelIPForbidden, o.adminClient, c)
 }
 
-func (o *AdminApi) ParseToken(c *gin.Context) {
+func (o *Api) ParseToken(c *gin.Context) {
 	a2r.Call(admin.AdminClient.ParseToken, o.adminClient, c)
 }
 
-func (o *AdminApi) BlockUser(c *gin.Context) {
+func (o *Api) BlockUser(c *gin.Context) {
 	var req admin.BlockUserReq
 	if err := c.BindJSON(&req); err != nil {
 		apiresp.GinError(c, err)
@@ -346,7 +338,7 @@ func (o *AdminApi) BlockUser(c *gin.Context) {
 		apiresp.GinError(c, err)
 		return
 	}
-	imToken, err := o.imApiCaller.UserToken(c, config.GetIMAdmin(mctx.GetOpUserID(c)), constant.AdminPlatformID)
+	imToken, err := o.imApiCaller.UserToken(c, o.GetDefaultIMAdminUserID(), constant.AdminPlatformID)
 	if err != nil {
 		apiresp.GinError(c, err)
 		return
@@ -359,47 +351,47 @@ func (o *AdminApi) BlockUser(c *gin.Context) {
 	apiresp.GinSuccess(c, resp)
 }
 
-func (o *AdminApi) UnblockUser(c *gin.Context) {
+func (o *Api) UnblockUser(c *gin.Context) {
 	a2r.Call(admin.AdminClient.UnblockUser, o.adminClient, c)
 }
 
-func (o *AdminApi) SearchBlockUser(c *gin.Context) {
+func (o *Api) SearchBlockUser(c *gin.Context) {
 	a2r.Call(admin.AdminClient.SearchBlockUser, o.adminClient, c)
 }
 
-func (o *AdminApi) SetClientConfig(c *gin.Context) {
+func (o *Api) SetClientConfig(c *gin.Context) {
 	a2r.Call(admin.AdminClient.SetClientConfig, o.adminClient, c)
 }
 
-func (o *AdminApi) DelClientConfig(c *gin.Context) {
+func (o *Api) DelClientConfig(c *gin.Context) {
 	a2r.Call(admin.AdminClient.DelClientConfig, o.adminClient, c)
 }
 
-func (o *AdminApi) GetClientConfig(c *gin.Context) {
+func (o *Api) GetClientConfig(c *gin.Context) {
 	a2r.Call(admin.AdminClient.GetClientConfig, o.adminClient, c)
 }
 
-func (o *AdminApi) AddApplet(c *gin.Context) {
+func (o *Api) AddApplet(c *gin.Context) {
 	a2r.Call(admin.AdminClient.AddApplet, o.adminClient, c)
 }
 
-func (o *AdminApi) DelApplet(c *gin.Context) {
+func (o *Api) DelApplet(c *gin.Context) {
 	a2r.Call(admin.AdminClient.DelApplet, o.adminClient, c)
 }
 
-func (o *AdminApi) UpdateApplet(c *gin.Context) {
+func (o *Api) UpdateApplet(c *gin.Context) {
 	a2r.Call(admin.AdminClient.UpdateApplet, o.adminClient, c)
 }
 
-func (o *AdminApi) SearchApplet(c *gin.Context) {
+func (o *Api) SearchApplet(c *gin.Context) {
 	a2r.Call(admin.AdminClient.SearchApplet, o.adminClient, c)
 }
 
-func (o *AdminApi) LoginUserCount(c *gin.Context) {
+func (o *Api) LoginUserCount(c *gin.Context) {
 	a2r.Call(chat.ChatClient.UserLoginCount, o.chatClient, c)
 }
 
-func (o *AdminApi) NewUserCount(c *gin.Context) {
+func (o *Api) NewUserCount(c *gin.Context) {
 	var req user.UserRegisterCountReq
 	var resp apistruct.NewUserCountResp
 	if err := c.BindJSON(&req); err != nil {
@@ -410,7 +402,7 @@ func (o *AdminApi) NewUserCount(c *gin.Context) {
 		apiresp.GinError(c, err) // 参数校验失败
 		return
 	}
-	imToken, err := o.imApiCaller.UserToken(c, config.GetIMAdmin(mctx.GetOpUserID(c)), constant.AdminPlatformID)
+	imToken, err := o.imApiCaller.UserToken(c, o.GetDefaultIMAdminUserID(), constant.AdminPlatformID)
 	if err != nil {
 		apiresp.GinError(c, err)
 		return
@@ -425,56 +417,27 @@ func (o *AdminApi) NewUserCount(c *gin.Context) {
 	apiresp.GinSuccess(c, resp)
 }
 
-func (o *AdminApi) SearchLogs(c *gin.Context) {
+func (o *Api) SearchLogs(c *gin.Context) {
 	a2r.Call(chat.ChatClient.SearchLogs, o.chatClient, c)
 }
 
-func (o *AdminApi) DeleteLogs(c *gin.Context) {
+func (o *Api) DeleteLogs(c *gin.Context) {
 	a2r.Call(chat.ChatClient.DeleteLogs, o.chatClient, c)
 }
 
-func (o *AdminApi) getClientIP(c *gin.Context) (string, error) {
-	if config.Config.ProxyHeader == "" {
-		ip, _, err := net.SplitHostPort(c.Request.RemoteAddr)
-		return ip, err
-	}
-	ip := c.Request.Header.Get(config.Config.ProxyHeader)
-	if ip == "" {
-		return "", errs.ErrInternalServer.Wrap()
-	}
-	if ip := net.ParseIP(ip); ip == nil {
-		return "", errs.ErrInternalServer.WrapMsg(fmt.Sprintf("parse proxy ip header %s failed", ip))
-	}
-	return ip, nil
-}
-
-func (o *AdminApi) checkSecretAdmin(c *gin.Context, secret string) error {
-	if _, ok := c.Get(constant2.RpcOpUserID); ok {
-		return nil
-	}
-	if config.Config.ChatSecret == "" {
-		return errs.ErrNoPermission.WrapMsg("not config chat secret")
-	}
-	if config.Config.ChatSecret != secret {
-		return errs.ErrNoPermission.WrapMsg("secret error")
-	}
-	api.SetToken(c, config.GetDefaultIMAdmin(), constant2.AdminUser)
-	return nil
-}
-
-func (o *AdminApi) ImportUserByXlsx(c *gin.Context) {
+func (o *Api) ImportUserByXlsx(c *gin.Context) {
 	formFile, err := c.FormFile("data")
 	if err != nil {
 		apiresp.GinError(c, err)
 		return
 	}
-	ip, err := o.getClientIP(c)
+	ip, err := o.GetClientIP(c)
 	if err != nil {
 		apiresp.GinError(c, err)
 		return
 	}
 	secret := c.PostForm("secret")
-	if err := o.checkSecretAdmin(c, secret); err != nil {
+	if err := o.CheckSecretAdmin(c, secret); err != nil {
 		apiresp.GinError(c, err)
 		return
 	}
@@ -504,7 +467,7 @@ func (o *AdminApi) ImportUserByXlsx(c *gin.Context) {
 	apiresp.GinError(c, o.registerChatUser(ctx, ip, us))
 }
 
-func (o *AdminApi) ImportUserByJson(c *gin.Context) {
+func (o *Api) ImportUserByJson(c *gin.Context) {
 	var req struct {
 		Secret string                   `json:"secret"`
 		Users  []*chat.RegisterUserInfo `json:"users"`
@@ -513,12 +476,12 @@ func (o *AdminApi) ImportUserByJson(c *gin.Context) {
 		apiresp.GinError(c, err)
 		return
 	}
-	ip, err := o.getClientIP(c)
+	ip, err := o.GetClientIP(c)
 	if err != nil {
 		apiresp.GinError(c, err)
 		return
 	}
-	if err := o.checkSecretAdmin(c, req.Secret); err != nil {
+	if err := o.CheckSecretAdmin(c, req.Secret); err != nil {
 		apiresp.GinError(c, err)
 		return
 	}
@@ -531,7 +494,7 @@ func (o *AdminApi) ImportUserByJson(c *gin.Context) {
 	apiresp.GinError(c, o.registerChatUser(ctx, ip, req.Users))
 }
 
-func (o *AdminApi) xlsx2user(users []model.User) ([]*chat.RegisterUserInfo, error) {
+func (o *Api) xlsx2user(users []model.User) ([]*chat.RegisterUserInfo, error) {
 	chatUsers := make([]*chat.RegisterUserInfo, len(users))
 	for i, info := range users {
 		if info.Nickname == "" {
@@ -566,7 +529,7 @@ func (o *AdminApi) xlsx2user(users []model.User) ([]*chat.RegisterUserInfo, erro
 	return chatUsers, nil
 }
 
-func (o *AdminApi) xlsxBirth(s string) time.Time {
+func (o *Api) xlsxBirth(s string) time.Time {
 	if s == "" {
 		return time.Now()
 	}
@@ -590,7 +553,7 @@ func (o *AdminApi) xlsxBirth(s string) time.Time {
 	return t
 }
 
-func (o *AdminApi) registerChatUser(ctx context.Context, ip string, users []*chat.RegisterUserInfo) error {
+func (o *Api) registerChatUser(ctx context.Context, ip string, users []*chat.RegisterUserInfo) error {
 	if len(users) == 0 {
 		return errs.ErrArgs.WrapMsg("users is empty")
 	}
@@ -617,7 +580,7 @@ func (o *AdminApi) registerChatUser(ctx context.Context, ip string, users []*cha
 	return nil
 }
 
-func (o *AdminApi) BatchImportTemplate(c *gin.Context) {
+func (o *Api) BatchImportTemplate(c *gin.Context) {
 	md5Sum := md5.Sum(config.ImportTemplate)
 	md5Val := hex.EncodeToString(md5Sum[:])
 	if c.GetHeader("If-None-Match") == md5Val {

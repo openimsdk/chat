@@ -6,18 +6,28 @@ import (
 	"github.com/openimsdk/tools/db/redisutil"
 )
 
-//go:embed version
-var Version string
+var (
+	//go:embed version
+	Version string
+	//go:embed template.xlsx
+	ImportTemplate []byte
+)
 
 type Share struct {
 	Secret          string          `mapstructure:"secret"`
 	Env             string          `mapstructure:"env"`
 	RpcRegisterName RpcRegisterName `mapstructure:"rpcRegisterName"`
-	IMAdmin         IMAdmin         `mapstructure:"imAdmin"`
+	OpenIM          struct {
+		ApiURL      string `mapstructure:"apiURL"`
+		Secret      string `mapstructure:"secret"`
+		AdminUserID string `mapstructure:"adminUserID"`
+	} `mapstructure:"openIM"`
+	ProxyHeader string `mapstructure:"proxyHeader"`
 }
-type IMAdmin struct {
-	UserID   []string `mapstructure:"userID"`
-	Nickname []string `mapstructure:"nickname"`
+
+type AdminUser struct {
+	UserID   string `mapstructure:"userID"`
+	Nickname string `mapstructure:"nickname"`
 }
 
 type RpcRegisterName struct {
@@ -88,6 +98,37 @@ type Chat struct {
 		ListenIP   string `mapstructure:"listenIP"`
 		Ports      []int  `mapstructure:"ports"`
 	} `mapstructure:"rpc"`
+	VerifyCode struct {
+		ValidTime  int    `mapstructure:"validTime"`
+		ValidCount int    `mapstructure:"validCount"`
+		UintTime   int    `mapstructure:"uintTime"`
+		MaxCount   int    `mapstructure:"maxCount"`
+		SuperCode  string `mapstructure:"superCode"`
+		Len        int    `mapstructure:"len"`
+		Phone      struct {
+			Use string `mapstructure:"use"`
+			Ali struct {
+				Endpoint                     string `mapstructure:"endpoint"`
+				AccessKeyID                  string `mapstructure:"accessKeyId"`
+				AccessKeySecret              string `mapstructure:"accessKeySecret"`
+				SignName                     string `mapstructure:"signName"`
+				VerificationCodeTemplateCode string `mapstructure:"verificationCodeTemplateCode"`
+			} `mapstructure:"ali"`
+		} `mapstructure:"phone"`
+		Mail struct {
+			Enable                  bool   `mapstructure:"enable"`
+			Title                   string `mapstructure:"title"`
+			SenderMail              string `mapstructure:"senderMail"`
+			SenderAuthorizationCode string `mapstructure:"senderAuthorizationCode"`
+			SMTPAddr                string `mapstructure:"smtpAddr"`
+			SMTPPort                int    `mapstructure:"smtpPort"`
+		} `mapstructure:"mail"`
+	} `mapstructure:"verifyCode"`
+	LiveKit struct {
+		URL    string `mapstructure:"url"`
+		Key    string `mapstructure:"key"`
+		Secret string `mapstructure:"secret"`
+	} `mapstructure:"liveKit"`
 }
 
 type Admin struct {

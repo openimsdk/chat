@@ -58,5 +58,5 @@ func (a *ChatRpcCmd) Exec() error {
 func (a *ChatRpcCmd) preRunE() error {
 	return startrpc.Start(a.ctx, &a.chatConfig.ZookeeperConfig, a.chatConfig.RpcConfig.RPC.ListenIP,
 		a.chatConfig.RpcConfig.RPC.RegisterIP, a.chatConfig.RpcConfig.RPC.Ports,
-		a.Index(), a.chatConfig.Share.RpcRegisterName.Auth, &a.chatConfig.Share, &a.chatConfig, chat.Start)
+		a.Index(), a.chatConfig.Share.RpcRegisterName.Chat, &a.chatConfig.Share, &a.chatConfig, chat.Start)
 }

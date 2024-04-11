@@ -216,6 +216,7 @@ github.com/openimsdk/tools v0.0.37 h1:qvDqmA4RbEJtPjZouWCkVuf/pjm6Y8nUrG5iH2gcnO
 github.com/openimsdk/tools v0.0.37/go.mod h1:wBfR5CYmEyvxl03QJbTkhz1CluK6J4/lX0lviu8JAjE=
 github.com/openimsdk/tools v0.0.47-alpha.11/go.mod h1:aTh3aPbr4bibBGf0qnC3nTWC947xFOrvHsW6WZ1oV3E=
 github.com/openimsdk/tools v0.0.47-alpha.14/go.mod h1:aTh3aPbr4bibBGf0qnC3nTWC947xFOrvHsW6WZ1oV3E=
+github.com/openimsdk/tools v0.0.47-alpha.18/go.mod h1:e6pAohiwdjhhAfuECXViGlgCrbk8qkNTIhUkFmLit/Q=
 github.com/pelletier/go-toml/v2 v2.0.8 h1:0ctb6s9mE31h0/lhu+J6OPmVeDxJn+kYnJc2jZR9tGQ=
 github.com/pelletier/go-toml/v2 v2.0.8/go.mod h1:vuYfssBdrU2XDZ9bYydBu6t+6a6PYNcZljzZR9VXg+4=
 github.com/pelletier/go-toml/v2 v2.1.0 h1:FnwAJ4oYMvbT/34k9zzHuZNrhlz48GB3/s6at6/MHO4=

@@ -12,23 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package api
+package mw
 
 import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/openimsdk/chat/pkg/common/constant"
+	"github.com/openimsdk/chat/pkg/proto/admin"
 	constant2 "github.com/openimsdk/protocol/constant"
 	"github.com/openimsdk/tools/apiresp"
 	"github.com/openimsdk/tools/errs"
-	"google.golang.org/grpc"
-
-	"github.com/openimsdk/chat/pkg/proto/admin"
 )
 
-func NewMW(adminConn grpc.ClientConnInterface) *MW {
-	return &MW{client: admin.NewAdminClient(adminConn)}
+func New(client admin.AdminClient) *MW {
+	return &MW{client: client}
 }
 
 type MW struct {
