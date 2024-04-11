@@ -6,7 +6,7 @@ rpc
 tokenPolicy:
   expire: 90
 
-chatSecret: openIM123
+chatSecret: chat123
 
 
 chatAdmin:
