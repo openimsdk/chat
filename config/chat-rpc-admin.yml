@@ -4,7 +4,7 @@ rpc:
   ports: [ 30200 ]
 
 tokenPolicy:
-  expire: 90 # todo：过期时间改为天
+  expire: 90
 
 chatSecret: chat123
 

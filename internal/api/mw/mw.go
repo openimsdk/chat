@@ -19,7 +19,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/openimsdk/chat/pkg/common/constant"
-	"github.com/openimsdk/chat/pkg/proto/admin"
+	"github.com/openimsdk/chat/pkg/protocol/admin"
 	constant2 "github.com/openimsdk/protocol/constant"
 	"github.com/openimsdk/tools/apiresp"
 	"github.com/openimsdk/tools/errs"

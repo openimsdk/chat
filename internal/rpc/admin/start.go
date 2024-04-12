@@ -2,15 +2,21 @@ package admin
 
 import (
 	"context"
+	"crypto/md5"
+	"encoding/hex"
 	"github.com/openimsdk/chat/pkg/common/config"
 	"github.com/openimsdk/chat/pkg/common/db/database"
-	"github.com/openimsdk/chat/pkg/proto/admin"
-	"github.com/openimsdk/chat/pkg/rpclient/chat"
+	"github.com/openimsdk/chat/pkg/common/db/dbutil"
+	"github.com/openimsdk/chat/pkg/common/db/table/admin"
+	"github.com/openimsdk/chat/pkg/common/tokenverify"
+	"github.com/openimsdk/chat/pkg/protocol/chat"
+	chatClient "github.com/openimsdk/chat/pkg/rpclient/chat"
 	"github.com/openimsdk/tools/db/mongoutil"
 	"github.com/openimsdk/tools/db/redisutil"
 	"github.com/openimsdk/tools/discovery"
-	"github.com/openimsdk/tools/errs"
 	"google.golang.org/grpc"
+	"math/rand"
+	"time"
 )
 
 type Config struct {
@@ -22,37 +28,59 @@ type Config struct {
 }
 
 func Start(ctx context.Context, config *Config, client discovery.SvcDiscoveryRegistry, server *grpc.Server) error {
-	return nil
-}
-
-func start(discov discoveryregistry.SvcDiscoveryRegistry, server *grpc.Server) error {
-	mgocli, err := mongoutil.NewMongoDB(ctx, config.MongodbConfig.Build())
-	if err != nil {
-		return err
-	}
+	rand.Seed(time.Now().UnixNano())
 	rdb, err := redisutil.NewRedisClient(ctx, config.RedisConfig.Build())
 	if err != nil {
 		return err
 	}
-	adminDatabase, err := database.NewAdminDatabase(mgocli, rdb)
+	mgocli, err := mongoutil.NewMongoDB(ctx, config.MongodbConfig.Build())
 	if err != nil {
 		return err
 	}
-
-	if err := adminDatabase.InitAdmin(context.Background()); err != nil {
+	var srv adminServer
+	srv.Database, err = database.NewAdminDatabase(mgocli, rdb)
+	if err != nil {
 		return err
 	}
-	if err := discov.CreateRpcRootNodes([]string{config.Config.RpcRegisterName.OpenImAdminName, config.Config.RpcRegisterName.OpenImChatName}); err != nil {
-		return errs.Wrap(err, "CreateRpcRootNodes error")
+	conn, err := client.GetConn(ctx, config.Share.RpcRegisterName.Chat)
+	if err != nil {
+		return err
 	}
-
-	admin.RegisterAdminServer(server, &adminServer{Database: adminDatabase,
-		Chat: chat.NewChatClient(discov),
-	})
+	srv.Chat = chatClient.NewChatClient(chat.NewChatClient(conn))
+	srv.Token = &tokenverify.Token{
+		Expires: time.Duration(config.RpcConfig.TokenPolicy.Expire) * time.Hour * 24,
+		Secret:  config.Share.Secret,
+	}
+	if err := srv.initAdmin(ctx, config.Share.ChatAdmin); err != nil {
+		return err
+	}
 	return nil
 }
 
 type adminServer struct {
 	Database database.AdminDatabaseInterface
-	Chat     *chat.ChatClient
+	Chat     *chatClient.ChatClient
+	Token    *tokenverify.Token
+}
+
+func (o *adminServer) initAdmin(ctx context.Context, users []config.AdminUser) error {
+	for _, user := range users {
+		if _, err := o.Database.GetAdmin(ctx, user.AdminID); err == nil {
+			continue
+		} else if !dbutil.IsDBNotFound(err) {
+			return err
+		}
+		sum := md5.Sum([]byte(user.AdminID))
+		a := admin.Admin{
+			Account:    user.AdminID,
+			UserID:     user.IMUserID,
+			Password:   hex.EncodeToString(sum[:]),
+			Level:      100,
+			CreateTime: time.Now(),
+		}
+		if err := o.Database.AddAdminAccount(ctx, []*admin.Admin{&a}); err != nil {
+			return err
+		}
+	}
+	return nil
 }

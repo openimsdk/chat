@@ -43,5 +43,4 @@ type AdminInterface interface {
 	ChangePassword(ctx context.Context, userID string, newPassword string) error
 	Delete(ctx context.Context, userIDs []string) error
 	Search(ctx context.Context, pagination pagination.Pagination) (int64, []*Admin, error)
-	InitAdmin(ctx context.Context) error
 }

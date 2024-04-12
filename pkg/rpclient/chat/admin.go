@@ -18,7 +18,7 @@ import (
 	"context"
 	"github.com/openimsdk/chat/pkg/common/mctx"
 	"github.com/openimsdk/chat/pkg/eerrs"
-	"github.com/openimsdk/chat/pkg/proto/admin"
+	"github.com/openimsdk/chat/pkg/protocol/admin"
 )
 
 func NewAdminClient(client admin.AdminClient) *AdminClient {

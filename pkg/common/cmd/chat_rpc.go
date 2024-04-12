@@ -31,24 +31,20 @@ type ChatRpcCmd struct {
 }
 
 func NewChatRpcCmd() *ChatRpcCmd {
-	var chatConfig chat.Config
-	ret := &ChatRpcCmd{chatConfig: chatConfig}
+	var ret ChatRpcCmd
 	ret.configMap = map[string]any{
-		OpenIMRPCChatCfgFileName: &chatConfig.RpcConfig,
-		RedisConfigFileName:      &chatConfig.RedisConfig,
-		ZookeeperConfigFileName:  &chatConfig.ZookeeperConfig,
-		MongodbConfigFileName:    &chatConfig.MongodbConfig,
-		ShareFileName:            &chatConfig.Share,
-		NotificationFileName:     &chatConfig.NotificationConfig,
-		WebhooksConfigFileName:   &chatConfig.WebhooksConfig,
-		LocalCacheConfigFileName: &chatConfig.LocalCacheConfig,
+		ChatRPCChatCfgFileName:  &ret.chatConfig.RpcConfig,
+		RedisConfigFileName:     &ret.chatConfig.RedisConfig,
+		ZookeeperConfigFileName: &ret.chatConfig.ZookeeperConfig,
+		MongodbConfigFileName:   &ret.chatConfig.MongodbConfig,
+		ShareFileName:           &ret.chatConfig.Share,
 	}
 	ret.RootCmd = NewRootCmd(program.GetProcessName(), WithConfigMap(ret.configMap))
 	ret.ctx = context.WithValue(context.Background(), "version", config.Version)
 	ret.Command.PreRunE = func(cmd *cobra.Command, args []string) error {
 		return ret.preRunE()
 	}
-	return ret
+	return &ret
 }
 
 func (a *ChatRpcCmd) Exec() error {

@@ -16,6 +16,7 @@ package chat
 
 import (
 	"context"
+	"fmt"
 	"github.com/openimsdk/tools/utils/datautil"
 	"math/rand"
 	"strconv"
@@ -30,12 +31,11 @@ import (
 	"github.com/openimsdk/tools/log"
 	"github.com/openimsdk/tools/mcontext"
 
-	"github.com/openimsdk/chat/pkg/common/config"
 	"github.com/openimsdk/chat/pkg/common/constant"
 	"github.com/openimsdk/chat/pkg/common/db/dbutil"
 	chat2 "github.com/openimsdk/chat/pkg/common/db/table/chat"
 	"github.com/openimsdk/chat/pkg/eerrs"
-	"github.com/openimsdk/chat/pkg/proto/chat"
+	"github.com/openimsdk/chat/pkg/protocol/chat"
 )
 
 func (o *chatSvr) verifyCodeJoin(areaCode, phoneNumber string) string {
@@ -64,7 +64,7 @@ func (o *chatSvr) SendVerifyCode(ctx context.Context, req *chat.SendVerifyCodeRe
 			_, err := o.Database.TakeAttributeByPhone(ctx, req.AreaCode, req.PhoneNumber)
 			if err == nil {
 				return nil, eerrs.ErrPhoneAlreadyRegister.WrapMsg("phone already register")
-			} else if !o.Database.IsNotFound(err) {
+			} else if !dbutil.IsDBNotFound(err) {
 				return nil, err
 			}
 		} else {
@@ -74,7 +74,7 @@ func (o *chatSvr) SendVerifyCode(ctx context.Context, req *chat.SendVerifyCodeRe
 			_, err := o.Database.TakeAttributeByEmail(ctx, req.Email)
 			if err == nil {
 				return nil, eerrs.ErrEmailAlreadyRegister.WrapMsg("email already register")
-			} else if !o.Database.IsNotFound(err) {
+			} else if !dbutil.IsDBNotFound(err) {
 				return nil, err
 			}
 		}
@@ -93,14 +93,14 @@ func (o *chatSvr) SendVerifyCode(ctx context.Context, req *chat.SendVerifyCodeRe
 	case constant.VerificationCodeForLogin, constant.VerificationCodeForResetPassword:
 		if req.Email == "" {
 			_, err := o.Database.TakeAttributeByPhone(ctx, req.AreaCode, req.PhoneNumber)
-			if o.Database.IsNotFound(err) {
+			if dbutil.IsDBNotFound(err) {
 				return nil, eerrs.ErrAccountNotFound.WrapMsg("phone unregistered")
 			} else if err != nil {
 				return nil, err
 			}
 		} else {
 			_, err := o.Database.TakeAttributeByEmail(ctx, req.Email)
-			if o.Database.IsNotFound(err) {
+			if dbutil.IsDBNotFound(err) {
 				return nil, eerrs.ErrAccountNotFound.WrapMsg("email unregistered")
 			} else if err != nil {
 				return nil, err
@@ -110,67 +110,57 @@ func (o *chatSvr) SendVerifyCode(ctx context.Context, req *chat.SendVerifyCodeRe
 	default:
 		return nil, errs.ErrArgs.WrapMsg("used unknown")
 	}
-	var account string
-	var isEmail bool
-	if req.Email == "" {
-		account = o.verifyCodeJoin(req.AreaCode, req.PhoneNumber)
-	} else {
-		isEmail = true
-		account = req.Email
+	if o.SMS == nil && o.Mail == nil {
+		return &chat.SendVerifyCodeResp{}, nil // super code
 	}
-
-	verifyCode := config.Config.VerifyCode
-	if verifyCode.UintTime == 0 || verifyCode.MaxCount == 0 {
-		return nil, errs.ErrNoPermission.WrapMsg("verify code disabled")
-	}
-	if verifyCode.Use == "" {
-		if verifyCode.SuperCode == "" {
-			return nil, errs.ErrInternalServer.WrapMsg("super code is empty")
+	isEmail := req.Email != ""
+	var (
+		code     = o.genVerifyCode()
+		account  string
+		sendCode func() error
+	)
+	if isEmail {
+		if o.Mail == nil {
+			return nil, errs.ErrInternalServer.WrapMsg("email verification code is not enabled")
 		}
-		return &chat.SendVerifyCodeResp{}, nil
+		sendCode = func() error {
+			return o.Mail.SendMail(ctx, req.Email, code)
+		}
+		account = req.Email
+	} else {
+		if o.SMS == nil {
+			return nil, errs.ErrInternalServer.WrapMsg("mobile phone verification code is not enabled")
+		}
+		sendCode = func() error {
+			return o.SMS.SendCode(ctx, req.AreaCode, req.PhoneNumber, code)
+		}
+		account = o.verifyCodeJoin(req.AreaCode, req.PhoneNumber)
 	}
 	now := time.Now()
-
-	var count int64
-	var err error
-	if !isEmail {
-		count, err = o.Database.CountVerifyCodeRange(ctx, o.verifyCodeJoin(req.AreaCode, req.PhoneNumber), now.Add(-time.Duration(verifyCode.UintTime)*time.Second), now)
-		if err != nil {
-			return nil, err
-		}
-	} else {
-		count, err = o.Database.CountVerifyCodeRange(ctx, req.Email, now.Add(-time.Duration(verifyCode.UintTime)*time.Second), now)
+	count, err := o.Database.CountVerifyCodeRange(ctx, account, now.Add(-o.Code.UintTime), now)
+	if err != nil {
+		return nil, err
 	}
-	if verifyCode.MaxCount < int(count) {
+	if o.Code.MaxCount < int(count) {
 		return nil, eerrs.ErrVerifyCodeSendFrequently.Wrap()
 	}
-
-	t := &chat2.VerifyCode{
+	platformName := constant2.PlatformIDToName(int(req.Platform))
+	if platformName == "" {
+		platformName = fmt.Sprintf("platform:%d", req.Platform)
+	}
+	vc := &chat2.VerifyCode{
 		Account:    account,
-		Code:       o.genVerifyCode(),
-		Duration:   uint(config.Config.VerifyCode.ValidTime),
-		CreateTime: time.Now(),
+		Code:       code,
+		Platform:   platformName,
+		Duration:   uint(o.Code.ValidTime / time.Second),
+		Count:      0,
+		Used:       false,
+		CreateTime: now,
 	}
-	if isEmail {
-		// 发送邮件验证码
-		if o.Mail == nil {
-			return nil, errs.ErrInternalServer.WrapMsg("email verification is not enabled")
-		}
-		err = o.Database.AddVerifyCode(ctx, t, func() error {
-			return o.Mail.SendMail(ctx, req.Email, t.Code)
-		})
-		if err != nil {
-			return nil, err
-		}
-	} else {
-		err := o.Database.AddVerifyCode(ctx, t, func() error {
-			return o.SMS.SendCode(ctx, req.AreaCode, req.PhoneNumber, t.Code)
-		})
-		if err != nil {
-			return nil, err
-		}
+	if err := o.Database.AddVerifyCode(ctx, vc, sendCode); err != nil {
+		return nil, err
 	}
-
+	log.ZDebug(ctx, "send code success", "account", account, "code", code, "platform", platformName)
 	return &chat.SendVerifyCodeResp{}, nil
 }
 
@@ -178,8 +168,8 @@ func (o *chatSvr) verifyCode(ctx context.Context, account string, verifyCode str
 	if verifyCode == "" {
 		return "", errs.ErrArgs.WrapMsg("verify code is empty")
 	}
-	if config.Config.VerifyCode.Use == "" {
-		if verifyCode != config.Config.VerifyCode.SuperCode {
+	if o.SMS == nil && o.Mail == nil {
+		if o.Code.SuperCode != verifyCode {
 			return "", eerrs.ErrVerifyCodeNotMatch.Wrap()
 		}
 		return "", nil
@@ -197,8 +187,8 @@ func (o *chatSvr) verifyCode(ctx context.Context, account string, verifyCode str
 	if last.Used {
 		return last.ID, eerrs.ErrVerifyCodeUsed.Wrap()
 	}
-	if config.Config.VerifyCode.MaxCount > 0 {
-		if last.Count >= config.Config.VerifyCode.MaxCount {
+	if n := o.Code.ValidCount; n > 0 {
+		if last.Count >= n {
 			return last.ID, eerrs.ErrVerifyCodeMaxCount.Wrap()
 		}
 		if last.Code != verifyCode {
@@ -242,7 +232,7 @@ func (o *chatSvr) genUserID() string {
 }
 
 func (o *chatSvr) genVerifyCode() string {
-	data := make([]byte, config.Config.VerifyCode.Len)
+	data := make([]byte, o.Code.Len)
 	rand.Read(data)
 	chars := []byte("0123456789")
 	for i := 0; i < len(data); i++ {
@@ -337,7 +327,7 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 		_, err := o.Database.TakeAttributeByPhone(ctx, req.User.AreaCode, req.User.PhoneNumber)
 		if err == nil {
 			return nil, eerrs.ErrPhoneAlreadyRegister.Wrap()
-		} else if !o.Database.IsNotFound(err) {
+		} else if !dbutil.IsDBNotFound(err) {
 			return nil, err
 		}
 		registerType = constant.PhoneRegister
@@ -347,7 +337,7 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 		_, err := o.Database.TakeAttributeByAccount(ctx, req.User.Account)
 		if err == nil {
 			return nil, eerrs.ErrAccountAlreadyRegister.Wrap()
-		} else if !o.Database.IsNotFound(err) {
+		} else if !dbutil.IsDBNotFound(err) {
 			return nil, err
 		}
 	}
@@ -357,7 +347,7 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 		registerType = constant.EmailRegister
 		if err == nil {
 			return nil, eerrs.ErrEmailAlreadyRegister.Wrap()
-		} else if !o.Database.IsNotFound(err) {
+		} else if !dbutil.IsDBNotFound(err) {
 			return nil, err
 		}
 	}
@@ -403,12 +393,11 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 		}
 	}
 	if req.AutoLogin {
-		chatToken, adminErr := o.Admin.CreateToken(ctx, req.User.UserID, constant.NormalUser)
-		if err != nil {
-			log.ZError(ctx, "Admin CreateToken Failed", err, "userID", req.User.UserID, "platform", req.Platform)
-		}
-		if adminErr == nil {
+		chatToken, err := o.Admin.CreateToken(ctx, req.User.UserID, constant.NormalUser)
+		if err == nil {
 			resp.ChatToken = chatToken.Token
+		} else {
+			log.ZError(ctx, "Admin CreateToken Failed", err, "userID", req.User.UserID, "platform", req.Platform)
 		}
 	}
 	resp.UserID = req.User.UserID
@@ -441,7 +430,7 @@ func (o *chatSvr) Login(ctx context.Context, req *chat.LoginReq) (*chat.LoginRes
 		err = errs.ErrArgs.WrapMsg("account or phone number or email must be set")
 	}
 	if err != nil {
-		if o.Database.IsNotFound(err) {
+		if dbutil.IsDBNotFound(err) {
 			return nil, eerrs.ErrAccountNotFound.WrapMsg("user unregistered")
 		}
 		return nil, err

@@ -26,7 +26,7 @@ import (
 	"github.com/openimsdk/chat/pkg/common/constant"
 	"github.com/openimsdk/chat/pkg/common/mctx"
 	"github.com/openimsdk/chat/pkg/eerrs"
-	"github.com/openimsdk/chat/pkg/proto/chat"
+	"github.com/openimsdk/chat/pkg/protocol/chat"
 	"github.com/openimsdk/tools/errs"
 )
 
@@ -75,7 +75,7 @@ func (o *chatSvr) UpdateUserInfo(ctx context.Context, req *chat.UpdateUserInfoRe
 		_, err := o.Database.TakeAttributeByAccount(ctx, req.Account.Value)
 		if err == nil {
 			return nil, eerrs.ErrAccountAlreadyRegister.Wrap()
-		} else if !o.Database.IsNotFound(err) {
+		} else if !dbutil.IsDBNotFound(err) {
 			return nil, err
 		}
 	}
@@ -92,7 +92,7 @@ func (o *chatSvr) UpdateUserInfo(ctx context.Context, req *chat.UpdateUserInfoRe
 			_, err := o.Database.TakeAttributeByPhone(ctx, areaCode, phoneNumber)
 			if err == nil {
 				return nil, eerrs.ErrAccountAlreadyRegister.Wrap()
-			} else if !o.Database.IsNotFound(err) {
+			} else if !dbutil.IsDBNotFound(err) {
 				return nil, err
 			}
 		}
@@ -295,14 +295,14 @@ func (o *chatSvr) checkTheUniqueness(ctx context.Context, req *chat.AddUserAccou
 		_, err := o.Database.TakeAttributeByPhone(ctx, req.User.AreaCode, req.User.PhoneNumber)
 		if err == nil {
 			return eerrs.ErrPhoneAlreadyRegister.Wrap()
-		} else if !o.Database.IsNotFound(err) {
+		} else if !dbutil.IsDBNotFound(err) {
 			return err
 		}
 	} else {
 		_, err := o.Database.TakeAttributeByEmail(ctx, req.User.Email)
 		if err == nil {
 			return eerrs.ErrEmailAlreadyRegister.Wrap()
-		} else if !o.Database.IsNotFound(err) {
+		} else if !dbutil.IsDBNotFound(err) {
 			return err
 		}
 	}

@@ -2,10 +2,11 @@ package chat
 
 import (
 	"context"
-	"github.com/openimsdk/chat/pkg/proto/admin"
+	"github.com/openimsdk/chat/pkg/protocol/admin"
 	"github.com/openimsdk/tools/db/mongoutil"
 	"github.com/openimsdk/tools/discovery"
 	"google.golang.org/grpc"
+	"time"
 
 	"github.com/openimsdk/chat/pkg/common/config"
 	"github.com/openimsdk/chat/pkg/common/db/database"
@@ -39,7 +40,7 @@ func Start(ctx context.Context, config *Config, client discovery.SvcDiscoveryReg
 	if mail := config.RpcConfig.VerifyCode.Mail; mail.Enable {
 		srv.Mail = email.NewMail(mail.SMTPAddr, mail.SMTPPort, mail.SenderMail, mail.SenderAuthorizationCode, mail.Title)
 	}
-	srv.Database, err = database.NewChatDatabase(mgocli.GetDB())
+	srv.Database, err = database.NewChatDatabase(mgocli)
 	if err != nil {
 		return err
 	}
@@ -48,6 +49,14 @@ func Start(ctx context.Context, config *Config, client discovery.SvcDiscoveryReg
 		return err
 	}
 	srv.Admin = chatClient.NewAdminClient(admin.NewAdminClient(conn))
+	srv.Code = verifyCode{
+		UintTime:   time.Duration(config.RpcConfig.VerifyCode.UintTime) * time.Second,
+		MaxCount:   config.RpcConfig.VerifyCode.MaxCount,
+		ValidCount: config.RpcConfig.VerifyCode.ValidCount,
+		SuperCode:  config.RpcConfig.VerifyCode.SuperCode,
+		ValidTime:  time.Duration(config.RpcConfig.VerifyCode.ValidTime) * time.Second,
+		Len:        config.RpcConfig.VerifyCode.Len,
+	}
 	return nil
 }
 
@@ -56,4 +65,14 @@ type chatSvr struct {
 	Admin    *chatClient.AdminClient
 	SMS      sms.SMS
 	Mail     email.Mail
+	Code     verifyCode
+}
+
+type verifyCode struct {
+	UintTime   time.Duration // sec
+	MaxCount   int
+	ValidCount int
+	SuperCode  string
+	ValidTime  time.Duration
+	Len        int
 }

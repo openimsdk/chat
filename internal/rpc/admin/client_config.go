@@ -20,7 +20,7 @@ import (
 	"github.com/openimsdk/tools/errs"
 
 	"github.com/openimsdk/chat/pkg/common/mctx"
-	"github.com/openimsdk/chat/pkg/proto/admin"
+	"github.com/openimsdk/chat/pkg/protocol/admin"
 )
 
 func (o *adminServer) GetClientConfig(ctx context.Context, req *admin.GetClientConfigReq) (*admin.GetClientConfigResp, error) {

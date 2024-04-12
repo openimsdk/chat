@@ -16,19 +16,14 @@ package admin
 
 import (
 	"context"
-	"crypto/md5"
-	"encoding/hex"
 	"github.com/openimsdk/chat/pkg/common/constant"
+	"github.com/openimsdk/chat/pkg/common/db/table/admin"
 	"github.com/openimsdk/tools/db/mongoutil"
 	"github.com/openimsdk/tools/db/pagination"
+	"github.com/openimsdk/tools/errs"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"time"
-
-	"github.com/openimsdk/chat/pkg/common/config"
-	"github.com/openimsdk/chat/pkg/common/db/table/admin"
-	"github.com/openimsdk/tools/errs"
 )
 
 func NewAdmin(db *mongo.Database) (admin.AdminInterface, error) {
@@ -86,47 +81,4 @@ func (o *Admin) Search(ctx context.Context, pagination pagination.Pagination) (i
 	opt := options.Find().SetSort(bson.D{{"create_time", -1}})
 	filter := bson.M{"level": constant.NormalAdmin}
 	return mongoutil.FindPage[*admin.Admin](ctx, o.coll, filter, pagination, opt)
-}
-
-func (o *Admin) InitAdmin(ctx context.Context) error {
-	filter := bson.M{}
-	count, err := mongoutil.Count(ctx, o.coll, filter)
-	if err != nil {
-		return errs.Wrap(err)
-	}
-	if count > 0 {
-		return nil
-	}
-	if len(config.Config.ChatAdmin) == 0 {
-		return nil
-	}
-
-	admins := make([]*admin.Admin, 0, len(config.Config.ChatAdmin))
-	o.createAdmins(&admins, config.Config.ChatAdmin)
-
-	return mongoutil.InsertMany(ctx, o.coll, admins)
-}
-
-func (o *Admin) createAdmins(adminList *[]*admin.Admin, registerList []config.Admin) {
-	// chatAdmin set the level to 50, this account use for send notification.
-	for _, adminChat := range registerList {
-		table := admin.Admin{
-			Account:    adminChat.AdminID,
-			UserID:     adminChat.ImAdminID,
-			Password:   o.passwordEncryption(adminChat.AdminID),
-			Level:      100,
-			CreateTime: time.Now(),
-		}
-		if adminChat.NickName != "" {
-			table.Nickname = adminChat.NickName
-		} else {
-			table.Nickname = adminChat.AdminID
-		}
-		*adminList = append(*adminList, &table)
-	}
-}
-
-func (o *Admin) passwordEncryption(password string) string {
-	paswd := md5.Sum([]byte(password))
-	return hex.EncodeToString(paswd[:])
 }

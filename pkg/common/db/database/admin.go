@@ -28,7 +28,6 @@ import (
 )
 
 type AdminDatabaseInterface interface {
-	InitAdmin(ctx context.Context) error
 	GetAdmin(ctx context.Context, account string) (*table.Admin, error)
 	GetAdminUserID(ctx context.Context, userID string) (*table.Admin, error)
 	UpdateAdmin(ctx context.Context, userID string, update map[string]any) error
@@ -142,10 +141,6 @@ type AdminDatabase struct {
 	applet             table.AppletInterface
 	clientConfig       table.ClientConfigInterface
 	cache              cache.TokenInterface
-}
-
-func (o *AdminDatabase) InitAdmin(ctx context.Context) error {
-	return o.admin.InitAdmin(ctx)
 }
 
 func (o *AdminDatabase) GetAdmin(ctx context.Context, account string) (*table.Admin, error) {

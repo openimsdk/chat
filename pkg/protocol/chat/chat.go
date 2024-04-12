@@ -15,7 +15,6 @@
 package chat
 
 import (
-	"github.com/openimsdk/tools/utils/datautil"
 	"regexp"
 	"strconv"
 
@@ -229,39 +228,6 @@ func (x *SearchUserFullInfoReq) Check() error {
 	}
 	if x.Normal < constant.FinDAllUser || x.Normal > constant.FindNormalUser {
 		return errs.ErrArgs.WrapMsg("normal flied is invalid")
-	}
-	return nil
-}
-
-func (x *DeleteLogsReq) Check() error {
-	if x.LogIDs == nil {
-		return errs.ErrArgs.WrapMsg("LogIDs is empty")
-	}
-	if datautil.Duplicate(x.LogIDs) {
-		return errs.ErrArgs.WrapMsg("Logs has duplicate")
-	}
-	return nil
-}
-
-func (x *UploadLogsReq) Check() error {
-	if x.FileURLs == nil {
-		return errs.ErrArgs.WrapMsg("FileUrls is empty")
-	}
-	if x.Platform < pconstant.IOSPlatformID || x.Platform > pconstant.AdminPlatformID {
-		return errs.ErrArgs.WrapMsg("Platform is invalid")
-	}
-	return nil
-}
-
-func (x *SearchLogsReq) Check() error {
-	if x.Pagination == nil {
-		return errs.ErrArgs.WrapMsg("Pagination is empty")
-	}
-	if x.Pagination.PageNumber < 1 {
-		return errs.ErrArgs.WrapMsg("pageNumber is invalid")
-	}
-	if x.Pagination.ShowNumber < 1 {
-		return errs.ErrArgs.WrapMsg("showNumber is invalid")
 	}
 	return nil
 }

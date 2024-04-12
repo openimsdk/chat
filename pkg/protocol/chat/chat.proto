@@ -17,7 +17,7 @@ package openim.chat;
 import "google/wrappers.proto";
 import "sdkws/sdkws.proto";
 import "common/common.proto";
-option go_package = "github.com/openimsdk/chat/pkg/proto/chat";
+option go_package = "github.com/openimsdk/chat/pkg/protocol/chat";
 
 message UserIdentity {
   string email = 1;
@@ -87,7 +87,7 @@ message SendVerifyCodeReq {
   int32 platform = 5;
   string areaCode = 6;
   string phoneNumber = 7;
-  string email= 8;
+  string email = 8;
 }
 
 message SendVerifyCodeResp {
@@ -133,10 +133,10 @@ message RegisterUserResp {
 }
 
 message AddUserAccountReq{
-  string ip=1;
-  string deviceID=2;
-  int32 platform=3;
-  RegisterUserInfo user=4;
+  string ip = 1;
+  string deviceID = 2;
+  int32 platform = 3;
+  RegisterUserInfo user = 4;
 }
 
 message AddUserAccountResp{
@@ -152,11 +152,6 @@ message LoginReq {
   string deviceID = 7;
   string ip = 8;
   string email = 9;
-}
-
-message LoginResp {
-  string chatToken = 2;
-  string userID = 3;
 }
 
 message ResetPasswordReq {
@@ -213,28 +208,6 @@ message SignalRecord {
   string downloadURL = 14;
 }
 
-message AddSignalRecordReq {
-  SignalRecord signalRecord = 1;
-  string operationID = 2;
-}
-
-message AddSignalRecordResp {
-}
-
-message GetSignalRecordsReq {
-  openim.sdkws.RequestPagination pagination = 1;
-  string senderID = 2;
-  string recvID = 3;
-  string mediaType = 4;
-  int64 createTime = 5;
-  string operationID = 6;
-}
-
-message GetSignalRecordsResp {
-  uint32 totalNumber = 1;
-  repeated SignalRecord signalRecords = 2;
-}
-
 message OpenIMCallbackReq {
   string command = 1;
   string body = 2;
@@ -264,41 +237,12 @@ message UserLoginCountReq{
 message UserLoginCountResp{
   int64 loginCount = 1;
   int64 unloginCount = 2;
-  map<string, int64>Count = 3;
+  map<string, int64> count = 3;
 }
 
-message fileURL{
-  string filename = 1;
-  string URL = 2;
-}
-message UploadLogsReq{
-  int32 platform = 1;
-  repeated fileURL fileURLs = 2;
-  string systemType = 3;
-  string version = 5;
-  string ex = 4;
-}
-
-message UploadLogsResp{
-}
-
-message DeleteLogsReq{
-  repeated string logIDs = 1;
-}
-
-message DeleteLogsResp{
-}
-
-message SearchLogsReq{
-  string keyword = 1;
-  int64 startTime = 2;
-  int64 endTime = 3;
-  openim.sdkws.RequestPagination pagination = 4;
-}
-
-message SearchLogsResp{
-  repeated openim.chat.common.LogInfo LogsInfos = 1;
-  uint32 total = 2;
+message LoginResp {
+  string chatToken = 2;
+  string userID = 3;
 }
 
 message SearchUserInfoReq{
@@ -344,17 +288,10 @@ service chat {
   rpc FindUserAccount(FindUserAccountReq) returns(FindUserAccountResp);
   rpc FindAccountUser(FindAccountUserReq) returns(FindAccountUserResp);
 
-  rpc AddSignalRecord(AddSignalRecordReq) returns(AddSignalRecordResp);
-  rpc GetSignalRecords(GetSignalRecordsReq) returns(GetSignalRecordsResp);
-
   rpc OpenIMCallback(OpenIMCallbackReq) returns(OpenIMCallbackResp);
 
   // Statistics
   rpc UserLoginCount(UserLoginCountReq) returns (UserLoginCountResp);
-  // Logs
-  rpc UploadLogs(UploadLogsReq) returns (UploadLogsResp);
-  rpc DeleteLogs(DeleteLogsReq) returns (DeleteLogsResp);
-  rpc SearchLogs(SearchLogsReq) returns (SearchLogsResp);
 
   rpc SearchUserInfo(SearchUserInfoReq)returns(SearchUserInfoResp);
 

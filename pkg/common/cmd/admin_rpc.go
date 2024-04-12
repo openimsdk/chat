@@ -16,7 +16,7 @@ package cmd
 
 import (
 	"context"
-	"github.com/openimsdk/chat/internal/rpc/chat"
+	"github.com/openimsdk/chat/internal/rpc/admin"
 	"github.com/openimsdk/chat/pkg/common/config"
 	"github.com/openimsdk/chat/pkg/common/startrpc"
 	"github.com/openimsdk/tools/system/program"
@@ -25,30 +25,26 @@ import (
 
 type AdminRpcCmd struct {
 	*RootCmd
-	ctx        context.Context
-	configMap  map[string]any
-	chatConfig chat.Config
+	ctx         context.Context
+	configMap   map[string]any
+	adminConfig admin.Config
 }
 
 func NewAdminRpcCmd() *AdminRpcCmd {
-	var chatConfig chat.Config
-	ret := &AdminRpcCmd{chatConfig: chatConfig}
+	var ret AdminRpcCmd
 	ret.configMap = map[string]any{
-		OpenIMRPCAdminCfgFileName: &chatConfig.RpcConfig,
-		RedisConfigFileName:       &chatConfig.RedisConfig,
-		ZookeeperConfigFileName:   &chatConfig.ZookeeperConfig,
-		MongodbConfigFileName:     &chatConfig.MongodbConfig,
-		ShareFileName:             &chatConfig.Share,
-		NotificationFileName:      &chatConfig.NotificationConfig,
-		WebhooksConfigFileName:    &chatConfig.WebhooksConfig,
-		LocalCacheConfigFileName:  &chatConfig.LocalCacheConfig,
+		ChatRPCAdminCfgFileName: &ret.adminConfig.RpcConfig,
+		RedisConfigFileName:     &ret.adminConfig.RedisConfig,
+		ZookeeperConfigFileName: &ret.adminConfig.ZookeeperConfig,
+		MongodbConfigFileName:   &ret.adminConfig.MongodbConfig,
+		ShareFileName:           &ret.adminConfig.Share,
 	}
 	ret.RootCmd = NewRootCmd(program.GetProcessName(), WithConfigMap(ret.configMap))
 	ret.ctx = context.WithValue(context.Background(), "version", config.Version)
 	ret.Command.PreRunE = func(cmd *cobra.Command, args []string) error {
 		return ret.preRunE()
 	}
-	return ret
+	return &ret
 }
 
 func (a *AdminRpcCmd) Exec() error {
@@ -56,7 +52,7 @@ func (a *AdminRpcCmd) Exec() error {
 }
 
 func (a *AdminRpcCmd) preRunE() error {
-	return startrpc.Start(a.ctx, &a.chatConfig.ZookeeperConfig, a.chatConfig.RpcConfig.RPC.ListenIP,
-		a.chatConfig.RpcConfig.RPC.RegisterIP, a.chatConfig.RpcConfig.RPC.Ports,
-		a.Index(), a.chatConfig.Share.RpcRegisterName.Admin, &a.chatConfig.Share, &a.chatConfig, chat.Start)
+	return startrpc.Start(a.ctx, &a.adminConfig.ZookeeperConfig, a.adminConfig.RpcConfig.RPC.ListenIP,
+		a.adminConfig.RpcConfig.RPC.RegisterIP, a.adminConfig.RpcConfig.RPC.Ports,
+		a.Index(), a.adminConfig.Share.RpcRegisterName.Admin, &a.adminConfig.Share, &a.adminConfig, admin.Start)
 }

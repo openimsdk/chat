@@ -28,7 +28,7 @@ import (
 	admin2 "github.com/openimsdk/chat/pkg/common/db/table/admin"
 	"github.com/openimsdk/chat/pkg/common/mctx"
 	"github.com/openimsdk/chat/pkg/eerrs"
-	"github.com/openimsdk/chat/pkg/proto/admin"
+	"github.com/openimsdk/chat/pkg/protocol/admin"
 )
 
 func (o *adminServer) GetAdminInfo(ctx context.Context, req *admin.GetAdminInfoReq) (*admin.GetAdminInfoResp, error) {
@@ -74,7 +74,7 @@ func (o *adminServer) AddAdminAccount(ctx context.Context, req *admin.AddAdminAc
 
 	_, err := o.Database.GetAdmin(ctx, req.Account)
 	if err == nil {
-		return nil, errs.ErrRegisteredAlready.WrapMsg("the account is registered")
+		return nil, errs.ErrDuplicateKey.WrapMsg("the account is registered")
 	}
 
 	adm := &admin2.Admin{

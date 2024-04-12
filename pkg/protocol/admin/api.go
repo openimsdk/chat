@@ -14,8 +14,8 @@
 
 package admin
 
-import "github.com/openimsdk/tools/utils"
+import "github.com/openimsdk/tools/utils/datautil"
 
 func (x *GetClientConfigResp) ApiFormat() {
-	utils.InitMap(&x.Config)
+	datautil.InitMap(&x.Config)
 }

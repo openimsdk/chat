@@ -26,8 +26,8 @@ import (
 	"github.com/openimsdk/chat/pkg/common/mctx"
 	"github.com/openimsdk/chat/pkg/common/xlsx"
 	"github.com/openimsdk/chat/pkg/common/xlsx/model"
-	"github.com/openimsdk/chat/pkg/proto/admin"
-	"github.com/openimsdk/chat/pkg/proto/chat"
+	"github.com/openimsdk/chat/pkg/protocol/admin"
+	"github.com/openimsdk/chat/pkg/protocol/chat"
 	"github.com/openimsdk/protocol/constant"
 	"github.com/openimsdk/protocol/sdkws"
 	"github.com/openimsdk/protocol/user"
@@ -415,14 +415,6 @@ func (o *Api) NewUserCount(c *gin.Context) {
 	resp.DateCount = dateCount
 	resp.Total = total
 	apiresp.GinSuccess(c, resp)
-}
-
-func (o *Api) SearchLogs(c *gin.Context) {
-	a2r.Call(chat.ChatClient.SearchLogs, o.chatClient, c)
-}
-
-func (o *Api) DeleteLogs(c *gin.Context) {
-	a2r.Call(chat.ChatClient.DeleteLogs, o.chatClient, c)
 }
 
 func (o *Api) ImportUserByXlsx(c *gin.Context) {

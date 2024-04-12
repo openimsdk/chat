@@ -21,7 +21,7 @@ import (
 
 	constant2 "github.com/openimsdk/chat/pkg/common/constant"
 	"github.com/openimsdk/chat/pkg/eerrs"
-	"github.com/openimsdk/chat/pkg/proto/chat"
+	"github.com/openimsdk/chat/pkg/protocol/chat"
 	"github.com/openimsdk/protocol/constant"
 	"github.com/openimsdk/tools/errs"
 )

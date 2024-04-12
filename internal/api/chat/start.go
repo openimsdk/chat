@@ -4,13 +4,12 @@ import (
 	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/openimsdk/chat/example/callback"
 	chatmw "github.com/openimsdk/chat/internal/api/mw"
 	"github.com/openimsdk/chat/internal/api/util"
 	"github.com/openimsdk/chat/pkg/common/config"
 	"github.com/openimsdk/chat/pkg/common/imapi"
-	adminclient "github.com/openimsdk/chat/pkg/proto/admin"
-	chatclient "github.com/openimsdk/chat/pkg/proto/chat"
+	adminclient "github.com/openimsdk/chat/pkg/protocol/admin"
+	chatclient "github.com/openimsdk/chat/pkg/protocol/chat"
 	"github.com/openimsdk/tools/discovery"
 	"github.com/openimsdk/tools/mw"
 	"github.com/openimsdk/tools/utils/datautil"
@@ -76,8 +75,6 @@ func SetChatRoute(router gin.IRouter, chat *Api, mw *chatmw.MW) {
 	router.Group("/client_config").POST("/get", chat.GetClientConfig) // Get client initialization configuration
 
 	router.Group("/callback").POST("/open_im", chat.OpenIMCallback) // Callback
-
-	router.Group("/callbackExample").POST("/callbackAfterSendSingleMsgCommand", callback.CallbackExample)
 
 	logs := router.Group("/logs", mw.CheckToken)
 	logs.POST("/upload", chat.UploadLogs)

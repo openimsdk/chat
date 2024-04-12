@@ -21,7 +21,7 @@ import (
 
 	"github.com/openimsdk/tools/errs"
 
-	"github.com/openimsdk/chat/pkg/proto/admin"
+	"github.com/openimsdk/chat/pkg/protocol/admin"
 )
 
 type Admin struct {

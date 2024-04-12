@@ -8,4 +8,4 @@ openIM:
   secret: chatIM123
   adminUserID: imAdmin
 
-# proxyHeader: "X-Forwarded-For"
+proxyHeader: "X-Forwarded-For"

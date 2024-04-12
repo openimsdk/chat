@@ -22,11 +22,13 @@ type Share struct {
 		Secret      string `mapstructure:"secret"`
 		AdminUserID string `mapstructure:"adminUserID"`
 	} `mapstructure:"openIM"`
-	ProxyHeader string `mapstructure:"proxyHeader"`
+	ChatAdmin   []AdminUser `mapstructure:"chatAdmin"`
+	ProxyHeader string      `mapstructure:"proxyHeader"`
 }
 
 type AdminUser struct {
-	UserID   string `mapstructure:"userID"`
+	AdminID  string `mapstructure:"adminID"`
+	IMUserID string `mapstructure:"imUserID"`
 	Nickname string `mapstructure:"nickname"`
 }
 
@@ -137,6 +139,9 @@ type Admin struct {
 		ListenIP   string `mapstructure:"listenIP"`
 		Ports      []int  `mapstructure:"ports"`
 	} `mapstructure:"rpc"`
+	TokenPolicy struct {
+		Expire int `mapstructure:"expire"`
+	} `mapstructure:"tokenPolicy"`
 }
 
 type Log struct {

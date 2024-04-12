@@ -19,7 +19,6 @@ import (
 	"fmt"
 	"github.com/openimsdk/chat/pkg/common/config"
 	"github.com/openimsdk/tools/utils/datautil"
-	"github.com/prometheus/client_golang/prometheus"
 	"net"
 	"net/http"
 	"os"
@@ -29,16 +28,12 @@ import (
 	"syscall"
 	"time"
 
-	grpcprometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
-	kdisc "github.com/openimsdk/open-im-server/v3/pkg/common/discoveryregister"
-	"github.com/openimsdk/open-im-server/v3/pkg/common/prommetrics"
 	"github.com/openimsdk/tools/discovery"
 	"github.com/openimsdk/tools/errs"
 	"github.com/openimsdk/tools/log"
 	"github.com/openimsdk/tools/mw"
 	"github.com/openimsdk/tools/system/program"
 	"github.com/openimsdk/tools/utils/network"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -63,10 +58,12 @@ func Start[T any](ctx context.Context, zookeeperConfig *config.ZooKeeper, listen
 	}
 
 	defer listener.Close()
-	client, err := kdisc.NewDiscoveryRegister(zookeeperConfig, share)
-	if err != nil {
-		return err
-	}
+
+	//client, err := kdisc.NewDiscoveryRegister(zookeeperConfig, share)
+	//if err != nil {
+	//	return err
+	//}
+	var client discovery.SvcDiscoveryRegistry // TODO
 
 	defer client.Close()
 	client.AddOption(mw.GrpcClient(), grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithDefaultServiceConfig(fmt.Sprintf(`{"LoadBalancingPolicy": "%s"}`, "round_robin")))
@@ -75,17 +72,7 @@ func Start[T any](ctx context.Context, zookeeperConfig *config.ZooKeeper, listen
 		return err
 	}
 
-	var reg *prometheus.Registry
-	var metric *grpcprometheus.ServerMetrics
-	if prometheusConfig.Enable {
-		cusMetrics := prommetrics.GetGrpcCusMetrics(rpcRegisterName, share)
-		reg, metric, _ = prommetrics.NewGrpcPromObj(cusMetrics)
-		options = append(options, mw.GrpcServer(), grpc.StreamInterceptor(metric.StreamServerInterceptor()),
-			grpc.UnaryInterceptor(metric.UnaryServerInterceptor()))
-	} else {
-		options = append(options, mw.GrpcServer())
-	}
-
+	options = append(options, mw.GrpcServer())
 	srv := grpc.NewServer(options...)
 	once := sync.Once{}
 	defer func() {
@@ -97,13 +84,7 @@ func Start[T any](ctx context.Context, zookeeperConfig *config.ZooKeeper, listen
 		return err
 	}
 
-	err = client.Register(
-		rpcRegisterName,
-		registerIP,
-		rpcPort,
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
-	)
-	if err != nil {
+	if err := client.Register(rpcRegisterName, registerIP, rpcPort, grpc.WithTransportCredentials(insecure.NewCredentials())); err != nil {
 		return err
 	}
 
@@ -112,18 +93,6 @@ func Start[T any](ctx context.Context, zookeeperConfig *config.ZooKeeper, listen
 		netErr     error
 		httpServer *http.Server
 	)
-
-	go func() {
-		if prometheusConfig.Enable && prometheusPort != 0 {
-			metric.InitializeMetrics(srv)
-			// Create a HTTP server for prometheus.
-			httpServer = &http.Server{Handler: promhttp.HandlerFor(reg, promhttp.HandlerOpts{}), Addr: fmt.Sprintf("0.0.0.0:%d", prometheusPort)}
-			if err := httpServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-				netErr = errs.WrapMsg(err, "prometheus start err", httpServer.Addr)
-				netDone <- struct{}{}
-			}
-		}
-	}()
 
 	go func() {
 		err := srv.Serve(listener)

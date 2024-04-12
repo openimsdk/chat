@@ -17,7 +17,7 @@ package openim.admin;
 import "google/wrappers.proto";
 import "sdkws/sdkws.proto";
 import "common/common.proto";
-option go_package = "github.com/openimsdk/chat/pkg/proto/admin";
+option go_package = "github.com/openimsdk/chat/pkg/protocol/admin";
 
 //登录
 message LoginReq  {

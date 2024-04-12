@@ -14,7 +14,7 @@
 
 syntax = "proto3";
 package openim.chat.common;
-option go_package = "github.com/openimsdk/chat/pkg/proto/common";
+option go_package = "github.com/openimsdk/chat/pkg/protocol/common";
 
 
 message UserFullInfo{

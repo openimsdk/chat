@@ -16,9 +16,8 @@ package chat
 
 import (
 	"github.com/openimsdk/chat/pkg/common/db/table/chat"
-	"github.com/openimsdk/chat/pkg/proto/common"
+	"github.com/openimsdk/chat/pkg/protocol/common"
 	"github.com/openimsdk/tools/utils/datautil"
-	"github.com/openimsdk/tools/utils/stringutil"
 )
 
 func DbToPbAttribute(attribute *chat.Attribute) *common.UserPublicInfo {
@@ -63,22 +62,4 @@ func DbToPbUserFullInfo(attribute *chat.Attribute) *common.UserFullInfo {
 
 func DbToPbUserFullInfos(attributes []*chat.Attribute) []*common.UserFullInfo {
 	return datautil.Slice(attributes, DbToPbUserFullInfo)
-}
-
-func DbToPbLogInfo(log *chat.Log) *common.LogInfo {
-	return &common.LogInfo{
-		Filename:   log.FileName,
-		UserID:     log.UserID,
-		Platform:   stringutil.StringToInt32(log.Platform),
-		Url:        log.Url,
-		CreateTime: log.CreateTime.UnixMilli(),
-		LogID:      log.LogID,
-		SystemType: log.SystemType,
-		Version:    log.Version,
-		Ex:         log.Ex,
-	}
-}
-
-func DbToPbLogInfos(logs []*chat.Log) []*common.LogInfo {
-	return datautil.Slice(logs, DbToPbLogInfo)
 }

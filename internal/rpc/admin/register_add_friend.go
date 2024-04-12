@@ -23,8 +23,8 @@ import (
 
 	admin2 "github.com/openimsdk/chat/pkg/common/db/table/admin"
 	"github.com/openimsdk/chat/pkg/common/mctx"
-	"github.com/openimsdk/chat/pkg/proto/admin"
-	"github.com/openimsdk/chat/pkg/proto/common"
+	"github.com/openimsdk/chat/pkg/protocol/admin"
+	"github.com/openimsdk/chat/pkg/protocol/common"
 )
 
 func (o *adminServer) AddDefaultFriend(ctx context.Context, req *admin.AddDefaultFriendReq) (*admin.AddDefaultFriendResp, error) {

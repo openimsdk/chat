@@ -24,8 +24,8 @@ import (
 	"github.com/openimsdk/chat/pkg/common/db/dbutil"
 	admin2 "github.com/openimsdk/chat/pkg/common/db/table/admin"
 	"github.com/openimsdk/chat/pkg/common/mctx"
-	"github.com/openimsdk/chat/pkg/proto/admin"
-	"github.com/openimsdk/chat/pkg/proto/chat"
+	"github.com/openimsdk/chat/pkg/protocol/admin"
+	"github.com/openimsdk/chat/pkg/protocol/chat"
 	"github.com/openimsdk/tools/errs"
 	"github.com/openimsdk/tools/mcontext"
 )
