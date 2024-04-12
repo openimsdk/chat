@@ -8,9 +8,9 @@ import (
 	"github.com/openimsdk/chat/internal/api/util"
 	"github.com/openimsdk/chat/pkg/common/config"
 	"github.com/openimsdk/chat/pkg/common/imapi"
+	"github.com/openimsdk/chat/pkg/common/kdisc"
 	adminclient "github.com/openimsdk/chat/pkg/protocol/admin"
 	chatclient "github.com/openimsdk/chat/pkg/protocol/chat"
-	"github.com/openimsdk/tools/discovery"
 	"github.com/openimsdk/tools/errs"
 	"github.com/openimsdk/tools/mw"
 	"github.com/openimsdk/tools/utils/datautil"
@@ -30,7 +30,10 @@ func Start(ctx context.Context, index int, config *Config) error {
 	if err != nil {
 		return err
 	}
-	var client discovery.SvcDiscoveryRegistry // TODO
+	client, err := kdisc.NewDiscoveryRegister(&config.ZookeeperConfig, &config.Share)
+	if err != nil {
+		return err
+	}
 	chatConn, err := client.GetConn(ctx, config.Share.RpcRegisterName.Chat)
 	if err != nil {
 		return err

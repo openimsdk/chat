@@ -18,6 +18,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/openimsdk/chat/pkg/common/config"
+	"github.com/openimsdk/chat/pkg/common/kdisc"
 	"github.com/openimsdk/tools/utils/datautil"
 	"net"
 	"net/http"
@@ -58,13 +59,10 @@ func Start[T any](ctx context.Context, zookeeperConfig *config.ZooKeeper, listen
 	}
 
 	defer listener.Close()
-
-	//client, err := kdisc.NewDiscoveryRegister(zookeeperConfig, share)
-	//if err != nil {
-	//	return err
-	//}
-	var client discovery.SvcDiscoveryRegistry // TODO
-
+	client, err := kdisc.NewDiscoveryRegister(zookeeperConfig, share)
+	if err != nil {
+		return err
+	}
 	defer client.Close()
 	client.AddOption(mw.GrpcClient(), grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithDefaultServiceConfig(fmt.Sprintf(`{"LoadBalancingPolicy": "%s"}`, "round_robin")))
 	registerIP, err = network.GetRpcRegisterIP(registerIP)
