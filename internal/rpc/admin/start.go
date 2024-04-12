@@ -14,6 +14,7 @@ import (
 	"github.com/openimsdk/tools/db/mongoutil"
 	"github.com/openimsdk/tools/db/redisutil"
 	"github.com/openimsdk/tools/discovery"
+	"github.com/openimsdk/tools/errs"
 	"google.golang.org/grpc"
 	"math/rand"
 	"time"
@@ -28,6 +29,9 @@ type Config struct {
 }
 
 func Start(ctx context.Context, config *Config, client discovery.SvcDiscoveryRegistry, server *grpc.Server) error {
+	if len(config.Share.ChatAdmin) == 0 {
+		return errs.New("share chat admin not configured")
+	}
 	rand.Seed(time.Now().UnixNano())
 	rdb, err := redisutil.NewRedisClient(ctx, config.RedisConfig.Build())
 	if err != nil {

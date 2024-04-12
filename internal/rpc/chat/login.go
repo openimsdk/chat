@@ -23,8 +23,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/openimsdk/chat/pkg/common/mctx"
-
 	constant2 "github.com/openimsdk/protocol/constant"
 
 	"github.com/openimsdk/tools/errs"
@@ -245,7 +243,7 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 	resp := &chat.RegisterUserResp{}
 
 	isAdmin, err := o.Admin.CheckNilOrAdmin(ctx)
-	ctx = mctx.WithAdminUser(ctx)
+	ctx = o.WithAdminUser(ctx)
 	if err != nil {
 		return nil, err
 	}

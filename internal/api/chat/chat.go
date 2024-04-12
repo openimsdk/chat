@@ -118,7 +118,7 @@ func (o *Api) RegisterUser(c *gin.Context) {
 		return
 	}
 	apiCtx := mctx.WithApiToken(c, imToken)
-	rpcCtx := mctx.WithAdminUser(c)
+	rpcCtx := o.WithAdminUser(c)
 	if resp, err := o.adminClient.FindDefaultFriend(rpcCtx, &admin.FindDefaultFriendReq{}); err == nil {
 		_ = o.imApiCaller.ImportFriend(apiCtx, respRegisterUser.UserID, resp.UserIDs)
 	}
@@ -289,10 +289,6 @@ func (o *Api) OpenIMCallback(c *gin.Context) {
 		return
 	}
 	apiresp.GinSuccess(c, nil)
-}
-
-func (o *Api) UploadLogs(c *gin.Context) {
-	a2r.Call(chat.ChatClient.UploadLogs, o.chatClient, c)
 }
 
 func (o *Api) SearchFriend(c *gin.Context) {

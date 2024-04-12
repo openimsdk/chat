@@ -11,6 +11,7 @@ import (
 	adminclient "github.com/openimsdk/chat/pkg/protocol/admin"
 	chatclient "github.com/openimsdk/chat/pkg/protocol/chat"
 	"github.com/openimsdk/tools/discovery"
+	"github.com/openimsdk/tools/errs"
 	"github.com/openimsdk/tools/mw"
 	"github.com/openimsdk/tools/utils/datautil"
 )
@@ -22,6 +23,9 @@ type Config struct {
 }
 
 func Start(ctx context.Context, index int, config *Config) error {
+	if len(config.Share.ChatAdmin) == 0 {
+		return errs.New("share chat admin not configured")
+	}
 	apiPort, err := datautil.GetElemByIndex(config.ApiConfig.Api.Ports, index)
 	if err != nil {
 		return err
@@ -39,9 +43,10 @@ func Start(ctx context.Context, index int, config *Config) error {
 	adminClient := adminclient.NewAdminClient(adminConn)
 	im := imapi.New(config.Share.OpenIM.ApiURL, config.Share.OpenIM.Secret, config.Share.OpenIM.AdminUserID)
 	base := util.Api{
-		ImUserID:    config.Share.OpenIM.AdminUserID,
-		ChatSecret:  config.Share.OpenIM.Secret,
-		ProxyHeader: config.Share.ProxyHeader,
+		ImUserID:        config.Share.OpenIM.AdminUserID,
+		ChatSecret:      config.Share.OpenIM.Secret,
+		ProxyHeader:     config.Share.ProxyHeader,
+		ChatAdminUserID: config.Share.ChatAdmin[0].AdminID,
 	}
 	adminApi := New(chatClient, adminClient, im, &base)
 	mwApi := chatmw.New(adminClient)
@@ -119,8 +124,4 @@ func SetAdminRoute(router gin.IRouter, admin *Api, mw *chatmw.MW) {
 	statistic := router.Group("/statistic", mw.CheckAdmin)
 	statistic.POST("/new_user_count", admin.NewUserCount)
 	statistic.POST("/login_user_count", admin.LoginUserCount)
-
-	logs := router.Group("/logs", mw.CheckAdmin)
-	logs.POST("/search", admin.SearchLogs)
-	logs.POST("/delete", admin.DeleteLogs)
 }

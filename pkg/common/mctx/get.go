@@ -19,8 +19,6 @@ import (
 	"github.com/openimsdk/tools/utils/datautil"
 	"strconv"
 
-	"github.com/openimsdk/chat/pkg/common/config"
-
 	constant2 "github.com/openimsdk/protocol/constant"
 	"github.com/openimsdk/tools/errs"
 
@@ -128,14 +126,8 @@ func WithOpUserID(ctx context.Context, opUserID string, userType int) context.Co
 	return ctx
 }
 
-func WithAdminUser(ctx context.Context) context.Context {
-	if config.Config.AdminList[0].AdminID != "" {
-		ctx = WithOpUserID(ctx, config.Config.AdminList[0].AdminID, constant.AdminUser)
-	}
-	if config.Config.AdminList[0].AdminID != "" && len(config.Config.ChatAdmin) > 0 {
-		ctx = WithOpUserID(ctx, config.Config.ChatAdmin[0].AdminID, constant.AdminUser)
-	}
-	return ctx
+func WithAdminUser(ctx context.Context, userID string) context.Context {
+	return WithOpUserID(ctx, userID, constant.AdminUser)
 }
 
 func WithApiToken(ctx context.Context, token string) context.Context {

@@ -455,7 +455,7 @@ func (o *Api) ImportUserByXlsx(c *gin.Context) {
 		return
 	}
 
-	ctx := mctx.WithAdminUser(mctx.WithApiToken(c, imToken))
+	ctx := o.WithAdminUser(mctx.WithApiToken(c, imToken))
 	apiresp.GinError(c, o.registerChatUser(ctx, ip, us))
 }
 
@@ -482,7 +482,7 @@ func (o *Api) ImportUserByJson(c *gin.Context) {
 		apiresp.GinError(c, err)
 		return
 	}
-	ctx := mctx.WithAdminUser(mctx.WithApiToken(c, imToken))
+	ctx := o.WithAdminUser(mctx.WithApiToken(c, imToken))
 	apiresp.GinError(c, o.registerChatUser(ctx, ip, req.Users))
 }
 

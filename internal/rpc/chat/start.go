@@ -2,9 +2,12 @@ package chat
 
 import (
 	"context"
+	"github.com/openimsdk/chat/pkg/common/mctx"
+	"github.com/openimsdk/chat/pkg/common/rtc"
 	"github.com/openimsdk/chat/pkg/protocol/admin"
 	"github.com/openimsdk/tools/db/mongoutil"
 	"github.com/openimsdk/tools/discovery"
+	"github.com/openimsdk/tools/errs"
 	"google.golang.org/grpc"
 	"time"
 
@@ -24,6 +27,9 @@ type Config struct {
 }
 
 func Start(ctx context.Context, config *Config, client discovery.SvcDiscoveryRegistry, server *grpc.Server) error {
+	if len(config.Share.ChatAdmin) == 0 {
+		return errs.New("share chat admin not configured")
+	}
 	mgocli, err := mongoutil.NewMongoDB(ctx, config.MongodbConfig.Build())
 	if err != nil {
 		return err
@@ -57,15 +63,22 @@ func Start(ctx context.Context, config *Config, client discovery.SvcDiscoveryReg
 		ValidTime:  time.Duration(config.RpcConfig.VerifyCode.ValidTime) * time.Second,
 		Len:        config.RpcConfig.VerifyCode.Len,
 	}
+	srv.Livekit = rtc.NewLiveKit(config.RpcConfig.LiveKit.Key, config.RpcConfig.LiveKit.Secret, config.RpcConfig.LiveKit.URL)
 	return nil
 }
 
 type chatSvr struct {
-	Database database.ChatDatabaseInterface
-	Admin    *chatClient.AdminClient
-	SMS      sms.SMS
-	Mail     email.Mail
-	Code     verifyCode
+	Database        database.ChatDatabaseInterface
+	Admin           *chatClient.AdminClient
+	SMS             sms.SMS
+	Mail            email.Mail
+	Code            verifyCode
+	Livekit         *rtc.LiveKit
+	ChatAdminUserID string
+}
+
+func (o *chatSvr) WithAdminUser(ctx context.Context) context.Context {
+	return mctx.WithAdminUser(ctx, o.ChatAdminUserID)
 }
 
 type verifyCode struct {

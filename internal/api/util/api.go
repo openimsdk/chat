@@ -1,18 +1,25 @@
 package util
 
 import (
+	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/openimsdk/chat/internal/api/mw"
 	constant2 "github.com/openimsdk/chat/pkg/common/constant"
+	"github.com/openimsdk/chat/pkg/common/mctx"
 	"github.com/openimsdk/tools/errs"
 	"net"
 )
 
 type Api struct {
-	ImUserID    string
-	ChatSecret  string
-	ProxyHeader string
+	ImUserID        string
+	ChatSecret      string
+	ProxyHeader     string
+	ChatAdminUserID string
+}
+
+func (o *Api) WithAdminUser(ctx context.Context) context.Context {
+	return mctx.WithAdminUser(ctx, o.ChatAdminUserID)
 }
 
 func (o *Api) GetClientIP(c *gin.Context) (string, error) {
