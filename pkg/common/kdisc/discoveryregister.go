@@ -23,7 +23,7 @@ import (
 )
 
 const (
-	zookeeperConst = "zoopkeeper"
+	zookeeperConst = "zookeeper"
 	kubenetesConst = "k8s"
 	directConst    = "direct"
 )
@@ -40,10 +40,9 @@ func NewDiscoveryRegister(zookeeperConfig *config.ZooKeeper, share *config.Share
 			zookeeper.WithRoundRobin(),
 			zookeeper.WithTimeout(10),
 		)
-	case directConst:
-		//return direct.NewConnDirect(config)
+	//case directConst:
+	//	return direct.NewConnDirect(config)
 	default:
 		return nil, errs.New("unsupported discovery type", "type", share.Env).Wrap()
 	}
-	return nil, nil
 }

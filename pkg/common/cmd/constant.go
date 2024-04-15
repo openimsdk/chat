@@ -19,7 +19,7 @@ import (
 )
 
 var (
-	ShareFileName           = "share.yaml"
+	ShareFileName           = "share.yml"
 	RedisConfigFileName     = "redis.yml"
 	ZookeeperConfigFileName = "zookeeper.yml"
 	MongodbConfigFileName   = "mongodb.yml"
