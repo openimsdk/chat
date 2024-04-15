@@ -21,7 +21,6 @@ import (
 	"github.com/openimsdk/chat/pkg/common/kdisc"
 	"github.com/openimsdk/tools/utils/datautil"
 	"net"
-	"net/http"
 	"os"
 	"os/signal"
 	"strconv"
@@ -87,9 +86,8 @@ func Start[T any](ctx context.Context, zookeeperConfig *config.ZooKeeper, listen
 	}
 
 	var (
-		netDone    = make(chan struct{}, 2)
-		netErr     error
-		httpServer *http.Server
+		netDone = make(chan struct{}, 2)
+		netErr  error
 	)
 
 	go func() {
@@ -112,10 +110,6 @@ func Start[T any](ctx context.Context, zookeeperConfig *config.ZooKeeper, listen
 		}
 		ctx, cancel = context.WithTimeout(context.Background(), 15*time.Second)
 		defer cancel()
-		err := httpServer.Shutdown(ctx)
-		if err != nil {
-			return errs.WrapMsg(err, "shutdown err")
-		}
 		return nil
 	case <-netDone:
 		close(netDone)
