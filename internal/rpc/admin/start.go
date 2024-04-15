@@ -9,6 +9,7 @@ import (
 	"github.com/openimsdk/chat/pkg/common/db/dbutil"
 	"github.com/openimsdk/chat/pkg/common/db/table/admin"
 	"github.com/openimsdk/chat/pkg/common/tokenverify"
+	pbadmin "github.com/openimsdk/chat/pkg/protocol/admin"
 	"github.com/openimsdk/chat/pkg/protocol/chat"
 	chatClient "github.com/openimsdk/chat/pkg/rpclient/chat"
 	"github.com/openimsdk/tools/db/mongoutil"
@@ -59,6 +60,7 @@ func Start(ctx context.Context, config *Config, client discovery.SvcDiscoveryReg
 	if err := srv.initAdmin(ctx, config.Share.ChatAdmin); err != nil {
 		return err
 	}
+	pbadmin.RegisterAdminServer(server, &srv)
 	return nil
 }
 

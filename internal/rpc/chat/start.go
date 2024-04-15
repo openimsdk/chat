@@ -5,6 +5,7 @@ import (
 	"github.com/openimsdk/chat/pkg/common/mctx"
 	"github.com/openimsdk/chat/pkg/common/rtc"
 	"github.com/openimsdk/chat/pkg/protocol/admin"
+	"github.com/openimsdk/chat/pkg/protocol/chat"
 	"github.com/openimsdk/tools/db/mongoutil"
 	"github.com/openimsdk/tools/discovery"
 	"github.com/openimsdk/tools/errs"
@@ -65,6 +66,7 @@ func Start(ctx context.Context, config *Config, client discovery.SvcDiscoveryReg
 		Len:        config.RpcConfig.VerifyCode.Len,
 	}
 	srv.Livekit = rtc.NewLiveKit(config.RpcConfig.LiveKit.Key, config.RpcConfig.LiveKit.Secret, config.RpcConfig.LiveKit.URL)
+	chat.RegisterChatServer(server, &srv)
 	return nil
 }
 
