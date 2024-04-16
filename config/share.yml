@@ -5,7 +5,7 @@ rpcRegisterName:
 
 openIM:
   apiURL: http://127.0.0.1:10002
-  secret: chatIM123
+  secret: openIM123
   adminUserID: imAdmin
 
 chatAdmin:
