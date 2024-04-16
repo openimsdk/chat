@@ -164,7 +164,7 @@ func (o *adminServer) AdminUpdateInfo(ctx context.Context, req *admin.AdminUpdat
 		resp.Nickname = req.Nickname.Value
 	}
 	if req.FaceURL == nil {
-		resp.Nickname = info.FaceURL
+		resp.FaceURL = info.FaceURL
 	} else {
 		resp.FaceURL = req.FaceURL.Value
 	}
