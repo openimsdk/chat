@@ -18,13 +18,12 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"errors"
 	"io"
 	"net/http"
 	"time"
 
 	"github.com/openimsdk/chat/pkg/common/constant"
-	constant2 "github.com/openimsdk/protocol/constant"
+	pconstant "github.com/openimsdk/protocol/constant"
 	"github.com/openimsdk/tools/errs"
 	"github.com/openimsdk/tools/log"
 	"gorm.io/gorm/utils"
@@ -79,10 +78,10 @@ func (a caller[Req, Resp]) call(ctx context.Context, apiPrefix string, req *Req)
 	if err != nil {
 		return nil, err
 	}
-	operationID := utils.ToString(ctx.Value(constant2.OperationID))
-	request.Header.Set(constant2.OperationID, operationID)
+	operationID := utils.ToString(ctx.Value(pconstant.OperationID))
+	request.Header.Set(pconstant.OperationID, operationID)
 	if token, _ := ctx.Value(constant.CtxApiToken).(string); token != "" {
-		request.Header.Set(constant2.Token, token)
+		request.Header.Set(pconstant.Token, token)
 		log.ZDebug(ctx, "req token", "token", token)
 	}
 	response, err := client.Do(request)
@@ -91,20 +90,17 @@ func (a caller[Req, Resp]) call(ctx context.Context, apiPrefix string, req *Req)
 	}
 	log.ZDebug(ctx, "call caller successfully", "code", response.Status)
 	defer response.Body.Close()
-	if response.StatusCode != http.StatusOK {
-		return nil, errs.Wrap(errors.New(response.Status))
-	}
 	data, err := io.ReadAll(response.Body)
 	if err != nil {
-		return nil, err
+		return nil, errs.WrapMsg(err, "read http response body", "url", url, "code", response.StatusCode)
 	}
-	log.ZDebug(ctx, "read respBody successfully", "body", string(data))
+	log.ZDebug(ctx, "read respBody successfully", "code", "url", url, response.StatusCode, "body", string(data))
 	var resp baseApiResponse[Resp]
 	if err := json.Unmarshal(data, &resp); err != nil {
-		return nil, err
+		return nil, errs.WrapMsg(err, string(data))
 	}
 	if resp.ErrCode != 0 {
-		return nil, errs.NewCodeError(resp.ErrCode, resp.ErrMsg).WithDetail(resp.ErrDlt)
+		return nil, errs.NewCodeError(resp.ErrCode, resp.ErrMsg).WithDetail(resp.ErrDlt).Wrap()
 	}
 	return resp.Data, nil
 }
