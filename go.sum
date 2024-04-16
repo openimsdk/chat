@@ -180,10 +180,10 @@ github.com/nats-io/nuid v1.0.1/go.mod h1:19wcPz3Ph3q0Jbyiqsd0kePYG7A95tJPxeL+1OS
 github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e/go.mod h1:zD1mROLANZcx1PVRCS0qkT7pwLkGfwJo4zjcN/Tysno=
 github.com/openimsdk/gomake v0.0.5 h1:MxKVvhQRPBRhh7rzeu4+bBnqNjEEiX8gn0ojdfplW0s=
 github.com/openimsdk/gomake v0.0.5/go.mod h1:PndCozNc2IsQIciyn9mvEblYWZwJmAI+06z94EY+csI=
-github.com/openimsdk/protocol v0.0.60 h1:iz5ORGpGupkaygLTdODogUb3E4jJzSixIXMJiRkc1qs=
-github.com/openimsdk/protocol v0.0.60/go.mod h1:OZQA9FR55lseYoN2Ql1XAHYKHJGu7OMNkUbuekrKCM8=
-github.com/openimsdk/tools v0.0.47-alpha.27 h1:0A8rPBkYHtWAuqcRzpzbbaZCpOXfvPxHD9In0jGBcNE=
-github.com/openimsdk/tools v0.0.47-alpha.27/go.mod h1:YpOW0aMen/sStdPRb0GuAVW3L2PIZbTWAcEqEqnyPn8=
+github.com/openimsdk/protocol v0.0.63 h1:9DnweZe9nEYDFa4fGTbC9Cqi0gLUdtBhRo1NRP2X3WQ=
+github.com/openimsdk/protocol v0.0.63/go.mod h1:OZQA9FR55lseYoN2Ql1XAHYKHJGu7OMNkUbuekrKCM8=
+github.com/openimsdk/tools v0.0.47-alpha.29 h1:J8iLKmdMBdsT4BGcKaWU0nEqvovp8VAK6kE/gkbEVBo=
+github.com/openimsdk/tools v0.0.47-alpha.29/go.mod h1:P4oGP1Pd+d4ctbLD5U/XQTgl8yu8Hd3skx640Fr69ko=
 github.com/pelletier/go-toml/v2 v2.1.0 h1:FnwAJ4oYMvbT/34k9zzHuZNrhlz48GB3/s6at6/MHO4=
 github.com/pelletier/go-toml/v2 v2.1.0/go.mod h1:tJU2Z3ZkXwnxa4DPO899bsyIoywizdUvyaeZurnPPDc=
 github.com/pion/datachannel v1.5.5 h1:10ef4kwdjije+M9d7Xm9im2Y3O6A6ccQb0zcqZcJew8=

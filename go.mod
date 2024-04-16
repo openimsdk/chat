@@ -28,8 +28,8 @@ require (
 	github.com/livekit/protocol v1.10.1
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/openimsdk/gomake v0.0.5
-	github.com/openimsdk/protocol v0.0.60
-	github.com/openimsdk/tools v0.0.47-alpha.27
+	github.com/openimsdk/protocol v0.0.63
+	github.com/openimsdk/tools v0.0.47-alpha.29
 	github.com/redis/go-redis/v9 v9.5.1
 	github.com/spf13/cobra v1.8.0
 	github.com/spf13/viper v1.18.2
