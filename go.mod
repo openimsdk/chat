@@ -29,7 +29,7 @@ require (
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/openimsdk/gomake v0.0.5
 	github.com/openimsdk/protocol v0.0.60
-	github.com/openimsdk/tools v0.0.47-alpha.26
+	github.com/openimsdk/tools v0.0.47-alpha.27
 	github.com/redis/go-redis/v9 v9.5.1
 	github.com/spf13/cobra v1.8.0
 	github.com/spf13/viper v1.18.2
@@ -116,7 +116,3 @@ require (
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 )
-
-//replace (
-//	github.com/openimsdk/tools => /Users/chao/Desktop/tools
-//)
