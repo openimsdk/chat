@@ -14,7 +14,7 @@
 
 syntax = "proto3";
 package openim.admin;
-import "google/wrappers.proto";
+import "wrapperspb/wrapperspb.proto";
 import "sdkws/sdkws.proto";
 import "common/common.proto";
 option go_package = "github.com/openimsdk/chat/pkg/protocol/admin";
@@ -45,11 +45,11 @@ message AddAdminAccountResp{
 }
 
 message AdminUpdateInfoReq {
-  google.protobuf.StringValue account = 1;
-  google.protobuf.StringValue password = 2;
-  google.protobuf.StringValue faceURL = 3;
-  google.protobuf.StringValue nickname = 4;
-  google.protobuf.Int32Value level = 6;
+  openim.protobuf.StringValue account = 1;
+  openim.protobuf.StringValue password = 2;
+  openim.protobuf.StringValue faceURL = 3;
+  openim.protobuf.StringValue nickname = 4;
+  openim.protobuf.Int32Value level = 6;
 }
 
 message AdminUpdateInfoResp {
@@ -443,16 +443,16 @@ message DelAppletResp  {
 
 message UpdateAppletReq  {
   string id = 1;
-  google.protobuf.StringValue name = 2;
-  google.protobuf.StringValue appID = 3;
-  google.protobuf.StringValue icon = 4;
-  google.protobuf.StringValue url = 5;
-  google.protobuf.StringValue md5 = 6;
-  google.protobuf.Int64Value size = 7;
-  google.protobuf.StringValue version = 8;
-  google.protobuf.UInt32Value priority = 9;
-  google.protobuf.UInt32Value status = 10;
-  google.protobuf.Int64Value createTime = 11;
+  openim.protobuf.StringValue name = 2;
+  openim.protobuf.StringValue appID = 3;
+  openim.protobuf.StringValue icon = 4;
+  openim.protobuf.StringValue url = 5;
+  openim.protobuf.StringValue md5 = 6;
+  openim.protobuf.Int64Value size = 7;
+  openim.protobuf.StringValue version = 8;
+  openim.protobuf.UInt32Value priority = 9;
+  openim.protobuf.UInt32Value status = 10;
+  openim.protobuf.Int64Value createTime = 11;
 }
 
 message UpdateAppletResp  {

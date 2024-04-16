@@ -14,7 +14,7 @@
 
 syntax = "proto3";
 package openim.sdkws;
-import "google/wrappers.proto";
+import "wrapperspb/wrapperspb.proto";
 option go_package = "github.com/openimsdk/protocol/sdkws";
 
 ////////////////////////////////base///////////////////////////////
@@ -45,10 +45,10 @@ message GroupInfoForSet{
   string notification = 3;
   string introduction = 4;
   string faceURL = 5;
-  google.protobuf.StringValue ex = 6;
-  google.protobuf.Int32Value needVerification = 7;
-  google.protobuf.Int32Value lookMemberInfo = 8;
-  google.protobuf.Int32Value applyMemberFriend = 9;
+  openim.protobuf.StringValue ex = 6;
+  openim.protobuf.Int32Value needVerification = 7;
+  openim.protobuf.Int32Value lookMemberInfo = 8;
+  openim.protobuf.Int32Value applyMemberFriend = 9;
 }
 
 
@@ -86,10 +86,10 @@ message UserInfo{
 
 message UserInfoWithEx{
   string userID = 1;
-  google.protobuf.StringValue nickname = 2;
-  google.protobuf.StringValue faceURL = 3;
-  google.protobuf.StringValue ex = 4;
-  google.protobuf.Int32Value globalRecvMsgOpt = 7;
+  openim.protobuf.StringValue nickname = 2;
+  openim.protobuf.StringValue faceURL = 3;
+  openim.protobuf.StringValue ex = 4;
+  openim.protobuf.Int32Value globalRecvMsgOpt = 7;
 }
 
 message FriendInfo{

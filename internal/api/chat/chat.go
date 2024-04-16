@@ -30,7 +30,6 @@ import (
 	"github.com/openimsdk/protocol/sdkws"
 	"github.com/openimsdk/tools/a2r"
 	"github.com/openimsdk/tools/apiresp"
-	"github.com/openimsdk/tools/checker"
 	"github.com/openimsdk/tools/errs"
 )
 
@@ -53,9 +52,8 @@ type Api struct {
 // ################## ACCOUNT ##################
 
 func (o *Api) SendVerifyCode(c *gin.Context) {
-	req := chat.SendVerifyCodeReq{}
-
-	if err := c.BindJSON(&req); err != nil {
+	req, err := a2r.ParseRequest[chat.SendVerifyCodeReq](c)
+	if err != nil {
 		apiresp.GinError(c, err)
 		return
 	}
@@ -65,7 +63,7 @@ func (o *Api) SendVerifyCode(c *gin.Context) {
 		return
 	}
 	req.Ip = ip
-	resp, err := o.chatClient.SendVerifyCode(c, &req)
+	resp, err := o.chatClient.SendVerifyCode(c, req)
 	if err != nil {
 		apiresp.GinError(c, err)
 		return
@@ -78,16 +76,9 @@ func (o *Api) VerifyCode(c *gin.Context) {
 }
 
 func (o *Api) RegisterUser(c *gin.Context) {
-	var (
-		req  chat.RegisterUserReq
-		resp apistruct.UserRegisterResp
-	)
-	if err := c.BindJSON(&req); err != nil {
+	req, err := a2r.ParseRequest[chat.RegisterUserReq](c)
+	if err != nil {
 		apiresp.GinError(c, err)
-		return
-	}
-	if err := checker.Validate(&req); err != nil {
-		apiresp.GinError(c, err) // 参数校验失败
 		return
 	}
 	ip, err := o.GetClientIP(c)
@@ -96,7 +87,7 @@ func (o *Api) RegisterUser(c *gin.Context) {
 		return
 	}
 	req.Ip = ip
-	respRegisterUser, err := o.chatClient.RegisterUser(c, &req)
+	respRegisterUser, err := o.chatClient.RegisterUser(c, req)
 	if err != nil {
 		apiresp.GinError(c, err)
 		return
@@ -125,6 +116,7 @@ func (o *Api) RegisterUser(c *gin.Context) {
 	if resp, err := o.adminClient.FindDefaultGroup(rpcCtx, &admin.FindDefaultGroupReq{}); err == nil {
 		_ = o.imApiCaller.InviteToGroup(apiCtx, respRegisterUser.UserID, resp.GroupIDs)
 	}
+	var resp apistruct.UserRegisterResp
 	if req.AutoLogin {
 		resp.ImToken, err = o.imApiCaller.UserToken(c, respRegisterUser.UserID, req.Platform)
 		if err != nil {
@@ -138,16 +130,9 @@ func (o *Api) RegisterUser(c *gin.Context) {
 }
 
 func (o *Api) Login(c *gin.Context) {
-	var (
-		req  chat.LoginReq
-		resp apistruct.LoginResp
-	)
-	if err := c.BindJSON(&req); err != nil {
+	req, err := a2r.ParseRequest[chat.LoginReq](c)
+	if err != nil {
 		apiresp.GinError(c, err)
-		return
-	}
-	if err := checker.Validate(&req); err != nil {
-		apiresp.GinError(c, err) // 参数校验失败
 		return
 	}
 	ip, err := o.GetClientIP(c)
@@ -156,20 +141,21 @@ func (o *Api) Login(c *gin.Context) {
 		return
 	}
 	req.Ip = ip
-	resp1, err := o.chatClient.Login(c, &req)
+	resp, err := o.chatClient.Login(c, req)
 	if err != nil {
 		apiresp.GinError(c, err)
 		return
 	}
-	imToken, err := o.imApiCaller.UserToken(c, resp1.UserID, req.Platform)
+	imToken, err := o.imApiCaller.UserToken(c, resp.UserID, req.Platform)
 	if err != nil {
 		apiresp.GinError(c, err)
 		return
 	}
-	resp.ImToken = imToken
-	resp.UserID = resp1.UserID
-	resp.ChatToken = resp1.ChatToken
-	apiresp.GinSuccess(c, resp)
+	apiresp.GinSuccess(c, &apistruct.LoginResp{
+		ImToken:   imToken,
+		UserID:    resp.UserID,
+		ChatToken: resp.ChatToken,
+	})
 }
 
 func (o *Api) ResetPassword(c *gin.Context) {
@@ -183,19 +169,12 @@ func (o *Api) ChangePassword(c *gin.Context) {
 // ################## USER ##################
 
 func (o *Api) UpdateUserInfo(c *gin.Context) {
-	var (
-		req  chat.UpdateUserInfoReq
-		resp apistruct.UpdateUserInfoResp
-	)
-	if err := c.BindJSON(&req); err != nil {
+	req, err := a2r.ParseRequest[chat.UpdateUserInfoReq](c)
+	if err != nil {
 		apiresp.GinError(c, err)
 		return
 	}
-	if err := checker.Validate(&req); err != nil {
-		apiresp.GinError(c, err) // 参数校验失败
-		return
-	}
-	respUpdate, err := o.chatClient.UpdateUserInfo(c, &req)
+	respUpdate, err := o.chatClient.UpdateUserInfo(c, req)
 	if err != nil {
 		apiresp.GinError(c, err)
 		return
@@ -237,7 +216,7 @@ func (o *Api) UpdateUserInfo(c *gin.Context) {
 		apiresp.GinError(c, err)
 		return
 	}
-	apiresp.GinSuccess(c, resp)
+	apiresp.GinSuccess(c, apistruct.UpdateUserInfoResp{})
 }
 
 func (o *Api) FindUserPublicInfo(c *gin.Context) {
@@ -292,11 +271,11 @@ func (o *Api) OpenIMCallback(c *gin.Context) {
 }
 
 func (o *Api) SearchFriend(c *gin.Context) {
-	var req struct {
+	req, err := a2r.ParseRequest[struct {
 		UserID string `json:"userID"`
 		chat.SearchUserInfoReq
-	}
-	if err := c.BindJSON(&req); err != nil {
+	}](c)
+	if err != nil {
 		apiresp.GinError(c, err)
 		return
 	}

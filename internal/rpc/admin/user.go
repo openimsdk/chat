@@ -16,8 +16,8 @@ package admin
 
 import (
 	"context"
+	"github.com/openimsdk/protocol/wrapperspb"
 	"github.com/openimsdk/tools/utils/datautil"
-	"google.golang.org/protobuf/types/known/wrapperspb"
 	"strings"
 	"time"
 

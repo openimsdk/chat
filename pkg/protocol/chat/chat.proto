@@ -14,7 +14,7 @@
 
 syntax = "proto3";
 package openim.chat;
-import "google/wrappers.proto";
+import "wrapperspb/wrapperspb.proto";
 import "sdkws/sdkws.proto";
 import "common/common.proto";
 option go_package = "github.com/openimsdk/chat/pkg/protocol/chat";
@@ -31,20 +31,20 @@ message UserIdentity {
 
 message UpdateUserInfoReq{
   string  userID = 1;
-  google.protobuf.StringValue  account = 2;
-  google.protobuf.StringValue  phoneNumber = 3;
-  google.protobuf.StringValue  areaCode = 4;
-  google.protobuf.StringValue  email = 5;
-  google.protobuf.StringValue  nickname = 6;
-  google.protobuf.StringValue  faceURL = 7;
-  google.protobuf.Int32Value  gender = 8;
-  google.protobuf.Int32Value  level = 9;
-  google.protobuf.Int64Value birth = 10;
-  google.protobuf.Int32Value  allowAddFriend = 11;
-  google.protobuf.Int32Value  allowBeep = 12;
-  google.protobuf.Int32Value  allowVibration = 13;
-  google.protobuf.Int32Value  globalRecvMsgOpt = 14;
-  google.protobuf.Int32Value RegisterType = 15;
+  openim.protobuf.StringValue  account = 2;
+  openim.protobuf.StringValue  phoneNumber = 3;
+  openim.protobuf.StringValue  areaCode = 4;
+  openim.protobuf.StringValue  email = 5;
+  openim.protobuf.StringValue  nickname = 6;
+  openim.protobuf.StringValue  faceURL = 7;
+  openim.protobuf.Int32Value  gender = 8;
+  openim.protobuf.Int32Value  level = 9;
+  openim.protobuf.Int64Value birth = 10;
+  openim.protobuf.Int32Value  allowAddFriend = 11;
+  openim.protobuf.Int32Value  allowBeep = 12;
+  openim.protobuf.Int32Value  allowVibration = 13;
+  openim.protobuf.Int32Value  globalRecvMsgOpt = 14;
+  openim.protobuf.Int32Value RegisterType = 15;
 }
 
 message UpdateUserInfoResp{

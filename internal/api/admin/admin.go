@@ -33,7 +33,6 @@ import (
 	"github.com/openimsdk/protocol/user"
 	"github.com/openimsdk/tools/a2r"
 	"github.com/openimsdk/tools/apiresp"
-	"github.com/openimsdk/tools/checker"
 	"github.com/openimsdk/tools/errs"
 	"github.com/openimsdk/tools/log"
 	"github.com/openimsdk/tools/utils/datautil"
@@ -61,19 +60,12 @@ type Api struct {
 }
 
 func (o *Api) AdminLogin(c *gin.Context) {
-	var (
-		req  admin.LoginReq
-		resp apistruct.AdminLoginResp
-	)
-	if err := c.BindJSON(&req); err != nil {
+	req, err := a2r.ParseRequest[admin.LoginReq](c)
+	if err != nil {
 		apiresp.GinError(c, err)
 		return
 	}
-	if err := checker.Validate(&req); err != nil {
-		apiresp.GinError(c, err) // 参数校验失败
-		return
-	}
-	loginResp, err := o.adminClient.Login(c, &req)
+	loginResp, err := o.adminClient.Login(c, req)
 	if err != nil {
 		apiresp.GinError(c, err)
 		return
@@ -84,6 +76,7 @@ func (o *Api) AdminLogin(c *gin.Context) {
 		apiresp.GinError(c, err)
 		return
 	}
+	var resp apistruct.AdminLoginResp
 	if err := datautil.CopyStructFields(&resp, loginResp); err != nil {
 		apiresp.GinError(c, err)
 		return
@@ -98,16 +91,12 @@ func (o *Api) ResetUserPassword(c *gin.Context) {
 }
 
 func (o *Api) AdminUpdateInfo(c *gin.Context) {
-	var req admin.AdminUpdateInfoReq
-	if err := c.BindJSON(&req); err != nil {
+	req, err := a2r.ParseRequest[admin.AdminUpdateInfoReq](c)
+	if err != nil {
 		apiresp.GinError(c, err)
 		return
 	}
-	if err := checker.Validate(&req); err != nil {
-		apiresp.GinError(c, err) // 参数校验失败
-		return
-	}
-	resp, err := o.adminClient.AdminUpdateInfo(c, &req)
+	resp, err := o.adminClient.AdminUpdateInfo(c, req)
 	if err != nil {
 		apiresp.GinError(c, err)
 		return
@@ -138,17 +127,15 @@ func (o *Api) AddAdminAccount(c *gin.Context) {
 }
 
 func (o *Api) AddUserAccount(c *gin.Context) {
-	var req chat.AddUserAccountReq
-	if err := c.BindJSON(&req); err != nil {
+	req, err := a2r.ParseRequest[chat.AddUserAccountReq](c)
+	if err != nil {
 		apiresp.GinError(c, err)
 		return
 	}
-	if err := checker.Validate(&req); err != nil {
-		apiresp.GinError(c, err) // 参数校验失败
+	if _, err := o.chatClient.AddUserAccount(c, req); err != nil {
+		apiresp.GinError(c, err)
 		return
 	}
-
-	_, err := o.chatClient.AddUserAccount(c, &req)
 
 	userInfo := &sdkws.UserInfo{
 		UserID:     req.User.UserID,
@@ -191,12 +178,8 @@ func (o *Api) FindDefaultFriend(c *gin.Context) {
 }
 
 func (o *Api) AddDefaultGroup(c *gin.Context) {
-	var req admin.AddDefaultGroupReq
-	if err := c.BindJSON(&req); err != nil {
-		apiresp.GinError(c, err)
-		return
-	}
-	if err := checker.Validate(&req); err != nil {
+	req, err := a2r.ParseRequest[admin.AddDefaultGroupReq](c)
+	if err != nil {
 		apiresp.GinError(c, err)
 		return
 	}
@@ -233,16 +216,12 @@ func (o *Api) FindDefaultGroup(c *gin.Context) {
 }
 
 func (o *Api) SearchDefaultGroup(c *gin.Context) {
-	var req admin.SearchDefaultGroupReq
-	if err := c.BindJSON(&req); err != nil {
+	req, err := a2r.ParseRequest[admin.SearchDefaultGroupReq](c)
+	if err != nil {
 		apiresp.GinError(c, err)
 		return
 	}
-	if err := checker.Validate(&req); err != nil {
-		apiresp.GinError(c, err)
-		return
-	}
-	searchResp, err := o.adminClient.SearchDefaultGroup(c, &req)
+	searchResp, err := o.adminClient.SearchDefaultGroup(c, req)
 	if err != nil {
 		apiresp.GinError(c, err)
 		return
@@ -324,16 +303,12 @@ func (o *Api) ParseToken(c *gin.Context) {
 }
 
 func (o *Api) BlockUser(c *gin.Context) {
-	var req admin.BlockUserReq
-	if err := c.BindJSON(&req); err != nil {
+	req, err := a2r.ParseRequest[admin.BlockUserReq](c)
+	if err != nil {
 		apiresp.GinError(c, err)
 		return
 	}
-	if err := checker.Validate(&req); err != nil {
-		apiresp.GinError(c, err) // 参数校验失败
-		return
-	}
-	resp, err := o.adminClient.BlockUser(c, &req)
+	resp, err := o.adminClient.BlockUser(c, req)
 	if err != nil {
 		apiresp.GinError(c, err)
 		return
@@ -392,14 +367,9 @@ func (o *Api) LoginUserCount(c *gin.Context) {
 }
 
 func (o *Api) NewUserCount(c *gin.Context) {
-	var req user.UserRegisterCountReq
-	var resp apistruct.NewUserCountResp
-	if err := c.BindJSON(&req); err != nil {
+	req, err := a2r.ParseRequest[user.UserRegisterCountReq](c)
+	if err != nil {
 		apiresp.GinError(c, err)
-		return
-	}
-	if err := checker.Validate(&req); err != nil {
-		apiresp.GinError(c, err) // 参数校验失败
 		return
 	}
 	imToken, err := o.imApiCaller.UserToken(c, o.GetDefaultIMAdminUserID(), constant.AdminPlatformID)
@@ -412,9 +382,10 @@ func (o *Api) NewUserCount(c *gin.Context) {
 		apiresp.GinError(c, err)
 		return
 	}
-	resp.DateCount = dateCount
-	resp.Total = total
-	apiresp.GinSuccess(c, resp)
+	apiresp.GinSuccess(c, &apistruct.NewUserCountResp{
+		DateCount: dateCount,
+		Total:     total,
+	})
 }
 
 func (o *Api) ImportUserByXlsx(c *gin.Context) {
@@ -460,11 +431,11 @@ func (o *Api) ImportUserByXlsx(c *gin.Context) {
 }
 
 func (o *Api) ImportUserByJson(c *gin.Context) {
-	var req struct {
+	req, err := a2r.ParseRequest[struct {
 		Secret string                   `json:"secret"`
 		Users  []*chat.RegisterUserInfo `json:"users"`
-	}
-	if err := c.BindJSON(&req); err != nil {
+	}](c)
+	if err != nil {
 		apiresp.GinError(c, err)
 		return
 	}
