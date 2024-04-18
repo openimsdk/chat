@@ -21,3 +21,9 @@ PROTO_NAMES=(
 for name in "${PROTO_NAMES[@]}"; do
   protoc --go_out=plugins=grpc:./${name} --go_opt=module=github.com/openimsdk/chat/pkg/protocol/${name} ${name}/${name}.proto
 done
+
+if [ "$(uname -s)" == "Darwin" ]; then
+    find . -type f -name '*.pb.go' -exec sed -i '' 's/,omitempty"`/\"\`/g' {} +
+else
+    find . -type f -name '*.pb.go' -exec sed -i 's/,omitempty"`/\"\`/g' {} +
+fi
