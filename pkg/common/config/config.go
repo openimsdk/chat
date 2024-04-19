@@ -14,7 +14,6 @@ var (
 )
 
 type Share struct {
-	Secret          string          `mapstructure:"secret"`
 	Env             string          `mapstructure:"env"`
 	RpcRegisterName RpcRegisterName `mapstructure:"rpcRegisterName"`
 	OpenIM          struct {
@@ -142,6 +141,7 @@ type Admin struct {
 	TokenPolicy struct {
 		Expire int `mapstructure:"expire"`
 	} `mapstructure:"tokenPolicy"`
+	Secret string `mapstructure:"secret"`
 }
 
 type Log struct {

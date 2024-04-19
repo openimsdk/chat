@@ -399,11 +399,6 @@ func (o *Api) ImportUserByXlsx(c *gin.Context) {
 		apiresp.GinError(c, err)
 		return
 	}
-	secret := c.PostForm("secret")
-	if err := o.CheckSecretAdmin(c, secret); err != nil {
-		apiresp.GinError(c, err)
-		return
-	}
 	file, err := formFile.Open()
 	if err != nil {
 		apiresp.GinError(c, err)
@@ -432,8 +427,7 @@ func (o *Api) ImportUserByXlsx(c *gin.Context) {
 
 func (o *Api) ImportUserByJson(c *gin.Context) {
 	req, err := a2r.ParseRequest[struct {
-		Secret string                   `json:"secret"`
-		Users  []*chat.RegisterUserInfo `json:"users"`
+		Users []*chat.RegisterUserInfo `json:"users"`
 	}](c)
 	if err != nil {
 		apiresp.GinError(c, err)
@@ -441,10 +435,6 @@ func (o *Api) ImportUserByJson(c *gin.Context) {
 	}
 	ip, err := o.GetClientIP(c)
 	if err != nil {
-		apiresp.GinError(c, err)
-		return
-	}
-	if err := o.CheckSecretAdmin(c, req.Secret); err != nil {
 		apiresp.GinError(c, err)
 		return
 	}

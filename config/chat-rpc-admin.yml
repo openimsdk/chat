@@ -6,9 +6,4 @@ rpc:
 tokenPolicy:
   expire: 90
 
-chatSecret: chat123
-
-
-chatAdmin:
-  - adminID: chatAdmin
-  - nickname: chatAdmin
+secret: chat123
