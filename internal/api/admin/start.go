@@ -49,7 +49,6 @@ func Start(ctx context.Context, index int, config *Config) error {
 	im := imapi.New(config.Share.OpenIM.ApiURL, config.Share.OpenIM.Secret, config.Share.OpenIM.AdminUserID)
 	base := util.Api{
 		ImUserID:        config.Share.OpenIM.AdminUserID,
-		ChatSecret:      config.Share.OpenIM.Secret,
 		ProxyHeader:     config.Share.ProxyHeader,
 		ChatAdminUserID: config.Share.ChatAdmin[0].AdminID,
 	}
