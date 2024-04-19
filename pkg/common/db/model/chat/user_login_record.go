@@ -16,12 +16,12 @@ package chat
 
 import (
 	"context"
-	"github.com/OpenIMSDK/tools/mgoutil"
+	"github.com/openimsdk/tools/db/mongoutil"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"time"
 
-	"github.com/OpenIMSDK/chat/pkg/common/db/table/chat"
+	"github.com/openimsdk/chat/pkg/common/db/table/chat"
 )
 
 func NewUserLoginRecord(db *mongo.Database) (chat.UserLoginRecordInterface, error) {
@@ -46,7 +46,7 @@ type UserLoginRecord struct {
 }
 
 func (o *UserLoginRecord) Create(ctx context.Context, records ...*chat.UserLoginRecord) error {
-	return mgoutil.InsertMany(ctx, o.coll, records)
+	return mongoutil.InsertMany(ctx, o.coll, records)
 }
 
 func (o *UserLoginRecord) CountTotal(ctx context.Context, before *time.Time) (count int64, err error) {
@@ -54,7 +54,7 @@ func (o *UserLoginRecord) CountTotal(ctx context.Context, before *time.Time) (co
 	if before != nil {
 		filter["create_time"] = bson.M{"$lt": before}
 	}
-	return mgoutil.Count(ctx, o.coll, filter)
+	return mongoutil.Count(ctx, o.coll, filter)
 }
 
 func (o *UserLoginRecord) CountRangeEverydayTotal(ctx context.Context, start *time.Time, end *time.Time) (map[string]int64, int64, error) {
@@ -106,7 +106,7 @@ func (o *UserLoginRecord) CountRangeEverydayTotal(ctx context.Context, start *ti
 		ID    string `bson:"_id"`
 		Count int64  `bson:"count"`
 	}
-	res, err := mgoutil.Aggregate[Temp](ctx, o.coll, pipeline)
+	res, err := mongoutil.Aggregate[Temp](ctx, o.coll, pipeline)
 	if err != nil {
 		return nil, 0, err
 	}

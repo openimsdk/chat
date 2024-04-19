@@ -19,9 +19,9 @@ import (
 	"encoding/hex"
 	"time"
 
-	"github.com/OpenIMSDK/tools/errs"
+	"github.com/openimsdk/tools/errs"
 
-	"github.com/OpenIMSDK/chat/pkg/proto/admin"
+	"github.com/openimsdk/chat/pkg/protocol/admin"
 )
 
 type Admin struct {
@@ -38,13 +38,13 @@ func ToDBAdminUpdate(req *admin.AdminUpdateInfoReq) (map[string]any, error) {
 	update := make(map[string]any)
 	if req.Account != nil {
 		if req.Account.Value == "" {
-			return nil, errs.ErrArgs.Wrap("account is empty")
+			return nil, errs.ErrArgs.WrapMsg("account is empty")
 		}
 		update["account"] = req.Account.Value
 	}
 	if req.Password != nil {
 		if req.Password.Value == "" {
-			return nil, errs.ErrArgs.Wrap("password is empty")
+			return nil, errs.ErrArgs.WrapMsg("password is empty")
 		}
 		update["password"] = req.Password.Value
 	}
@@ -53,7 +53,7 @@ func ToDBAdminUpdate(req *admin.AdminUpdateInfoReq) (map[string]any, error) {
 	}
 	if req.Nickname != nil {
 		if req.Nickname.Value == "" {
-			return nil, errs.ErrArgs.Wrap("nickname is empty")
+			return nil, errs.ErrArgs.WrapMsg("nickname is empty")
 		}
 		update["nickname"] = req.Nickname.Value
 	}
@@ -64,14 +64,14 @@ func ToDBAdminUpdate(req *admin.AdminUpdateInfoReq) (map[string]any, error) {
 		update["level"] = req.Level.Value
 	}
 	if len(update) == 0 {
-		return nil, errs.ErrArgs.Wrap("no update info")
+		return nil, errs.ErrArgs.WrapMsg("no update info")
 	}
 	return update, nil
 }
 
 func ToDBAdminUpdatePassword(password string) (map[string]any, error) {
 	if password == "" {
-		return nil, errs.ErrArgs.Wrap("password is empty")
+		return nil, errs.ErrArgs.WrapMsg("password is empty")
 	}
 	return map[string]any{"password": password}, nil
 }
@@ -80,13 +80,13 @@ func ToDBAppletUpdate(req *admin.UpdateAppletReq) (map[string]any, error) {
 	update := make(map[string]any)
 	if req.Name != nil {
 		if req.Name.Value == "" {
-			return nil, errs.ErrArgs.Wrap("name is empty")
+			return nil, errs.ErrArgs.WrapMsg("name is empty")
 		}
 		update["name"] = req.Name.Value
 	}
 	if req.AppID != nil {
 		if req.AppID.Value == "" {
-			return nil, errs.ErrArgs.Wrap("appID is empty")
+			return nil, errs.ErrArgs.WrapMsg("appID is empty")
 		}
 		update["app_id"] = req.AppID.Value
 	}
@@ -95,25 +95,25 @@ func ToDBAppletUpdate(req *admin.UpdateAppletReq) (map[string]any, error) {
 	}
 	if req.Url != nil {
 		if req.Url.Value == "" {
-			return nil, errs.ErrArgs.Wrap("url is empty")
+			return nil, errs.ErrArgs.WrapMsg("url is empty")
 		}
 		update["url"] = req.Url.Value
 	}
 	if req.Md5 != nil {
 		if hash, _ := hex.DecodeString(req.Md5.Value); len(hash) != md5.Size {
-			return nil, errs.ErrArgs.Wrap("md5 is invalid")
+			return nil, errs.ErrArgs.WrapMsg("md5 is invalid")
 		}
 		update["md5"] = req.Md5.Value
 	}
 	if req.Size != nil {
 		if req.Size.Value <= 0 {
-			return nil, errs.ErrArgs.Wrap("size is invalid")
+			return nil, errs.ErrArgs.WrapMsg("size is invalid")
 		}
 		update["size"] = req.Size.Value
 	}
 	if req.Version != nil {
 		if req.Version.Value == "" {
-			return nil, errs.ErrArgs.Wrap("version is empty")
+			return nil, errs.ErrArgs.WrapMsg("version is empty")
 		}
 		update["version"] = req.Version.Value
 	}
@@ -124,7 +124,7 @@ func ToDBAppletUpdate(req *admin.UpdateAppletReq) (map[string]any, error) {
 		update["status"] = req.Status.Value
 	}
 	if len(update) == 0 {
-		return nil, errs.ErrArgs.Wrap("no update info")
+		return nil, errs.ErrArgs.WrapMsg("no update info")
 	}
 	return update, nil
 }

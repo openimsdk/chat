@@ -14,24 +14,13 @@
 
 package constant
 
-import "github.com/OpenIMSDK/protocol/constant"
-
-// config path
-const (
-	ConfigPath = "/config/config.yaml"
-
-	OpenIMConfig = "OpenIMConfig" // environment variables
-)
+import "github.com/openimsdk/protocol/constant"
 
 const (
 	// verificationCode used for.
 	VerificationCodeForRegister      = 1 // Register
 	VerificationCodeForResetPassword = 2 // Reset password
 	VerificationCodeForLogin         = 3 // Login
-
-	VerificationCodeForRegisterSuffix = "_forRegister"
-	VerificationCodeForResetSuffix    = "_forReset"
-	VerificationCodeForLoginSuffix    = "_forLogin"
 )
 
 const LogFileName = "chat.log"
@@ -55,9 +44,10 @@ const (
 	AdminMode = "admin"
 )
 
+const DefaultAdminLevel = 100
+
 // user level.
 const (
-	OrdinaryUserLevel = 1
 	NormalAdmin       = 80
 	AdvancedUserLevel = 100
 )
@@ -68,75 +58,15 @@ const (
 	OrdinaryUserAddFriendDisable = -1 // Do not allow ordinary users to add friends
 )
 
-// minioUpload.
-const (
-	OtherType = 1
-	VideoType = 2
-	ImageType = 3
-)
-
-// callback Action.
-const (
-	ActionAllow     = 0
-	ActionForbidden = 1
-)
-
-const (
-	ScreenInvitationRegisterAll     = 0 // All
-	ScreenInvitationRegisterUsed    = 1 // Used
-	ScreenInvitationRegisterNotUsed = 2 // Unused
-)
-
-// 1 block; 2 unblock.
-const (
-	UserBlock   = 1 // Account ban
-	UserUnblock = 2 // Unban
-)
-
 const (
 	NormalUser = 1
 	AdminUser  = 2
-)
-
-const (
-	DoNotDisturbModeDisable = 1
-	DoNotDisturbModeEnable  = 2
-)
-
-const (
-	AllowAddFriend    = 1
-	NotAllowAddFriend = 2
-)
-
-const (
-	AllowBeep    = 1
-	NotAllowBeep = 2
-)
-
-const (
-	AllowVibration    = 1
-	NotAllowVibration = 2
-)
-
-const (
-	AllowSendMsgNotFriend    = 1
-	NotAllowSendMsgNotFriend = 2
-)
-
-const (
-	NotNeedInvitationCodeRegister = 0 // No invitation code required
-	NeedInvitationCodeRegister    = 1 // Invitation code required
 )
 
 // mini-app
 const (
 	StatusOnShelf = 1 // OnShelf
 	StatusUnShelf = 2 // UnShelf
-)
-
-const (
-	LimitIP    = 1
-	NotLimitIP = 0
 )
 
 const (
@@ -155,15 +85,9 @@ const (
 	InvitationCodeUnused = 2 // Unused
 )
 
-// Default discovery page
-const DefaultDiscoverPageURL = "https://doc.rentsoft.cn/#/"
-
-// const OperationID = "operationID"
-// const OpUserID = "opUserID".
 const (
-	RpcOperationID = constant.OperationID
-	RpcOpUserID    = constant.OpUserID
-	RpcOpUserType  = "opUserType"
+	RpcOpUserID   = constant.OpUserID
+	RpcOpUserType = "opUserType"
 )
 
 const RpcCustomHeader = constant.RpcCustomHeader
@@ -180,8 +104,6 @@ const (
 	FinDAllUser    = 0
 	FindNormalUser = 1
 )
-
-const DefaultPlatform = 1
 
 const CtxApiToken = "api-token"
 

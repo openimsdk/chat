@@ -16,7 +16,7 @@ package admin
 
 import (
 	"context"
-	"github.com/OpenIMSDK/tools/pagination"
+	"github.com/openimsdk/tools/db/pagination"
 	"time"
 )
 
@@ -43,5 +43,4 @@ type AdminInterface interface {
 	ChangePassword(ctx context.Context, userID string, newPassword string) error
 	Delete(ctx context.Context, userIDs []string) error
 	Search(ctx context.Context, pagination pagination.Pagination) (int64, []*Admin, error)
-	InitAdmin(ctx context.Context) error
 }

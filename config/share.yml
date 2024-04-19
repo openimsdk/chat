@@ -1,0 +1,16 @@
+env: zookeeper
+rpcRegisterName:
+  chat: chat
+  admin: admin
+
+openIM:
+  apiURL: http://127.0.0.1:10002
+  secret: openIM123
+  adminUserID: imAdmin
+
+chatAdmin:
+  - adminID: chatAdmin
+    imUserID: imAdmin
+    nickname: chatAdmin
+
+#proxyHeader: "X-Forwarded-For"

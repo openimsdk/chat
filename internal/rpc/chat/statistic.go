@@ -18,14 +18,14 @@ import (
 	"context"
 	"time"
 
-	"github.com/OpenIMSDK/chat/pkg/proto/chat"
-	"github.com/OpenIMSDK/tools/errs"
+	"github.com/openimsdk/chat/pkg/protocol/chat"
+	"github.com/openimsdk/tools/errs"
 )
 
 func (o *chatSvr) UserLoginCount(ctx context.Context, req *chat.UserLoginCountReq) (*chat.UserLoginCountResp, error) {
 	resp := &chat.UserLoginCountResp{}
 	if req.Start > req.End {
-		return nil, errs.ErrArgs.Wrap("start > end")
+		return nil, errs.ErrArgs.WrapMsg("start > end")
 	}
 	total, err := o.Database.NewUserCountTotal(ctx, nil)
 	if err != nil {

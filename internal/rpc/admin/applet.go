@@ -16,18 +16,18 @@ package admin
 
 import (
 	"context"
+	"github.com/openimsdk/tools/utils/datautil"
 	"strings"
 	"time"
 
-	"github.com/OpenIMSDK/tools/errs"
-	"github.com/OpenIMSDK/tools/utils"
 	"github.com/google/uuid"
+	"github.com/openimsdk/tools/errs"
 
-	"github.com/OpenIMSDK/chat/pkg/common/constant"
-	admin2 "github.com/OpenIMSDK/chat/pkg/common/db/table/admin"
-	"github.com/OpenIMSDK/chat/pkg/common/mctx"
-	"github.com/OpenIMSDK/chat/pkg/proto/admin"
-	"github.com/OpenIMSDK/chat/pkg/proto/common"
+	"github.com/openimsdk/chat/pkg/common/constant"
+	admin2 "github.com/openimsdk/chat/pkg/common/db/table/admin"
+	"github.com/openimsdk/chat/pkg/common/mctx"
+	"github.com/openimsdk/chat/pkg/protocol/admin"
+	"github.com/openimsdk/chat/pkg/protocol/common"
 )
 
 func (o *adminServer) AddApplet(ctx context.Context, req *admin.AddAppletReq) (*admin.AddAppletResp, error) {
@@ -35,13 +35,13 @@ func (o *adminServer) AddApplet(ctx context.Context, req *admin.AddAppletReq) (*
 		return nil, err
 	}
 	if req.Name == "" {
-		return nil, errs.ErrArgs.Wrap("name empty")
+		return nil, errs.ErrArgs.WrapMsg("name empty")
 	}
 	if req.AppID == "" {
-		return nil, errs.ErrArgs.Wrap("appid empty")
+		return nil, errs.ErrArgs.WrapMsg("appid empty")
 	}
 	if !(req.Status == constant.StatusOnShelf || req.Status == constant.StatusUnShelf) {
-		return nil, errs.ErrArgs.Wrap("invalid status")
+		return nil, errs.ErrArgs.WrapMsg("invalid status")
 	}
 	m := admin2.Applet{
 		ID:         req.Id,
@@ -70,14 +70,14 @@ func (o *adminServer) DelApplet(ctx context.Context, req *admin.DelAppletReq) (*
 		return nil, err
 	}
 	if len(req.AppletIds) == 0 {
-		return nil, errs.ErrArgs.Wrap("AppletIds empty")
+		return nil, errs.ErrArgs.WrapMsg("AppletIds empty")
 	}
 	applets, err := o.Database.FindApplet(ctx, req.AppletIds)
 	if err != nil {
 		return nil, err
 	}
-	if ids := utils.Single(req.AppletIds, utils.Slice(applets, func(e *admin2.Applet) string { return e.ID })); len(ids) > 0 {
-		return nil, errs.ErrArgs.Wrap("ids not found: " + strings.Join(ids, ", "))
+	if ids := datautil.Single(req.AppletIds, datautil.Slice(applets, func(e *admin2.Applet) string { return e.ID })); len(ids) > 0 {
+		return nil, errs.ErrArgs.WrapMsg("ids not found: " + strings.Join(ids, ", "))
 	}
 	if err := o.Database.DelApplet(ctx, req.AppletIds); err != nil {
 		return nil, err

@@ -17,10 +17,9 @@ package tokenverify
 import (
 	"time"
 
-	"github.com/OpenIMSDK/chat/pkg/common/config"
-	"github.com/OpenIMSDK/chat/pkg/common/constant"
-	"github.com/OpenIMSDK/tools/errs"
 	"github.com/golang-jwt/jwt/v4"
+	"github.com/openimsdk/chat/pkg/common/constant"
+	"github.com/openimsdk/tools/errs"
 )
 
 const (
@@ -35,41 +34,32 @@ type claims struct {
 	jwt.RegisteredClaims
 }
 
-func buildClaims(userID string, userType int32, ttl int64) claims {
+type Token struct {
+	Expires time.Duration
+	Secret  string
+}
+
+func (t *Token) secret() jwt.Keyfunc {
+	return func(token *jwt.Token) (any, error) {
+		return []byte(t.Secret), nil
+	}
+}
+
+func (t *Token) buildClaims(userID string, userType int32) claims {
 	now := time.Now()
-	before := now.Add(-time.Minute * 5)
 	return claims{
 		UserID:   userID,
 		UserType: userType,
 		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(now.Add(time.Duration(ttl*24) * time.Hour)), // Expiration time
-			IssuedAt:  jwt.NewNumericDate(now),                                        // Issuing time
-			NotBefore: jwt.NewNumericDate(before),                                     // Begin Effective time
+			ExpiresAt: jwt.NewNumericDate(now.Add(t.Expires)),    // Expiration time
+			IssuedAt:  jwt.NewNumericDate(now),                   // Issuing time
+			NotBefore: jwt.NewNumericDate(now.Add(-time.Minute)), // Begin Effective time
 		},
 	}
 }
 
-func CreateToken(UserID string, userType int32, ttl int64) (string, error) {
-	if !(userType == TokenUser || userType == TokenAdmin) {
-		return "", errs.ErrTokenUnknown.Wrap("token type unknown")
-	}
-	claims := buildClaims(UserID, userType, ttl)
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString([]byte(*config.Config.Secret))
-	if err != nil {
-		return "", errs.Wrap(err, "")
-	}
-	return tokenString, nil
-}
-
-func secret() jwt.Keyfunc {
-	return func(token *jwt.Token) (interface{}, error) {
-		return []byte(*config.Config.Secret), nil
-	}
-}
-
-func getToken(t string) (string, int32, error) {
-	token, err := jwt.ParseWithClaims(t, &claims{}, secret())
+func (t *Token) getToken(str string) (string, int32, error) {
+	token, err := jwt.ParseWithClaims(str, &claims{}, t.secret())
 	if err != nil {
 		if ve, ok := err.(*jwt.ValidationError); ok {
 			if ve.Errors&jwt.ValidationErrorMalformed != 0 {
@@ -87,7 +77,7 @@ func getToken(t string) (string, int32, error) {
 	} else {
 		claims, ok := token.Claims.(*claims)
 		if claims.PlatformID != 0 {
-			return "", 0, errs.ErrTokenNotExist.Wrap()
+			return "", 0, errs.ErrTokenExpired.Wrap()
 		}
 		if ok && token.Valid {
 			return claims.UserID, claims.UserType, nil
@@ -96,35 +86,47 @@ func getToken(t string) (string, int32, error) {
 	}
 }
 
-func GetToken(token string) (string, int32, error) {
-	userID, userType, err := getToken(token)
+func (t *Token) CreateToken(UserID string, userType int32) (string, error) {
+	if !(userType == TokenUser || userType == TokenAdmin) {
+		return "", errs.ErrTokenUnknown.WrapMsg("token type unknown")
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, t.buildClaims(UserID, userType))
+	str, err := token.SignedString([]byte(t.Secret))
+	if err != nil {
+		return "", errs.Wrap(err)
+	}
+	return str, nil
+}
+
+func (t *Token) GetToken(token string) (string, int32, error) {
+	userID, userType, err := t.getToken(token)
 	if err != nil {
 		return "", 0, err
 	}
 	if !(userType == TokenUser || userType == TokenAdmin) {
-		return "", 0, errs.ErrTokenUnknown.Wrap("token type unknown")
+		return "", 0, errs.ErrTokenUnknown.WrapMsg("token type unknown")
 	}
 	return userID, userType, nil
 }
 
-func GetAdminToken(token string) (string, error) {
-	userID, userType, err := getToken(token)
-	if err != nil {
-		return "", err
-	}
-	if userType != TokenAdmin {
-		return "", errs.ErrTokenInvalid.Wrap("token type error")
-	}
-	return userID, nil
-}
-
-func GetUserToken(token string) (string, error) {
-	userID, userType, err := getToken(token)
-	if err != nil {
-		return "", err
-	}
-	if userType != TokenUser {
-		return "", errs.ErrTokenInvalid.Wrap("token type error")
-	}
-	return userID, nil
-}
+//func (t *Token) GetAdminToken(token string) (string, error) {
+//	userID, userType, err := getToken(token)
+//	if err != nil {
+//		return "", err
+//	}
+//	if userType != TokenAdmin {
+//		return "", errs.ErrTokenUnknown.WrapMsg("token type error")
+//	}
+//	return userID, nil
+//}
+//
+//func (t *Token) GetUserToken(token string) (string, error) {
+//	userID, userType, err := getToken(token)
+//	if err != nil {
+//		return "", err
+//	}
+//	if userType != TokenUser {
+//		return "", errs.ErrTokenUnknown.WrapMsg("token type error")
+//	}
+//	return userID, nil
+//}

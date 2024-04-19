@@ -17,42 +17,39 @@ package email
 import (
 	"context"
 	"fmt"
-	"github.com/OpenIMSDK/chat/pkg/common/config"
-	"github.com/OpenIMSDK/tools/errs"
+	"github.com/openimsdk/tools/errs"
 	"gopkg.in/gomail.v2"
 )
-
-func NewMail() Mail {
-	dail := gomail.NewDialer(
-		config.Config.VerifyCode.Mail.SmtpAddr,
-		config.Config.VerifyCode.Mail.SmtpPort,
-		config.Config.VerifyCode.Mail.SenderMail,
-		config.Config.VerifyCode.Mail.SenderAuthorizationCode)
-
-	return &mail{dail: dail}
-}
 
 type Mail interface {
 	Name() string
 	SendMail(ctx context.Context, mail string, verifyCode string) error
 }
 
-type mail struct {
-	dail *gomail.Dialer
+func NewMail(smtpAddr string, smtpPort int, senderMail, senderAuthorizationCode, title string) Mail {
+	dail := gomail.NewDialer(smtpAddr, smtpPort, senderMail, senderAuthorizationCode)
+	return &mail{
+		title:      title,
+		senderMail: senderMail,
+		dail:       dail,
+	}
 }
 
-func (a *mail) Name() string {
+type mail struct {
+	senderMail string
+	title      string
+	dail       *gomail.Dialer
+}
+
+func (m *mail) Name() string {
 	return "mail"
 }
 
-func (a *mail) SendMail(ctx context.Context, mail string, verifyCode string) error {
-	m := gomail.NewMessage()
-	m.SetHeader(`From`, config.Config.VerifyCode.Mail.SenderMail)
-	m.SetHeader(`To`, []string{mail}...)
-	m.SetHeader(`Subject`, config.Config.VerifyCode.Mail.Title)
-	m.SetBody(`text/html`, fmt.Sprintf("您的验证码为:%s，该验证码5分钟内有效，请勿泄露于他人。", verifyCode))
-
-	// Send
-	err := a.dail.DialAndSend(m)
-	return errs.Wrap(err)
+func (m *mail) SendMail(ctx context.Context, mail string, verifyCode string) error {
+	msg := gomail.NewMessage()
+	msg.SetHeader(`From`, m.senderMail)
+	msg.SetHeader(`To`, []string{mail}...)
+	msg.SetHeader(`Subject`, m.title)
+	msg.SetBody(`text/html`, fmt.Sprintf("您的验证码为:%s，该验证码5分钟内有效，请勿泄露于他人。", verifyCode))
+	return errs.Wrap(m.dail.DialAndSend(msg))
 }

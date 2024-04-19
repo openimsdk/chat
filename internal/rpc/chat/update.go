@@ -17,9 +17,9 @@ package chat
 import (
 	"time"
 
-	"github.com/OpenIMSDK/tools/errs"
+	"github.com/openimsdk/tools/errs"
 
-	"github.com/OpenIMSDK/chat/pkg/proto/chat"
+	"github.com/openimsdk/chat/pkg/protocol/chat"
 )
 
 func ToDBAttributeUpdate(req *chat.UpdateUserInfoReq) (map[string]any, error) {
@@ -35,7 +35,7 @@ func ToDBAttributeUpdate(req *chat.UpdateUserInfoReq) (map[string]any, error) {
 	}
 	if req.Nickname != nil {
 		if req.Nickname.Value == "" {
-			return nil, errs.ErrArgs.Wrap("nickname can not be empty")
+			return nil, errs.ErrArgs.WrapMsg("nickname can not be empty")
 		}
 		update["nickname"] = req.Nickname.Value
 	}
@@ -64,7 +64,7 @@ func ToDBAttributeUpdate(req *chat.UpdateUserInfoReq) (map[string]any, error) {
 		update["global_recv_msg_opt"] = req.GlobalRecvMsgOpt.Value
 	}
 	if len(update) == 0 {
-		return nil, errs.ErrArgs.Wrap("no update info")
+		return nil, errs.ErrArgs.WrapMsg("no update info")
 	}
 	return update, nil
 }
