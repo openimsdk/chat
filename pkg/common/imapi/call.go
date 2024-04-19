@@ -55,21 +55,18 @@ type caller[Req, Resp any] struct {
 }
 
 func (a caller[Req, Resp]) Call(ctx context.Context, apiPrefix string, req *Req) (*Resp, error) {
+	start := time.Now()
 	resp, err := a.call(ctx, apiPrefix, req)
 	if err != nil {
-		log.ZError(ctx, "caller resp", err)
+		log.ZError(ctx, "api caller failed", err, "api", a.api, "duration", time.Since(start), "req", req)
 		return nil, err
 	}
-	log.ZInfo(ctx, "resp", resp)
+	log.ZInfo(ctx, "api caller success resp", "api", a.api, "duration", time.Since(start), "req", req, "resp", resp)
 	return resp, nil
 }
 
 func (a caller[Req, Resp]) call(ctx context.Context, apiPrefix string, req *Req) (*Resp, error) {
 	url := apiPrefix + a.api
-	defer func(start time.Time) {
-		log.ZDebug(ctx, "api call caller time", "api", a.api, "cost", time.Since(start).String())
-	}(time.Now())
-	log.ZInfo(ctx, "caller req", "addr", url, "req", req)
 	reqBody, err := json.Marshal(req)
 	if err != nil {
 		return nil, err
@@ -82,19 +79,16 @@ func (a caller[Req, Resp]) call(ctx context.Context, apiPrefix string, req *Req)
 	request.Header.Set(pconstant.OperationID, operationID)
 	if token, _ := ctx.Value(constant.CtxApiToken).(string); token != "" {
 		request.Header.Set(pconstant.Token, token)
-		log.ZDebug(ctx, "req token", "token", token)
 	}
 	response, err := client.Do(request)
 	if err != nil {
 		return nil, err
 	}
-	log.ZDebug(ctx, "call caller successfully", "code", response.Status)
 	defer response.Body.Close()
 	data, err := io.ReadAll(response.Body)
 	if err != nil {
 		return nil, errs.WrapMsg(err, "read http response body", "url", url, "code", response.StatusCode)
 	}
-	log.ZDebug(ctx, "read respBody successfully", "code", "url", url, response.StatusCode, "body", string(data))
 	var resp baseApiResponse[Resp]
 	if err := json.Unmarshal(data, &resp); err != nil {
 		return nil, errs.WrapMsg(err, string(data))
