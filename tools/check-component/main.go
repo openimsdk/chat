@@ -126,7 +126,7 @@ func performChecks(ctx context.Context, mongoConfig *config.Mongo, redisConfig *
 	for i := 0; i < maxRetry; i++ {
 		allSuccess := true
 		for name, check := range checks {
-			ctx, _ := context.WithTimeout(ctx, 5*time.Second)
+			ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 			if !checksDone[name] {
 				if err := check(ctx); err != nil {
 					fmt.Printf("%s check failed: %v\n", name, err)
@@ -136,6 +136,7 @@ func performChecks(ctx context.Context, mongoConfig *config.Mongo, redisConfig *
 					checksDone[name] = true
 				}
 			}
+			cancel()
 		}
 
 		if allSuccess {
