@@ -14,85 +14,91 @@ You may use the OpenIM source code to create compiled versions not originally pr
 + Obtain a commercial license by contacting OpenIM.
 + For more details and licensing inquiries, please email 📧 [contact@openim.io](mailto:contact@openim.io).
 
-## 🧩 Awesome features
-1. This repository implement a business system, which consists of two parts: User related function and background management function
-2. The business system depends on the api of the im system ([open-im-server repository](https://github.com/openimsdk/open-im-server)) and implement various functions by calling the api of the im system
-3. User related part includes some regular functions like user login, user register, user info update, etc.
-4. Background management provides api for admin to manage the im system containing functions like user management, message mangement,group management,etc.
+## 🧩 Feature Overview
+
+1. This repository implements a business system, which consists of two parts: User System and Backend Management System.
+2. The system relies on the [open-im-server repository](https://github.com/openimsdk/open-im-server) and implements various business functions by calling the APIs of the instant messaging system.
+3. The User System includes regular functions such as user login, user registration, user information update, etc.
+4. The Backend Management System includes APIs for managing users, groups, and messages.
 
 ## :busts_in_silhouette: Community
 
 + 💬 [Follow our Twitter account](https://twitter.com/founder_im63606)
 + 👫 [Join our Reddit](https://www.reddit.com/r/OpenIMessaging)
 + 🚀 [Join our Slack community](https://join.slack.com/t/openimsdk/shared_invite/zt-22720d66b-o_FvKxMTGXtcnnnHiMqe9Q)
-+ :eyes: [Join our wechat (微信群)](https://openim-1253691595.cos.ap-nanjing.myqcloud.com/WechatIMG20.jpeg)
++ :eyes: [Join our WeChat group](https://openim-1253691595.cos.ap-nanjing.myqcloud.com/WechatIMG20.jpeg)
 + 📚 [OpenIM Community](https://github.com/openimsdk/community)
-+ 💕 [OpenIM Interest Group](https://github.com/Openim-sigs)
++ 💕 [OpenIM Interest Groups](https://github.com/Openim-sigs)
 
-## 🛫 Quick start 
+## 🛫 Quick Start
 
-> **Note**: You can get started quickly with OpenIM Chat.
+> :warning: **Note**: This project works on Linux/Windows/Mac platforms and both ARM and AMD architectures.
 
-### 📦 Installation
-
-```bash
-$ git clone https://github.com/openimsdk/chat openim-chat
-$ cd openim-chat
-```
-
-### Chat Build
+### 📦 Clone
 
 ```bash
-$ mage
+git clone https://github.com/openimsdk/chat openim-chat
+cd openim-chat
 ```
 
+### 🛠 Initialization
 
-### Chat Start
+:computer: Before the first compilation, execute on Linux/Mac platforms:
+
+```
+sh bootstrap.sh
+```
+
+:computer: On Windows execute:
+
+```
+bootstrap.bat
+```
+
+### 🏗 Build
 
 ```bash
-$ mage start
+mage
 ```
 
-### Chat Check
+### 🚀 Start
 
 ```bash
-$ mage check
+mage start
 ```
 
-### Chat Stop
+### :floppy_disk: Or start in the background and collect logs
+
+```
+nohup mage start >> _output/logs/chat.log 2>&1 &
+```
+
+### :mag_right: Check
 
 ```bash
-$ mage stop
+mage check
 ```
 
-### 🚀 Boot Sequence
-1. start [open-im-server](https://github.com/openimsdk/open-im-server) successfully.
-2. modify related component configurations under the `config` folder.
-3. build chat `mage`.
-4. start chat `mage start`.
+### 🛑 Stop
 
-## Add REST RPC API
+```bash
+mage stop
+```
 
-Please refer to "[How to add REST RPC API for OpenIM Chat](./HOW_TO_ADD_REST_RPC_API.md)".
+### 🚀 Start Sequence
 
-## Setup LiveKit if you want to enable Audio and Video chat
+1. Successfully start [open-im-server](https://github.com/openimsdk/open-im-server).
+2. Compile chat `mage`.
+3. Start chat `mage start`.
 
-Please refer to "[How to setup LiveKit server](./HOW_TO_SETUP_LIVEKIT_SERVER.md)".
+## 📞 If you want to enable audio and video calls, please configure LiveKit
 
-## Contributing
+:link: Please refer to "[How to set up LiveKit server](./HOW_TO_SETUP_LIVEKIT_SERVER.md)".
 
-Contributions to this project are welcome! Please see [CONTRIBUTING.md](./CONTRIBUTING.md) for details.
+## :handshake: Contributing
 
-## Community Meetings
-We want anyone to get involved in our community, we offer gifts and rewards, and we welcome you to join us every Thursday night.
-
-We take notes of each [biweekly meeting](https://github.com/openimsdk/open-im-server/issues/381) in [GitHub discussions](https://github.com/openimsdk/open-im-server/discussions/categories/meeting), and our minutes are written in [Google Docs](https://docs.google.com/document/d/1nx8MDpuG74NASx081JcCpxPgDITNTpIIos0DS6Vr9GU/edit?usp=sharing).
-
-
-## Who are using open-im-server
-The [user case studies](https://github.com/openimsdk/community/blob/main/ADOPTERS.md) page includes the user list of the project. You can leave a [📝comment](https://github.com/openimsdk/open-im-server/issues/379) to let us know your use case.
-
+:heart: Contributions to this project are welcome! Please see [CONTRIBUTING.md](./CONTRIBUTING.md) for details.
 
 ## 🚨 License
 
-chat is licensed under the  Apache 2.0 license. See [LICENSE](https://github.com/openimsdk/chat/tree/main/LICENSE) for the full license text.
+:scroll: chat is licensed under the [GPL-3.0 license](https://github.com/openimsdk/chat#GPL-3.0-1-ov-file). See the [LICENSE](https://github.com/openimsdk/chat/tree/main/LICENSE) for the full license text.
