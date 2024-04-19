@@ -25,6 +25,7 @@ type Config struct {
 }
 
 func Start(ctx context.Context, index int, config *Config) error {
+	gin.SetMode(gin.ReleaseMode)
 	if len(config.Share.ChatAdmin) == 0 {
 		return errs.New("share chat admin not configured")
 	}
