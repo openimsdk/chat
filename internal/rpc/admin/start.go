@@ -5,6 +5,7 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"github.com/openimsdk/chat/pkg/common/config"
+	"github.com/openimsdk/chat/pkg/common/constant"
 	"github.com/openimsdk/chat/pkg/common/db/database"
 	"github.com/openimsdk/chat/pkg/common/db/dbutil"
 	"github.com/openimsdk/chat/pkg/common/db/table/admin"
@@ -82,7 +83,7 @@ func (o *adminServer) initAdmin(ctx context.Context, users []config.AdminUser) e
 			Account:    user.AdminID,
 			UserID:     user.IMUserID,
 			Password:   hex.EncodeToString(sum[:]),
-			Level:      100,
+			Level:      constant.DefaultAdminLevel,
 			CreateTime: time.Now(),
 		}
 		if err := o.Database.AddAdminAccount(ctx, []*admin.Admin{&a}); err != nil {
