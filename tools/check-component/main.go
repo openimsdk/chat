@@ -72,6 +72,11 @@ func initConfig(configDir string) (*config.Mongo, *config.Redis, *config.ZooKeep
 	if err != nil {
 		return nil, nil, nil, nil, err
 	}
+	err = config.LoadConfig(filepath.Join(configDir, cmd.ShareFileName), cmd.ConfigEnvPrefixMap[cmd.ShareFileName], shareConfig)
+	if err != nil {
+		return nil, nil, nil, nil, err
+	}
+
 	return mongoConfig, redisConfig, zookeeperConfig, shareConfig, nil
 }
 
