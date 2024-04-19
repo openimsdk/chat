@@ -25,7 +25,9 @@ import (
 	"github.com/openimsdk/tools/db/mongoutil"
 	"github.com/openimsdk/tools/db/redisutil"
 	"github.com/openimsdk/tools/discovery/zookeeper"
+	"github.com/openimsdk/tools/mcontext"
 	"github.com/openimsdk/tools/system/program"
+	"github.com/openimsdk/tools/utils/idutil"
 	"path/filepath"
 	"time"
 )
@@ -46,7 +48,7 @@ func CheckRedis(ctx context.Context, config *config.Redis) error {
 
 func CheckOpenIM(ctx context.Context, apiURL, secret, adminUserID string) error {
 	api2 := imapi.New(apiURL, secret, adminUserID)
-
+	mcontext.SetOperationID(ctx, "CheckOpenIM"+idutil.OperationIDGenerator())
 	_, err := api2.UserToken(ctx, adminUserID, constant.AdminPlatformID)
 	return err
 }
