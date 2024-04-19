@@ -117,10 +117,6 @@ func (r *RootCmd) applyOptions(opts ...func(*CmdOpts)) *CmdOpts {
 }
 
 func (r *RootCmd) initializeLogger(cmdOpts *CmdOpts) error {
-	fmt.Println("initializeLogger=======>", r.log.StorageLocation)
-	fmt.Printf("config log %+v\n", r.log)
-	fmt.Println(filepath.Abs(r.log.StorageLocation))
-	fmt.Println("=================================")
 	err := log.InitFromConfig(
 		cmdOpts.loggerPrefixName,
 		r.processName,
