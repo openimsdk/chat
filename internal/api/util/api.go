@@ -11,7 +11,6 @@ import (
 
 type Api struct {
 	ImUserID        string
-	ChatSecret      string
 	ProxyHeader     string
 	ChatAdminUserID string
 }

@@ -46,12 +46,6 @@ type CmdOpts struct {
 	configMap        map[string]any
 }
 
-func WithCronTaskLogName() func(*CmdOpts) {
-	return func(opts *CmdOpts) {
-		opts.loggerPrefixName = "openim-crontask"
-	}
-}
-
 func WithLogName(logName string) func(*CmdOpts) {
 	return func(opts *CmdOpts) {
 		opts.loggerPrefixName = logName
@@ -66,7 +60,7 @@ func WithConfigMap(configMap map[string]any) func(*CmdOpts) {
 func NewRootCmd(processName string, opts ...func(*CmdOpts)) *RootCmd {
 	rootCmd := &RootCmd{processName: processName}
 	cmd := cobra.Command{
-		Use:  "Start openIM application",
+		Use:  "Start openIM chat application",
 		Long: fmt.Sprintf(`Start %s `, processName),
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 			return rootCmd.persistentPreRun(cmd, opts...)
@@ -124,7 +118,6 @@ func (r *RootCmd) applyOptions(opts ...func(*CmdOpts)) *CmdOpts {
 
 func (r *RootCmd) initializeLogger(cmdOpts *CmdOpts) error {
 	err := log.InitFromConfig(
-
 		cmdOpts.loggerPrefixName,
 		r.processName,
 		r.log.RemainLogLevel,
@@ -144,7 +137,7 @@ func (r *RootCmd) initializeLogger(cmdOpts *CmdOpts) error {
 
 func defaultCmdOpts() *CmdOpts {
 	return &CmdOpts{
-		loggerPrefixName: "openim-service-log",
+		loggerPrefixName: "openim-chat-log",
 	}
 }
 
