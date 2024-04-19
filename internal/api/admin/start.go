@@ -75,8 +75,8 @@ func SetAdminRoute(router gin.IRouter, admin *Api, mw *chatmw.MW) {
 	//account.POST("/add_notification_account")
 
 	importGroup := router.Group("/user/import")
-	importGroup.POST("/json", mw.CheckAdminOrNil, admin.ImportUserByJson)
-	importGroup.POST("/xlsx", mw.CheckAdminOrNil, admin.ImportUserByXlsx)
+	importGroup.POST("/json", mw.CheckAdmin, admin.ImportUserByJson)
+	importGroup.POST("/xlsx", mw.CheckAdmin, admin.ImportUserByXlsx)
 	importGroup.GET("/xlsx", admin.BatchImportTemplate)
 
 	defaultRouter := router.Group("/default", mw.CheckAdmin)

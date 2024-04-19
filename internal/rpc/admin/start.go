@@ -55,7 +55,7 @@ func Start(ctx context.Context, config *Config, client discovery.SvcDiscoveryReg
 	srv.Chat = chatClient.NewChatClient(chat.NewChatClient(conn))
 	srv.Token = &tokenverify.Token{
 		Expires: time.Duration(config.RpcConfig.TokenPolicy.Expire) * time.Hour * 24,
-		Secret:  config.Share.Secret,
+		Secret:  config.RpcConfig.Secret,
 	}
 	if err := srv.initAdmin(ctx, config.Share.ChatAdmin); err != nil {
 		return err
