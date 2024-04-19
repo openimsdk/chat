@@ -2,8 +2,6 @@ module github.com/openimsdk/chat
 
 go 1.21.2
 
-toolchain go1.21.9
-
 require (
 	github.com/gin-gonic/gin v1.9.1
 	github.com/golang-jwt/jwt/v4 v4.5.0
