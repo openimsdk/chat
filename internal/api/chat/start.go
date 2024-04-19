@@ -56,6 +56,7 @@ func Start(ctx context.Context, index int, config *Config) error {
 	}
 	adminApi := New(chatClient, adminClient, im, &base)
 	mwApi := chatmw.New(adminClient)
+	gin.SetMode(gin.ReleaseMode)
 	engine := gin.Default()
 	engine.Use(mw.CorsHandler(), mw.GinParseOperationID())
 	SetChatRoute(engine, adminApi, mwApi)
