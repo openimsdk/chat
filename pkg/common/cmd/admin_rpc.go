@@ -42,7 +42,7 @@ func NewAdminRpcCmd() *AdminRpcCmd {
 	ret.RootCmd = NewRootCmd(program.GetProcessName(), WithConfigMap(ret.configMap))
 	ret.ctx = context.WithValue(context.Background(), "version", config.Version)
 	ret.Command.RunE = func(cmd *cobra.Command, args []string) error {
-		return ret.preRunE()
+		return ret.runE()
 	}
 	return &ret
 }
@@ -51,7 +51,7 @@ func (a *AdminRpcCmd) Exec() error {
 	return a.Execute()
 }
 
-func (a *AdminRpcCmd) preRunE() error {
+func (a *AdminRpcCmd) runE() error {
 	return startrpc.Start(a.ctx, &a.adminConfig.ZookeeperConfig, a.adminConfig.RpcConfig.RPC.ListenIP,
 		a.adminConfig.RpcConfig.RPC.RegisterIP, a.adminConfig.RpcConfig.RPC.Ports,
 		a.Index(), a.adminConfig.Share.RpcRegisterName.Admin, &a.adminConfig.Share, &a.adminConfig, admin.Start)

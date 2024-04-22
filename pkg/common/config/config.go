@@ -36,6 +36,13 @@ type RpcRegisterName struct {
 	Admin string `mapstructure:"admin"`
 }
 
+func (r *RpcRegisterName) GetServiceNames() []string {
+	return []string{
+		r.Chat,
+		r.Admin,
+	}
+}
+
 type API struct {
 	Api struct {
 		ListenIP string `mapstructure:"listenIP"`

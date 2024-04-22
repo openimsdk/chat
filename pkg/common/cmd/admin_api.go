@@ -25,7 +25,7 @@ func NewAdminApiCmd() *AdminApiCmd {
 	ret.RootCmd = NewRootCmd(program.GetProcessName(), WithConfigMap(ret.configMap))
 	ret.ctx = context.WithValue(context.Background(), "version", config.Version)
 	ret.Command.RunE = func(cmd *cobra.Command, args []string) error {
-		return ret.preRunE()
+		return ret.runE()
 	}
 	return &ret
 }
@@ -34,6 +34,6 @@ func (a *AdminApiCmd) Exec() error {
 	return a.Execute()
 }
 
-func (a *AdminApiCmd) preRunE() error {
+func (a *AdminApiCmd) runE() error {
 	return admin.Start(a.ctx, a.Index(), &a.apiConfig)
 }

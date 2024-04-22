@@ -1,6 +1,6 @@
 module github.com/openimsdk/chat
 
-go 1.21.2
+go 1.20
 
 require (
 	github.com/gin-gonic/gin v1.9.1
@@ -27,7 +27,7 @@ require (
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/openimsdk/gomake v0.0.6
 	github.com/openimsdk/protocol v0.0.63
-	github.com/openimsdk/tools v0.0.47-alpha.43
+	github.com/openimsdk/tools v0.0.48
 	github.com/redis/go-redis/v9 v9.5.1
 	github.com/spf13/cobra v1.8.0
 	github.com/spf13/viper v1.18.2

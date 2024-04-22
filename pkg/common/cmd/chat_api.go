@@ -25,7 +25,7 @@ func NewChatApiCmd() *ChatApiCmd {
 	ret.RootCmd = NewRootCmd(program.GetProcessName(), WithConfigMap(ret.configMap))
 	ret.ctx = context.WithValue(context.Background(), "version", config.Version)
 	ret.Command.RunE = func(cmd *cobra.Command, args []string) error {
-		return ret.preRunE()
+		return ret.runE()
 	}
 	return &ret
 }
@@ -34,6 +34,6 @@ func (a *ChatApiCmd) Exec() error {
 	return a.Execute()
 }
 
-func (a *ChatApiCmd) preRunE() error {
+func (a *ChatApiCmd) runE() error {
 	return chat.Start(a.ctx, a.Index(), &a.apiConfig)
 }
