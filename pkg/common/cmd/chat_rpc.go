@@ -42,7 +42,7 @@ func NewChatRpcCmd() *ChatRpcCmd {
 	ret.RootCmd = NewRootCmd(program.GetProcessName(), WithConfigMap(ret.configMap))
 	ret.ctx = context.WithValue(context.Background(), "version", config.Version)
 	ret.Command.RunE = func(cmd *cobra.Command, args []string) error {
-		return ret.preRunE()
+		return ret.runE()
 	}
 	return &ret
 }
@@ -51,7 +51,7 @@ func (a *ChatRpcCmd) Exec() error {
 	return a.Execute()
 }
 
-func (a *ChatRpcCmd) preRunE() error {
+func (a *ChatRpcCmd) runE() error {
 	return startrpc.Start(a.ctx, &a.chatConfig.ZookeeperConfig, a.chatConfig.RpcConfig.RPC.ListenIP,
 		a.chatConfig.RpcConfig.RPC.RegisterIP, a.chatConfig.RpcConfig.RPC.Ports,
 		a.Index(), a.chatConfig.Share.RpcRegisterName.Chat, &a.chatConfig.Share, &a.chatConfig, chat.Start)

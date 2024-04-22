@@ -36,6 +36,10 @@ func Start(ctx context.Context, index int, config *Config) error {
 	if err != nil {
 		return err
 	}
+
+	if err = client.CreateRpcRootNodes(config.Share.RpcRegisterName.GetServiceNames()); err != nil {
+		return errs.WrapMsg(err, "failed to create RPC root nodes")
+	}
 	chatConn, err := client.GetConn(ctx, config.Share.RpcRegisterName.Chat, grpc.WithTransportCredentials(insecure.NewCredentials()), mw.GrpcClient())
 	if err != nil {
 		return err
