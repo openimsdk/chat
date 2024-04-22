@@ -33,7 +33,6 @@ func (UserLoginRecord) TableName() string {
 }
 
 type UserLoginRecordInterface interface {
-	//NewTx(tx any) UserLoginRecordInterface
 	Create(ctx context.Context, records ...*UserLoginRecord) error
 	CountTotal(ctx context.Context, before *time.Time) (int64, error)
 	CountRangeEverydayTotal(ctx context.Context, start *time.Time, end *time.Time) (map[string]int64, int64, error)

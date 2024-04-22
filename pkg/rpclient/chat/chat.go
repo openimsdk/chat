@@ -16,26 +16,15 @@ package chat
 
 import (
 	"context"
-	"fmt"
-	"os"
-
-	"github.com/OpenIMSDK/tools/discoveryregistry"
-	"github.com/OpenIMSDK/tools/errs"
-	"github.com/OpenIMSDK/tools/utils"
-
-	"github.com/OpenIMSDK/chat/pkg/common/config"
-	"github.com/OpenIMSDK/chat/pkg/proto/chat"
-	"github.com/OpenIMSDK/chat/pkg/proto/common"
+	"github.com/openimsdk/chat/pkg/protocol/chat"
+	"github.com/openimsdk/chat/pkg/protocol/common"
+	"github.com/openimsdk/tools/errs"
+	"github.com/openimsdk/tools/utils/datautil"
 )
 
-func NewChatClient(discov discoveryregistry.SvcDiscoveryRegistry) *ChatClient {
-	conn, err := discov.GetConn(context.Background(), config.Config.RpcRegisterName.OpenImChatName)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "\n\nexit -1: \n%+v\n\n", err)
-		os.Exit(-1)
-	}
+func NewChatClient(client chat.ChatClient) *ChatClient {
 	return &ChatClient{
-		client: chat.NewChatClient(conn),
+		client: client,
 	}
 }
 
@@ -59,7 +48,7 @@ func (o *ChatClient) MapUserPublicInfo(ctx context.Context, userIDs []string) (m
 	if err != nil {
 		return nil, err
 	}
-	return utils.SliceToMap(users, func(user *common.UserPublicInfo) string {
+	return datautil.SliceToMap(users, func(user *common.UserPublicInfo) string {
 		return user.UserID
 	}), nil
 }
@@ -93,7 +82,7 @@ func (o *ChatClient) GetUserFullInfo(ctx context.Context, userID string) (*commo
 		return nil, err
 	}
 	if len(users) == 0 {
-		return nil, errs.ErrUserIDNotFound.Wrap()
+		return nil, errs.ErrRecordNotFound.WrapMsg("user id not found")
 	}
 	return users[0], nil
 }
@@ -104,7 +93,7 @@ func (o *ChatClient) GetUserPublicInfo(ctx context.Context, userID string) (*com
 		return nil, err
 	}
 	if len(users) == 0 {
-		return nil, errs.ErrUserIDNotFound.Wrap()
+		return nil, errs.ErrRecordNotFound.WrapMsg("user id not found", "userID", userID)
 	}
 	return users[0], nil
 }

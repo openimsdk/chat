@@ -15,7 +15,7 @@
 package dbutil
 
 import (
-	"github.com/OpenIMSDK/tools/errs"
+	"github.com/openimsdk/tools/errs"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 

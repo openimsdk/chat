@@ -1,0 +1,578 @@
+// Copyright © 2023 OpenIM open source community. All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+package openim.admin;
+import "wrapperspb/wrapperspb.proto";
+import "sdkws/sdkws.proto";
+import "common/common.proto";
+option go_package = "github.com/openimsdk/chat/pkg/protocol/admin";
+
+//登录
+message LoginReq  {
+  string account = 1;
+  string password = 2;
+}
+
+message LoginResp {
+  string adminAccount = 1;
+  string adminToken = 2;
+  string nickname = 3;
+  string faceURL = 4;
+  int32 level = 5;
+  string adminUserID = 6;
+}
+
+message AddAdminAccountReq{
+  string account=1;
+  string password=2;
+  string faceURL=3;
+  string nickname=4;
+}
+
+message AddAdminAccountResp{
+}
+
+message AdminUpdateInfoReq {
+  openim.protobuf.StringValue account = 1;
+  openim.protobuf.StringValue password = 2;
+  openim.protobuf.StringValue faceURL = 3;
+  openim.protobuf.StringValue nickname = 4;
+  openim.protobuf.Int32Value level = 6;
+}
+
+message AdminUpdateInfoResp {
+  string userID = 1;
+  string nickname = 2;
+  string faceURL = 3;
+}
+
+message ChangePasswordReq  {
+  string password = 1;
+}
+
+message ChangePasswordResp  {}
+
+
+message GetAdminInfoReq {
+}
+
+message ChangeAdminPasswordReq{
+    string userID = 1;
+    string currentPassword = 2;
+    string newPassword = 3;
+}
+
+message ChangeAdminPasswordResp{
+}
+
+message DelAdminAccountReq{
+  repeated string userIDs=1;
+}
+
+message DelAdminAccountResp{
+}
+
+message SearchAdminAccountReq{
+  openim.sdkws.RequestPagination pagination = 2;
+}
+
+message SearchAdminAccountResp{
+  uint32 total = 1;
+  repeated  GetAdminInfoResp adminAccounts= 2;
+}
+
+message GetAdminInfoResp {
+  string account = 2;
+  string password = 3;
+  string faceURL = 4;
+  string nickname = 5;
+  string userID = 6;
+  int32  level = 7;
+  int64  createTime = 8;
+}
+
+// ################### 默认好友 ###################
+
+message AddDefaultFriendReq {
+  repeated string userIDs = 1;
+}
+
+message AddDefaultFriendResp {}
+
+message DelDefaultFriendReq {
+  repeated string userIDs = 1;
+}
+
+message DelDefaultFriendResp {}
+
+message FindDefaultFriendReq {}
+
+message FindDefaultFriendResp {
+  repeated string userIDs = 1;
+}
+
+message SearchDefaultFriendReq {
+  string keyword = 1;
+  openim.sdkws.RequestPagination pagination = 2;
+}
+
+message DefaultFriendAttribute {
+  string userID = 1;
+  int64 createTime = 2;
+  openim.chat.common.UserPublicInfo user = 3;
+}
+
+message SearchDefaultFriendResp {
+  uint32 total = 1;
+  repeated DefaultFriendAttribute users = 2;
+}
+
+// ################### 默认群组 ###################
+
+
+message AddDefaultGroupReq {
+  repeated string groupIDs = 1;
+}
+
+message AddDefaultGroupResp {}
+
+message DelDefaultGroupReq {
+  repeated string groupIDs = 1;
+}
+
+message DelDefaultGroupResp {}
+
+message FindDefaultGroupReq {}
+
+message FindDefaultGroupResp {
+  repeated string groupIDs = 1;
+}
+
+message SearchDefaultGroupReq {
+  string keyword = 1;
+  openim.sdkws.RequestPagination pagination = 2;
+}
+
+message GroupAttribute {
+  string groupID = 1;
+  int64 createTime = 2;
+  openim.sdkws.GroupInfo group = 3;
+}
+
+message SearchDefaultGroupResp {
+  uint32 total = 1;
+  repeated string groupIDs = 2;
+}
+
+// ################### 邀请码 ###################
+
+message AddInvitationCodeReq {
+  repeated string codes = 1;
+}
+
+message AddInvitationCodeResp {}
+
+message GenInvitationCodeReq {
+  int32 len = 1;
+  int32 num = 2;
+  string chars = 3;
+}
+
+message GenInvitationCodeResp {}
+
+message FindInvitationCodeReq{
+  repeated string codes = 1;
+}
+
+message FindInvitationCodeResp{
+  repeated InvitationRegister codes = 1;
+}
+
+message UseInvitationCodeReq{
+  string code = 1;
+  string userID = 2;
+}
+
+message UseInvitationCodeResp{
+}
+
+
+message DelInvitationCodeReq {
+  repeated string codes = 1;
+}
+
+message DelInvitationCodeResp {}
+
+message InvitationRegister {
+  string invitationCode = 1;
+  int64 createTime = 2;
+  string usedUserID = 3;
+  openim.chat.common.UserPublicInfo usedUser = 4;
+}
+
+
+
+message SearchInvitationCodeReq {
+  int32 status = 1;
+  repeated string userIDs = 2;
+  repeated string codes = 3;
+  string keyword = 4;
+  openim.sdkws.RequestPagination pagination = 5;
+}
+
+message SearchInvitationCodeResp {
+  uint32 total = 1;
+  repeated InvitationRegister list = 2;
+}
+
+// ################### 用户登录ip限制 ###################
+
+message SearchUserIPLimitLoginReq {
+  string keyword = 1;
+  openim.sdkws.RequestPagination pagination = 2;
+}
+
+message LimitUserLoginIP {
+  string userID = 1;
+  string ip = 2;
+  int64 createTime = 3;
+  openim.chat.common.UserPublicInfo user = 4;
+}
+
+message SearchUserIPLimitLoginResp {
+  uint32 total = 1;
+  repeated LimitUserLoginIP limits = 2;
+}
+
+message UserIPLimitLogin {
+  string userID = 1;
+  string ip = 2;
+}
+
+message AddUserIPLimitLoginReq {
+  repeated UserIPLimitLogin limits = 1;
+}
+
+message AddUserIPLimitLoginResp {
+}
+
+message DelUserIPLimitLoginReq {
+  repeated UserIPLimitLogin limits = 1;
+}
+
+message DelUserIPLimitLoginResp {
+}
+
+
+// ################### 用户IP限制 ###################
+
+message IPForbidden {
+  string ip = 1;
+  bool limitRegister = 2;
+  bool limitLogin = 3;
+  int64 createTime = 4;
+}
+
+message IPForbiddenAdd {
+  string ip = 1;
+  bool limitRegister = 2;
+  bool limitLogin = 3;
+}
+
+message SearchIPForbiddenReq {
+  string keyword = 1;
+  int32 status = 2;
+  openim.sdkws.RequestPagination pagination = 3;
+}
+
+message SearchIPForbiddenResp{
+  uint32 total = 1;
+  repeated IPForbidden forbiddens = 2;
+}
+
+message AddIPForbiddenReq {
+  repeated IPForbiddenAdd forbiddens = 1;
+}
+message AddIPForbiddenResp {}
+
+message DelIPForbiddenReq {
+  repeated string ips = 1;
+}
+message DelIPForbiddenResp {}
+
+// ################### 用户限制 ###################
+message CheckRegisterForbiddenReq {
+  string ip = 1;
+}
+
+message CheckRegisterForbiddenResp {
+}
+
+message CheckLoginForbiddenReq {
+  string ip = 1;
+  string userID = 2;
+}
+
+message CheckLoginForbiddenResp {
+}
+
+// ################### 注销 ###################
+message CancellationUserReq{
+  string userID = 1;
+  string reason = 2;
+}
+
+message CancellationUserResp {}
+
+// ################### 封号、解封 ###################
+message BlockUserReq{
+  string userID = 1;
+  string reason = 2;
+}
+
+message BlockUserResp {
+}
+
+message UnblockUserReq{
+  repeated string userIDs = 1;
+}
+
+message UnblockUserResp {}
+
+
+message SearchBlockUserReq{
+  string keyword = 1;
+  openim.sdkws.RequestPagination pagination = 2;
+}
+
+message BlockUserInfo {
+  string userID = 1;
+  string account = 2;
+  string phoneNumber = 3;
+  string areaCode = 4;
+  string email = 5;
+  string nickname = 6;
+  string faceURL = 7;
+  int32 gender = 8;
+  string reason = 9;
+  string opUserID = 10;
+  int64 createTime = 11;
+}
+
+message SearchBlockUserResp{
+  uint32 total = 1;
+  repeated BlockUserInfo users = 2;
+}
+
+message FindUserBlockInfoReq{
+  repeated string userIDs = 1;
+}
+
+message BlockInfo {
+  string  userID = 1;
+  string  reason = 2;
+  string opUserID = 3;
+  int64  createTime = 4;
+}
+
+
+message FindUserBlockInfoResp{
+  repeated BlockInfo blocks = 2;
+}
+
+// ################### TOKEN ###################
+
+message CreateTokenReq{
+  string userID = 2;
+  int32 userType = 3;
+}
+
+message CreateTokenResp{
+  string token = 2;
+}
+
+message ParseTokenReq{
+  string token = 2;
+}
+
+message ParseTokenResp{
+  string userID = 2;
+  int32 userType = 3;
+  int64 expireTimeSeconds = 4;
+}
+
+// ################### 小程序 ###################
+
+message AddAppletReq  {
+  string id = 1;
+  string name = 2;
+  string appID = 3;
+  string icon = 4;
+  string url = 5;
+  string md5 = 6;
+  int64 size = 7;
+  string version = 8;
+  uint32 priority = 9;
+  uint32 status = 10;
+  int64 createTime = 11;
+}
+
+message AddAppletResp  {
+}
+
+
+message DelAppletReq  {
+  repeated string appletIds = 1;
+}
+
+message DelAppletResp  {
+}
+
+
+message UpdateAppletReq  {
+  string id = 1;
+  openim.protobuf.StringValue name = 2;
+  openim.protobuf.StringValue appID = 3;
+  openim.protobuf.StringValue icon = 4;
+  openim.protobuf.StringValue url = 5;
+  openim.protobuf.StringValue md5 = 6;
+  openim.protobuf.Int64Value size = 7;
+  openim.protobuf.StringValue version = 8;
+  openim.protobuf.UInt32Value priority = 9;
+  openim.protobuf.UInt32Value status = 10;
+  openim.protobuf.Int64Value createTime = 11;
+}
+
+message UpdateAppletResp  {
+}
+
+message FindAppletReq {
+}
+
+message FindAppletResp {
+  repeated openim.chat.common.AppletInfo applets = 1;
+}
+
+message SearchAppletReq {
+  string keyword = 1;
+  openim.sdkws.RequestPagination pagination = 2;
+}
+
+message SearchAppletResp {
+  uint32 total = 1;
+  repeated openim.chat.common.AppletInfo applets = 2;
+}
+
+
+message SetClientConfigReq {
+  map<string, string> config = 1;
+}
+
+message SetClientConfigResp {
+}
+
+message DelClientConfigReq {
+  repeated string keys = 1;
+}
+
+message DelClientConfigResp {
+}
+
+message GetClientConfigReq {
+}
+
+message GetClientConfigResp {
+  map<string, string> config = 1;
+}
+
+message GetUserTokenReq{
+  string userID = 1;
+}
+
+message GetUserTokenResp{
+  map<string, int32> tokensMap = 1;
+}
+
+service admin {
+  // Login
+  rpc Login(LoginReq) returns(LoginResp);
+  rpc ChangePassword(ChangePasswordReq) returns(ChangePasswordResp);
+  rpc AdminUpdateInfo(AdminUpdateInfoReq)returns(AdminUpdateInfoResp);
+  // Get administrator information
+  rpc GetAdminInfo(GetAdminInfoReq) returns(GetAdminInfoResp);
+  rpc AddAdminAccount(AddAdminAccountReq)returns(AddAdminAccountResp);
+  rpc ChangeAdminPassword(ChangeAdminPasswordReq)returns(ChangeAdminPasswordResp);
+  rpc DelAdminAccount(DelAdminAccountReq)returns(DelAdminAccountResp);
+  rpc SearchAdminAccount(SearchAdminAccountReq)returns(SearchAdminAccountResp);
+
+  // Add Remove Get default friend list on registration
+  rpc AddDefaultFriend(AddDefaultFriendReq) returns(AddDefaultFriendResp);
+  rpc DelDefaultFriend(DelDefaultFriendReq) returns(DelDefaultFriendResp);
+  rpc FindDefaultFriend(FindDefaultFriendReq) returns(FindDefaultFriendResp);
+  rpc SearchDefaultFriend(SearchDefaultFriendReq) returns(SearchDefaultFriendResp);
+
+  rpc AddDefaultGroup(AddDefaultGroupReq) returns(AddDefaultGroupResp);
+  rpc DelDefaultGroup(DelDefaultGroupReq) returns(DelDefaultGroupResp);
+  rpc FindDefaultGroup(FindDefaultGroupReq) returns(FindDefaultGroupResp);
+  rpc SearchDefaultGroup(SearchDefaultGroupReq) returns(SearchDefaultGroupResp);
+
+
+  // Invitation Code Generate Query Get
+  rpc AddInvitationCode(AddInvitationCodeReq) returns(AddInvitationCodeResp);
+  rpc GenInvitationCode(GenInvitationCodeReq) returns(GenInvitationCodeResp);
+  rpc FindInvitationCode(FindInvitationCodeReq) returns(FindInvitationCodeResp);
+  rpc UseInvitationCode(UseInvitationCodeReq) returns(UseInvitationCodeResp);
+  rpc DelInvitationCode(DelInvitationCodeReq) returns(DelInvitationCodeResp);
+  rpc SearchInvitationCode(SearchInvitationCodeReq) returns(SearchInvitationCodeResp);
+
+  // User login ip limit Query Add Remove
+  rpc SearchUserIPLimitLogin(SearchUserIPLimitLoginReq) returns(SearchUserIPLimitLoginResp);
+  rpc AddUserIPLimitLogin(AddUserIPLimitLoginReq) returns(AddUserIPLimitLoginResp);
+  rpc DelUserIPLimitLogin(DelUserIPLimitLoginReq) returns(DelUserIPLimitLoginResp);
+
+  // Prohibit users from registering at certain ip Query Add Remove
+  rpc SearchIPForbidden(SearchIPForbiddenReq) returns(SearchIPForbiddenResp);
+  rpc AddIPForbidden(AddIPForbiddenReq) returns(AddIPForbiddenResp);
+  rpc DelIPForbidden(DelIPForbiddenReq) returns(DelIPForbiddenResp);
+
+  // User Management Related Add Block/Unblock Pull
+  rpc CancellationUser(CancellationUserReq) returns(CancellationUserResp);
+  rpc BlockUser(BlockUserReq) returns(BlockUserResp);
+  rpc UnblockUser(UnblockUserReq) returns(UnblockUserResp);
+  rpc SearchBlockUser(SearchBlockUserReq) returns(SearchBlockUserResp);
+  rpc FindUserBlockInfo(FindUserBlockInfoReq) returns(FindUserBlockInfoResp);
+
+  rpc CheckRegisterForbidden(CheckRegisterForbiddenReq)returns(CheckRegisterForbiddenResp);
+  rpc CheckLoginForbidden(CheckLoginForbiddenReq)returns(CheckLoginForbiddenResp);
+
+  // create token
+  rpc CreateToken(CreateTokenReq) returns(CreateTokenResp);
+  // parse token
+  rpc ParseToken(ParseTokenReq) returns(ParseTokenResp);
+
+  // app
+  rpc AddApplet(AddAppletReq)returns(AddAppletResp);
+  rpc DelApplet(DelAppletReq)returns(DelAppletResp);
+  rpc UpdateApplet(UpdateAppletReq)returns(UpdateAppletResp);
+  rpc FindApplet(FindAppletReq)returns(FindAppletResp);
+  rpc SearchApplet(SearchAppletReq)returns(SearchAppletResp);
+
+  // Client Configuration
+  rpc GetClientConfig(GetClientConfigReq) returns(GetClientConfigResp);
+  rpc SetClientConfig(SetClientConfigReq) returns(SetClientConfigResp);
+  rpc DelClientConfig(DelClientConfigReq) returns(DelClientConfigResp);
+
+  rpc GetUserToken(GetUserTokenReq) returns (GetUserTokenResp);
+}

@@ -1,0 +1,84 @@
+// Copyright © 2023 OpenIM open source community. All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+package openim.chat.common;
+option go_package = "github.com/openimsdk/chat/pkg/protocol/common";
+
+
+message UserFullInfo{
+  string  userID = 1;
+  string  password = 2;
+  string  account = 3;
+  string  phoneNumber = 4;
+  string  areaCode = 5;
+  string  email = 6;
+  string  nickname = 7;
+  string  faceURL = 8;
+  int32  gender = 9;
+  int32  level = 10;
+  int64 birth = 11;
+  int32  allowAddFriend = 12;
+  int32  allowBeep = 13;
+  int32  allowVibration = 14;
+  int32 globalRecvMsgOpt = 15;
+  int32 registerType = 16;
+}
+
+message UserPublicInfo{
+  string  userID = 1;
+  string  account = 2;
+  string  email = 3;
+  string  nickname = 4;
+  string  faceURL = 5;
+  int32  gender = 6;
+  int32  level = 7;
+}
+
+message UserIdentity {
+  string email = 1;
+  string areaCode = 2;
+  string phoneNumber = 3;
+  string deviceID = 4;
+  int32 platform = 5;
+  string account = 6;
+}
+
+
+message AppletInfo  {
+  string id = 1;
+  string name = 2;
+  string appID = 3;
+  string icon = 4;
+  string url = 5;
+  string md5 = 6;
+  int64 size = 7;
+  string version = 8;
+  uint32 priority = 9;
+  uint32 status = 10;
+  int64 createTime = 11;
+}
+
+message LogInfo{
+  string userID=1;
+  int32 platform=2;
+  string url=3;
+  int64 createTime=4;
+  string nickname=5;
+  string logID=6;
+  string filename=7;
+  string systemType=8;
+  string ex=9;
+  string version=10;
+}

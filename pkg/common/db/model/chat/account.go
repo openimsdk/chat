@@ -16,14 +16,14 @@ package chat
 
 import (
 	"context"
-	"github.com/OpenIMSDK/tools/errs"
-	"github.com/OpenIMSDK/tools/mgoutil"
+	"github.com/openimsdk/tools/db/mongoutil"
+	"github.com/openimsdk/tools/errs"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"time"
 
-	"github.com/OpenIMSDK/chat/pkg/common/db/table/chat"
+	"github.com/openimsdk/chat/pkg/common/db/table/chat"
 )
 
 func NewAccount(db *mongo.Database) (chat.AccountInterface, error) {
@@ -45,20 +45,20 @@ type Account struct {
 }
 
 func (o *Account) Create(ctx context.Context, accounts ...*chat.Account) error {
-	return mgoutil.InsertMany(ctx, o.coll, accounts)
+	return mongoutil.InsertMany(ctx, o.coll, accounts)
 }
 
 func (o *Account) Take(ctx context.Context, userId string) (*chat.Account, error) {
-	return mgoutil.FindOne[*chat.Account](ctx, o.coll, bson.M{"user_id": userId})
+	return mongoutil.FindOne[*chat.Account](ctx, o.coll, bson.M{"user_id": userId})
 }
 
 func (o *Account) Update(ctx context.Context, userID string, data map[string]any) error {
 	if len(data) == 0 {
 		return nil
 	}
-	return mgoutil.UpdateOne(ctx, o.coll, bson.M{"user_id": userID}, bson.M{"$set": data}, false)
+	return mongoutil.UpdateOne(ctx, o.coll, bson.M{"user_id": userID}, bson.M{"$set": data}, false)
 }
 
 func (o *Account) UpdatePassword(ctx context.Context, userId string, password string) error {
-	return mgoutil.UpdateOne(ctx, o.coll, bson.M{"user_id": userId}, bson.M{"$set": bson.M{"password": password, "change_time": time.Now()}}, false)
+	return mongoutil.UpdateOne(ctx, o.coll, bson.M{"user_id": userId}, bson.M{"$set": bson.M{"password": password, "change_time": time.Now()}}, false)
 }
