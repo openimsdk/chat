@@ -16,14 +16,14 @@ package admin
 
 import (
 	"context"
-	"github.com/OpenIMSDK/tools/mgoutil"
-	"github.com/OpenIMSDK/tools/pagination"
+	"github.com/openimsdk/tools/db/mongoutil"
+	"github.com/openimsdk/tools/db/pagination"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 
-	"github.com/OpenIMSDK/chat/pkg/common/db/table/admin"
-	"github.com/OpenIMSDK/tools/errs"
+	"github.com/openimsdk/chat/pkg/common/db/table/admin"
+	"github.com/openimsdk/tools/errs"
 )
 
 func NewRegisterAddFriend(db *mongo.Database) (admin.RegisterAddFriendInterface, error) {
@@ -47,14 +47,14 @@ type RegisterAddFriend struct {
 }
 
 func (o *RegisterAddFriend) Add(ctx context.Context, registerAddFriends []*admin.RegisterAddFriend) error {
-	return mgoutil.InsertMany(ctx, o.coll, registerAddFriends)
+	return mongoutil.InsertMany(ctx, o.coll, registerAddFriends)
 }
 
 func (o *RegisterAddFriend) Del(ctx context.Context, userIDs []string) error {
 	if len(userIDs) == 0 {
 		return nil
 	}
-	return mgoutil.DeleteMany(ctx, o.coll, bson.M{"user_id": bson.M{"$in": userIDs}})
+	return mongoutil.DeleteMany(ctx, o.coll, bson.M{"user_id": bson.M{"$in": userIDs}})
 }
 
 func (o *RegisterAddFriend) FindUserID(ctx context.Context, userIDs []string) ([]string, error) {
@@ -62,10 +62,10 @@ func (o *RegisterAddFriend) FindUserID(ctx context.Context, userIDs []string) ([
 	if len(userIDs) > 0 {
 		filter["user_id"] = bson.M{"$in": userIDs}
 	}
-	return mgoutil.Find[string](ctx, o.coll, filter, options.Find().SetProjection(bson.M{"_id": 0, "user_id": 1}))
+	return mongoutil.Find[string](ctx, o.coll, filter, options.Find().SetProjection(bson.M{"_id": 0, "user_id": 1}))
 }
 
 func (o *RegisterAddFriend) Search(ctx context.Context, keyword string, pagination pagination.Pagination) (int64, []*admin.RegisterAddFriend, error) {
 	filter := bson.M{"user_id": bson.M{"$regex": keyword, "$options": "i"}}
-	return mgoutil.FindPage[*admin.RegisterAddFriend](ctx, o.coll, filter, pagination)
+	return mongoutil.FindPage[*admin.RegisterAddFriend](ctx, o.coll, filter, pagination)
 }

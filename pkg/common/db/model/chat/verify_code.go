@@ -16,15 +16,15 @@ package chat
 
 import (
 	"context"
-	"github.com/OpenIMSDK/tools/mgoutil"
+	"github.com/openimsdk/tools/db/mongoutil"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"time"
 
-	"github.com/OpenIMSDK/chat/pkg/common/db/table/chat"
-	"github.com/OpenIMSDK/tools/errs"
+	"github.com/openimsdk/chat/pkg/common/db/table/chat"
+	"github.com/openimsdk/tools/errs"
 )
 
 type mongoVerifyCode struct {
@@ -93,7 +93,7 @@ func (o *VerifyCode) Add(ctx context.Context, ms []*chat.VerifyCode) error {
 			CreateTime: m.CreateTime,
 		})
 	}
-	return mgoutil.InsertMany(ctx, o.coll, tmp)
+	return mongoutil.InsertMany(ctx, o.coll, tmp)
 }
 
 func (o *VerifyCode) RangeNum(ctx context.Context, account string, start time.Time, end time.Time) (int64, error) {
@@ -104,7 +104,7 @@ func (o *VerifyCode) RangeNum(ctx context.Context, account string, start time.Ti
 			"$lte": end,
 		},
 	}
-	return mgoutil.Count(ctx, o.coll, filter)
+	return mongoutil.Count(ctx, o.coll, filter)
 }
 
 func (o *VerifyCode) TakeLast(ctx context.Context, account string) (*chat.VerifyCode, error) {
@@ -112,7 +112,7 @@ func (o *VerifyCode) TakeLast(ctx context.Context, account string) (*chat.Verify
 		"account": account,
 	}
 	opt := options.FindOne().SetSort(bson.M{"_id": -1})
-	last, err := mgoutil.FindOne[*mongoVerifyCode](ctx, o.coll, filter, opt)
+	last, err := mongoutil.FindOne[*mongoVerifyCode](ctx, o.coll, filter, opt)
 	if err != nil {
 		return nil, err
 	}
@@ -133,7 +133,7 @@ func (o *VerifyCode) Incr(ctx context.Context, id string) error {
 	if err != nil {
 		return err
 	}
-	return mgoutil.UpdateOne(ctx, o.coll, bson.M{"_id": objID}, bson.M{"$inc": bson.M{"count": 1}}, false)
+	return mongoutil.UpdateOne(ctx, o.coll, bson.M{"_id": objID}, bson.M{"$inc": bson.M{"count": 1}}, false)
 }
 
 func (o *VerifyCode) Delete(ctx context.Context, id string) error {
@@ -141,5 +141,5 @@ func (o *VerifyCode) Delete(ctx context.Context, id string) error {
 	if err != nil {
 		return err
 	}
-	return mgoutil.DeleteOne(ctx, o.coll, bson.M{"_id": objID})
+	return mongoutil.DeleteOne(ctx, o.coll, bson.M{"_id": objID})
 }

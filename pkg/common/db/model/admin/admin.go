@@ -16,19 +16,14 @@ package admin
 
 import (
 	"context"
-	"crypto/md5"
-	"encoding/hex"
-	"github.com/OpenIMSDK/chat/pkg/common/constant"
-	"github.com/OpenIMSDK/tools/mgoutil"
-	"github.com/OpenIMSDK/tools/pagination"
+	"github.com/openimsdk/chat/pkg/common/constant"
+	"github.com/openimsdk/chat/pkg/common/db/table/admin"
+	"github.com/openimsdk/tools/db/mongoutil"
+	"github.com/openimsdk/tools/db/pagination"
+	"github.com/openimsdk/tools/errs"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"time"
-
-	"github.com/OpenIMSDK/chat/pkg/common/config"
-	"github.com/OpenIMSDK/chat/pkg/common/db/table/admin"
-	"github.com/OpenIMSDK/tools/errs"
 )
 
 func NewAdmin(db *mongo.Database) (admin.AdminInterface, error) {
@@ -52,26 +47,26 @@ type Admin struct {
 }
 
 func (o *Admin) Take(ctx context.Context, account string) (*admin.Admin, error) {
-	return mgoutil.FindOne[*admin.Admin](ctx, o.coll, bson.M{"account": account})
+	return mongoutil.FindOne[*admin.Admin](ctx, o.coll, bson.M{"account": account})
 }
 
 func (o *Admin) TakeUserID(ctx context.Context, userID string) (*admin.Admin, error) {
-	return mgoutil.FindOne[*admin.Admin](ctx, o.coll, bson.M{"user_id": userID})
+	return mongoutil.FindOne[*admin.Admin](ctx, o.coll, bson.M{"user_id": userID})
 }
 
 func (o *Admin) Update(ctx context.Context, account string, update map[string]any) error {
 	if len(update) == 0 {
 		return nil
 	}
-	return mgoutil.UpdateOne(ctx, o.coll, bson.M{"user_id": account}, bson.M{"$set": update}, false)
+	return mongoutil.UpdateOne(ctx, o.coll, bson.M{"user_id": account}, bson.M{"$set": update}, false)
 }
 
 func (o *Admin) Create(ctx context.Context, admins []*admin.Admin) error {
-	return mgoutil.InsertMany(ctx, o.coll, admins)
+	return mongoutil.InsertMany(ctx, o.coll, admins)
 }
 
 func (o *Admin) ChangePassword(ctx context.Context, userID string, newPassword string) error {
-	return mgoutil.UpdateOne(ctx, o.coll, bson.M{"user_id": userID}, bson.M{"$set": bson.M{"password": newPassword}}, false)
+	return mongoutil.UpdateOne(ctx, o.coll, bson.M{"user_id": userID}, bson.M{"$set": bson.M{"password": newPassword}}, false)
 
 }
 
@@ -79,54 +74,11 @@ func (o *Admin) Delete(ctx context.Context, userIDs []string) error {
 	if len(userIDs) == 0 {
 		return nil
 	}
-	return mgoutil.DeleteMany(ctx, o.coll, bson.M{"user_id": bson.M{"$in": userIDs}})
+	return mongoutil.DeleteMany(ctx, o.coll, bson.M{"user_id": bson.M{"$in": userIDs}})
 }
 
 func (o *Admin) Search(ctx context.Context, pagination pagination.Pagination) (int64, []*admin.Admin, error) {
 	opt := options.Find().SetSort(bson.D{{"create_time", -1}})
 	filter := bson.M{"level": constant.NormalAdmin}
-	return mgoutil.FindPage[*admin.Admin](ctx, o.coll, filter, pagination, opt)
-}
-
-func (o *Admin) InitAdmin(ctx context.Context) error {
-	filter := bson.M{}
-	count, err := mgoutil.Count(ctx, o.coll, filter)
-	if err != nil {
-		return errs.Wrap(err)
-	}
-	if count > 0 {
-		return nil
-	}
-	if len(config.Config.ChatAdmin) == 0 {
-		return nil
-	}
-
-	admins := make([]*admin.Admin, 0, len(config.Config.ChatAdmin))
-	o.createAdmins(&admins, config.Config.ChatAdmin)
-
-	return mgoutil.InsertMany(ctx, o.coll, admins)
-}
-
-func (o *Admin) createAdmins(adminList *[]*admin.Admin, registerList []config.Admin) {
-	// chatAdmin set the level to 50, this account use for send notification.
-	for _, adminChat := range registerList {
-		table := admin.Admin{
-			Account:    adminChat.AdminID,
-			UserID:     adminChat.ImAdminID,
-			Password:   o.passwordEncryption(adminChat.AdminID),
-			Level:      100,
-			CreateTime: time.Now(),
-		}
-		if adminChat.NickName != "" {
-			table.Nickname = adminChat.NickName
-		} else {
-			table.Nickname = adminChat.AdminID
-		}
-		*adminList = append(*adminList, &table)
-	}
-}
-
-func (o *Admin) passwordEncryption(password string) string {
-	paswd := md5.Sum([]byte(password))
-	return hex.EncodeToString(paswd[:])
+	return mongoutil.FindPage[*admin.Admin](ctx, o.coll, filter, pagination, opt)
 }

@@ -16,14 +16,14 @@ package chat
 
 import (
 	"context"
-	"github.com/OpenIMSDK/tools/mgoutil"
+	"github.com/openimsdk/tools/db/mongoutil"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"time"
 
-	"github.com/OpenIMSDK/chat/pkg/common/db/table/chat"
-	"github.com/OpenIMSDK/tools/errs"
+	"github.com/openimsdk/chat/pkg/common/db/table/chat"
+	"github.com/openimsdk/tools/errs"
 )
 
 func NewRegister(db *mongo.Database) (chat.RegisterInterface, error) {
@@ -47,7 +47,7 @@ type Register struct {
 }
 
 func (o *Register) Create(ctx context.Context, registers ...*chat.Register) error {
-	return mgoutil.InsertMany(ctx, o.coll, registers)
+	return mongoutil.InsertMany(ctx, o.coll, registers)
 }
 
 func (o *Register) CountTotal(ctx context.Context, before *time.Time) (int64, error) {
@@ -55,5 +55,5 @@ func (o *Register) CountTotal(ctx context.Context, before *time.Time) (int64, er
 	if before != nil {
 		filter["create_time"] = bson.M{"$lt": before}
 	}
-	return mgoutil.Count(ctx, o.coll, filter)
+	return mongoutil.Count(ctx, o.coll, filter)
 }

@@ -14,7 +14,7 @@
 
 package eerrs
 
-import "github.com/OpenIMSDK/tools/errs"
+import "github.com/openimsdk/tools/errs"
 
 var (
 	ErrPassword                 = errs.NewCodeError(20001, "PasswordError")            // 密码错误

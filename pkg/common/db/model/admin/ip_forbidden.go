@@ -16,15 +16,15 @@ package admin
 
 import (
 	"context"
-	"github.com/OpenIMSDK/tools/mgoutil"
-	"github.com/OpenIMSDK/tools/pagination"
+	"github.com/openimsdk/tools/db/mongoutil"
+	"github.com/openimsdk/tools/db/pagination"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 
-	"github.com/OpenIMSDK/chat/pkg/common/constant"
-	"github.com/OpenIMSDK/chat/pkg/common/db/table/admin"
-	"github.com/OpenIMSDK/tools/errs"
+	"github.com/openimsdk/chat/pkg/common/constant"
+	"github.com/openimsdk/chat/pkg/common/db/table/admin"
+	"github.com/openimsdk/tools/errs"
 )
 
 func NewIPForbidden(db *mongo.Database) (admin.IPForbiddenInterface, error) {
@@ -48,12 +48,12 @@ type IPForbidden struct {
 }
 
 func (o *IPForbidden) Take(ctx context.Context, ip string) (*admin.IPForbidden, error) {
-	return mgoutil.FindOne[*admin.IPForbidden](ctx, o.coll, bson.M{"ip": ip})
+	return mongoutil.FindOne[*admin.IPForbidden](ctx, o.coll, bson.M{"ip": ip})
 
 }
 
 func (o *IPForbidden) Find(ctx context.Context, ips []string) ([]*admin.IPForbidden, error) {
-	return mgoutil.Find[*admin.IPForbidden](ctx, o.coll, bson.M{"ip": bson.M{"$in": ips}})
+	return mongoutil.Find[*admin.IPForbidden](ctx, o.coll, bson.M{"ip": bson.M{"$in": ips}})
 
 }
 
@@ -82,16 +82,16 @@ func (o *IPForbidden) Search(ctx context.Context, keyword string, state int32, p
 			{"ip": bson.M{"$regex": keyword, "$options": "i"}},
 		}
 	}
-	return mgoutil.FindPage[*admin.IPForbidden](ctx, o.coll, filter, pagination)
+	return mongoutil.FindPage[*admin.IPForbidden](ctx, o.coll, filter, pagination)
 }
 
 func (o *IPForbidden) Create(ctx context.Context, ms []*admin.IPForbidden) error {
-	return mgoutil.InsertMany(ctx, o.coll, ms)
+	return mongoutil.InsertMany(ctx, o.coll, ms)
 }
 
 func (o *IPForbidden) Delete(ctx context.Context, ips []string) error {
 	if len(ips) == 0 {
 		return nil
 	}
-	return mgoutil.DeleteMany(ctx, o.coll, bson.M{"ip": bson.M{"$in": ips}})
+	return mongoutil.DeleteMany(ctx, o.coll, bson.M{"ip": bson.M{"$in": ips}})
 }

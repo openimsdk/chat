@@ -17,13 +17,11 @@ package admin
 import (
 	"context"
 
-	"github.com/OpenIMSDK/chat/pkg/common/config"
-	"github.com/OpenIMSDK/chat/pkg/common/tokenverify"
-	"github.com/OpenIMSDK/chat/pkg/proto/admin"
+	"github.com/openimsdk/chat/pkg/protocol/admin"
 )
 
 func (o *adminServer) CreateToken(ctx context.Context, req *admin.CreateTokenReq) (*admin.CreateTokenResp, error) {
-	token, err := tokenverify.CreateToken(req.UserID, req.UserType, *config.Config.TokenPolicy.Expire)
+	token, err := o.Token.CreateToken(req.UserID, req.UserType)
 	if err != nil {
 		return nil, err
 	}
@@ -36,8 +34,8 @@ func (o *adminServer) CreateToken(ctx context.Context, req *admin.CreateTokenReq
 	}, nil
 }
 
-func (*adminServer) ParseToken(ctx context.Context, req *admin.ParseTokenReq) (*admin.ParseTokenResp, error) {
-	userID, userType, err := tokenverify.GetToken(req.Token)
+func (o *adminServer) ParseToken(ctx context.Context, req *admin.ParseTokenReq) (*admin.ParseTokenResp, error) {
+	userID, userType, err := o.Token.GetToken(req.Token)
 	if err != nil {
 		return nil, err
 	}
