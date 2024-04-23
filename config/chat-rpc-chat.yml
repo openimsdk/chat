@@ -1,0 +1,32 @@
+rpc:
+  registerIP: ''
+  listenIP: 0.0.0.0
+  ports: [ 30300 ]
+
+verifyCode:
+  validTime: 300
+  validCount: 5
+  uintTime: 86400
+  maxCount: 10
+  superCode: "666666"
+  len: 6
+  phone:
+    use: ""
+    ali:
+      endpoint: ""
+      accessKeyId: ""
+      accessKeySecret: ""
+      signName: ""
+      verificationCodeTemplateCode: ""
+  mail:
+    enable: false
+    title: ""
+    senderMail: ""
+    senderAuthorizationCode: ""
+    smtpAddr: ""
+    smtpPort:
+
+liveKit:
+  url: "ws://127.0.0.1:7880" # LIVEKIT_URL, LiveKit server address and port
+  key: "APIGPW3gnFTzqHH"
+  secret: "23ztfSqsfQ8hKkHzHTl3Z4bvaxro0snjk5jwbp5p6Q3"

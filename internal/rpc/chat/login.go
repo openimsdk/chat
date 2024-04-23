@@ -16,26 +16,24 @@ package chat
 
 import (
 	"context"
+	"fmt"
+	"github.com/openimsdk/tools/utils/datautil"
 	"math/rand"
 	"strconv"
 	"strings"
 	"time"
 
-	"github.com/OpenIMSDK/chat/pkg/common/mctx"
+	constant2 "github.com/openimsdk/protocol/constant"
 
-	constant2 "github.com/OpenIMSDK/protocol/constant"
+	"github.com/openimsdk/tools/errs"
+	"github.com/openimsdk/tools/log"
+	"github.com/openimsdk/tools/mcontext"
 
-	"github.com/OpenIMSDK/tools/errs"
-	"github.com/OpenIMSDK/tools/log"
-	"github.com/OpenIMSDK/tools/mcontext"
-	"github.com/OpenIMSDK/tools/utils"
-
-	"github.com/OpenIMSDK/chat/pkg/common/config"
-	"github.com/OpenIMSDK/chat/pkg/common/constant"
-	"github.com/OpenIMSDK/chat/pkg/common/db/dbutil"
-	chat2 "github.com/OpenIMSDK/chat/pkg/common/db/table/chat"
-	"github.com/OpenIMSDK/chat/pkg/eerrs"
-	"github.com/OpenIMSDK/chat/pkg/proto/chat"
+	"github.com/openimsdk/chat/pkg/common/constant"
+	"github.com/openimsdk/chat/pkg/common/db/dbutil"
+	chat2 "github.com/openimsdk/chat/pkg/common/db/table/chat"
+	"github.com/openimsdk/chat/pkg/eerrs"
+	"github.com/openimsdk/chat/pkg/protocol/chat"
 )
 
 func (o *chatSvr) verifyCodeJoin(areaCode, phoneNumber string) string {
@@ -50,31 +48,31 @@ func (o *chatSvr) SendVerifyCode(ctx context.Context, req *chat.SendVerifyCodeRe
 		}
 		if req.Email == "" {
 			if req.AreaCode == "" || req.PhoneNumber == "" {
-				return nil, errs.ErrArgs.Wrap("area code or phone number is empty")
+				return nil, errs.ErrArgs.WrapMsg("area code or phone number is empty")
 			}
 			if req.AreaCode[0] != '+' {
 				req.AreaCode = "+" + req.AreaCode
 			}
 			if _, err := strconv.ParseUint(req.AreaCode[1:], 10, 64); err != nil {
-				return nil, errs.ErrArgs.Wrap("area code must be number")
+				return nil, errs.ErrArgs.WrapMsg("area code must be number")
 			}
 			if _, err := strconv.ParseUint(req.PhoneNumber, 10, 64); err != nil {
-				return nil, errs.ErrArgs.Wrap("phone number must be number")
+				return nil, errs.ErrArgs.WrapMsg("phone number must be number")
 			}
 			_, err := o.Database.TakeAttributeByPhone(ctx, req.AreaCode, req.PhoneNumber)
 			if err == nil {
-				return nil, eerrs.ErrPhoneAlreadyRegister.Wrap("phone already register")
-			} else if !o.Database.IsNotFound(err) {
+				return nil, eerrs.ErrPhoneAlreadyRegister.WrapMsg("phone already register")
+			} else if !dbutil.IsDBNotFound(err) {
 				return nil, err
 			}
 		} else {
 			if err := chat.EmailCheck(req.Email); err != nil {
-				return nil, errs.ErrArgs.Wrap("email must be right")
+				return nil, errs.ErrArgs.WrapMsg("email must be right")
 			}
 			_, err := o.Database.TakeAttributeByEmail(ctx, req.Email)
 			if err == nil {
-				return nil, eerrs.ErrEmailAlreadyRegister.Wrap("email already register")
-			} else if !o.Database.IsNotFound(err) {
+				return nil, eerrs.ErrEmailAlreadyRegister.WrapMsg("email already register")
+			} else if !dbutil.IsDBNotFound(err) {
 				return nil, err
 			}
 		}
@@ -82,9 +80,9 @@ func (o *chatSvr) SendVerifyCode(ctx context.Context, req *chat.SendVerifyCodeRe
 		if err != nil {
 			return nil, err
 		}
-		if val := conf[constant.NeedInvitationCodeRegisterConfigKey]; utils.Contain(strings.ToLower(val), "1", "true", "yes") {
+		if val := conf[constant.NeedInvitationCodeRegisterConfigKey]; datautil.Contain(strings.ToLower(val), "1", "true", "yes") {
 			if req.InvitationCode == "" {
-				return nil, errs.ErrArgs.Wrap("invitation code is empty")
+				return nil, errs.ErrArgs.WrapMsg("invitation code is empty")
 			}
 			if err := o.Admin.CheckInvitationCode(ctx, req.InvitationCode); err != nil {
 				return nil, err
@@ -93,86 +91,83 @@ func (o *chatSvr) SendVerifyCode(ctx context.Context, req *chat.SendVerifyCodeRe
 	case constant.VerificationCodeForLogin, constant.VerificationCodeForResetPassword:
 		if req.Email == "" {
 			_, err := o.Database.TakeAttributeByPhone(ctx, req.AreaCode, req.PhoneNumber)
-			if o.Database.IsNotFound(err) {
-				return nil, eerrs.ErrAccountNotFound.Wrap("phone unregistered")
+			if dbutil.IsDBNotFound(err) {
+				return nil, eerrs.ErrAccountNotFound.WrapMsg("phone unregistered")
 			} else if err != nil {
 				return nil, err
 			}
 		} else {
 			_, err := o.Database.TakeAttributeByEmail(ctx, req.Email)
-			if o.Database.IsNotFound(err) {
-				return nil, eerrs.ErrAccountNotFound.Wrap("email unregistered")
+			if dbutil.IsDBNotFound(err) {
+				return nil, eerrs.ErrAccountNotFound.WrapMsg("email unregistered")
 			} else if err != nil {
 				return nil, err
 			}
 		}
 
 	default:
-		return nil, errs.ErrArgs.Wrap("used unknown")
+		return nil, errs.ErrArgs.WrapMsg("used unknown")
 	}
-	var account string
-	var isEmail bool
-	if req.Email == "" {
-		account = o.verifyCodeJoin(req.AreaCode, req.PhoneNumber)
-	} else {
-		isEmail = true
-		account = req.Email
+	if o.SMS == nil && o.Mail == nil {
+		return &chat.SendVerifyCodeResp{}, nil // super code
 	}
-
-	verifyCode := config.Config.VerifyCode
-	if verifyCode.UintTime == 0 || verifyCode.MaxCount == 0 {
-		return nil, errs.ErrNoPermission.Wrap("verify code disabled")
-	}
-	if verifyCode.Use == "" {
-		if verifyCode.SuperCode == "" {
-			return nil, errs.ErrInternalServer.Wrap("super code is empty")
+	isEmail := req.Email != ""
+	var (
+		code     = o.genVerifyCode()
+		account  string
+		sendCode func() error
+	)
+	if isEmail {
+		if o.Mail == nil {
+			return nil, errs.ErrInternalServer.WrapMsg("email verification code is not enabled")
 		}
-		return &chat.SendVerifyCodeResp{}, nil
+		sendCode = func() error {
+			return o.Mail.SendMail(ctx, req.Email, code)
+		}
+		account = req.Email
+	} else {
+		if o.SMS == nil {
+			return nil, errs.ErrInternalServer.WrapMsg("mobile phone verification code is not enabled")
+		}
+		sendCode = func() error {
+			return o.SMS.SendCode(ctx, req.AreaCode, req.PhoneNumber, code)
+		}
+		account = o.verifyCodeJoin(req.AreaCode, req.PhoneNumber)
 	}
 	now := time.Now()
-
-	var count int64
-	var err error
-	if !isEmail {
-		count, err = o.Database.CountVerifyCodeRange(ctx, o.verifyCodeJoin(req.AreaCode, req.PhoneNumber), now.Add(-time.Duration(verifyCode.UintTime)*time.Second), now)
-		if err != nil {
-			return nil, err
-		}
-	} else {
-		count, err = o.Database.CountVerifyCodeRange(ctx, req.Email, now.Add(-time.Duration(verifyCode.UintTime)*time.Second), now)
-	}
-	if verifyCode.MaxCount < int(count) {
-		return nil, eerrs.ErrVerifyCodeSendFrequently.Wrap()
-	}
-
-	t := &chat2.VerifyCode{
-		Account:    account,
-		Code:       o.genVerifyCode(),
-		Duration:   uint(config.Config.VerifyCode.ValidTime),
-		CreateTime: time.Now(),
-	}
-	if !isEmail {
-		err = o.Database.AddVerifyCode(ctx, t, func() error {
-			return o.SMS.SendCode(ctx, req.AreaCode, req.PhoneNumber, t.Code)
-		})
-	} else {
-		// 发送邮件验证码
-		err = o.Database.AddVerifyCode(ctx, t, func() error {
-			return o.Mail.SendMail(ctx, req.Email, t.Code)
-		})
-	}
+	count, err := o.Database.CountVerifyCodeRange(ctx, account, now.Add(-o.Code.UintTime), now)
 	if err != nil {
 		return nil, err
 	}
+	if o.Code.MaxCount < int(count) {
+		return nil, eerrs.ErrVerifyCodeSendFrequently.Wrap()
+	}
+	platformName := constant2.PlatformIDToName(int(req.Platform))
+	if platformName == "" {
+		platformName = fmt.Sprintf("platform:%d", req.Platform)
+	}
+	vc := &chat2.VerifyCode{
+		Account:    account,
+		Code:       code,
+		Platform:   platformName,
+		Duration:   uint(o.Code.ValidTime / time.Second),
+		Count:      0,
+		Used:       false,
+		CreateTime: now,
+	}
+	if err := o.Database.AddVerifyCode(ctx, vc, sendCode); err != nil {
+		return nil, err
+	}
+	log.ZDebug(ctx, "send code success", "account", account, "code", code, "platform", platformName)
 	return &chat.SendVerifyCodeResp{}, nil
 }
 
 func (o *chatSvr) verifyCode(ctx context.Context, account string, verifyCode string) (string, error) {
 	if verifyCode == "" {
-		return "", errs.ErrArgs.Wrap("verify code is empty")
+		return "", errs.ErrArgs.WrapMsg("verify code is empty")
 	}
-	if config.Config.VerifyCode.Use == "" {
-		if verifyCode != config.Config.VerifyCode.SuperCode {
+	if o.SMS == nil && o.Mail == nil {
+		if o.Code.SuperCode != verifyCode {
 			return "", eerrs.ErrVerifyCodeNotMatch.Wrap()
 		}
 		return "", nil
@@ -190,8 +185,8 @@ func (o *chatSvr) verifyCode(ctx context.Context, account string, verifyCode str
 	if last.Used {
 		return last.ID, eerrs.ErrVerifyCodeUsed.Wrap()
 	}
-	if config.Config.VerifyCode.MaxCount > 0 {
-		if last.Count >= config.Config.VerifyCode.MaxCount {
+	if n := o.Code.ValidCount; n > 0 {
+		if last.Count >= n {
 			return last.ID, eerrs.ErrVerifyCodeMaxCount.Wrap()
 		}
 		if last.Code != verifyCode {
@@ -235,7 +230,7 @@ func (o *chatSvr) genUserID() string {
 }
 
 func (o *chatSvr) genVerifyCode() string {
-	data := make([]byte, config.Config.VerifyCode.Len)
+	data := make([]byte, o.Code.Len)
 	rand.Read(data)
 	chars := []byte("0123456789")
 	for i := 0; i < len(data); i++ {
@@ -248,22 +243,22 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 	resp := &chat.RegisterUserResp{}
 
 	isAdmin, err := o.Admin.CheckNilOrAdmin(ctx)
-	ctx = mctx.WithAdminUser(ctx)
+	ctx = o.WithAdminUser(ctx)
 	if err != nil {
 		return nil, err
 	}
 	if req.User == nil {
-		return nil, errs.ErrArgs.Wrap("user is nil")
+		return nil, errs.ErrArgs.WrapMsg("user is nil")
 	}
 	if req.User.Email == "" {
 		if (req.User.AreaCode == "" && req.User.PhoneNumber != "") || (req.User.AreaCode != "" && req.User.PhoneNumber == "") {
-			return nil, errs.ErrArgs.Wrap("area code or phone number error, no email provide")
+			return nil, errs.ErrArgs.WrapMsg("area code or phone number error, no email provide")
 		}
 	}
 	var usedInvitationCode bool
 	if !isAdmin {
 		if req.User.UserID != "" {
-			return nil, errs.ErrNoPermission.Wrap("only admin can set user id")
+			return nil, errs.ErrNoPermission.WrapMsg("only admin can set user id")
 		}
 		if err := o.Admin.CheckRegister(ctx, req.Ip); err != nil {
 			return nil, err
@@ -272,10 +267,10 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 		if err != nil {
 			return nil, err
 		}
-		if val := conf[constant.NeedInvitationCodeRegisterConfigKey]; utils.Contain(strings.ToLower(val), "1", "true", "yes") {
+		if val := conf[constant.NeedInvitationCodeRegisterConfigKey]; datautil.Contain(strings.ToLower(val), "1", "true", "yes") {
 			usedInvitationCode = true
 			if req.InvitationCode == "" {
-				return nil, errs.ErrArgs.Wrap("invitation code is empty")
+				return nil, errs.ErrArgs.WrapMsg("invitation code is empty")
 			}
 			if err := o.Admin.CheckInvitationCode(ctx, req.InvitationCode); err != nil {
 				return nil, err
@@ -306,12 +301,12 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 			}
 		}
 		if req.User.UserID == "" {
-			return nil, errs.ErrInternalServer.Wrap("gen user id failed")
+			return nil, errs.ErrInternalServer.WrapMsg("gen user id failed")
 		}
 	} else {
 		_, err := o.Database.GetUser(ctx, req.User.UserID)
 		if err == nil {
-			return nil, errs.ErrArgs.Wrap("appoint user id already register")
+			return nil, errs.ErrArgs.WrapMsg("appoint user id already register")
 		} else if !dbutil.IsDBNotFound(err) {
 			return nil, err
 		}
@@ -322,15 +317,15 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 			req.User.AreaCode = "+" + req.User.AreaCode
 		}
 		if _, err := strconv.ParseUint(req.User.AreaCode[1:], 10, 64); err != nil {
-			return nil, errs.ErrArgs.Wrap("area code must be number")
+			return nil, errs.ErrArgs.WrapMsg("area code must be number")
 		}
 		if _, err := strconv.ParseUint(req.User.PhoneNumber, 10, 64); err != nil {
-			return nil, errs.ErrArgs.Wrap("phone number must be number")
+			return nil, errs.ErrArgs.WrapMsg("phone number must be number")
 		}
 		_, err := o.Database.TakeAttributeByPhone(ctx, req.User.AreaCode, req.User.PhoneNumber)
 		if err == nil {
 			return nil, eerrs.ErrPhoneAlreadyRegister.Wrap()
-		} else if !o.Database.IsNotFound(err) {
+		} else if !dbutil.IsDBNotFound(err) {
 			return nil, err
 		}
 		registerType = constant.PhoneRegister
@@ -340,7 +335,7 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 		_, err := o.Database.TakeAttributeByAccount(ctx, req.User.Account)
 		if err == nil {
 			return nil, eerrs.ErrAccountAlreadyRegister.Wrap()
-		} else if !o.Database.IsNotFound(err) {
+		} else if !dbutil.IsDBNotFound(err) {
 			return nil, err
 		}
 	}
@@ -350,7 +345,7 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 		registerType = constant.EmailRegister
 		if err == nil {
 			return nil, eerrs.ErrEmailAlreadyRegister.Wrap()
-		} else if !o.Database.IsNotFound(err) {
+		} else if !dbutil.IsDBNotFound(err) {
 			return nil, err
 		}
 	}
@@ -396,12 +391,11 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 		}
 	}
 	if req.AutoLogin {
-		chatToken, adminErr := o.Admin.CreateToken(ctx, req.User.UserID, constant.NormalUser)
-		if err != nil {
-			log.ZError(ctx, "Admin CreateToken Failed", err, "userID", req.User.UserID, "platform", req.Platform)
-		}
-		if adminErr == nil {
+		chatToken, err := o.Admin.CreateToken(ctx, req.User.UserID, constant.NormalUser)
+		if err == nil {
 			resp.ChatToken = chatToken.Token
+		} else {
+			log.ZError(ctx, "Admin CreateToken Failed", err, "userID", req.User.UserID, "platform", req.Platform)
 		}
 	}
 	resp.UserID = req.User.UserID
@@ -411,7 +405,7 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 func (o *chatSvr) Login(ctx context.Context, req *chat.LoginReq) (*chat.LoginResp, error) {
 	resp := &chat.LoginResp{}
 	if req.Password == "" && req.VerifyCode == "" {
-		return nil, errs.ErrArgs.Wrap("password or code must be set")
+		return nil, errs.ErrArgs.WrapMsg("password or code must be set")
 	}
 	var err error
 	var attribute *chat2.Attribute
@@ -419,23 +413,23 @@ func (o *chatSvr) Login(ctx context.Context, req *chat.LoginReq) (*chat.LoginRes
 		attribute, err = o.Database.GetAttributeByAccount(ctx, req.Account)
 	} else if req.PhoneNumber != "" {
 		if req.AreaCode == "" {
-			return nil, errs.ErrArgs.Wrap("area code must")
+			return nil, errs.ErrArgs.WrapMsg("area code must")
 		}
 		if req.AreaCode[0] != '+' {
 			req.AreaCode = "+" + req.AreaCode
 		}
 		if _, err := strconv.ParseUint(req.AreaCode[1:], 10, 64); err != nil {
-			return nil, errs.ErrArgs.Wrap("area code must be number")
+			return nil, errs.ErrArgs.WrapMsg("area code must be number")
 		}
 		attribute, err = o.Database.GetAttributeByPhone(ctx, req.AreaCode, req.PhoneNumber)
 	} else if req.Email != "" {
 		attribute, err = o.Database.GetAttributeByEmail(ctx, req.Email)
 	} else {
-		err = errs.ErrArgs.Wrap("account or phone number or email must be set")
+		err = errs.ErrArgs.WrapMsg("account or phone number or email must be set")
 	}
 	if err != nil {
-		if o.Database.IsNotFound(err) {
-			return nil, eerrs.ErrAccountNotFound.Wrap("user unregistered")
+		if dbutil.IsDBNotFound(err) {
+			return nil, eerrs.ErrAccountNotFound.WrapMsg("user unregistered")
 		}
 		return nil, err
 	}
@@ -444,18 +438,19 @@ func (o *chatSvr) Login(ctx context.Context, req *chat.LoginReq) (*chat.LoginRes
 	}
 	var verifyCodeID *string
 	if req.Password == "" {
-		var id string
-		var err error
+		var account string
 		if req.Email == "" {
-			id, err = o.verifyCode(ctx, o.verifyCodeJoin(req.AreaCode, req.PhoneNumber), req.VerifyCode)
+			account = o.verifyCodeJoin(req.AreaCode, req.PhoneNumber)
 		} else {
-			id, err = o.verifyCode(ctx, req.Email, req.VerifyCode)
+			account = req.Email
 		}
-
+		id, err := o.verifyCode(ctx, account, req.VerifyCode)
 		if err != nil {
 			return nil, err
 		}
-		verifyCodeID = &id
+		if id != "" {
+			verifyCodeID = &id
+		}
 	} else {
 		account, err := o.Database.GetAccount(ctx, attribute.UserID)
 		if err != nil {

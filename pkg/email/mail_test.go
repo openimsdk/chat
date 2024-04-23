@@ -22,7 +22,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/OpenIMSDK/chat/pkg/common/config"
+	"github.com/openimsdk/chat/pkg/common/config"
 	"gopkg.in/yaml.v3"
 )
 

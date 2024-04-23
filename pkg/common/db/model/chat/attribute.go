@@ -16,14 +16,14 @@ package chat
 
 import (
 	"context"
-	"github.com/OpenIMSDK/tools/errs"
-	"github.com/OpenIMSDK/tools/mgoutil"
-	"github.com/OpenIMSDK/tools/pagination"
+	"github.com/openimsdk/tools/db/mongoutil"
+	"github.com/openimsdk/tools/db/pagination"
+	"github.com/openimsdk/tools/errs"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 
-	"github.com/OpenIMSDK/chat/pkg/common/db/table/chat"
+	"github.com/openimsdk/chat/pkg/common/db/table/chat"
 )
 
 func NewAttribute(db *mongo.Database) (chat.AttributeInterface, error) {
@@ -63,22 +63,22 @@ type Attribute struct {
 }
 
 func (o *Attribute) Create(ctx context.Context, attribute ...*chat.Attribute) error {
-	return mgoutil.InsertMany(ctx, o.coll, attribute)
+	return mongoutil.InsertMany(ctx, o.coll, attribute)
 }
 
 func (o *Attribute) Update(ctx context.Context, userID string, data map[string]any) error {
 	if len(data) == 0 {
 		return nil
 	}
-	return mgoutil.UpdateOne(ctx, o.coll, bson.M{"user_id": userID}, bson.M{"$set": data}, false)
+	return mongoutil.UpdateOne(ctx, o.coll, bson.M{"user_id": userID}, bson.M{"$set": data}, false)
 }
 
 func (o *Attribute) Find(ctx context.Context, userIds []string) ([]*chat.Attribute, error) {
-	return mgoutil.Find[*chat.Attribute](ctx, o.coll, bson.M{"user_id": bson.M{"$in": userIds}})
+	return mongoutil.Find[*chat.Attribute](ctx, o.coll, bson.M{"user_id": bson.M{"$in": userIds}})
 }
 
 func (o *Attribute) FindAccount(ctx context.Context, accounts []string) ([]*chat.Attribute, error) {
-	return mgoutil.Find[*chat.Attribute](ctx, o.coll, bson.M{"account": bson.M{"$in": accounts}})
+	return mongoutil.Find[*chat.Attribute](ctx, o.coll, bson.M{"account": bson.M{"$in": accounts}})
 }
 
 func (o *Attribute) Search(ctx context.Context, keyword string, genders []int32, pagination pagination.Pagination) (int64, []*chat.Attribute, error) {
@@ -96,23 +96,23 @@ func (o *Attribute) Search(ctx context.Context, keyword string, genders []int32,
 			{"phone_number": bson.M{"$regex": keyword, "$options": "i"}},
 		}
 	}
-	return mgoutil.FindPage[*chat.Attribute](ctx, o.coll, filter, pagination)
+	return mongoutil.FindPage[*chat.Attribute](ctx, o.coll, filter, pagination)
 }
 
 func (o *Attribute) TakePhone(ctx context.Context, areaCode string, phoneNumber string) (*chat.Attribute, error) {
-	return mgoutil.FindOne[*chat.Attribute](ctx, o.coll, bson.M{"area_code": areaCode, "phone_number": phoneNumber})
+	return mongoutil.FindOne[*chat.Attribute](ctx, o.coll, bson.M{"area_code": areaCode, "phone_number": phoneNumber})
 }
 
 func (o *Attribute) TakeEmail(ctx context.Context, email string) (*chat.Attribute, error) {
-	return mgoutil.FindOne[*chat.Attribute](ctx, o.coll, bson.M{"email": email})
+	return mongoutil.FindOne[*chat.Attribute](ctx, o.coll, bson.M{"email": email})
 }
 
 func (o *Attribute) TakeAccount(ctx context.Context, account string) (*chat.Attribute, error) {
-	return mgoutil.FindOne[*chat.Attribute](ctx, o.coll, bson.M{"account": account})
+	return mongoutil.FindOne[*chat.Attribute](ctx, o.coll, bson.M{"account": account})
 }
 
 func (o *Attribute) Take(ctx context.Context, userID string) (*chat.Attribute, error) {
-	return mgoutil.FindOne[*chat.Attribute](ctx, o.coll, bson.M{"user_id": userID})
+	return mongoutil.FindOne[*chat.Attribute](ctx, o.coll, bson.M{"user_id": userID})
 }
 
 func (o *Attribute) SearchNormalUser(ctx context.Context, keyword string, forbiddenIDs []string, gender int32, pagination pagination.Pagination) (int64, []*chat.Attribute, error) {
@@ -137,7 +137,7 @@ func (o *Attribute) SearchNormalUser(ctx context.Context, keyword string, forbid
 			{"phone_number": bson.M{"$regex": keyword, "$options": "i"}},
 		}
 	}
-	return mgoutil.FindPage[*chat.Attribute](ctx, o.coll, filter, pagination)
+	return mongoutil.FindPage[*chat.Attribute](ctx, o.coll, filter, pagination)
 }
 
 func (o *Attribute) SearchUser(ctx context.Context, keyword string, userIDs []string, genders []int32, pagination pagination.Pagination) (int64, []*chat.Attribute, error) {
@@ -160,5 +160,5 @@ func (o *Attribute) SearchUser(ctx context.Context, keyword string, userIDs []st
 			{"phone_number": bson.M{"$regex": keyword, "$options": "i"}},
 		}
 	}
-	return mgoutil.FindPage[*chat.Attribute](ctx, o.coll, filter, pagination)
+	return mongoutil.FindPage[*chat.Attribute](ctx, o.coll, filter, pagination)
 }

@@ -15,10 +15,9 @@
 package chat
 
 import (
-	"github.com/OpenIMSDK/tools/utils"
-
-	"github.com/OpenIMSDK/chat/pkg/common/db/table/chat"
-	"github.com/OpenIMSDK/chat/pkg/proto/common"
+	"github.com/openimsdk/chat/pkg/common/db/table/chat"
+	"github.com/openimsdk/chat/pkg/protocol/common"
+	"github.com/openimsdk/tools/utils/datautil"
 )
 
 func DbToPbAttribute(attribute *chat.Attribute) *common.UserPublicInfo {
@@ -37,7 +36,7 @@ func DbToPbAttribute(attribute *chat.Attribute) *common.UserPublicInfo {
 }
 
 func DbToPbAttributes(attributes []*chat.Attribute) []*common.UserPublicInfo {
-	return utils.Slice(attributes, DbToPbAttribute)
+	return datautil.Slice(attributes, DbToPbAttribute)
 }
 
 func DbToPbUserFullInfo(attribute *chat.Attribute) *common.UserFullInfo {
@@ -62,23 +61,5 @@ func DbToPbUserFullInfo(attribute *chat.Attribute) *common.UserFullInfo {
 }
 
 func DbToPbUserFullInfos(attributes []*chat.Attribute) []*common.UserFullInfo {
-	return utils.Slice(attributes, DbToPbUserFullInfo)
-}
-
-func DbToPbLogInfo(log *chat.Log) *common.LogInfo {
-	return &common.LogInfo{
-		Filename:   log.FileName,
-		UserID:     log.UserID,
-		Platform:   utils.StringToInt32(log.Platform),
-		Url:        log.Url,
-		CreateTime: log.CreateTime.UnixMilli(),
-		LogID:      log.LogID,
-		SystemType: log.SystemType,
-		Version:    log.Version,
-		Ex:         log.Ex,
-	}
-}
-
-func DbToPbLogInfos(logs []*chat.Log) []*common.LogInfo {
-	return utils.Slice(logs, DbToPbLogInfo)
+	return datautil.Slice(attributes, DbToPbUserFullInfo)
 }

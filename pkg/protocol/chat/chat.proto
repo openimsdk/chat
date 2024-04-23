@@ -1,0 +1,300 @@
+// Copyright © 2023 OpenIM open source community. All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+package openim.chat;
+import "wrapperspb/wrapperspb.proto";
+import "sdkws/sdkws.proto";
+import "common/common.proto";
+option go_package = "github.com/openimsdk/chat/pkg/protocol/chat";
+
+message UserIdentity {
+  string email = 1;
+  string areaCode = 2;
+  string phoneNumber = 3;
+  string deviceID = 4;
+  int32 platform = 5;
+  string account = 6;
+}
+
+
+message UpdateUserInfoReq{
+  string  userID = 1;
+  openim.protobuf.StringValue  account = 2;
+  openim.protobuf.StringValue  phoneNumber = 3;
+  openim.protobuf.StringValue  areaCode = 4;
+  openim.protobuf.StringValue  email = 5;
+  openim.protobuf.StringValue  nickname = 6;
+  openim.protobuf.StringValue  faceURL = 7;
+  openim.protobuf.Int32Value  gender = 8;
+  openim.protobuf.Int32Value  level = 9;
+  openim.protobuf.Int64Value birth = 10;
+  openim.protobuf.Int32Value  allowAddFriend = 11;
+  openim.protobuf.Int32Value  allowBeep = 12;
+  openim.protobuf.Int32Value  allowVibration = 13;
+  openim.protobuf.Int32Value  globalRecvMsgOpt = 14;
+  openim.protobuf.Int32Value RegisterType = 15;
+}
+
+message UpdateUserInfoResp{
+  string faceUrl = 1;
+  string nickName = 2;
+}
+
+message FindUserPublicInfoReq{
+  repeated  string userIDs = 1;
+}
+
+message FindUserPublicInfoResp{
+  repeated openim.chat.common.UserPublicInfo users = 1;
+}
+
+message SearchUserPublicInfoReq{
+  string keyword = 1;
+  openim.sdkws.RequestPagination pagination = 2;
+  int32 genders = 3;
+}
+
+message SearchUserPublicInfoResp{
+  uint32 total = 1;
+  repeated openim.chat.common.UserPublicInfo users = 2;
+}
+
+message FindUserFullInfoReq{
+  repeated string userIDs = 1;
+}
+
+message FindUserFullInfoResp{
+  repeated openim.chat.common.UserFullInfo users = 1;
+}
+
+message SendVerifyCodeReq {
+  int32 usedFor = 1;
+  string ip = 2;
+  string invitationCode = 3;
+  string deviceID = 4;
+  int32 platform = 5;
+  string areaCode = 6;
+  string phoneNumber = 7;
+  string email = 8;
+}
+
+message SendVerifyCodeResp {
+}
+
+message VerifyCodeReq {
+  string areaCode = 1;
+  string phoneNumber = 2;
+  string verifyCode = 3;
+  string email = 4;
+}
+
+message VerifyCodeResp {
+}
+
+message RegisterUserInfo {
+  string userID = 1;
+  string nickname = 2;
+  string faceURL = 3;
+  int64 birth = 4;
+  int32 gender = 5;
+  string areaCode = 6;
+  string phoneNumber = 7;
+  string email = 8;
+  string account = 9;
+  string password = 10;
+  int32 RegisterType = 11;
+}
+
+message RegisterUserReq {
+  string invitationCode = 1;
+  string verifyCode = 2;
+  string ip = 3;
+  string deviceID = 4;
+  int32 platform = 5;
+  bool autoLogin = 6;
+  RegisterUserInfo user = 7;
+}
+
+message RegisterUserResp {
+  string userID = 1;
+  string chatToken = 3;
+}
+
+message AddUserAccountReq{
+  string ip = 1;
+  string deviceID = 2;
+  int32 platform = 3;
+  RegisterUserInfo user = 4;
+}
+
+message AddUserAccountResp{
+}
+
+message LoginReq {
+  string areaCode = 1;
+  string phoneNumber = 2;
+  string verifyCode = 3;
+  string account = 4;
+  string password = 5;
+  int32 platform = 6;
+  string deviceID = 7;
+  string ip = 8;
+  string email = 9;
+}
+
+message ResetPasswordReq {
+  string areaCode = 1;
+  string phoneNumber = 2;
+  string verifyCode = 3;
+  string password = 4;
+  string email = 5;
+}
+
+message ResetPasswordResp {
+}
+
+message ChangePasswordReq {
+  string userID = 1;
+  string currentPassword = 2;
+  string newPassword = 3;
+}
+
+message ChangePasswordResp {
+}
+
+message FindUserAccountReq {
+  repeated string userIDs = 1;
+}
+
+
+message FindUserAccountResp {
+  map<string, string> userAccountMap = 1; // userID  account
+}
+
+message FindAccountUserReq {
+  repeated string accounts = 1;
+}
+
+message FindAccountUserResp {
+  map<string, string> accountUserMap = 1; // account  userID
+}
+
+message SignalRecord {
+  string fileName = 1;
+  string mediaType = 2;
+  string roomType = 3;
+  string senderID = 4;
+  string senderNickname = 5;
+  string recvID = 6;
+  string recvNickname = 7;
+  string groupID = 8;
+  string groupName = 9;
+  repeated openim.chat.common.UserPublicInfo inviterUserList = 10;
+  int32 duration = 11;
+  int64 createTime = 12;
+  string size = 13;
+  string downloadURL = 14;
+}
+
+message OpenIMCallbackReq {
+  string command = 1;
+  string body = 2;
+}
+
+message OpenIMCallbackResp {
+
+}
+
+message SearchUserFullInfoReq{
+  string keyword = 1;
+  openim.sdkws.RequestPagination pagination = 2;
+  int32 genders = 3;
+  int32 normal = 4;
+}
+
+message SearchUserFullInfoResp{
+  uint32 total = 1;
+  repeated openim.chat.common.UserFullInfo users = 2;
+}
+
+message UserLoginCountReq{
+  int64 start = 1;
+  int64 end = 2;
+}
+
+message UserLoginCountResp{
+  int64 loginCount = 1;
+  int64 unloginCount = 2;
+  map<string, int64> count = 3;
+}
+
+message LoginResp {
+  string chatToken = 2;
+  string userID = 3;
+}
+
+message SearchUserInfoReq{
+  string keyword = 1;
+  openim.sdkws.RequestPagination pagination = 2;
+  repeated int32 genders = 3;
+  repeated string userIDs = 4;
+}
+
+message SearchUserInfoResp {
+  uint32 total = 1;
+  repeated openim.chat.common.UserFullInfo users = 2;
+}
+
+message GetTokenForVideoMeetingReq {
+  string room = 1;
+  string identity = 2;
+}
+
+message GetTokenForVideoMeetingResp {
+  string serverUrl = 1;
+  string token = 2;
+}
+
+service chat {
+  // Edit personal information - called by the user or an administrator
+  rpc UpdateUserInfo(UpdateUserInfoReq) returns(UpdateUserInfoResp);
+  rpc AddUserAccount(AddUserAccountReq) returns(AddUserAccountResp);
+  // Get user's public information - called by strangers
+  rpc SearchUserPublicInfo(SearchUserPublicInfoReq) returns(SearchUserPublicInfoResp);
+  rpc FindUserPublicInfo(FindUserPublicInfoReq) returns(FindUserPublicInfoResp);
+  // Search user information - called by administrators, other users get public fields
+  rpc SearchUserFullInfo(SearchUserFullInfoReq) returns(SearchUserFullInfoResp);
+  rpc FindUserFullInfo(FindUserFullInfoReq) returns(FindUserFullInfoResp);
+
+  rpc SendVerifyCode(SendVerifyCodeReq) returns(SendVerifyCodeResp);
+  rpc VerifyCode(VerifyCodeReq) returns(VerifyCodeResp);
+  rpc RegisterUser(RegisterUserReq) returns(RegisterUserResp);
+  rpc Login(LoginReq) returns(LoginResp);
+  rpc ResetPassword(ResetPasswordReq) returns(ResetPasswordResp);
+  rpc ChangePassword(ChangePasswordReq) returns(ChangePasswordResp);
+
+  rpc FindUserAccount(FindUserAccountReq) returns(FindUserAccountResp);
+  rpc FindAccountUser(FindAccountUserReq) returns(FindAccountUserResp);
+
+  rpc OpenIMCallback(OpenIMCallbackReq) returns(OpenIMCallbackResp);
+
+  // Statistics
+  rpc UserLoginCount(UserLoginCountReq) returns (UserLoginCountResp);
+
+  rpc SearchUserInfo(SearchUserInfoReq)returns(SearchUserInfoResp);
+
+  // Audio/video call and video meeting
+  rpc GetTokenForVideoMeeting(GetTokenForVideoMeetingReq) returns (GetTokenForVideoMeetingResp);
+}

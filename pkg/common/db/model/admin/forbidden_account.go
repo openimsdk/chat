@@ -16,14 +16,14 @@ package admin
 
 import (
 	"context"
-	"github.com/OpenIMSDK/tools/mgoutil"
-	"github.com/OpenIMSDK/tools/pagination"
+	"github.com/openimsdk/tools/db/mongoutil"
+	"github.com/openimsdk/tools/db/pagination"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 
-	"github.com/OpenIMSDK/chat/pkg/common/db/table/admin"
-	"github.com/OpenIMSDK/tools/errs"
+	"github.com/openimsdk/chat/pkg/common/db/table/admin"
+	"github.com/openimsdk/tools/errs"
 )
 
 func NewForbiddenAccount(db *mongo.Database) (admin.ForbiddenAccountInterface, error) {
@@ -47,22 +47,22 @@ type ForbiddenAccount struct {
 }
 
 func (o *ForbiddenAccount) Create(ctx context.Context, ms []*admin.ForbiddenAccount) error {
-	return mgoutil.InsertMany(ctx, o.coll, ms)
+	return mongoutil.InsertMany(ctx, o.coll, ms)
 }
 
 func (o *ForbiddenAccount) Take(ctx context.Context, userID string) (*admin.ForbiddenAccount, error) {
-	return mgoutil.FindOne[*admin.ForbiddenAccount](ctx, o.coll, bson.M{"user_id": userID})
+	return mongoutil.FindOne[*admin.ForbiddenAccount](ctx, o.coll, bson.M{"user_id": userID})
 }
 
 func (o *ForbiddenAccount) Delete(ctx context.Context, userIDs []string) error {
 	if len(userIDs) == 0 {
 		return nil
 	}
-	return mgoutil.DeleteMany(ctx, o.coll, bson.M{"user_id": bson.M{"$in": userIDs}})
+	return mongoutil.DeleteMany(ctx, o.coll, bson.M{"user_id": bson.M{"$in": userIDs}})
 }
 
 func (o *ForbiddenAccount) Find(ctx context.Context, userIDs []string) ([]*admin.ForbiddenAccount, error) {
-	return mgoutil.Find[*admin.ForbiddenAccount](ctx, o.coll, bson.M{"user_id": bson.M{"$in": userIDs}})
+	return mongoutil.Find[*admin.ForbiddenAccount](ctx, o.coll, bson.M{"user_id": bson.M{"$in": userIDs}})
 }
 
 func (o *ForbiddenAccount) Search(ctx context.Context, keyword string, pagination pagination.Pagination) (int64, []*admin.ForbiddenAccount, error) {
@@ -77,9 +77,9 @@ func (o *ForbiddenAccount) Search(ctx context.Context, keyword string, paginatio
 			},
 		}
 	}
-	return mgoutil.FindPage[*admin.ForbiddenAccount](ctx, o.coll, filter, pagination)
+	return mongoutil.FindPage[*admin.ForbiddenAccount](ctx, o.coll, filter, pagination)
 }
 
 func (o *ForbiddenAccount) FindAllIDs(ctx context.Context) ([]string, error) {
-	return mgoutil.Find[string](ctx, o.coll, bson.M{}, options.Find().SetProjection(bson.M{"_id": 0, "user_id": 1}))
+	return mongoutil.Find[string](ctx, o.coll, bson.M{}, options.Find().SetProjection(bson.M{"_id": 0, "user_id": 1}))
 }
