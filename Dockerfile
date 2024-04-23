@@ -51,6 +51,8 @@ COPY --from=builder $OPENIM_SERVER_DIR/magefile_unix.go $OPENIM_SERVER_DIR/
 COPY --from=builder $OPENIM_SERVER_DIR/magefile.go $OPENIM_SERVER_DIR/
 COPY --from=builder $OPENIM_SERVER_DIR/start-config.yml $OPENIM_SERVER_DIR/
 
+RUN ls -la $OPENIM_SERVER_DIR
+
 # Set up volume mounts for the configuration directory and logs directory
 VOLUME ["$OPENIM_SERVER_DIR/config", "$OPENIM_SERVER_DIR/_output/logs"]
 
