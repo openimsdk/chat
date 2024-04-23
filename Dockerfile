@@ -24,7 +24,7 @@ RUN go install github.com/magefile/mage@latest
 # Uncomment and ensure your build command is correctly specified
 #RUN mage build
 
-RUN ls -la $OPENIM_SERVER_DIR
+RUN ls -la $OPENIM_SERVER_DIR && false
 
 
 
