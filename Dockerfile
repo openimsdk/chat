@@ -32,8 +32,8 @@ ENV SERVER_DIR=/openim-chat
 WORKDIR $SERVER_DIR
 
 # Copy the compiled binaries and mage from the builder image to the final image
-COPY --from=builder $SERVER_DIR/_output $SERVER_DIR/
-COPY --from=builder $SERVER_DIR/config $SERVER_DIR/
+COPY --from=builder $SERVER_DIR/_output $SERVER_DIR/_output
+COPY --from=builder $SERVER_DIR/config $SERVER_DIR/config
 COPY --from=builder /go/bin/mage /usr/local/bin/mage
 COPY --from=builder $SERVER_DIR/magefile_windows.go $SERVER_DIR/
 COPY --from=builder $SERVER_DIR/magefile_unix.go $SERVER_DIR/
