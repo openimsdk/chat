@@ -21,6 +21,8 @@ RUN go install github.com/magefile/mage@latest
 # Optionally build your application if needed
 RUN mage build
 
+
+
 # Using Alpine Linux with Go environment for the final image
 FROM golang:1.21-alpine
 
@@ -30,6 +32,8 @@ RUN apk add --no-cache bash
 # Set the environment and work directory
 ENV SERVER_DIR=/openim-chat
 WORKDIR $SERVER_DIR
+
+RUN go get github.com/openimsdk/gomake@v0.0.6
 
 # Copy the compiled binaries and mage from the builder image to the final image
 COPY --from=builder $SERVER_DIR/_output $SERVER_DIR/_output
@@ -46,4 +50,4 @@ COPY --from=builder $SERVER_DIR/go.sum $SERVER_DIR/
 VOLUME ["$SERVER_DIR/config", "$SERVER_DIR/_output/logs"]
 
 # Set the command to run when the container starts
-ENTRYPOINT ["sh", "-c", "mage start"]
+ENTRYPOINT ["sh", "-c", "mage start && tail -f /dev/null"]
