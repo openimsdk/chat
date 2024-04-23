@@ -4,7 +4,6 @@
 .dockerignore
 
 # Ignore build artifacts
-_output/
 logs/
 
 # Ignore non-essential documentation
@@ -17,8 +16,6 @@ CHANGELOG/
 # Ignore testing and linting configuration
 .golangci.yml
 
-# Ignore deployment-related files
-docker-compose.yaml
 
 # Ignore assets
 assets/
