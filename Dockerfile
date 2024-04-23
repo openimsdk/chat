@@ -16,7 +16,7 @@ COPY . .
 RUN go mod download
 
 # Install Mage to use for building the application
-RUN go install github.com/magefile/mage@latest
+RUN go install github.com/magefile/mage@v1.15.0
 
 # Optionally build your application if needed
 RUN mage build
