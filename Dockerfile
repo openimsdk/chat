@@ -25,7 +25,7 @@ RUN go install github.com/magefile/mage@latest
 FROM ubuntu:18.04
 
 # Install necessary packages, such as bash
-RUN apk add --no-cache bash
+#RUN apk add --no-cache bash
 
 # Set the environment and work directory
 ENV SERVER_DIR=/openim-chat
