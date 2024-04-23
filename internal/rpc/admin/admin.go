@@ -17,59 +17,19 @@ package admin
 import (
 	"context"
 	"fmt"
-	"github.com/OpenIMSDK/chat/pkg/common/db/cache"
-	"github.com/OpenIMSDK/tools/discoveryregistry"
-	"github.com/OpenIMSDK/tools/errs"
-	"github.com/OpenIMSDK/tools/mcontext"
-	"github.com/OpenIMSDK/tools/utils"
-	"google.golang.org/grpc"
+	"github.com/openimsdk/tools/errs"
+	"github.com/openimsdk/tools/mcontext"
+	"github.com/openimsdk/tools/utils/datautil"
 	"math/rand"
 	"time"
 
-	"github.com/OpenIMSDK/chat/pkg/common/config"
-	"github.com/OpenIMSDK/chat/pkg/common/constant"
-	"github.com/OpenIMSDK/chat/pkg/common/db/database"
-	"github.com/OpenIMSDK/chat/pkg/common/db/dbutil"
-	admin2 "github.com/OpenIMSDK/chat/pkg/common/db/table/admin"
-	"github.com/OpenIMSDK/chat/pkg/common/dbconn"
-	"github.com/OpenIMSDK/chat/pkg/common/mctx"
-	"github.com/OpenIMSDK/chat/pkg/eerrs"
-	"github.com/OpenIMSDK/chat/pkg/proto/admin"
-	"github.com/OpenIMSDK/chat/pkg/rpclient/chat"
+	"github.com/openimsdk/chat/pkg/common/constant"
+	"github.com/openimsdk/chat/pkg/common/db/dbutil"
+	admin2 "github.com/openimsdk/chat/pkg/common/db/table/admin"
+	"github.com/openimsdk/chat/pkg/common/mctx"
+	"github.com/openimsdk/chat/pkg/eerrs"
+	"github.com/openimsdk/chat/pkg/protocol/admin"
 )
-
-func Start(discov discoveryregistry.SvcDiscoveryRegistry, server *grpc.Server) error {
-	db, err := dbconn.NewMongo()
-	if err != nil {
-		return err
-	}
-	rdb, err := cache.NewRedis()
-	if err != nil {
-		return errs.Wrap(err)
-	}
-
-	adminDatabase, err := database.NewAdminDatabase(db, rdb)
-	if err != nil {
-		return err
-	}
-
-	if err := adminDatabase.InitAdmin(context.Background()); err != nil {
-		return err
-	}
-	if err := discov.CreateRpcRootNodes([]string{config.Config.RpcRegisterName.OpenImAdminName, config.Config.RpcRegisterName.OpenImChatName}); err != nil {
-		return errs.Wrap(err, "CreateRpcRootNodes error")
-	}
-
-	admin.RegisterAdminServer(server, &adminServer{Database: adminDatabase,
-		Chat: chat.NewChatClient(discov),
-	})
-	return nil
-}
-
-type adminServer struct {
-	Database database.AdminDatabaseInterface
-	Chat     *chat.ChatClient
-}
 
 func (o *adminServer) GetAdminInfo(ctx context.Context, req *admin.GetAdminInfoReq) (*admin.GetAdminInfoResp, error) {
 	userID, err := mctx.CheckAdmin(ctx)
@@ -98,7 +58,7 @@ func (o *adminServer) ChangeAdminPassword(ctx context.Context, req *admin.Change
 	}
 
 	if user.Password != req.CurrentPassword {
-		return nil, errs.ErrInternalServer.Wrap("password error")
+		return nil, errs.ErrInternalServer.WrapMsg("password error")
 	}
 
 	if err := o.Database.ChangePassword(ctx, req.UserID, req.NewPassword); err != nil {
@@ -114,7 +74,7 @@ func (o *adminServer) AddAdminAccount(ctx context.Context, req *admin.AddAdminAc
 
 	_, err := o.Database.GetAdmin(ctx, req.Account)
 	if err == nil {
-		return nil, errs.ErrRegisteredAlready.Wrap("the account is registered")
+		return nil, errs.ErrDuplicateKey.WrapMsg("the account is registered")
 	}
 
 	adm := &admin2.Admin{
@@ -137,8 +97,8 @@ func (o *adminServer) DelAdminAccount(ctx context.Context, req *admin.DelAdminAc
 		return nil, err
 	}
 
-	if utils.Duplicate(req.UserIDs) {
-		return nil, errs.ErrArgs.Wrap("user ids is duplicate")
+	if datautil.Duplicate(req.UserIDs) {
+		return nil, errs.ErrArgs.WrapMsg("user ids is duplicate")
 	}
 
 	for _, userID := range req.UserIDs {
@@ -147,8 +107,7 @@ func (o *adminServer) DelAdminAccount(ctx context.Context, req *admin.DelAdminAc
 			return nil, err
 		}
 		if superAdmin.Level == constant.AdvancedUserLevel {
-			str := fmt.Sprintf("%s is superAdminID", userID)
-			return nil, errs.ErrNoPermission.Wrap(str)
+			return nil, errs.ErrNoPermission.WrapMsg(fmt.Sprintf("%s is superAdminID", userID))
 		}
 	}
 
@@ -205,7 +164,7 @@ func (o *adminServer) AdminUpdateInfo(ctx context.Context, req *admin.AdminUpdat
 		resp.Nickname = req.Nickname.Value
 	}
 	if req.FaceURL == nil {
-		resp.Nickname = info.FaceURL
+		resp.FaceURL = info.FaceURL
 	} else {
 		resp.FaceURL = req.FaceURL.Value
 	}

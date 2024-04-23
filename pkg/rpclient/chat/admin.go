@@ -16,25 +16,14 @@ package chat
 
 import (
 	"context"
-	"fmt"
-	"os"
-
-	"github.com/OpenIMSDK/tools/discoveryregistry"
-
-	"github.com/OpenIMSDK/chat/pkg/common/config"
-	"github.com/OpenIMSDK/chat/pkg/common/mctx"
-	"github.com/OpenIMSDK/chat/pkg/eerrs"
-	"github.com/OpenIMSDK/chat/pkg/proto/admin"
+	"github.com/openimsdk/chat/pkg/common/mctx"
+	"github.com/openimsdk/chat/pkg/eerrs"
+	"github.com/openimsdk/chat/pkg/protocol/admin"
 )
 
-func NewAdminClient(discov discoveryregistry.SvcDiscoveryRegistry) *AdminClient {
-	conn, err := discov.GetConn(context.Background(), config.Config.RpcRegisterName.OpenImAdminName)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "\n\nexit -1: \n%+v\n\n", err)
-		os.Exit(-1)
-	}
+func NewAdminClient(client admin.AdminClient) *AdminClient {
 	return &AdminClient{
-		client: admin.NewAdminClient(conn),
+		client: client,
 	}
 }
 

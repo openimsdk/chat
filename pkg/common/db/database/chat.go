@@ -16,21 +16,19 @@ package database
 
 import (
 	"context"
-	"github.com/OpenIMSDK/chat/pkg/common/db/dbutil"
-	"github.com/OpenIMSDK/tools/pagination"
-	"go.mongodb.org/mongo-driver/mongo"
+	"github.com/openimsdk/tools/db/mongoutil"
+	"github.com/openimsdk/tools/db/pagination"
+	"github.com/openimsdk/tools/db/tx"
 	"time"
 
-	constant2 "github.com/OpenIMSDK/chat/pkg/common/constant"
-	admin2 "github.com/OpenIMSDK/chat/pkg/common/db/model/admin"
-	"github.com/OpenIMSDK/chat/pkg/common/db/model/chat"
-	"github.com/OpenIMSDK/chat/pkg/common/db/table/admin"
-	table "github.com/OpenIMSDK/chat/pkg/common/db/table/chat"
-	"github.com/OpenIMSDK/tools/tx"
+	constant2 "github.com/openimsdk/chat/pkg/common/constant"
+	admin2 "github.com/openimsdk/chat/pkg/common/db/model/admin"
+	"github.com/openimsdk/chat/pkg/common/db/model/chat"
+	"github.com/openimsdk/chat/pkg/common/db/table/admin"
+	table "github.com/openimsdk/chat/pkg/common/db/table/chat"
 )
 
 type ChatDatabaseInterface interface {
-	IsNotFound(err error) bool
 	GetUser(ctx context.Context, userID string) (account *table.Account, err error)
 	UpdateUseInfo(ctx context.Context, userID string, attribute map[string]any) (err error)
 	FindAttribute(ctx context.Context, userIDs []string) ([]*table.Attribute, error)
@@ -58,82 +56,52 @@ type ChatDatabaseInterface interface {
 	NewUserCountTotal(ctx context.Context, before *time.Time) (int64, error)
 	UserLoginCountTotal(ctx context.Context, before *time.Time) (int64, error)
 	UserLoginCountRangeEverydayTotal(ctx context.Context, start *time.Time, end *time.Time) (map[string]int64, int64, error)
-	UploadLogs(ctx context.Context, logs []*table.Log) error
-	DeleteLogs(ctx context.Context, logID []string, userID string) error
-	SearchLogs(ctx context.Context, keyword string, start time.Time, end time.Time, pagination pagination.Pagination) (int64, []*table.Log, error)
-	GetLogs(ctx context.Context, LogIDs []string, userID string) ([]*table.Log, error)
 }
 
-func NewChatDatabase(db *mongo.Database) (ChatDatabaseInterface, error) {
-	register, err := chat.NewRegister(db)
+func NewChatDatabase(cli *mongoutil.Client) (ChatDatabaseInterface, error) {
+	register, err := chat.NewRegister(cli.GetDB())
 	if err != nil {
 		return nil, err
 	}
-	account, err := chat.NewAccount(db)
+	account, err := chat.NewAccount(cli.GetDB())
 	if err != nil {
 		return nil, err
 	}
-	attribute, err := chat.NewAttribute(db)
+	attribute, err := chat.NewAttribute(cli.GetDB())
 	if err != nil {
 		return nil, err
 	}
-	userLoginRecord, err := chat.NewUserLoginRecord(db)
+	userLoginRecord, err := chat.NewUserLoginRecord(cli.GetDB())
 	if err != nil {
 		return nil, err
 	}
-	verifyCode, err := chat.NewVerifyCode(db)
+	verifyCode, err := chat.NewVerifyCode(cli.GetDB())
 	if err != nil {
 		return nil, err
 	}
-	forbiddenAccount, err := admin2.NewForbiddenAccount(db)
-	if err != nil {
-		return nil, err
-	}
-	log, err := chat.NewLogs(db)
+	forbiddenAccount, err := admin2.NewForbiddenAccount(cli.GetDB())
 	if err != nil {
 		return nil, err
 	}
 	return &ChatDatabase{
-		tx:               tx.NewMongo(db.Client()),
+		tx:               cli.GetTx(),
 		register:         register,
 		account:          account,
 		attribute:        attribute,
 		userLoginRecord:  userLoginRecord,
 		verifyCode:       verifyCode,
 		forbiddenAccount: forbiddenAccount,
-		log:              log,
 	}, nil
 }
 
 type ChatDatabase struct {
-	tx               tx.CtxTx
+	tx               tx.Tx
 	register         table.RegisterInterface
 	account          table.AccountInterface
 	attribute        table.AttributeInterface
 	userLoginRecord  table.UserLoginRecordInterface
 	verifyCode       table.VerifyCodeInterface
 	forbiddenAccount admin.ForbiddenAccountInterface
-	log              table.LogInterface
-}
-
-func (o *ChatDatabase) GetLogs(ctx context.Context, LogIDs []string, userID string) ([]*table.Log, error) {
-	return o.log.Get(ctx, LogIDs, userID)
-}
-
-func (o *ChatDatabase) DeleteLogs(ctx context.Context, logID []string, userID string) error {
-	return o.log.Delete(ctx, logID, userID)
-}
-
-func (o *ChatDatabase) SearchLogs(ctx context.Context, keyword string, start time.Time, end time.Time, pagination pagination.Pagination) (int64, []*table.Log, error) {
-	return o.log.Search(ctx, keyword, start, end, pagination)
-}
-
-func (o *ChatDatabase) UploadLogs(ctx context.Context, logs []*table.Log) error {
-	return o.log.Create(ctx, logs)
-}
-
-func (o *ChatDatabase) IsNotFound(err error) bool {
-	return dbutil.IsDBNotFound(err)
 }
 
 func (o *ChatDatabase) GetUser(ctx context.Context, userID string) (account *table.Account, err error) {

@@ -16,15 +16,15 @@ package admin
 
 import (
 	"context"
-	"github.com/OpenIMSDK/tools/mgoutil"
-	"github.com/OpenIMSDK/tools/pagination"
+	"github.com/openimsdk/tools/db/mongoutil"
+	"github.com/openimsdk/tools/db/pagination"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 
-	"github.com/OpenIMSDK/chat/pkg/common/constant"
-	"github.com/OpenIMSDK/chat/pkg/common/db/table/admin"
-	"github.com/OpenIMSDK/tools/errs"
+	"github.com/openimsdk/chat/pkg/common/constant"
+	"github.com/openimsdk/chat/pkg/common/db/table/admin"
+	"github.com/openimsdk/tools/errs"
 )
 
 func NewApplet(db *mongo.Database) (admin.AppletInterface, error) {
@@ -48,25 +48,25 @@ type Applet struct {
 }
 
 func (o *Applet) Create(ctx context.Context, applets []*admin.Applet) error {
-	return mgoutil.InsertMany(ctx, o.coll, applets)
+	return mongoutil.InsertMany(ctx, o.coll, applets)
 }
 
 func (o *Applet) Del(ctx context.Context, ids []string) error {
 	if len(ids) == 0 {
 		return nil
 	}
-	return mgoutil.DeleteMany(ctx, o.coll, bson.M{"id": bson.M{"$in": ids}})
+	return mongoutil.DeleteMany(ctx, o.coll, bson.M{"id": bson.M{"$in": ids}})
 }
 
 func (o *Applet) Update(ctx context.Context, id string, data map[string]any) error {
 	if len(data) == 0 {
 		return nil
 	}
-	return mgoutil.UpdateOne(ctx, o.coll, bson.M{"id": id}, bson.M{"$set": data}, false)
+	return mongoutil.UpdateOne(ctx, o.coll, bson.M{"id": id}, bson.M{"$set": data}, false)
 }
 
 func (o *Applet) Take(ctx context.Context, id string) (*admin.Applet, error) {
-	return mgoutil.FindOne[*admin.Applet](ctx, o.coll, bson.M{"id": id})
+	return mongoutil.FindOne[*admin.Applet](ctx, o.coll, bson.M{"id": id})
 
 }
 
@@ -83,15 +83,15 @@ func (o *Applet) Search(ctx context.Context, keyword string, pagination paginati
 			},
 		}
 	}
-	return mgoutil.FindPage[*admin.Applet](ctx, o.coll, filter, pagination)
+	return mongoutil.FindPage[*admin.Applet](ctx, o.coll, filter, pagination)
 }
 
 func (o *Applet) FindOnShelf(ctx context.Context) ([]*admin.Applet, error) {
-	return mgoutil.Find[*admin.Applet](ctx, o.coll, bson.M{"status": constant.StatusOnShelf})
+	return mongoutil.Find[*admin.Applet](ctx, o.coll, bson.M{"status": constant.StatusOnShelf})
 
 }
 
 func (o *Applet) FindID(ctx context.Context, ids []string) ([]*admin.Applet, error) {
-	return mgoutil.Find[*admin.Applet](ctx, o.coll, bson.M{"id": bson.M{"$in": ids}})
+	return mongoutil.Find[*admin.Applet](ctx, o.coll, bson.M{"id": bson.M{"$in": ids}})
 
 }

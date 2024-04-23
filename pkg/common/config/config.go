@@ -1,20 +1,10 @@
-// Copyright © 2023 OpenIM open source community. All rights reserved.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
 package config
 
-import _ "embed"
+import (
+	_ "embed"
+	"github.com/openimsdk/tools/db/mongoutil"
+	"github.com/openimsdk/tools/db/redisutil"
+)
 
 var (
 	//go:embed version
@@ -23,109 +13,150 @@ var (
 	ImportTemplate []byte
 )
 
-var Config struct {
-	Envs struct {
-		Discovery string `yaml:"discovery"`
-	} `yaml:"envs"`
-	Zookeeper struct {
-		Schema   string   `yaml:"schema"`
-		ZkAddr   []string `yaml:"zkAddr"`
-		Username string   `yaml:"username"`
-		Password string   `yaml:"password"`
-	} `yaml:"zookeeper"`
-	ChatApi struct {
-		GinPort  []int  `yaml:"openImChatApiPort"`
-		ListenIP string `yaml:"listenIP"`
-	} `yaml:"chatApi"`
-	AdminApi struct {
-		GinPort  []int  `yaml:"openImAdminApiPort"`
-		ListenIP string `yaml:"listenIP"`
-	} `yaml:"adminApi"`
-	Rpc struct {
-		RegisterIP string `yaml:"registerIP"`
-		ListenIP   string `yaml:"listenIP"`
-	} `yaml:"rpc"`
-	Redis struct {
-		Address  *[]string `yaml:"address"`
-		Username string    `yaml:"username"`
-		Password string    `yaml:"password"`
-	} `yaml:"redis"`
-	LiveKit struct {
-		LiveKitUrl string `yaml:"liveKitUrl"`
-		Key        string `yaml:"key"`
-		Secret     string `yaml:"secret"`
-	} `yaml:"liveKit"`
-	RpcPort struct {
-		OpenImAdminPort []int `yaml:"openImAdminPort"`
-		OpenImChatPort  []int `yaml:"openImChatPort"`
-	} `yaml:"rpcPort"`
-	RpcRegisterName struct {
-		OpenImAdminName string `yaml:"openImAdminName"`
-		OpenImChatName  string `yaml:"openImChatName"`
-	} `yaml:"rpcRegisterName"`
-	Mysql *struct {
-		Address       *[]string `yaml:"address"`
-		Username      *string   `yaml:"username"`
-		Password      *string   `yaml:"password"`
-		Database      *string   `yaml:"database"`
-		MaxOpenConn   *int      `yaml:"maxOpenConn"`
-		MaxIdleConn   *int      `yaml:"maxIdleConn"`
-		MaxLifeTime   *int      `yaml:"maxLifeTime"`
-		LogLevel      *int      `yaml:"logLevel"`
-		SlowThreshold *int      `yaml:"slowThreshold"`
-	} `yaml:"mysql"`
-	Mongo struct {
-		Uri         string   `yaml:"uri"`
-		Address     []string `yaml:"address"`
-		Database    string   `yaml:"database"`
-		Username    string   `yaml:"username"`
-		Password    string   `yaml:"password"`
-		MaxPoolSize int      `yaml:"maxPoolSize"`
-	} `yaml:"mongo"`
-	Log struct {
-		StorageLocation     *string `yaml:"storageLocation"`
-		RotationTime        *uint   `yaml:"rotationTime"`
-		RemainRotationCount *uint   `yaml:"remainRotationCount"`
-		RemainLogLevel      *int    `yaml:"remainLogLevel"`
-		IsStdout            *bool   `yaml:"isStdout"`
-		IsJson              *bool   `yaml:"isJson"`
-		WithStack           *bool   `yaml:"withStack"`
-	} `yaml:"log"`
-	Secret      *string `yaml:"secret"`
-	ChatSecret  string  `yaml:"chatSecret"`
-	OpenIMUrl   string  `yaml:"openIMUrl"`
-	TokenPolicy struct {
-		Expire *int64 `yaml:"expire"`
-	} `yaml:"tokenPolicy"`
+type Share struct {
+	Env             string          `mapstructure:"env"`
+	RpcRegisterName RpcRegisterName `mapstructure:"rpcRegisterName"`
+	OpenIM          struct {
+		ApiURL      string `mapstructure:"apiURL"`
+		Secret      string `mapstructure:"secret"`
+		AdminUserID string `mapstructure:"adminUserID"`
+	} `mapstructure:"openIM"`
+	ChatAdmin   []AdminUser `mapstructure:"chatAdmin"`
+	ProxyHeader string      `mapstructure:"proxyHeader"`
+}
+
+type AdminUser struct {
+	AdminID  string `mapstructure:"adminID"`
+	IMUserID string `mapstructure:"imUserID"`
+	Nickname string `mapstructure:"nickname"`
+}
+
+type RpcRegisterName struct {
+	Chat  string `mapstructure:"chat"`
+	Admin string `mapstructure:"admin"`
+}
+
+func (r *RpcRegisterName) GetServiceNames() []string {
+	return []string{
+		r.Chat,
+		r.Admin,
+	}
+}
+
+type API struct {
+	Api struct {
+		ListenIP string `mapstructure:"listenIP"`
+		Ports    []int  `mapstructure:"ports"`
+	} `mapstructure:"api"`
+}
+
+type Mongo struct {
+	URI         string   `mapstructure:"uri"`
+	Address     []string `mapstructure:"address"`
+	Database    string   `mapstructure:"database"`
+	Username    string   `mapstructure:"username"`
+	Password    string   `mapstructure:"password"`
+	MaxPoolSize int      `mapstructure:"maxPoolSize"`
+	MaxRetry    int      `mapstructure:"maxRetry"`
+}
+
+func (m *Mongo) Build() *mongoutil.Config {
+	return &mongoutil.Config{
+		Uri:         m.URI,
+		Address:     m.Address,
+		Database:    m.Database,
+		Username:    m.Username,
+		Password:    m.Password,
+		MaxPoolSize: m.MaxPoolSize,
+		MaxRetry:    m.MaxRetry,
+	}
+}
+
+type Redis struct {
+	Address        []string `mapstructure:"address"`
+	Username       string   `mapstructure:"username"`
+	Password       string   `mapstructure:"password"`
+	EnablePipeline bool     `mapstructure:"enablePipeline"`
+	ClusterMode    bool     `mapstructure:"clusterMode"`
+	DB             int      `mapstructure:"db"`
+	MaxRetry       int      `mapstructure:"MaxRetry"`
+}
+
+func (r *Redis) Build() *redisutil.Config {
+	return &redisutil.Config{
+		ClusterMode: r.ClusterMode,
+		Address:     r.Address,
+		Username:    r.Username,
+		Password:    r.Password,
+		DB:          r.DB,
+		MaxRetry:    r.MaxRetry,
+	}
+}
+
+type ZooKeeper struct {
+	Schema   string   `mapstructure:"schema"`
+	Address  []string `mapstructure:"address"`
+	Username string   `mapstructure:"username"`
+	Password string   `mapstructure:"password"`
+}
+
+type Chat struct {
+	RPC struct {
+		RegisterIP string `mapstructure:"registerIP"`
+		ListenIP   string `mapstructure:"listenIP"`
+		Ports      []int  `mapstructure:"ports"`
+	} `mapstructure:"rpc"`
 	VerifyCode struct {
-		ValidTime int    `yaml:"validTime"`
-		UintTime  int    `yaml:"uintTime"`
-		MaxCount  int    `yaml:"maxCount"`
-		SuperCode string `yaml:"superCode"`
-		Len       int    `yaml:"len"`
-		Use       string `yaml:"use"`
-		Ali       struct {
-			Endpoint                     string `yaml:"endpoint"`
-			AccessKeyId                  string `yaml:"accessKeyId"`
-			AccessKeySecret              string `yaml:"accessKeySecret"`
-			SignName                     string `yaml:"signName"`
-			VerificationCodeTemplateCode string `yaml:"verificationCodeTemplateCode"`
-		} `yaml:"ali"`
+		ValidTime  int    `mapstructure:"validTime"`
+		ValidCount int    `mapstructure:"validCount"`
+		UintTime   int    `mapstructure:"uintTime"`
+		MaxCount   int    `mapstructure:"maxCount"`
+		SuperCode  string `mapstructure:"superCode"`
+		Len        int    `mapstructure:"len"`
+		Phone      struct {
+			Use string `mapstructure:"use"`
+			Ali struct {
+				Endpoint                     string `mapstructure:"endpoint"`
+				AccessKeyID                  string `mapstructure:"accessKeyId"`
+				AccessKeySecret              string `mapstructure:"accessKeySecret"`
+				SignName                     string `mapstructure:"signName"`
+				VerificationCodeTemplateCode string `mapstructure:"verificationCodeTemplateCode"`
+			} `mapstructure:"ali"`
+		} `mapstructure:"phone"`
 		Mail struct {
-			Title                   string `yaml:"title"`
-			SenderMail              string `yaml:"senderMail"`
-			SenderAuthorizationCode string `yaml:"senderAuthorizationCode"`
-			SmtpAddr                string `yaml:"smtpAddr"`
-			SmtpPort                int    `yaml:"smtpPort"`
-		} `yaml:"mail"`
-	} `yaml:"verifyCode"`
-	ProxyHeader string  `yaml:"proxyHeader"`
-	AdminList   []Admin `yaml:"adminList"`
-	ChatAdmin   []Admin `yaml:"chatAdmin"`
+			Enable                  bool   `mapstructure:"enable"`
+			Title                   string `mapstructure:"title"`
+			SenderMail              string `mapstructure:"senderMail"`
+			SenderAuthorizationCode string `mapstructure:"senderAuthorizationCode"`
+			SMTPAddr                string `mapstructure:"smtpAddr"`
+			SMTPPort                int    `mapstructure:"smtpPort"`
+		} `mapstructure:"mail"`
+	} `mapstructure:"verifyCode"`
+	LiveKit struct {
+		URL    string `mapstructure:"url"`
+		Key    string `mapstructure:"key"`
+		Secret string `mapstructure:"secret"`
+	} `mapstructure:"liveKit"`
 }
 
 type Admin struct {
-	AdminID   string `yaml:"adminID"`
-	NickName  string `yaml:"nickname"`
-	ImAdminID string `yaml:"imAdmin"`
+	RPC struct {
+		RegisterIP string `mapstructure:"registerIP"`
+		ListenIP   string `mapstructure:"listenIP"`
+		Ports      []int  `mapstructure:"ports"`
+	} `mapstructure:"rpc"`
+	TokenPolicy struct {
+		Expire int `mapstructure:"expire"`
+	} `mapstructure:"tokenPolicy"`
+	Secret string `mapstructure:"secret"`
+}
+
+type Log struct {
+	StorageLocation     string `mapstructure:"storageLocation"`
+	RotationTime        uint   `mapstructure:"rotationTime"`
+	RemainRotationCount uint   `mapstructure:"remainRotationCount"`
+	RemainLogLevel      int    `mapstructure:"remainLogLevel"`
+	IsStdout            bool   `mapstructure:"isStdout"`
+	IsJson              bool   `mapstructure:"isJson"`
+	WithStack           bool   `mapstructure:"withStack"`
 }

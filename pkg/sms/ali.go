@@ -18,29 +18,33 @@ import (
 	"context"
 	"encoding/json"
 
-	"github.com/OpenIMSDK/tools/errs"
 	aliconf "github.com/alibabacloud-go/darabonba-openapi/client"
 	dysmsapi "github.com/alibabacloud-go/dysmsapi-20170525/v2/client"
 	"github.com/alibabacloud-go/tea/tea"
-
-	"github.com/OpenIMSDK/chat/pkg/common/config"
+	"github.com/openimsdk/tools/errs"
 )
 
-func newAli() (SMS, error) {
+func NewAli(endpoint, accessKeyId, accessKeySecret, signName, verificationCodeTemplateCode string) (SMS, error) {
 	conf := &aliconf.Config{
-		Endpoint:        tea.String(config.Config.VerifyCode.Ali.Endpoint),
-		AccessKeyId:     tea.String(config.Config.VerifyCode.Ali.AccessKeyId),
-		AccessKeySecret: tea.String(config.Config.VerifyCode.Ali.AccessKeySecret),
+		Endpoint:        tea.String(endpoint),
+		AccessKeyId:     tea.String(accessKeyId),
+		AccessKeySecret: tea.String(accessKeySecret),
 	}
 	client, err := dysmsapi.NewClient(conf)
 	if err != nil {
 		return nil, err
 	}
-	return &ali{client: client}, nil
+	return &ali{
+		signName:                     signName,
+		verificationCodeTemplateCode: verificationCodeTemplateCode,
+		client:                       client,
+	}, nil
 }
 
 type ali struct {
-	client *dysmsapi.Client
+	signName                     string
+	verificationCodeTemplateCode string
+	client                       *dysmsapi.Client
 }
 
 func (a *ali) Name() string {
@@ -56,8 +60,8 @@ func (a *ali) SendCode(ctx context.Context, areaCode string, phoneNumber string,
 	}
 	req := &dysmsapi.SendSmsRequest{
 		PhoneNumbers:  tea.String(areaCode + phoneNumber),
-		SignName:      tea.String(config.Config.VerifyCode.Ali.SignName),
-		TemplateCode:  tea.String(config.Config.VerifyCode.Ali.VerificationCodeTemplateCode),
+		SignName:      tea.String(a.signName),
+		TemplateCode:  tea.String(a.verificationCodeTemplateCode),
 		TemplateParam: tea.String(string(data)),
 	}
 	_, err = a.client.SendSms(req)

@@ -17,10 +17,10 @@ package admin
 import (
 	"context"
 
-	"github.com/OpenIMSDK/tools/errs"
+	"github.com/openimsdk/tools/errs"
 
-	"github.com/OpenIMSDK/chat/pkg/common/mctx"
-	"github.com/OpenIMSDK/chat/pkg/proto/admin"
+	"github.com/openimsdk/chat/pkg/common/mctx"
+	"github.com/openimsdk/chat/pkg/protocol/admin"
 )
 
 func (o *adminServer) GetClientConfig(ctx context.Context, req *admin.GetClientConfigReq) (*admin.GetClientConfigResp, error) {
@@ -36,7 +36,7 @@ func (o *adminServer) SetClientConfig(ctx context.Context, req *admin.SetClientC
 		return nil, err
 	}
 	if len(req.Config) == 0 {
-		return nil, errs.ErrArgs.Wrap("update config empty")
+		return nil, errs.ErrArgs.WrapMsg("update config empty")
 	}
 	if err := o.Database.SetConfig(ctx, req.Config); err != nil {
 		return nil, err

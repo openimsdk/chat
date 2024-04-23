@@ -19,7 +19,7 @@ package OpenIMChat.chat;
 import "pub/wrapperspb.proto";
 import "pub/sdkws.proto";
 import "common/common.proto";
-option go_package = "github.com/OpenIMSDK/chat/pkg/proto/chat";
+option go_package = "github.com/openimsdk/chat/pkg/protocol/chat";
 
 ...
 
@@ -54,10 +54,10 @@ To check the parameters in the request message, we should add a Check() method f
 ```go
 func (x *GetTokenForVideoMeetingReq) Check() error {
     if x.Room == "" {
-        errs.ErrArgs.Wrap("Room is empty")
+        errs.ErrArgs.WrapMsg("Room is empty")
     }
     if x.Identity == "" {
-        errs.ErrArgs.Wrap("User Identity is empty")
+        errs.ErrArgs.WrapMsg("User Identity is empty")
     }
     return nil
 }
@@ -117,7 +117,7 @@ package chat
 
 import (
     ...
-    "github.com/OpenIMSDK/chat/pkg/common/rtc"
+    "github.com/openimsdk/chat/pkg/common/rtc"
     ...
 )
 

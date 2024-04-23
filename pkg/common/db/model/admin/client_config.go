@@ -16,13 +16,13 @@ package admin
 
 import (
 	"context"
-	"github.com/OpenIMSDK/tools/mgoutil"
+	"github.com/openimsdk/tools/db/mongoutil"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 
-	"github.com/OpenIMSDK/chat/pkg/common/db/table/admin"
-	"github.com/OpenIMSDK/tools/errs"
+	"github.com/openimsdk/chat/pkg/common/db/table/admin"
+	"github.com/openimsdk/tools/errs"
 )
 
 func NewClientConfig(db *mongo.Database) (admin.ClientConfigInterface, error) {
@@ -51,7 +51,7 @@ func (o *ClientConfig) Set(ctx context.Context, config map[string]string) error 
 		update := bson.M{
 			"value": value,
 		}
-		err := mgoutil.UpdateOne(ctx, o.coll, filter, bson.M{"$set": update}, false, options.Update().SetUpsert(true))
+		err := mongoutil.UpdateOne(ctx, o.coll, filter, bson.M{"$set": update}, false, options.Update().SetUpsert(true))
 		if err != nil {
 			return err
 		}
@@ -61,11 +61,11 @@ func (o *ClientConfig) Set(ctx context.Context, config map[string]string) error 
 }
 
 func (o *ClientConfig) Del(ctx context.Context, keys []string) error {
-	return mgoutil.DeleteMany(ctx, o.coll, bson.M{"key": bson.M{"$in": keys}})
+	return mongoutil.DeleteMany(ctx, o.coll, bson.M{"key": bson.M{"$in": keys}})
 }
 
 func (o *ClientConfig) Get(ctx context.Context) (map[string]string, error) {
-	cs, err := mgoutil.Find[*admin.ClientConfig](ctx, o.coll, bson.M{})
+	cs, err := mongoutil.Find[*admin.ClientConfig](ctx, o.coll, bson.M{})
 	if err != nil {
 		return nil, err
 	}

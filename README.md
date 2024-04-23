@@ -14,207 +14,91 @@ You may use the OpenIM source code to create compiled versions not originally pr
 + Obtain a commercial license by contacting OpenIM.
 + For more details and licensing inquiries, please email 📧 [contact@openim.io](mailto:contact@openim.io).
 
-## 🧩 Awesome features
-1. This repository implement a business system, which consists of two parts: User related function and background management function
-2. The business system depends on the api of the im system ([open-im-server repository](https://github.com/openimsdk/open-im-server)) and implement various functions by calling the api of the im system
-3. User related part includes some regular functions like user login, user register, user info update, etc.
-4. Background management provides api for admin to manage the im system containing functions like user management, message mangement,group management,etc.
+## 🧩 Feature Overview
+
+1. This repository implements a business system, which consists of two parts: User System and Backend Management System.
+2. The system relies on the [open-im-server repository](https://github.com/openimsdk/open-im-server) and implements various business functions by calling the APIs of the instant messaging system.
+3. The User System includes regular functions such as user login, user registration, user information update, etc.
+4. The Backend Management System includes APIs for managing users, groups, and messages.
 
 ## :busts_in_silhouette: Community
 
 + 💬 [Follow our Twitter account](https://twitter.com/founder_im63606)
 + 👫 [Join our Reddit](https://www.reddit.com/r/OpenIMessaging)
 + 🚀 [Join our Slack community](https://join.slack.com/t/openimsdk/shared_invite/zt-22720d66b-o_FvKxMTGXtcnnnHiMqe9Q)
-+ :eyes: [Join our wechat (微信群)](https://openim-1253691595.cos.ap-nanjing.myqcloud.com/WechatIMG20.jpeg)
-+ 📚 [OpenIM Community](https://github.com/OpenIMSDK/community)
-+ 💕 [OpenIM Interest Group](https://github.com/Openim-sigs)
++ :eyes: [Join our WeChat group](https://openim-1253691595.cos.ap-nanjing.myqcloud.com/WechatIMG20.jpeg)
++ 📚 [OpenIM Community](https://github.com/openimsdk/community)
++ 💕 [OpenIM Interest Groups](https://github.com/Openim-sigs)
 
-## 🛫 Quick start 
+## 🛫 Quick Start
 
-> **Note**: You can get started quickly with OpenIM Chat.
+> :warning: **Note**: This project works on Linux/Windows/Mac platforms and both ARM and AMD architectures.
 
-### 📦 Installation
-
-```bash
-git clone https://github.com/openimsdk/chat openim-chat && export openim-chat=$(pwd)/openim-chat && cd $openim-chat && make
-```
-
-### Developing chat
-
-You can deploy OpenIM Chat in two ways, either from source (which requires openIM-server to be installed) or with [docker compose](https://github.com/openimsdk/openim-docker)
-
-**Here's how to deploy from source code:**
-
-If you wish to deploy chat, then you should first install and deploy OpenIM, this [open-im-server repository](https://github.com/openimsdk/open-im-server)
-
-First, install openim-server in a new directory or location repository
+### 📦 Clone
 
 ```bash
-git clone -b release-v3.5 https://github.com/OpenIMSDK/Open-IM-Server.git openim && export openim=$(pwd)/openim && cd $openim
-sudo docker compose up -d
+git clone https://github.com/openimsdk/chat openim-chat
+cd openim-chat
 ```
 
-**Setting configuration items:**
+### 🛠 Initialization
+
+:computer: Before the first compilation, execute on Linux/Mac platforms:
+
+```
+sh bootstrap.sh
+```
+
+:computer: On Windows execute:
+
+```
+bootstrap.bat
+```
+
+### 🏗 Build
 
 ```bash
-make init
+mage
 ```
 
-> Then modify the configuration file `config/config.yaml` according to your needs
-> Note: If you want to use the mysql database, you need to modify the mysql configuration item in the configuration file. If you want to use the mongo database, you need to modify the mongo configuration item in the configuration file
-
-
-Then go back to the chat directory, Installing Chat
-
-**Starting MySQL:**
-
-> Recent OpenIM versions have discontinued the MySQL component, necessitating a separate MySQL installation for chat deployment.
+### 🚀 Start
 
 ```bash
-docker run -d \
-  --name mysql \
-  -p 13306:3306 \
-  -p 3306:33060 \
-  -v "$(pwd)/components/mysql/data:/var/lib/mysql" \
-  -v "/etc/localtime:/etc/localtime" \
-  -e MYSQL_ROOT_PASSWORD="openIM123" \
-  --restart always \
-  mysql:5.7
+mage start
 ```
 
-**MySQL Compatibility Note:**
+### :floppy_disk: Or start in the background and collect logs
 
-The MySQL version 5.7 primarily supports the linux/amd64 architecture. Users operating on Mac or other architectures, or those with specific version requirements for MySQL, can opt for the latest version of the open-source MariaDB. MariaDB is compatible with MySQL and can be a suitable alternative.
+```
+nohup mage start >> _output/logs/chat.log 2>&1 &
+```
+
+### :mag_right: Check
 
 ```bash
-docker run -d \
-  --name mysql \
-  -p 13306:3306 \
-  -p 3306:33060 \
-  -v "$(pwd)/components/mysql/data:/var/lib/mysql" \
-  -v "/etc/localtime:/etc/localtime" \
-  -e MYSQL_ROOT_PASSWORD="openIM123" \
-  --restart always \
-  mariadb:10.6
+mage check
 ```
 
-If you want to use a local or remote database, edit the `config/config.yaml` section after the initial configuration
-
-
-**Install Chat:**
+### 🛑 Stop
 
 ```bash
-$ make build
-$ make start
-$ make check
+mage stop
 ```
 
-## 🛫 Quick start 
+### 🚀 Start Sequence
 
-> **Note**: You can get started quickly with chat.
+1. Successfully start [open-im-server](https://github.com/openimsdk/open-im-server).
+2. Compile chat `mage`.
+3. Start chat `mage start`.
 
-### 🚀 Run
+## 📞 If you want to enable audio and video calls, please configure LiveKit
 
-> **Note**: 
-> We need to run the backend server first
+:link: Please refer to "[How to set up LiveKit server](./HOW_TO_SETUP_LIVEKIT_SERVER.md)".
 
-```bash
-$ make build
+## :handshake: Contributing
 
-# OR build Specifying binary
-$ make build BINS=admin-api
-
-# OR build multiarch
-$ make build-multiarch
-$ make build-multiarch BINS="admin-api"
-
-# OR use scripts build source code
-$ ./scripts/build_all.sh
-```
-
-### 📖 Contributors get up to speed
-
-Be good at using Makefile, it can ensure the quality of your project.
-
-```bash
-Usage: make <TARGETS> ...
-
-Targets:
-  all                          Build all the necessary targets. 🏗️
-  build                        Build binaries by default. 🛠️
-  go.build                     Build the binary file of the specified platform. 👨‍💻
-  build-multiarch              Build binaries for multiple platforms. 🌍
-  tidy                         tidy go.mod 📦
-  style                        Code style -> fmt,vet,lint 🎨
-  fmt                          Run go fmt against code. ✨
-  vet                          Run go vet against code. 🔍
-  generate                     Run go generate against code and docs. ✅
-  lint                         Run go lint against code. 🔎
-  test                         Run unit test ✔️
-  cover                        Run unit test with coverage. 🧪
-  docker-build                 Build docker image with the manager. 🐳
-  docker-push                  Push docker image with the manager. 🔝
-  docker-buildx-push           Push docker image with the manager using buildx. 🚢
-  copyright-verify             Validate boilerplate headers for assign files. 📄
-  copyright-add                Add the boilerplate headers for all files. 📝
-  swagger                      Generate swagger document. 📚
-  serve-swagger                Serve swagger spec and docs. 🌐
-  clean                        Clean all builds. 🧹
-  help                         Show this help info. ℹ️
-```
-
-> **Note**: 
-> It's highly recommended that you run `make all` before committing your code. 🚀
-
-```bash
-$ make all
-```
-
-### Chat Start
-
-```bash
-$ make start_all
-# OR use scripts start
-$ ./scripts/start-all.sh
-```
-
-### Chat Detection
-
-```bash
-$ make check
-# OR use scripts check
-$ ./scripts/check-all.sh --print-screen
-```
-
-### Chat Stop
-
-```bash
-$ make stop
-# OR use scripts stop
-$ ./scripts/stop-all.sh
-```
-## Add REST RPC API
-
-Please refer to "[How to add REST RPC API for OpenIM Chat](./HOW_TO_ADD_REST_RPC_API.md)".
-
-## Setup LiveKit if you want to enable Audio and Video chat
-
-Please refer to "[How to setup LiveKit server](./HOW_TO_SETUP_LIVEKIT_SERVER.md)".
-
-## Contributing
-
-Contributions to this project are welcome! Please see [CONTRIBUTING.md](./CONTRIBUTING.md) for details.
-
-## Community Meetings
-We want anyone to get involved in our community, we offer gifts and rewards, and we welcome you to join us every Thursday night.
-
-We take notes of each [biweekly meeting](https://github.com/openimsdk/open-im-server/issues/381) in [GitHub discussions](https://github.com/openimsdk/open-im-server/discussions/categories/meeting), and our minutes are written in [Google Docs](https://docs.google.com/document/d/1nx8MDpuG74NASx081JcCpxPgDITNTpIIos0DS6Vr9GU/edit?usp=sharing).
-
-
-## Who are using open-im-server
-The [user case studies](https://github.com/openimsdk/community/blob/main/ADOPTERS.md) page includes the user list of the project. You can leave a [📝comment](https://github.com/openimsdk/open-im-server/issues/379) to let us know your use case.
-
+:heart: Contributions to this project are welcome! Please see [CONTRIBUTING.md](./CONTRIBUTING.md) for details.
 
 ## 🚨 License
 
-chat is licensed under the  Apache 2.0 license. See [LICENSE](https://github.com/openimsdk/chat/tree/main/LICENSE) for the full license text.
+:scroll: chat is licensed under the [GPL-3.0 license](https://github.com/openimsdk/chat#GPL-3.0-1-ov-file). See the [LICENSE](https://github.com/openimsdk/chat/tree/main/LICENSE) for the full license text.

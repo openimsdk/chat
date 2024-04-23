@@ -16,14 +16,14 @@ package admin
 
 import (
 	"context"
-	"github.com/OpenIMSDK/tools/mgoutil"
-	"github.com/OpenIMSDK/tools/pagination"
+	"github.com/openimsdk/tools/db/mongoutil"
+	"github.com/openimsdk/tools/db/pagination"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 
-	"github.com/OpenIMSDK/chat/pkg/common/db/table/admin"
-	"github.com/OpenIMSDK/tools/errs"
+	"github.com/openimsdk/chat/pkg/common/db/table/admin"
+	"github.com/openimsdk/tools/errs"
 )
 
 func NewLimitUserLoginIP(db *mongo.Database) (admin.LimitUserLoginIPInterface, error) {
@@ -48,15 +48,15 @@ type LimitUserLoginIP struct {
 }
 
 func (o *LimitUserLoginIP) Create(ctx context.Context, ms []*admin.LimitUserLoginIP) error {
-	return mgoutil.InsertMany(ctx, o.coll, ms)
+	return mongoutil.InsertMany(ctx, o.coll, ms)
 }
 
 func (o *LimitUserLoginIP) Delete(ctx context.Context, ms []*admin.LimitUserLoginIP) error {
-	return mgoutil.DeleteMany(ctx, o.coll, o.limitUserLoginIPFilter(ms))
+	return mongoutil.DeleteMany(ctx, o.coll, o.limitUserLoginIPFilter(ms))
 }
 
 func (o *LimitUserLoginIP) Count(ctx context.Context, userID string) (uint32, error) {
-	count, err := mgoutil.Count(ctx, o.coll, bson.M{"user_id": userID})
+	count, err := mongoutil.Count(ctx, o.coll, bson.M{"user_id": userID})
 	if err != nil {
 		return 0, err
 	}
@@ -64,7 +64,7 @@ func (o *LimitUserLoginIP) Count(ctx context.Context, userID string) (uint32, er
 }
 
 func (o *LimitUserLoginIP) Take(ctx context.Context, userID string, ip string) (*admin.LimitUserLoginIP, error) {
-	return mgoutil.FindOne[*admin.LimitUserLoginIP](ctx, o.coll, bson.M{"user_id": userID, "ip": ip})
+	return mongoutil.FindOne[*admin.LimitUserLoginIP](ctx, o.coll, bson.M{"user_id": userID, "ip": ip})
 }
 
 func (o *LimitUserLoginIP) Search(ctx context.Context, keyword string, pagination pagination.Pagination) (int64, []*admin.LimitUserLoginIP, error) {
@@ -74,7 +74,7 @@ func (o *LimitUserLoginIP) Search(ctx context.Context, keyword string, paginatio
 			{"ip": bson.M{"$regex": keyword, "$options": "i"}},
 		},
 	}
-	return mgoutil.FindPage[*admin.LimitUserLoginIP](ctx, o.coll, filter, pagination)
+	return mongoutil.FindPage[*admin.LimitUserLoginIP](ctx, o.coll, filter, pagination)
 
 }
 
