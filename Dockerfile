@@ -20,7 +20,7 @@ COPY . .
 # Install Mage to use for building the application
 RUN go install github.com/magefile/mage@latest
 
-# Execute the build command using Mage
+# Uncomment and ensure your build command is correctly specified
 #RUN mage build
 
 # Use Alpine Linux as the final base image due to its small size and included utilities
