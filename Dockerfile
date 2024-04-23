@@ -47,7 +47,8 @@ COPY --from=builder $SERVER_DIR/go.sum $SERVER_DIR/
 
 RUN go get github.com/openimsdk/gomake@v0.0.6
 # Set up volume mounts for the configuration directory and logs directory
-VOLUME ["$SERVER_DIR/config", "$SERVER_DIR/_output/logs"]
+#VOLUME ["/openim-chat/config", "/openim-chat/_output/logs"]
+VOLUME ["/openim-chat/config", "/openim-chat/_output/logs"]
 
 # Set the command to run when the container starts
 ENTRYPOINT ["sh", "-c", "mage start && tail -f /dev/null"]
