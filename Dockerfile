@@ -37,9 +37,9 @@ WORKDIR $OPENIM_SERVER_DIR
 
 
 # Copy the compiled binaries and mage from the builder image to the final image
-COPY  $OPENIM_SERVER_DIR/_output $OPENIM_SERVER_DIR/
-COPY  /go/bin/mage /usr/local/bin/mage
-COPY  $OPENIM_SERVER_DIR/magefile_windows.go $OPENIM_SERVER_DIR/
+#COPY --from=builder $OPENIM_SERVER_DIR/_output $OPENIM_SERVER_DIR/
+COPY --from=builder /go/bin/mage /usr/local/bin/mage
+COPY --from=builder $OPENIM_SERVER_DIR/magefile_windows.go $OPENIM_SERVER_DIR/
 COPY --from=builder $OPENIM_SERVER_DIR/magefile_unix.go $OPENIM_SERVER_DIR/
 COPY --from=builder $OPENIM_SERVER_DIR/magefile.go $OPENIM_SERVER_DIR/
 COPY --from=builder $OPENIM_SERVER_DIR/start-config.yml $OPENIM_SERVER_DIR/
