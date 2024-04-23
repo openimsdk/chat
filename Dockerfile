@@ -19,13 +19,13 @@ RUN go mod download
 RUN go install github.com/magefile/mage@latest
 
 # Optionally build your application if needed
-# RUN mage build
+RUN mage build
 
 # Using Alpine Linux with Go environment for the final image
-FROM ubuntu:18.04
+FROM golang:1.21-alpine
 
 # Install necessary packages, such as bash
-#RUN apk add --no-cache bash
+RUN apk add --no-cache bash
 
 # Set the environment and work directory
 ENV SERVER_DIR=/openim-chat
