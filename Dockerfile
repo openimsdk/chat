@@ -45,6 +45,8 @@ COPY --from=builder $SERVER_DIR/magefile_windows.go $SERVER_DIR/
 COPY --from=builder $SERVER_DIR/magefile_unix.go $SERVER_DIR/
 COPY --from=builder $SERVER_DIR/magefile.go $SERVER_DIR/
 COPY --from=builder $SERVER_DIR/start-config.yml $SERVER_DIR/
+COPY --from=builder $SERVER_DIR/go.mod $SERVER_DIR/
+COPY --from=builder $SERVER_DIR/go.sum $SERVER_DIR/
 
 
 # Set up volume mounts for the configuration directory and logs directory
