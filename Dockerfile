@@ -46,6 +46,7 @@ COPY --from=builder $SERVER_DIR/start-config.yml $SERVER_DIR/
 COPY --from=builder $SERVER_DIR/go.mod $SERVER_DIR/
 COPY --from=builder $SERVER_DIR/go.sum $SERVER_DIR/
 
+RUN go get github.com/openimsdk/gomake@v0.0.6
 # Set up volume mounts for the configuration directory and logs directory
 VOLUME ["$SERVER_DIR/config", "$SERVER_DIR/_output/logs"]
 
