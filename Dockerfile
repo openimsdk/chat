@@ -44,7 +44,7 @@ RUN ls -la $OPENIM_SERVER_DIR
 
 # Copy the compiled binaries and mage from the builder image to the final image
 #COPY --from=builder $OPENIM_SERVER_DIR/_output $OPENIM_SERVER_DIR/
-COPY --from=builder /openim-chat/_output /openim-chat/
+#COPY --from=builder /openim-chat/_output /openim-chat/
 COPY --from=builder /go/bin/mage /usr/local/bin/mage
 COPY --from=builder $OPENIM_SERVER_DIR/magefile_windows.go $OPENIM_SERVER_DIR/
 COPY --from=builder $OPENIM_SERVER_DIR/magefile_unix.go $OPENIM_SERVER_DIR/
