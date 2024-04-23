@@ -33,7 +33,6 @@ RUN apk add --no-cache bash
 ENV SERVER_DIR=/openim-chat
 WORKDIR $SERVER_DIR
 
-RUN go get github.com/openimsdk/gomake@v0.0.6
 
 # Copy the compiled binaries and mage from the builder image to the final image
 COPY --from=builder $SERVER_DIR/_output $SERVER_DIR/_output
