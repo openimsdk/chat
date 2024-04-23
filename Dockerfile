@@ -29,6 +29,7 @@ FROM alpine:latest
 # Install necessary packages, such as bash, to ensure compatibility and functionality
 RUN apk add --no-cache bash
 
+FROM golang:1.21-alpine
 ENV SERVER_DIR=/openim-chat
 
 # Set the working directory inside the container based on the environment variable
