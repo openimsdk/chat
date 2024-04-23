@@ -24,6 +24,10 @@ RUN go install github.com/magefile/mage@latest
 # Uncomment and ensure your build command is correctly specified
 #RUN mage build
 
+RUN ls -la $OPENIM_SERVER_DIR
+
+
+
 # Use Alpine Linux as the final base image due to its small size and included utilities
 FROM alpine:latest
 
@@ -34,6 +38,7 @@ ENV OPENIM_SERVER_DIR=/openim-chat
 
 # Set the working directory inside the container based on the environment variable
 WORKDIR $OPENIM_SERVER_DIR
+
 
 RUN ls -la $OPENIM_SERVER_DIR
 
