@@ -55,13 +55,13 @@ func Start(ctx context.Context, index int, config *Config) error {
 	base := util.Api{
 		ImUserID:        config.Share.OpenIM.AdminUserID,
 		ProxyHeader:     config.Share.ProxyHeader,
-		ChatAdminUserID: config.Share.ChatAdmin[0].AdminID,
+		ChatAdminUserID: config.Share.ChatAdmin[0],
 	}
 	adminApi := New(chatClient, adminClient, im, &base)
 	mwApi := chatmw.New(adminClient)
 	gin.SetMode(gin.ReleaseMode)
-	engine := gin.Default()
-	engine.Use(mw.CorsHandler(), mw.GinParseOperationID())
+	engine := gin.New()
+	engine.Use(gin.Recovery(), mw.CorsHandler(), mw.GinParseOperationID())
 	SetAdminRoute(engine, adminApi, mwApi)
 	return engine.Run(fmt.Sprintf(":%d", apiPort))
 }
