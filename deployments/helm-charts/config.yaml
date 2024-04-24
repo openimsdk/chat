@@ -74,7 +74,7 @@ config:
     slowThreshold: 500                      
     database: openim_enterprise
 
-  # 没有配置表示和OpenIM一致
+ 
   log:
     storageLocation: ../_output/logs/           
     rotationTime: 24                    
