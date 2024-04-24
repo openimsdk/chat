@@ -43,17 +43,6 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: Set up environment
-      run: |
-        if [ "$RUNNER_OS" == "Linux" ]; then
-          sudo apt-get update
-          # Add other Linux specific setup here
-        elif [ "$RUNNER_OS" == "macOS" ]; then
-          # Add macOS specific setup here
-          brew update
-        fi
-      shell: bash
-
     # - name: Install latest Bash (macOS only)
     #   if: runner.os == 'macOS'
     #   run: |
@@ -68,13 +57,6 @@ jobs:
 
     #     brew install --cask docker
     #     open /Applications/Docker.app
-
-    - name: Build Chat
-      run: |
-        sudo bash bootstrap.sh
-        sudo mage
-        sudo mage start
-      shell: bash
 
     - name: deploy all services
       run: |
@@ -94,6 +76,13 @@ jobs:
         ls -al && pwd
       shell: bash
       continue-on-error: true
+
+    - name: Build Chat
+      run: |
+        sudo bash bootstrap.sh
+        sudo mage
+        sudo mage start
+      shell: bash
 
     - name: Print chat_$(date '+%Y%m%d').log
       run: |
