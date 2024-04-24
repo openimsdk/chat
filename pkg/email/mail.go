@@ -50,6 +50,6 @@ func (m *mail) SendMail(ctx context.Context, mail string, verifyCode string) err
 	msg.SetHeader(`From`, m.senderMail)
 	msg.SetHeader(`To`, []string{mail}...)
 	msg.SetHeader(`Subject`, m.title)
-	msg.SetBody(`text/html`, fmt.Sprintf("您的验证码为:%s，该验证码5分钟内有效，请勿泄露于他人。", verifyCode))
+	msg.SetBody(`text/html`, fmt.Sprintf("Your verification code is: %s. This code is valid for 5 minutes and should not be shared with others", verifyCode))
 	return errs.Wrap(m.dail.DialAndSend(msg))
 }
