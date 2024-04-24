@@ -12,8 +12,6 @@ openIM:
   adminUserID: imAdmin
 
 chatAdmin:
-  # Default username and password for the admin panel
-  - admin: chatAdmin
-
-
+   # Default username and password for the admin
+  - "chatAdmin"
 

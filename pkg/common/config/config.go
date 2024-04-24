@@ -21,14 +21,8 @@ type Share struct {
 		Secret      string `mapstructure:"secret"`
 		AdminUserID string `mapstructure:"adminUserID"`
 	} `mapstructure:"openIM"`
-	ChatAdmin   []AdminUser `mapstructure:"chatAdmin"`
-	ProxyHeader string      `mapstructure:"proxyHeader"`
-}
-
-type AdminUser struct {
-	AdminID  string `mapstructure:"adminID"`
-	IMUserID string `mapstructure:"imUserID"`
-	Nickname string `mapstructure:"nickname"`
+	ChatAdmin   []string `mapstructure:"chatAdmin"`
+	ProxyHeader string   `mapstructure:"proxyHeader"`
 }
 
 type RpcRegisterName struct {

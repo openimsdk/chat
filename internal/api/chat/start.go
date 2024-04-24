@@ -54,7 +54,7 @@ func Start(ctx context.Context, index int, config *Config) error {
 	base := util.Api{
 		ImUserID:        config.Share.OpenIM.AdminUserID,
 		ProxyHeader:     config.Share.ProxyHeader,
-		ChatAdminUserID: config.Share.ChatAdmin[0].AdminID,
+		ChatAdminUserID: config.Share.ChatAdmin[0],
 	}
 	adminApi := New(chatClient, adminClient, im, &base)
 	mwApi := chatmw.New(adminClient)
