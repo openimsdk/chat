@@ -20,7 +20,6 @@ import (
 	"time"
 )
 
-// Attribute 用户属性表.
 type Attribute struct {
 	UserID           string    `bson:"user_id"`
 	Account          string    `bson:"account"`

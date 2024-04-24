@@ -38,7 +38,7 @@ func ParseSheet(file *excelize.File, v interface{}) error {
 	} else if sheetIndex < 0 {
 		return nil
 	}
-	fieldIndex := make(map[string]int) // 结构体对应的下标
+	fieldIndex := make(map[string]int)
 	for i := 0; i < itemType.NumField(); i++ {
 		field := itemType.Field(i)
 		alias := field.Tag.Get("column")
@@ -54,8 +54,8 @@ func ParseSheet(file *excelize.File, v interface{}) error {
 	if len(fieldIndex) == 0 {
 		return errors.New("empty column struct")
 	}
-	sheetIndex := make(map[string]int) // sheet 对应的下标
-	for i := 1; ; i++ {                // 第一行
+	sheetIndex := make(map[string]int)
+	for i := 1; ; i++ {
 		name, err := file.GetCellValue(sheetName, GetAxis(i, 1))
 		if err != nil {
 			return err
@@ -88,7 +88,7 @@ func ParseSheet(file *excelize.File, v interface{}) error {
 				return err
 			}
 		}
-		if notEmpty > 0 { // 空行表示结束
+		if notEmpty > 0 {
 			putItem(item)
 		} else {
 			break

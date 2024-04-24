@@ -20,7 +20,6 @@ import (
 	"time"
 )
 
-// 禁止ip登录 注册.
 type IPForbidden struct {
 	IP            string    `bson:"ip"`
 	LimitRegister bool      `bson:"limit_register"`

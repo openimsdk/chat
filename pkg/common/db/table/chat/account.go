@@ -19,7 +19,6 @@ import (
 	"time"
 )
 
-// Account 账号密码表.
 type Account struct {
 	UserID         string    `bson:"user_id"`
 	Password       string    `bson:"password"`

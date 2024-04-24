@@ -20,7 +20,6 @@ import (
 	"time"
 )
 
-// RegisterAddGroup 注册时默认群组.
 type RegisterAddGroup struct {
 	GroupID    string    `bson:"group_id"`
 	CreateTime time.Time `bson:"create_time"`
