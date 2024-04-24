@@ -62,7 +62,6 @@ func (o *IPForbidden) Search(ctx context.Context, keyword string, state int32, p
 
 	switch state {
 	case constant.LimitNil:
-		// 不添加额外的过滤条件
 	case constant.LimitEmpty:
 		filter = bson.M{"limit_register": 0, "limit_login": 0}
 	case constant.LimitOnlyRegisterIP:
