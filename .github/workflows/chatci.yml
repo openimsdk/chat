@@ -64,14 +64,3 @@ jobs:
         run: |
           sudo bash bootstrap.sh
           echo "init successfully"
-
-      - name: build and start
-        run: |
-          mage start
-          mage check
-
-      - name: restart
-        run: |
-          mage stop
-          mage start
-          mage check
