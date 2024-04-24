@@ -9,8 +9,6 @@ openIM:
   adminUserID: imAdmin
 
 chatAdmin:
-  - adminID: chatAdmin
-    imUserID: imAdmin
-    nickname: chatAdmin
+  - "chatAdmin"
 
 #proxyHeader: "X-Forwarded-For"
