@@ -70,7 +70,6 @@ jobs:
         sudo mage start
         sudo mage check
 
-        sudo cat _output/logs/chat_$(date '+%Y%m%d').log 2>/dev/null
         echo "pwd = $(pwd)"
         cd ..
         ls -al && pwd
@@ -87,7 +86,5 @@ jobs:
     - name: Print chat_$(date '+%Y%m%d').log
       run: |
         ls -al && echo "pwd = $(pwd)"
-        sudo cat ./_output/logs/* 2>/dev/null
-        sudo cat ./_output/logs/* 2>/dev/null >> "$GITHUB_OUTPUT"
       shell: bash
       continue-on-error: true
