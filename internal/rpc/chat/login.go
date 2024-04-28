@@ -313,7 +313,7 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 	}
 	var registerType int32
 	if req.User.PhoneNumber != "" {
-		if req.User.AreaCode[0] != '+' {
+		if !strings.HasPrefix(req.User.AreaCode, "+") {
 			req.User.AreaCode = "+" + req.User.AreaCode
 		}
 		if _, err := strconv.ParseUint(req.User.AreaCode[1:], 10, 64); err != nil {
