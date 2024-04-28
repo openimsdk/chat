@@ -20,7 +20,6 @@ import (
 	"time"
 )
 
-// RegisterAddFriend 注册时默认好友.
 type RegisterAddFriend struct {
 	UserID     string    `bson:"user_id"`
 	CreateTime time.Time `bson:"create_time"`

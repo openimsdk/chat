@@ -20,7 +20,7 @@ import (
 	"time"
 )
 
-// Admin 后台管理员.
+// Admin user
 type Admin struct {
 	Account    string    `bson:"account"`
 	Password   string    `bson:"password"`

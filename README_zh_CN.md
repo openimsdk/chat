@@ -24,11 +24,8 @@
 ## :busts_in_silhouette: 社区
 
 + 💬 [关注我们的 Twitter 账户](https://twitter.com/founder_im63606)
-+ 👫 [加入我们的 Reddit](https://www.reddit.com/r/OpenIMessaging)
-+ 🚀 [加入我们的 Slack 社区](https://join.slack.com/t/openimsdk/shared_invite/zt-22720d66b-o_FvKxMTGXtcnnnHiMqe9Q)
++ 🚀 [加入我们的 Slack 社区](https://join.slack.com/t/openimsdk/shared_invite/zt-2hljfom5u-9ZuzP3NfEKW~BJKbpLm0Hw)
 + :eyes: [加入我们的微信群](https://openim-1253691595.cos.ap-nanjing.myqcloud.com/WechatIMG20.jpeg)
-+ 📚 [OpenIM 社区](https://github.com/openimsdk/community)
-+ 💕 [OpenIM 兴趣小组](https://github.com/Openim-sigs)
 
 ## 🛫 快速开始
 

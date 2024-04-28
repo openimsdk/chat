@@ -19,7 +19,6 @@ import (
 	"time"
 )
 
-// Register 注册信息表.
 type Register struct {
 	UserID      string    `bson:"user_id"`
 	DeviceID    string    `bson:"device_id"`
