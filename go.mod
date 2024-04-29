@@ -2,6 +2,8 @@ module github.com/openimsdk/chat
 
 go 1.21.2
 
+toolchain go1.21.9
+
 require (
 	github.com/gin-gonic/gin v1.9.1
 	github.com/golang-jwt/jwt/v4 v4.5.0
@@ -25,7 +27,7 @@ require (
 require (
 	github.com/livekit/protocol v1.10.1
 	github.com/mitchellh/mapstructure v1.5.0
-	github.com/openimsdk/gomake v0.0.9
+	github.com/openimsdk/gomake v0.0.11
 	github.com/openimsdk/protocol v0.0.63
 	github.com/openimsdk/tools v0.0.49-alpha.3
 	github.com/redis/go-redis/v9 v9.5.1
