@@ -19,7 +19,6 @@ import "sdkws/sdkws.proto";
 import "common/common.proto";
 option go_package = "github.com/openimsdk/chat/pkg/protocol/admin";
 
-//登录
 message LoginReq  {
   string account = 1;
   string password = 2;
@@ -103,8 +102,6 @@ message GetAdminInfoResp {
   int64  createTime = 8;
 }
 
-// ################### 默认好友 ###################
-
 message AddDefaultFriendReq {
   repeated string userIDs = 1;
 }
@@ -139,9 +136,6 @@ message SearchDefaultFriendResp {
   repeated DefaultFriendAttribute users = 2;
 }
 
-// ################### 默认群组 ###################
-
-
 message AddDefaultGroupReq {
   repeated string groupIDs = 1;
 }
@@ -175,8 +169,6 @@ message SearchDefaultGroupResp {
   uint32 total = 1;
   repeated string groupIDs = 2;
 }
-
-// ################### 邀请码 ###################
 
 message AddInvitationCodeReq {
   repeated string codes = 1;
@@ -237,8 +229,6 @@ message SearchInvitationCodeResp {
   repeated InvitationRegister list = 2;
 }
 
-// ################### 用户登录ip限制 ###################
-
 message SearchUserIPLimitLoginReq {
   string keyword = 1;
   openim.sdkws.RequestPagination pagination = 2;
@@ -275,9 +265,6 @@ message DelUserIPLimitLoginReq {
 message DelUserIPLimitLoginResp {
 }
 
-
-// ################### 用户IP限制 ###################
-
 message IPForbidden {
   string ip = 1;
   bool limitRegister = 2;
@@ -312,7 +299,6 @@ message DelIPForbiddenReq {
 }
 message DelIPForbiddenResp {}
 
-// ################### 用户限制 ###################
 message CheckRegisterForbiddenReq {
   string ip = 1;
 }
@@ -328,7 +314,6 @@ message CheckLoginForbiddenReq {
 message CheckLoginForbiddenResp {
 }
 
-// ################### 注销 ###################
 message CancellationUserReq{
   string userID = 1;
   string reason = 2;
@@ -336,7 +321,6 @@ message CancellationUserReq{
 
 message CancellationUserResp {}
 
-// ################### 封号、解封 ###################
 message BlockUserReq{
   string userID = 1;
   string reason = 2;
@@ -392,8 +376,6 @@ message FindUserBlockInfoResp{
   repeated BlockInfo blocks = 2;
 }
 
-// ################### TOKEN ###################
-
 message CreateTokenReq{
   string userID = 2;
   int32 userType = 3;
@@ -412,8 +394,6 @@ message ParseTokenResp{
   int32 userType = 3;
   int64 expireTimeSeconds = 4;
 }
-
-// ################### 小程序 ###################
 
 message AddAppletReq  {
   string id = 1;
