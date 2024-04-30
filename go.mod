@@ -1,44 +1,44 @@
 module github.com/openimsdk/chat
 
 go 1.21.2
+toolchain go1.22.2
 
 require (
 	github.com/gin-gonic/gin v1.9.1
 	github.com/golang-jwt/jwt/v4 v4.5.0
-	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/google/uuid v1.6.0
 	github.com/jinzhu/copier v0.4.0 // indirect
 	github.com/lestrrat-go/file-rotatelogs v2.4.0+incompatible // indirect
 	github.com/pkg/errors v0.9.1 // indirect
-	google.golang.org/grpc v1.62.1
-	google.golang.org/protobuf v1.33.0
+	google.golang.org/grpc v1.63.2
+	google.golang.org/protobuf v1.34.0
 	gopkg.in/yaml.v3 v3.0.1
-	gorm.io/gorm v1.25.8
+	gorm.io/gorm v1.25.10
 )
 
 require (
 	github.com/alibabacloud-go/darabonba-openapi v0.2.1
 	github.com/alibabacloud-go/dysmsapi-20170525/v2 v2.0.18
-	github.com/alibabacloud-go/tea v1.2.1
+	github.com/alibabacloud-go/tea v1.2.2
 )
 
 require (
-	github.com/livekit/protocol v1.10.1
+	github.com/livekit/protocol v1.14.0
 	github.com/mitchellh/mapstructure v1.5.0
-	github.com/openimsdk/gomake v0.0.9
-	github.com/openimsdk/protocol v0.0.63
-	github.com/openimsdk/tools v0.0.49-alpha.3
+	github.com/openimsdk/gomake v0.0.11
+	github.com/openimsdk/protocol v0.0.65
+	github.com/openimsdk/tools v0.0.49-alpha.5
 	github.com/redis/go-redis/v9 v9.5.1
 	github.com/spf13/cobra v1.8.0
 	github.com/spf13/viper v1.18.2
-	github.com/xuri/excelize/v2 v2.8.0
-	go.mongodb.org/mongo-driver v1.14.0
+	github.com/xuri/excelize/v2 v2.8.1
+	go.mongodb.org/mongo-driver v1.15.0
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
 )
 
 require (
 	github.com/alibabacloud-go/alibabacloud-gateway-spi v0.0.4 // indirect
-	github.com/alibabacloud-go/debug v0.0.0-20190504072949-9472017b5c68 // indirect
+	github.com/alibabacloud-go/debug v1.0.0 // indirect
 	github.com/alibabacloud-go/endpoint-util v1.1.0 // indirect
 	github.com/alibabacloud-go/openapi-util v0.0.11 // indirect
 	github.com/alibabacloud-go/tea-utils v1.4.5 // indirect
@@ -96,8 +96,8 @@ require (
 	github.com/xdg-go/pbkdf2 v1.0.0 // indirect
 	github.com/xdg-go/scram v1.1.2 // indirect
 	github.com/xdg-go/stringprep v1.0.4 // indirect
-	github.com/xuri/efp v0.0.0-20230802181842-ad255f2331ca // indirect
-	github.com/xuri/nfp v0.0.0-20230819163627-dc951e3ffe1a // indirect
+	github.com/xuri/efp v0.0.0-20231025114914-d1ff6096ae53 // indirect
+	github.com/xuri/nfp v0.0.0-20230919160717-d98342af3f05 // indirect
 	github.com/youmark/pkcs8 v0.0.0-20181117223130-1be2e3e5546d // indirect
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
@@ -105,7 +105,7 @@ require (
 	golang.org/x/arch v0.3.0 // indirect
 	golang.org/x/crypto v0.21.0 // indirect
 	golang.org/x/exp v0.0.0-20240222234643-814bf88cf225 // indirect
-	golang.org/x/net v0.22.0 // indirect
+	golang.org/x/net v0.23.0 // indirect
 	golang.org/x/sync v0.6.0 // indirect
 	golang.org/x/sys v0.19.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
