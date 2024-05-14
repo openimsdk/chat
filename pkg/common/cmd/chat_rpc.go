@@ -35,7 +35,7 @@ func NewChatRpcCmd() *ChatRpcCmd {
 	ret.configMap = map[string]any{
 		ChatRPCChatCfgFileName:  &ret.chatConfig.RpcConfig,
 		RedisConfigFileName:     &ret.chatConfig.RedisConfig,
-		ZookeeperConfigFileName: &ret.chatConfig.ZookeeperConfig,
+		DiscoveryConfigFileName: &ret.chatConfig.Discovery,
 		MongodbConfigFileName:   &ret.chatConfig.MongodbConfig,
 		ShareFileName:           &ret.chatConfig.Share,
 	}
@@ -52,7 +52,7 @@ func (a *ChatRpcCmd) Exec() error {
 }
 
 func (a *ChatRpcCmd) runE() error {
-	return startrpc.Start(a.ctx, &a.chatConfig.ZookeeperConfig, a.chatConfig.RpcConfig.RPC.ListenIP,
+	return startrpc.Start(a.ctx, &a.chatConfig.Discovery, a.chatConfig.RpcConfig.RPC.ListenIP,
 		a.chatConfig.RpcConfig.RPC.RegisterIP, a.chatConfig.RpcConfig.RPC.Ports,
 		a.Index(), a.chatConfig.Share.RpcRegisterName.Chat, &a.chatConfig.Share, &a.chatConfig, chat.Start)
 }
