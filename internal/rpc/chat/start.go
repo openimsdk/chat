@@ -9,6 +9,7 @@ import (
 	"github.com/openimsdk/tools/db/mongoutil"
 	"github.com/openimsdk/tools/discovery"
 	"github.com/openimsdk/tools/errs"
+	"github.com/openimsdk/tools/mw"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"time"
@@ -21,11 +22,11 @@ import (
 )
 
 type Config struct {
-	RpcConfig       config.Chat
-	RedisConfig     config.Redis
-	MongodbConfig   config.Mongo
-	ZookeeperConfig config.ZooKeeper
-	Share           config.Share
+	RpcConfig     config.Chat
+	RedisConfig   config.Redis
+	MongodbConfig config.Mongo
+	Discovery     config.Discovery
+	Share         config.Share
 }
 
 func Start(ctx context.Context, config *Config, client discovery.SvcDiscoveryRegistry, server *grpc.Server) error {
@@ -52,7 +53,7 @@ func Start(ctx context.Context, config *Config, client discovery.SvcDiscoveryReg
 	if err != nil {
 		return err
 	}
-	conn, err := client.GetConn(ctx, config.Share.RpcRegisterName.Admin, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := client.GetConn(ctx, config.Share.RpcRegisterName.Admin, grpc.WithTransportCredentials(insecure.NewCredentials()), mw.GrpcClient())
 	if err != nil {
 		return err
 	}

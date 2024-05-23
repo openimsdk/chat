@@ -20,7 +20,6 @@ import (
 	"time"
 )
 
-// 限制userID只能在某些ip登录.
 type LimitUserLoginIP struct {
 	UserID     string    `bson:"user_id"`
 	IP         string    `bson:"ip"`

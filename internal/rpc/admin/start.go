@@ -17,6 +17,7 @@ import (
 	"github.com/openimsdk/tools/db/redisutil"
 	"github.com/openimsdk/tools/discovery"
 	"github.com/openimsdk/tools/errs"
+	"github.com/openimsdk/tools/mw"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"math/rand"
@@ -24,11 +25,11 @@ import (
 )
 
 type Config struct {
-	RpcConfig       config.Admin
-	RedisConfig     config.Redis
-	MongodbConfig   config.Mongo
-	ZookeeperConfig config.ZooKeeper
-	Share           config.Share
+	RpcConfig     config.Admin
+	RedisConfig   config.Redis
+	MongodbConfig config.Mongo
+	Discovery     config.Discovery
+	Share         config.Share
 }
 
 func Start(ctx context.Context, config *Config, client discovery.SvcDiscoveryRegistry, server *grpc.Server) error {
@@ -49,7 +50,7 @@ func Start(ctx context.Context, config *Config, client discovery.SvcDiscoveryReg
 	if err != nil {
 		return err
 	}
-	conn, err := client.GetConn(ctx, config.Share.RpcRegisterName.Chat, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := client.GetConn(ctx, config.Share.RpcRegisterName.Chat, grpc.WithTransportCredentials(insecure.NewCredentials()), mw.GrpcClient())
 	if err != nil {
 		return err
 	}
@@ -58,7 +59,7 @@ func Start(ctx context.Context, config *Config, client discovery.SvcDiscoveryReg
 		Expires: time.Duration(config.RpcConfig.TokenPolicy.Expire) * time.Hour * 24,
 		Secret:  config.RpcConfig.Secret,
 	}
-	if err := srv.initAdmin(ctx, config.Share.ChatAdmin); err != nil {
+	if err := srv.initAdmin(ctx, config.Share.ChatAdmin, config.Share.OpenIM.AdminUserID); err != nil {
 		return err
 	}
 	pbadmin.RegisterAdminServer(server, &srv)
@@ -71,17 +72,17 @@ type adminServer struct {
 	Token    *tokenverify.Token
 }
 
-func (o *adminServer) initAdmin(ctx context.Context, users []config.AdminUser) error {
-	for _, user := range users {
-		if _, err := o.Database.GetAdmin(ctx, user.AdminID); err == nil {
+func (o *adminServer) initAdmin(ctx context.Context, admins []string, imUserID string) error {
+	for _, account := range admins {
+		if _, err := o.Database.GetAdmin(ctx, account); err == nil {
 			continue
 		} else if !dbutil.IsDBNotFound(err) {
 			return err
 		}
-		sum := md5.Sum([]byte(user.AdminID))
+		sum := md5.Sum([]byte(account))
 		a := admin.Admin{
-			Account:    user.AdminID,
-			UserID:     user.IMUserID,
+			Account:    account,
+			UserID:     imUserID,
 			Password:   hex.EncodeToString(sum[:]),
 			Level:      constant.DefaultAdminLevel,
 			CreateTime: time.Now(),

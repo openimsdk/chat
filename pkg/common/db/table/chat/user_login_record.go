@@ -19,7 +19,6 @@ import (
 	"time"
 )
 
-// 用户登录信息表.
 type UserLoginRecord struct {
 	UserID    string    `bson:"user_id"`
 	LoginTime time.Time `bson:"login_time"`

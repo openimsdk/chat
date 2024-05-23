@@ -21,14 +21,8 @@ type Share struct {
 		Secret      string `mapstructure:"secret"`
 		AdminUserID string `mapstructure:"adminUserID"`
 	} `mapstructure:"openIM"`
-	ChatAdmin   []AdminUser `mapstructure:"chatAdmin"`
-	ProxyHeader string      `mapstructure:"proxyHeader"`
-}
-
-type AdminUser struct {
-	AdminID  string `mapstructure:"adminID"`
-	IMUserID string `mapstructure:"imUserID"`
-	Nickname string `mapstructure:"nickname"`
+	ChatAdmin   []string `mapstructure:"chatAdmin"`
+	ProxyHeader string   `mapstructure:"proxyHeader"`
 }
 
 type RpcRegisterName struct {
@@ -98,6 +92,19 @@ type ZooKeeper struct {
 	Address  []string `mapstructure:"address"`
 	Username string   `mapstructure:"username"`
 	Password string   `mapstructure:"password"`
+}
+
+type Discovery struct {
+	Enable    string    `mapstructure:"enable"`
+	Etcd      Etcd      `mapstructure:"etcd"`
+	ZooKeeper ZooKeeper `mapstructure:"zooKeeper"`
+}
+
+type Etcd struct {
+	RootDirectory string   `mapstructure:"rootDirectory"`
+	Address       []string `mapstructure:"address"`
+	Username      string   `mapstructure:"username"`
+	Password      string   `mapstructure:"password"`
 }
 
 type Chat struct {

@@ -16,7 +16,7 @@ package admin
 
 import "context"
 
-// ClientConfig 客户端相关配置项.
+// ClientConfig config
 type ClientConfig struct {
 	Key   string `bson:"key"`
 	Value string `bson:"value"`
