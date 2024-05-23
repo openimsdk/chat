@@ -11,56 +11,111 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-name: OpenIM CI
+name: OpenIM CI Auto Build
 
 on: 
   push:
     branches:
         - main
-        - develop
+        - release-*
     paths-ignore:
         - "docs/**"
         - "README.md"
         - "README_zh-CN.md"
+        - "**.md"
+        - "docs/**"
         - "CONTRIBUTING.md"
   pull_request:
     branches:
         - main
-        - develop
+        - release-*
     paths-ignore:
         - "README.md"
         - "README_zh-CN.md"
-        - "CONTRIBUTING.md"
+        - "CONTRIBUTING/**"
+        - "**.md"
         - "docs/**"
-
-env:
-  GO_VERSION: "1.19"
-  GOLANGCI_VERSION: "v1.50.1"
+  workflow_dispatch:
 
 jobs:
-  openim:
-    name: Test with go ${{ matrix.go_version }} on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
+
+  build-linux:
+    name: Execute OpenIM Script On Linux
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
     environment:
       name: openim
-
     strategy:
       matrix:
-        go_version: ["1.21"]
-        os: [ubuntu-latest]
-
+        arch: [arm64, armv7, amd64]
+    
     steps:
-      - name: Set up Go ${{ matrix.go_version }}
-        uses: actions/setup-go@v4
-        with:
-          go-version: ${{ matrix.go_version }}
-        id: go
+    - uses: actions/checkout@v3
 
-      - name: Check out code into the Go module directory
-        uses: actions/checkout@v4
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.21'
 
-      - name: init
-        run: |
-          sudo bash bootstrap.sh
-          echo "init successfully"
+    - name: init
+      run: sudo bash bootstrap.sh
+      timeout-minutes: 20
+
+    - name: Checkout chat repository
+      uses: actions/checkout@v4
+      with:
+        repository: 'openimsdk/open-im-server'
+        path: 'server-repo'
+    
+    - name: Set up Docker for Linux
+      run: |
+        cd ${{ github.workspace }}/server-repo
+        sudo docker compose up -d
+        sudo sleep 30  # Increased sleep time for better stability
+      timeout-minutes: 20  # Increased timeout for Docker setup
+
+    - name: Build and Start IM Serevr Services
+      run: |
+        cd ${{ github.workspace }}/server-repo
+        sudo mage
+        sudo mage start
+        sudo mage check
+
+    - name: Build, Start, Check Services and Print Logs for Linux
+      run: |
+        sudo mage
+        sudo mage start
+        sudo mage check
+        
+
+    - name: Restart Services and Print Logs
+      run: |
+        sudo mage stop
+        sudo mage start
+        sudo mage check
+
+   
+    
+    # - name: Checkout e2e repository
+    #   uses: actions/checkout@v4
+    #   with:
+    #       repository: "openimsdk/test-e2e"
+    #       path: e2e-repo
+
+    # - name: Set up Python 3.9
+    #   uses: actions/setup-python@v4
+    #   with:
+    #     python-version: '3.9'
+    
+    # - name: Install dependencies
+    #   run: |
+    #     cd ${{ github.workspace }}/e2e-repo
+    #     pip install PyYAML webdriver_manager selenium pytest
+    
+    # - name: Run tests
+    #   run: |
+    #     cd ${{ github.workspace }}/e2e-repo
+    #     pytest main.py
+    
