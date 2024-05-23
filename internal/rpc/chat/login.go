@@ -50,7 +50,7 @@ func (o *chatSvr) SendVerifyCode(ctx context.Context, req *chat.SendVerifyCodeRe
 			if req.AreaCode == "" || req.PhoneNumber == "" {
 				return nil, errs.ErrArgs.WrapMsg("area code or phone number is empty")
 			}
-			if req.AreaCode[0] != '+' {
+			if !strings.HasPrefix(req.AreaCode, "+") {
 				req.AreaCode = "+" + req.AreaCode
 			}
 			if _, err := strconv.ParseUint(req.AreaCode[1:], 10, 64); err != nil {
@@ -313,7 +313,7 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 	}
 	var registerType int32
 	if req.User.PhoneNumber != "" {
-		if req.User.AreaCode[0] != '+' {
+		if !strings.HasPrefix(req.User.AreaCode, "+") {
 			req.User.AreaCode = "+" + req.User.AreaCode
 		}
 		if _, err := strconv.ParseUint(req.User.AreaCode[1:], 10, 64); err != nil {
@@ -415,7 +415,7 @@ func (o *chatSvr) Login(ctx context.Context, req *chat.LoginReq) (*chat.LoginRes
 		if req.AreaCode == "" {
 			return nil, errs.ErrArgs.WrapMsg("area code must")
 		}
-		if req.AreaCode[0] != '+' {
+		if !strings.HasPrefix(req.AreaCode, "+") {
 			req.AreaCode = "+" + req.AreaCode
 		}
 		if _, err := strconv.ParseUint(req.AreaCode[1:], 10, 64); err != nil {
