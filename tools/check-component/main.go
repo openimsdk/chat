@@ -108,8 +108,6 @@ func main() {
 	ctx := context.Background()
 	err = performChecks(ctx, mongoConfig, redisConfig, zookeeperConfig, shareConfig, maxRetry)
 	if err != nil {
-		// Assume program.ExitWithError logs the error and exits.
-		// Replace with your error handling logic as necessary.
 		program.ExitWithError(err)
 	}
 }
