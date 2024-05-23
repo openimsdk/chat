@@ -51,8 +51,8 @@ config:
     listenIP:
 
   rpc:
-    registerIP:                            #作为rpc启动时，注册到zookeeper的IP，api/gateway能访问到此ip和对应的rpcPort中的端口
-    listenIP:                               #默认为0.0.0.0
+    registerIP:
+    listenIP:
 
   rpcPort:
     openImAdminPort: [ 80 ]
@@ -61,25 +61,23 @@ config:
     openImAdminName: openimchat-admin-rpc:80
     openImChatName: openimchat-chat-rpc:80
 
-  # 没有配置表示和OpenIM一致
   mysql:
-    address: [ im-mysql:3306 ]            #目前仅支持单机
-    username: root                          #用户名
-    password: openIM123                     #密码
-    #database: openIM_v2                     #不建议修改
-    maxOpenConn: 1000                       #最大连接数
-    maxIdleConn: 100                        #最大空闲连接数
-    maxLifeTime: 60                         #连接可以重复使用的最长时间（秒）
-    logLevel: 4                             #日志级别 1=slient 2=error 3=warn 4=info
-    slowThreshold: 500                      #慢语句阈值 （毫秒）
+    address: [ im-mysql:3306 ]
+    username: root
+    password: openIM123
+    #database: openIM_v2
+    maxOpenConn: 1000
+    maxIdleConn: 100
+    maxLifeTime: 60
+    logLevel: 4
+    slowThreshold: 500
     database: openim_enterprise
 
-  # 没有配置表示和OpenIM一致
   log:
-    storageLocation: ../_output/logs/           #存放目录
-    rotationTime: 24                    #日志旋转时间
-    remainRotationCount: 2              #日志数量
-    remainLogLevel: 6                   #日志级别 6表示全都打印，
+    storageLocation: ../_output/logs/
+    rotationTime: 24
+    remainRotationCount: 2
+    remainLogLevel: 6
     isStdout: true
     isJson: false
     withStack: false
@@ -91,13 +89,13 @@ config:
     expire: 86400
 
   verifyCode:
-    validTime: 300 # 验证码有效时间
-    validCount: 5 # 验证码有效次数
-    uintTime: 86400 # 单位时间间隔
-    maxCount: 10 # 单位时间内最大获取次数
-    superCode: "666666" # 超级验证码(只有use为空时使用)
-    len: 6 # 验证码长度
-    use: "" # 使用的验证码服务(use: "ali")
+    validTime: 300
+    validCount: 5
+    uintTime: 86400
+    maxCount: 10
+    superCode: "666666"
+    len: 6
+    use: ""
     ali:
       endpoint: "dysmsapi.aliyuncs.com"
       accessKeyId: ""
@@ -105,8 +103,7 @@ config:
       signName: ""
       verificationCodeTemplateCode: ""
 
-  # 获取ip的header,没有配置直接获取远程地址
-  #proxyHeader: "X-Forwarded-For"
+
 
   adminList:
     - adminID: admin1
