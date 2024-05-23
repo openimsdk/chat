@@ -3561,7 +3561,6 @@ func (*CancellationUserResp) Descriptor() ([]byte, []int) {
 	return file_admin_admin_proto_rawDescGZIP(), []int{68}
 }
 
-
 type BlockUserReq struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
