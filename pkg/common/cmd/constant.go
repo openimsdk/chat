@@ -21,7 +21,7 @@ import (
 var (
 	ShareFileName           = "share.yml"
 	RedisConfigFileName     = "redis.yml"
-	ZookeeperConfigFileName = "zookeeper.yml"
+	DiscoveryConfigFileName = "discovery.yml"
 	MongodbConfigFileName   = "mongodb.yml"
 	LogConfigFileName       = "log.yml"
 	ChatAPIAdminCfgFileName = "chat-api-admin.yml"
@@ -37,7 +37,7 @@ func init() {
 	fileNames := []string{
 		ShareFileName,
 		RedisConfigFileName,
-		ZookeeperConfigFileName,
+		DiscoveryConfigFileName,
 		MongodbConfigFileName,
 		LogConfigFileName,
 		ChatAPIAdminCfgFileName,

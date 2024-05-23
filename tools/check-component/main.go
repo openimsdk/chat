@@ -24,6 +24,7 @@ import (
 	"github.com/openimsdk/protocol/constant"
 	"github.com/openimsdk/tools/db/mongoutil"
 	"github.com/openimsdk/tools/db/redisutil"
+	"github.com/openimsdk/tools/discovery/etcd"
 	"github.com/openimsdk/tools/discovery/zookeeper"
 	"github.com/openimsdk/tools/mcontext"
 	"github.com/openimsdk/tools/system/program"
@@ -36,6 +37,14 @@ const maxRetry = 180
 
 func CheckZookeeper(ctx context.Context, config *config.ZooKeeper) error {
 	return zookeeper.Check(ctx, config.Address, config.Schema, zookeeper.WithUserNameAndPassword(config.Username, config.Password))
+}
+
+func CheckEtcd(ctx context.Context, config *config.Etcd) error {
+	return etcd.Check(ctx, config.Address, "/check_chat_component",
+		true,
+		etcd.WithDialTimeout(10*time.Second),
+		etcd.WithMaxCallSendMsgSize(20*1024*1024),
+		etcd.WithUsernameAndPassword(config.Username, config.Password))
 }
 
 func CheckMongo(ctx context.Context, config *config.Mongo) error {
@@ -52,11 +61,11 @@ func CheckOpenIM(ctx context.Context, apiURL, secret, adminUserID string) error 
 	return err
 }
 
-func initConfig(configDir string) (*config.Mongo, *config.Redis, *config.ZooKeeper, *config.Share, error) {
+func initConfig(configDir string) (*config.Mongo, *config.Redis, *config.Discovery, *config.Share, error) {
 	var (
 		mongoConfig     = &config.Mongo{}
 		redisConfig     = &config.Redis{}
-		zookeeperConfig = &config.ZooKeeper{}
+		discoveryConfig = &config.Discovery{}
 		shareConfig     = &config.Share{}
 	)
 	err := config.LoadConfig(filepath.Join(configDir, cmd.MongodbConfigFileName), cmd.ConfigEnvPrefixMap[cmd.MongodbConfigFileName], mongoConfig)
@@ -69,7 +78,7 @@ func initConfig(configDir string) (*config.Mongo, *config.Redis, *config.ZooKeep
 		return nil, nil, nil, nil, err
 	}
 
-	err = config.LoadConfig(filepath.Join(configDir, cmd.ZookeeperConfigFileName), cmd.ConfigEnvPrefixMap[cmd.ZookeeperConfigFileName], zookeeperConfig)
+	err = config.LoadConfig(filepath.Join(configDir, cmd.DiscoveryConfigFileName), cmd.ConfigEnvPrefixMap[cmd.DiscoveryConfigFileName], discoveryConfig)
 	if err != nil {
 		return nil, nil, nil, nil, err
 	}
@@ -78,7 +87,7 @@ func initConfig(configDir string) (*config.Mongo, *config.Redis, *config.ZooKeep
 		return nil, nil, nil, nil, err
 	}
 
-	return mongoConfig, redisConfig, zookeeperConfig, shareConfig, nil
+	return mongoConfig, redisConfig, discoveryConfig, shareConfig, nil
 }
 
 func main() {
@@ -99,19 +108,14 @@ func main() {
 	ctx := context.Background()
 	err = performChecks(ctx, mongoConfig, redisConfig, zookeeperConfig, shareConfig, maxRetry)
 	if err != nil {
-		// Assume program.ExitWithError logs the error and exits.
-		// Replace with your error handling logic as necessary.
 		program.ExitWithError(err)
 	}
 }
 
-func performChecks(ctx context.Context, mongoConfig *config.Mongo, redisConfig *config.Redis, zookeeperConfig *config.ZooKeeper, shareConfig *config.Share, maxRetry int) error {
+func performChecks(ctx context.Context, mongoConfig *config.Mongo, redisConfig *config.Redis, discovery *config.Discovery, shareConfig *config.Share, maxRetry int) error {
 	checksDone := make(map[string]bool)
 
 	checks := map[string]func(ctx context.Context) error{
-		"Zookeeper": func(ctx context.Context) error {
-			return CheckZookeeper(ctx, zookeeperConfig)
-		},
 		"Mongo": func(ctx context.Context) error {
 			return CheckMongo(ctx, mongoConfig)
 		},
@@ -121,6 +125,16 @@ func performChecks(ctx context.Context, mongoConfig *config.Mongo, redisConfig *
 		"OpenIM": func(ctx context.Context) error {
 			return CheckOpenIM(ctx, shareConfig.OpenIM.ApiURL, shareConfig.OpenIM.Secret, shareConfig.OpenIM.AdminUserID)
 		},
+	}
+
+	if discovery.Enable == "etcd" {
+		checks["Etcd"] = func(ctx context.Context) error {
+			return CheckEtcd(ctx, &discovery.Etcd)
+		}
+	} else if discovery.Enable == "zookeeper" {
+		checks["Zookeeper"] = func(ctx context.Context) error {
+			return CheckZookeeper(ctx, &discovery.ZooKeeper)
+		}
 	}
 
 	for i := 0; i < maxRetry; i++ {

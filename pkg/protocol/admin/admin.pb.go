@@ -41,7 +41,6 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// 登录
 type LoginReq struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -3288,7 +3287,6 @@ func (*DelIPForbiddenResp) Descriptor() ([]byte, []int) {
 	return file_admin_admin_proto_rawDescGZIP(), []int{62}
 }
 
-// ################### 用户限制 ###################
 type CheckRegisterForbiddenReq struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -3467,7 +3465,6 @@ func (*CheckLoginForbiddenResp) Descriptor() ([]byte, []int) {
 	return file_admin_admin_proto_rawDescGZIP(), []int{66}
 }
 
-// ################### 注销 ###################
 type CancellationUserReq struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -3561,7 +3558,6 @@ func (*CancellationUserResp) Descriptor() ([]byte, []int) {
 	return file_admin_admin_proto_rawDescGZIP(), []int{68}
 }
 
-// ################### 封号、解封 ###################
 type BlockUserReq struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

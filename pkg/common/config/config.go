@@ -94,6 +94,19 @@ type ZooKeeper struct {
 	Password string   `mapstructure:"password"`
 }
 
+type Discovery struct {
+	Enable    string    `mapstructure:"enable"`
+	Etcd      Etcd      `mapstructure:"etcd"`
+	ZooKeeper ZooKeeper `mapstructure:"zooKeeper"`
+}
+
+type Etcd struct {
+	RootDirectory string   `mapstructure:"rootDirectory"`
+	Address       []string `mapstructure:"address"`
+	Username      string   `mapstructure:"username"`
+	Password      string   `mapstructure:"password"`
+}
+
 type Chat struct {
 	RPC struct {
 		RegisterIP string `mapstructure:"registerIP"`
