@@ -21,7 +21,7 @@ import (
 
 	"github.com/openimsdk/tools/errs"
 
-	admin2 "github.com/openimsdk/chat/pkg/common/db/table/admin"
+	admindb "github.com/openimsdk/chat/pkg/common/db/table/admin"
 	"github.com/openimsdk/chat/pkg/common/mctx"
 	"github.com/openimsdk/chat/pkg/protocol/admin"
 	"github.com/openimsdk/chat/pkg/protocol/common"
@@ -52,9 +52,9 @@ func (o *adminServer) AddDefaultFriend(ctx context.Context, req *admin.AddDefaul
 		return nil, errs.ErrDuplicateKey.WrapMsg("user id existed", "userID", exists)
 	}
 	now := time.Now()
-	ms := make([]*admin2.RegisterAddFriend, 0, len(req.UserIDs))
+	ms := make([]*admindb.RegisterAddFriend, 0, len(req.UserIDs))
 	for _, userID := range req.UserIDs {
-		ms = append(ms, &admin2.RegisterAddFriend{
+		ms = append(ms, &admindb.RegisterAddFriend{
 			UserID:     userID,
 			CreateTime: now,
 		})
@@ -83,9 +83,9 @@ func (o *adminServer) DelDefaultFriend(ctx context.Context, req *admin.DelDefaul
 		return nil, errs.ErrRecordNotFound.WrapMsg("user id not found", "userID", ids)
 	}
 	now := time.Now()
-	ms := make([]*admin2.RegisterAddFriend, 0, len(req.UserIDs))
+	ms := make([]*admindb.RegisterAddFriend, 0, len(req.UserIDs))
 	for _, userID := range req.UserIDs {
-		ms = append(ms, &admin2.RegisterAddFriend{
+		ms = append(ms, &admindb.RegisterAddFriend{
 			UserID:     userID,
 			CreateTime: now,
 		})
@@ -115,7 +115,7 @@ func (o *adminServer) SearchDefaultFriend(ctx context.Context, req *admin.Search
 	if err != nil {
 		return nil, err
 	}
-	userIDs := datautil.Slice(infos, func(info *admin2.RegisterAddFriend) string { return info.UserID })
+	userIDs := datautil.Slice(infos, func(info *admindb.RegisterAddFriend) string { return info.UserID })
 	userMap, err := o.Chat.MapUserPublicInfo(ctx, userIDs)
 	if err != nil {
 		return nil, err

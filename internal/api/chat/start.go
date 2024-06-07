@@ -3,6 +3,7 @@ package chat
 import (
 	"context"
 	"fmt"
+
 	"github.com/gin-gonic/gin"
 	chatmw "github.com/openimsdk/chat/internal/api/mw"
 	"github.com/openimsdk/chat/internal/api/util"

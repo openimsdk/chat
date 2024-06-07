@@ -16,6 +16,7 @@ package admin
 
 import (
 	"context"
+
 	"github.com/openimsdk/tools/db/mongoutil"
 	"github.com/openimsdk/tools/db/pagination"
 	"go.mongodb.org/mongo-driver/bson"
@@ -23,11 +24,11 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 
 	"github.com/openimsdk/chat/pkg/common/constant"
-	"github.com/openimsdk/chat/pkg/common/db/table/admin"
+	admindb "github.com/openimsdk/chat/pkg/common/db/table/admin"
 	"github.com/openimsdk/tools/errs"
 )
 
-func NewIPForbidden(db *mongo.Database) (admin.IPForbiddenInterface, error) {
+func NewIPForbidden(db *mongo.Database) (admindb.IPForbiddenInterface, error) {
 	coll := db.Collection("ip_forbidden")
 	_, err := coll.Indexes().CreateOne(context.Background(), mongo.IndexModel{
 		Keys: bson.D{
@@ -47,17 +48,15 @@ type IPForbidden struct {
 	coll *mongo.Collection
 }
 
-func (o *IPForbidden) Take(ctx context.Context, ip string) (*admin.IPForbidden, error) {
-	return mongoutil.FindOne[*admin.IPForbidden](ctx, o.coll, bson.M{"ip": ip})
-
+func (o *IPForbidden) Take(ctx context.Context, ip string) (*admindb.IPForbidden, error) {
+	return mongoutil.FindOne[*admindb.IPForbidden](ctx, o.coll, bson.M{"ip": ip})
 }
 
-func (o *IPForbidden) Find(ctx context.Context, ips []string) ([]*admin.IPForbidden, error) {
-	return mongoutil.Find[*admin.IPForbidden](ctx, o.coll, bson.M{"ip": bson.M{"$in": ips}})
-
+func (o *IPForbidden) Find(ctx context.Context, ips []string) ([]*admindb.IPForbidden, error) {
+	return mongoutil.Find[*admindb.IPForbidden](ctx, o.coll, bson.M{"ip": bson.M{"$in": ips}})
 }
 
-func (o *IPForbidden) Search(ctx context.Context, keyword string, state int32, pagination pagination.Pagination) (int64, []*admin.IPForbidden, error) {
+func (o *IPForbidden) Search(ctx context.Context, keyword string, state int32, pagination pagination.Pagination) (int64, []*admindb.IPForbidden, error) {
 	filter := bson.M{}
 
 	switch state {
@@ -81,10 +80,10 @@ func (o *IPForbidden) Search(ctx context.Context, keyword string, state int32, p
 			{"ip": bson.M{"$regex": keyword, "$options": "i"}},
 		}
 	}
-	return mongoutil.FindPage[*admin.IPForbidden](ctx, o.coll, filter, pagination)
+	return mongoutil.FindPage[*admindb.IPForbidden](ctx, o.coll, filter, pagination)
 }
 
-func (o *IPForbidden) Create(ctx context.Context, ms []*admin.IPForbidden) error {
+func (o *IPForbidden) Create(ctx context.Context, ms []*admindb.IPForbidden) error {
 	return mongoutil.InsertMany(ctx, o.coll, ms)
 }
 
