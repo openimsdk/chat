@@ -17,13 +17,13 @@ package chat
 import (
 	"context"
 	"fmt"
-	"github.com/openimsdk/tools/utils/datautil"
 	"math/rand"
 	"strconv"
 	"strings"
 	"time"
 
-	constant2 "github.com/openimsdk/protocol/constant"
+	constantpb "github.com/openimsdk/protocol/constant"
+	"github.com/openimsdk/tools/utils/datautil"
 
 	"github.com/openimsdk/tools/errs"
 	"github.com/openimsdk/tools/log"
@@ -31,7 +31,7 @@ import (
 
 	"github.com/openimsdk/chat/pkg/common/constant"
 	"github.com/openimsdk/chat/pkg/common/db/dbutil"
-	chat2 "github.com/openimsdk/chat/pkg/common/db/table/chat"
+	chatdb "github.com/openimsdk/chat/pkg/common/db/table/chat"
 	"github.com/openimsdk/chat/pkg/eerrs"
 	"github.com/openimsdk/chat/pkg/protocol/chat"
 )
@@ -142,11 +142,11 @@ func (o *chatSvr) SendVerifyCode(ctx context.Context, req *chat.SendVerifyCodeRe
 	if o.Code.MaxCount < int(count) {
 		return nil, eerrs.ErrVerifyCodeSendFrequently.Wrap()
 	}
-	platformName := constant2.PlatformIDToName(int(req.Platform))
+	platformName := constantpb.PlatformIDToName(int(req.Platform))
 	if platformName == "" {
 		platformName = fmt.Sprintf("platform:%d", req.Platform)
 	}
-	vc := &chat2.VerifyCode{
+	vc := &chatdb.VerifyCode{
 		Account:    account,
 		Code:       code,
 		Platform:   platformName,
@@ -285,7 +285,6 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 				return nil, err
 			}
 		}
-
 	}
 	if req.User.UserID == "" {
 		for i := 0; i < 20; i++ {
@@ -349,23 +348,23 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 			return nil, err
 		}
 	}
-	register := &chat2.Register{
+	register := &chatdb.Register{
 		UserID:      req.User.UserID,
 		DeviceID:    req.DeviceID,
 		IP:          req.Ip,
-		Platform:    constant2.PlatformID2Name[int(req.Platform)],
+		Platform:    constantpb.PlatformID2Name[int(req.Platform)],
 		AccountType: "",
 		Mode:        constant.UserMode,
 		CreateTime:  time.Now(),
 	}
-	account := &chat2.Account{
+	account := &chatdb.Account{
 		UserID:         req.User.UserID,
 		Password:       req.User.Password,
 		OperatorUserID: mcontext.GetOpUserID(ctx),
 		ChangeTime:     register.CreateTime,
 		CreateTime:     register.CreateTime,
 	}
-	attribute := &chat2.Attribute{
+	attribute := &chatdb.Attribute{
 		UserID:         req.User.UserID,
 		Account:        req.User.Account,
 		PhoneNumber:    req.User.PhoneNumber,
@@ -408,7 +407,7 @@ func (o *chatSvr) Login(ctx context.Context, req *chat.LoginReq) (*chat.LoginRes
 		return nil, errs.ErrArgs.WrapMsg("password or code must be set")
 	}
 	var err error
-	var attribute *chat2.Attribute
+	var attribute *chatdb.Attribute
 	if req.Account != "" {
 		attribute, err = o.Database.GetAttributeByAccount(ctx, req.Account)
 	} else if req.PhoneNumber != "" {
@@ -464,12 +463,12 @@ func (o *chatSvr) Login(ctx context.Context, req *chat.LoginReq) (*chat.LoginRes
 	if err != nil {
 		return nil, err
 	}
-	record := &chat2.UserLoginRecord{
+	record := &chatdb.UserLoginRecord{
 		UserID:    attribute.UserID,
 		LoginTime: time.Now(),
 		IP:        req.Ip,
 		DeviceID:  req.DeviceID,
-		Platform:  constant2.PlatformIDToName(int(req.Platform)),
+		Platform:  constantpb.PlatformIDToName(int(req.Platform)),
 	}
 	if err := o.Database.LoginRecord(ctx, record, verifyCodeID); err != nil {
 		return nil, err

@@ -2,6 +2,7 @@ package chat
 
 import (
 	"context"
+
 	"github.com/openimsdk/chat/pkg/common/mctx"
 	"github.com/openimsdk/chat/pkg/protocol/chat"
 )

@@ -19,7 +19,7 @@ import (
 	"strconv"
 
 	"github.com/openimsdk/chat/pkg/common/constant"
-	pconstant "github.com/openimsdk/protocol/constant"
+	constantpb "github.com/openimsdk/protocol/constant"
 	"github.com/openimsdk/tools/errs"
 )
 
@@ -116,7 +116,7 @@ func (x *RegisterUserReq) Check() error {
 	if x.User.Nickname == "" {
 		return errs.ErrArgs.WrapMsg("Nickname is nil")
 	}
-	if x.Platform < pconstant.IOSPlatformID || x.Platform > pconstant.AdminPlatformID {
+	if x.Platform < constantpb.IOSPlatformID || x.Platform > constantpb.AdminPlatformID {
 		return errs.ErrArgs.WrapMsg("platform is invalid")
 	}
 	if x.User == nil {
@@ -142,7 +142,7 @@ func (x *RegisterUserReq) Check() error {
 }
 
 func (x *LoginReq) Check() error {
-	if x.Platform < pconstant.IOSPlatformID || x.Platform > pconstant.AdminPlatformID {
+	if x.Platform < constantpb.IOSPlatformID || x.Platform > constantpb.AdminPlatformID {
 		return errs.ErrArgs.WrapMsg("platform is invalid")
 	}
 	if x.Email == "" {

@@ -15,25 +15,26 @@
 package chat
 
 import (
-	"github.com/openimsdk/chat/internal/api/util"
 	"io"
 	"time"
 
+	"github.com/openimsdk/chat/internal/api/util"
+
 	"github.com/gin-gonic/gin"
 	"github.com/openimsdk/chat/pkg/common/apistruct"
-	chatconstant "github.com/openimsdk/chat/pkg/common/constant"
+	"github.com/openimsdk/chat/pkg/common/constant"
 	"github.com/openimsdk/chat/pkg/common/imapi"
 	"github.com/openimsdk/chat/pkg/common/mctx"
 	"github.com/openimsdk/chat/pkg/protocol/admin"
-	"github.com/openimsdk/chat/pkg/protocol/chat"
-	"github.com/openimsdk/protocol/constant"
+	chatpb "github.com/openimsdk/chat/pkg/protocol/chat"
+	constantpb "github.com/openimsdk/protocol/constant"
 	"github.com/openimsdk/protocol/sdkws"
 	"github.com/openimsdk/tools/a2r"
 	"github.com/openimsdk/tools/apiresp"
 	"github.com/openimsdk/tools/errs"
 )
 
-func New(chatClient chat.ChatClient, adminClient admin.AdminClient, imApiCaller imapi.CallerInterface, api *util.Api) *Api {
+func New(chatClient chatpb.ChatClient, adminClient admin.AdminClient, imApiCaller imapi.CallerInterface, api *util.Api) *Api {
 	return &Api{
 		Api:         api,
 		chatClient:  chatClient,
@@ -44,7 +45,7 @@ func New(chatClient chat.ChatClient, adminClient admin.AdminClient, imApiCaller 
 
 type Api struct {
 	*util.Api
-	chatClient  chat.ChatClient
+	chatClient  chatpb.ChatClient
 	adminClient admin.AdminClient
 	imApiCaller imapi.CallerInterface
 }
@@ -52,7 +53,7 @@ type Api struct {
 // ################## ACCOUNT ##################
 
 func (o *Api) SendVerifyCode(c *gin.Context) {
-	req, err := a2r.ParseRequest[chat.SendVerifyCodeReq](c)
+	req, err := a2r.ParseRequest[chatpb.SendVerifyCodeReq](c)
 	if err != nil {
 		apiresp.GinError(c, err)
 		return
@@ -72,11 +73,11 @@ func (o *Api) SendVerifyCode(c *gin.Context) {
 }
 
 func (o *Api) VerifyCode(c *gin.Context) {
-	a2r.Call(chat.ChatClient.VerifyCode, o.chatClient, c)
+	a2r.Call(chatpb.ChatClient.VerifyCode, o.chatClient, c)
 }
 
 func (o *Api) RegisterUser(c *gin.Context) {
-	req, err := a2r.ParseRequest[chat.RegisterUserReq](c)
+	req, err := a2r.ParseRequest[chatpb.RegisterUserReq](c)
 	if err != nil {
 		apiresp.GinError(c, err)
 		return
@@ -130,7 +131,7 @@ func (o *Api) RegisterUser(c *gin.Context) {
 }
 
 func (o *Api) Login(c *gin.Context) {
-	req, err := a2r.ParseRequest[chat.LoginReq](c)
+	req, err := a2r.ParseRequest[chatpb.LoginReq](c)
 	if err != nil {
 		apiresp.GinError(c, err)
 		return
@@ -159,17 +160,17 @@ func (o *Api) Login(c *gin.Context) {
 }
 
 func (o *Api) ResetPassword(c *gin.Context) {
-	a2r.Call(chat.ChatClient.ResetPassword, o.chatClient, c)
+	a2r.Call(chatpb.ChatClient.ResetPassword, o.chatClient, c)
 }
 
 func (o *Api) ChangePassword(c *gin.Context) {
-	a2r.Call(chat.ChatClient.ChangePassword, o.chatClient, c)
+	a2r.Call(chatpb.ChatClient.ChangePassword, o.chatClient, c)
 }
 
 // ################## USER ##################
 
 func (o *Api) UpdateUserInfo(c *gin.Context) {
-	req, err := a2r.ParseRequest[chat.UpdateUserInfoReq](c)
+	req, err := a2r.ParseRequest[chatpb.UpdateUserInfoReq](c)
 	if err != nil {
 		apiresp.GinError(c, err)
 		return
@@ -185,10 +186,10 @@ func (o *Api) UpdateUserInfo(c *gin.Context) {
 		return
 	}
 	var imToken string
-	if opUserType == chatconstant.NormalUser {
+	if opUserType == constant.NormalUser {
 		imToken, err = o.imApiCaller.ImAdminTokenWithDefaultAdmin(c)
-	} else if opUserType == chatconstant.AdminUser {
-		imToken, err = o.imApiCaller.UserToken(c, o.GetDefaultIMAdminUserID(), constant.AdminPlatformID)
+	} else if opUserType == constant.AdminUser {
+		imToken, err = o.imApiCaller.UserToken(c, o.GetDefaultIMAdminUserID(), constantpb.AdminPlatformID)
 	} else {
 		apiresp.GinError(c, errs.ErrArgs.WrapMsg("opUserType unknown"))
 		return
@@ -220,23 +221,23 @@ func (o *Api) UpdateUserInfo(c *gin.Context) {
 }
 
 func (o *Api) FindUserPublicInfo(c *gin.Context) {
-	a2r.Call(chat.ChatClient.FindUserPublicInfo, o.chatClient, c)
+	a2r.Call(chatpb.ChatClient.FindUserPublicInfo, o.chatClient, c)
 }
 
 func (o *Api) FindUserFullInfo(c *gin.Context) {
-	a2r.Call(chat.ChatClient.FindUserFullInfo, o.chatClient, c)
+	a2r.Call(chatpb.ChatClient.FindUserFullInfo, o.chatClient, c)
 }
 
 func (o *Api) SearchUserFullInfo(c *gin.Context) {
-	a2r.Call(chat.ChatClient.SearchUserFullInfo, o.chatClient, c)
+	a2r.Call(chatpb.ChatClient.SearchUserFullInfo, o.chatClient, c)
 }
 
 func (o *Api) SearchUserPublicInfo(c *gin.Context) {
-	a2r.Call(chat.ChatClient.SearchUserPublicInfo, o.chatClient, c)
+	a2r.Call(chatpb.ChatClient.SearchUserPublicInfo, o.chatClient, c)
 }
 
 func (o *Api) GetTokenForVideoMeeting(c *gin.Context) {
-	a2r.Call(chat.ChatClient.GetTokenForVideoMeeting, o.chatClient, c)
+	a2r.Call(chatpb.ChatClient.GetTokenForVideoMeeting, o.chatClient, c)
 }
 
 // ################## APPLET ##################
@@ -259,8 +260,8 @@ func (o *Api) OpenIMCallback(c *gin.Context) {
 		apiresp.GinError(c, err)
 		return
 	}
-	req := &chat.OpenIMCallbackReq{
-		Command: c.Query(constant.CallbackCommand),
+	req := &chatpb.OpenIMCallbackReq{
+		Command: c.Query(constantpb.CallbackCommand),
 		Body:    string(body),
 	}
 	if _, err := o.chatClient.OpenIMCallback(c, req); err != nil {
@@ -273,7 +274,7 @@ func (o *Api) OpenIMCallback(c *gin.Context) {
 func (o *Api) SearchFriend(c *gin.Context) {
 	req, err := a2r.ParseRequest[struct {
 		UserID string `json:"userID"`
-		chat.SearchUserInfoReq
+		chatpb.SearchUserInfoReq
 	}](c)
 	if err != nil {
 		apiresp.GinError(c, err)
@@ -293,7 +294,7 @@ func (o *Api) SearchFriend(c *gin.Context) {
 		return
 	}
 	if len(userIDs) == 0 {
-		apiresp.GinSuccess(c, &chat.SearchUserInfoResp{})
+		apiresp.GinSuccess(c, &chatpb.SearchUserInfoResp{})
 		return
 	}
 	req.SearchUserInfoReq.UserIDs = userIDs

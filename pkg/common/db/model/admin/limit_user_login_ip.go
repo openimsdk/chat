@@ -16,6 +16,7 @@ package admin
 
 import (
 	"context"
+
 	"github.com/openimsdk/tools/db/mongoutil"
 	"github.com/openimsdk/tools/db/pagination"
 	"go.mongodb.org/mongo-driver/bson"
@@ -75,7 +76,6 @@ func (o *LimitUserLoginIP) Search(ctx context.Context, keyword string, paginatio
 		},
 	}
 	return mongoutil.FindPage[*admin.LimitUserLoginIP](ctx, o.coll, filter, pagination)
-
 }
 
 func (o *LimitUserLoginIP) limitUserLoginIPFilter(ips []*admin.LimitUserLoginIP) bson.M {

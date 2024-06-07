@@ -23,7 +23,7 @@ import (
 	"time"
 
 	"github.com/openimsdk/chat/pkg/common/constant"
-	pconstant "github.com/openimsdk/protocol/constant"
+	constantpb "github.com/openimsdk/protocol/constant"
 	"github.com/openimsdk/tools/errs"
 	"github.com/openimsdk/tools/log"
 	"gorm.io/gorm/utils"
@@ -75,10 +75,10 @@ func (a caller[Req, Resp]) call(ctx context.Context, apiPrefix string, req *Req)
 	if err != nil {
 		return nil, err
 	}
-	operationID := utils.ToString(ctx.Value(pconstant.OperationID))
-	request.Header.Set(pconstant.OperationID, operationID)
+	operationID := utils.ToString(ctx.Value(constantpb.OperationID))
+	request.Header.Set(constantpb.OperationID, operationID)
 	if token, _ := ctx.Value(constant.CtxApiToken).(string); token != "" {
-		request.Header.Set(pconstant.Token, token)
+		request.Header.Set(constantpb.Token, token)
 	}
 	response, err := client.Do(request)
 	if err != nil {

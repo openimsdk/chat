@@ -16,10 +16,12 @@ package mctx
 
 import (
 	"context"
-	"github.com/openimsdk/tools/utils/datautil"
 	"strconv"
 
-	constant2 "github.com/openimsdk/protocol/constant"
+
+	"github.com/openimsdk/tools/utils/datautil"
+
+	constantpb "github.com/openimsdk/protocol/constant"
 	"github.com/openimsdk/tools/errs"
 
 	"github.com/openimsdk/chat/pkg/common/constant"
@@ -103,7 +105,7 @@ func CheckAdminOr(ctx context.Context, userIDs ...string) error {
 }
 
 func GetOpUserID(ctx context.Context) string {
-	userID, _ := ctx.Value(constant2.OpUserID).(string)
+	userID, _ := ctx.Value(constantpb.OpUserID).(string)
 	return userID
 }
 

@@ -18,10 +18,13 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"path/filepath"
+	"time"
+
 	"github.com/openimsdk/chat/pkg/common/cmd"
 	"github.com/openimsdk/chat/pkg/common/config"
 	"github.com/openimsdk/chat/pkg/common/imapi"
-	"github.com/openimsdk/protocol/constant"
+	constantpb "github.com/openimsdk/protocol/constant"
 	"github.com/openimsdk/tools/db/mongoutil"
 	"github.com/openimsdk/tools/db/redisutil"
 	"github.com/openimsdk/tools/discovery/etcd"
@@ -29,8 +32,6 @@ import (
 	"github.com/openimsdk/tools/mcontext"
 	"github.com/openimsdk/tools/system/program"
 	"github.com/openimsdk/tools/utils/idutil"
-	"path/filepath"
-	"time"
 )
 
 const maxRetry = 180
@@ -56,8 +57,8 @@ func CheckRedis(ctx context.Context, config *config.Redis) error {
 }
 
 func CheckOpenIM(ctx context.Context, apiURL, secret, adminUserID string) error {
-	api2 := imapi.New(apiURL, secret, adminUserID)
-	_, err := api2.UserToken(mcontext.SetOperationID(ctx, "CheckOpenIM"+idutil.OperationIDGenerator()), adminUserID, constant.AdminPlatformID)
+	imAPI := imapi.New(apiURL, secret, adminUserID)
+	_, err := imAPI.UserToken(mcontext.SetOperationID(ctx, "CheckOpenIM"+idutil.OperationIDGenerator()), adminUserID, constantpb.AdminPlatformID)
 	return err
 }
 
