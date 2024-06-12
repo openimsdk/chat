@@ -31,4 +31,5 @@ var (
 	ErrForbidden                = errs.NewCodeError(20012, "Forbidden")
 	ErrRefuseFriend             = errs.NewCodeError(20013, "RefuseFriend")
 	ErrEmailAlreadyRegister     = errs.NewCodeError(20014, "EmailAlreadyRegister")
+	ErrTokenNotExist            = errs.NewCodeError(20015, "ErrTokenNotExist")
 )

@@ -164,7 +164,28 @@ func (o *Api) ResetPassword(c *gin.Context) {
 }
 
 func (o *Api) ChangePassword(c *gin.Context) {
-	a2r.Call(chatpb.ChatClient.ChangePassword, o.chatClient, c)
+	req, err := a2r.ParseRequest[chatpb.ChangePasswordReq](c)
+	if err != nil {
+		apiresp.GinError(c, err)
+		return
+	}
+	resp, err := o.chatClient.ChangePassword(c, req)
+	if err != nil {
+		apiresp.GinError(c, err)
+		return
+	}
+
+	imToken, err := o.imApiCaller.ImAdminTokenWithDefaultAdmin(c)
+	if err != nil {
+		apiresp.GinError(c, err)
+		return
+	}
+	err = o.imApiCaller.ForceOffLine(mctx.WithApiToken(c, imToken), req.UserID)
+	if err != nil {
+		apiresp.GinError(c, err)
+		return
+	}
+	apiresp.GinSuccess(c, resp)
 }
 
 // ################## USER ##################
