@@ -100,7 +100,7 @@ message GetAdminInfoResp {
   int64 createTime = 8;
 }
 
-// ################### 默认好友 ###################
+// ################### Default Friend ###################
 
 message AddDefaultFriendReq {
   repeated string userIDs = 1;
@@ -136,7 +136,7 @@ message SearchDefaultFriendResp {
   repeated DefaultFriendAttribute users = 2;
 }
 
-// ################### 默认群组 ###################
+// ################### DefaultGroup ###################
 
 message AddDefaultGroupReq {
   repeated string groupIDs = 1;
@@ -172,7 +172,7 @@ message SearchDefaultGroupResp {
   repeated string groupIDs = 2;
 }
 
-// ################### 邀请码 ###################
+// ################### InvitationCode ###################
 
 message AddInvitationCodeReq {
   repeated string codes = 1;
@@ -229,7 +229,7 @@ message SearchInvitationCodeResp {
   repeated InvitationRegister list = 2;
 }
 
-// ################### 用户登录ip限制 ###################
+// ################### User Login IP Limit ###################
 
 message SearchUserIPLimitLoginReq {
   string keyword = 1;
@@ -265,7 +265,7 @@ message DelUserIPLimitLoginReq {
 
 message DelUserIPLimitLoginResp {}
 
-// ################### 用户IP限制 ###################
+// ################### User IP Limit ###################
 
 message IPForbidden {
   string ip = 1;
@@ -301,7 +301,7 @@ message DelIPForbiddenReq {
 }
 message DelIPForbiddenResp {}
 
-// ################### 用户限制 ###################
+// ################### User Limit ###################
 message CheckRegisterForbiddenReq {
   string ip = 1;
 }
@@ -315,7 +315,7 @@ message CheckLoginForbiddenReq {
 
 message CheckLoginForbiddenResp {}
 
-// ################### 注销 ###################
+// ################### login out ###################
 message CancellationUserReq {
   string userID = 1;
   string reason = 2;
@@ -323,7 +323,7 @@ message CancellationUserReq {
 
 message CancellationUserResp {}
 
-// ################### 封号、解封 ###################
+// ################### Block User, Unblock User ###################
 message BlockUserReq {
   string userID = 1;
   string reason = 2;
@@ -403,7 +403,7 @@ message InvalidateTokenReq {
 
 message InvalidateTokenResp {}
 
-// ################### 小程序 ###################
+// ################### mini program ###################
 
 message AddAppletReq {
   string id = 1;
