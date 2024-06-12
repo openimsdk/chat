@@ -17,6 +17,7 @@ package cache
 import (
 	"context"
 	"github.com/openimsdk/tools/utils/stringutil"
+	"time"
 
 	"github.com/openimsdk/tools/errs"
 	"github.com/redis/go-redis/v9"
@@ -28,11 +29,13 @@ const (
 
 type TokenInterface interface {
 	AddTokenFlag(ctx context.Context, userID string, token string, flag int) error
+	AddTokenFlagNXEx(ctx context.Context, userID string, token string, flag int, expire time.Duration) (bool, error)
 	GetTokensWithoutError(ctx context.Context, userID string) (map[string]int32, error)
 }
 
 type TokenCacheRedis struct {
-	rdb redis.UniversalClient
+	rdb          redis.UniversalClient
+	accessExpire int64
 }
 
 func NewTokenInterface(rdb redis.UniversalClient) *TokenCacheRedis {
@@ -42,6 +45,22 @@ func NewTokenInterface(rdb redis.UniversalClient) *TokenCacheRedis {
 func (t *TokenCacheRedis) AddTokenFlag(ctx context.Context, userID string, token string, flag int) error {
 	key := chatToken + userID
 	return errs.Wrap(t.rdb.HSet(ctx, key, token, flag).Err())
+}
+
+func (t *TokenCacheRedis) AddTokenFlagNXEx(ctx context.Context, userID string, token string, flag int, expire time.Duration) (bool, error) {
+	key := chatToken + userID
+	isSet, err := t.rdb.HSetNX(ctx, key, token, flag).Result()
+	if err != nil {
+		return false, errs.Wrap(err)
+	}
+	if !isSet {
+		// key already exists
+		return false, nil
+	}
+	if err = t.rdb.Expire(ctx, key, expire).Err(); err != nil {
+		return false, errs.Wrap(err)
+	}
+	return isSet, nil
 }
 
 func (t *TokenCacheRedis) GetTokensWithoutError(ctx context.Context, userID string) (map[string]int32, error) {

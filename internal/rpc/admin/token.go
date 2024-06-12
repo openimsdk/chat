@@ -21,11 +21,11 @@ import (
 )
 
 func (o *adminServer) CreateToken(ctx context.Context, req *admin.CreateTokenReq) (*admin.CreateTokenResp, error) {
-	token, err := o.Token.CreateToken(req.UserID, req.UserType)
+	token, expire, err := o.Token.CreateToken(req.UserID, req.UserType)
 	if err != nil {
 		return nil, err
 	}
-	err = o.Database.CacheToken(ctx, req.UserID, token)
+	err = o.Database.CacheToken(ctx, req.UserID, token, expire)
 	if err != nil {
 		return nil, err
 	}
