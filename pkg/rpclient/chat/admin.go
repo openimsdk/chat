@@ -104,6 +104,6 @@ func (o *AdminClient) GetDefaultGroupID(ctx context.Context) ([]string, error) {
 }
 
 func (o *AdminClient) InvalidateToken(ctx context.Context, userID string) error {
-	_, err := o.client.InvalidateToken(ctx, &admin.InvalidateTokenReq{})
+	_, err := o.client.InvalidateToken(ctx, &admin.InvalidateTokenReq{UserID: userID})
 	return err
 }
