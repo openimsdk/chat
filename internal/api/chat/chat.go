@@ -25,6 +25,7 @@ import (
 	"github.com/openimsdk/chat/pkg/common/constant"
 	"github.com/openimsdk/chat/pkg/common/imapi"
 	"github.com/openimsdk/chat/pkg/common/mctx"
+	"github.com/openimsdk/chat/pkg/eerrs"
 	"github.com/openimsdk/chat/pkg/protocol/admin"
 	chatpb "github.com/openimsdk/chat/pkg/protocol/chat"
 	constantpb "github.com/openimsdk/protocol/constant"
@@ -88,22 +89,33 @@ func (o *Api) RegisterUser(c *gin.Context) {
 		return
 	}
 	req.Ip = ip
-	respRegisterUser, err := o.chatClient.RegisterUser(c, req)
-	if err != nil {
-		apiresp.GinError(c, err)
-		return
-	}
+
 	userInfo := &sdkws.UserInfo{
-		UserID:     respRegisterUser.UserID,
+		UserID:     req.User.UserID,
 		Nickname:   req.User.Nickname,
 		FaceURL:    req.User.FaceURL,
 		CreateTime: time.Now().UnixMilli(),
 	}
-	err = o.imApiCaller.RegisterUser(c, []*sdkws.UserInfo{userInfo})
+
+	chatUser, err := o.chatClient.FindUserAccount(c, &chatpb.FindUserAccountReq{UserIDs: []string{req.User.UserID}})
+	if _, isChatUserExist := chatUser.UserAccountMap[req.User.UserID]; isChatUserExist {
+		apiresp.GinError(c, eerrs.ErrAccountAlreadyRegister.Wrap())
+		return
+	}
+
+	isUserNotExist, err := o.imApiCaller.AccountCheckSingle(c, req.User.UserID)
 	if err != nil {
 		apiresp.GinError(c, err)
 		return
 	}
+
+	if isUserNotExist {
+		if err = o.imApiCaller.RegisterUser(c, []*sdkws.UserInfo{userInfo}); err != nil {
+			apiresp.GinError(c, err)
+			return
+		}
+	}
+
 	imToken, err := o.imApiCaller.ImAdminTokenWithDefaultAdmin(c)
 	if err != nil {
 		apiresp.GinError(c, err)
@@ -111,6 +123,13 @@ func (o *Api) RegisterUser(c *gin.Context) {
 	}
 	apiCtx := mctx.WithApiToken(c, imToken)
 	rpcCtx := o.WithAdminUser(c)
+
+	respRegisterUser, err := o.chatClient.RegisterUser(c, req)
+	if err != nil {
+		apiresp.GinError(c, err)
+		return
+	}
+
 	if resp, err := o.adminClient.FindDefaultFriend(rpcCtx, &admin.FindDefaultFriendReq{}); err == nil {
 		_ = o.imApiCaller.ImportFriend(apiCtx, respRegisterUser.UserID, resp.UserIDs)
 	}
