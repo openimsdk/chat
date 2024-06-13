@@ -99,5 +99,9 @@ func (o *chatSvr) ChangePassword(ctx context.Context, req *chat.ChangePasswordRe
 			return nil, err
 		}
 	}
+	if err := o.Admin.InvalidateToken(ctx, req.UserID); err != nil {
+		return nil, err
+	}
+
 	return &chat.ChangePasswordResp{}, nil
 }
