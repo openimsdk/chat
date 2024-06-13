@@ -191,6 +191,8 @@ github.com/openimsdk/protocol v0.0.63 h1:9DnweZe9nEYDFa4fGTbC9Cqi0gLUdtBhRo1NRP2
 github.com/openimsdk/protocol v0.0.63/go.mod h1:OZQA9FR55lseYoN2Ql1XAHYKHJGu7OMNkUbuekrKCM8=
 github.com/openimsdk/tools v0.0.49-alpha.18 h1:ARQeCiRmExvtB6XYItegThuV63JGOTxddwhSLHYXd78=
 github.com/openimsdk/tools v0.0.49-alpha.18/go.mod h1:g7mkHXYUPi0/8aAX8VPMHpnb3hqdV69Jph+bXOGvvNM=
+github.com/openimsdk/tools v0.0.49-alpha.24 h1:lJsqnjTPujnr91LRQ6QmcTliMIa4fMOBSTri6rFz2ek=
+github.com/openimsdk/tools v0.0.49-alpha.24/go.mod h1:g7mkHXYUPi0/8aAX8VPMHpnb3hqdV69Jph+bXOGvvNM=
 github.com/pelletier/go-toml/v2 v2.1.0 h1:FnwAJ4oYMvbT/34k9zzHuZNrhlz48GB3/s6at6/MHO4=
 github.com/pelletier/go-toml/v2 v2.1.0/go.mod h1:tJU2Z3ZkXwnxa4DPO899bsyIoywizdUvyaeZurnPPDc=
 github.com/pion/datachannel v1.5.5 h1:10ef4kwdjije+M9d7Xm9im2Y3O6A6ccQb0zcqZcJew8=

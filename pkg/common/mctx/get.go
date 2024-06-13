@@ -17,8 +17,6 @@ package mctx
 import (
 	"context"
 	"strconv"
-
-
 	"github.com/openimsdk/tools/utils/datautil"
 
 	constantpb "github.com/openimsdk/protocol/constant"

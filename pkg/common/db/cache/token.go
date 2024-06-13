@@ -16,6 +16,7 @@ package cache
 
 import (
 	"context"
+
 	"github.com/openimsdk/tools/utils/stringutil"
 	"time"
 
@@ -31,6 +32,7 @@ type TokenInterface interface {
 	AddTokenFlag(ctx context.Context, userID string, token string, flag int) error
 	AddTokenFlagNXEx(ctx context.Context, userID string, token string, flag int, expire time.Duration) (bool, error)
 	GetTokensWithoutError(ctx context.Context, userID string) (map[string]int32, error)
+	DeleteTokenByUid(ctx context.Context, userID string) error
 }
 
 type TokenCacheRedis struct {
@@ -74,4 +76,9 @@ func (t *TokenCacheRedis) GetTokensWithoutError(ctx context.Context, userID stri
 		mm[k] = stringutil.StringToInt32(v)
 	}
 	return mm, nil
+}
+
+func (t *TokenCacheRedis) DeleteTokenByUid(ctx context.Context, userID string) error {
+	key := chatToken + userID
+	return errs.Wrap(t.rdb.Del(ctx, key).Err())
 }

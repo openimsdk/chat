@@ -77,6 +77,7 @@ type AdminDatabaseInterface interface {
 	GetLimitUserLoginIP(ctx context.Context, userID string, ip string) (*admindb.LimitUserLoginIP, error)
 	CacheToken(ctx context.Context, userID string, token string, expire time.Duration) error
 	GetTokens(ctx context.Context, userID string) (map[string]int32, error)
+	DeleteToken(ctx context.Context, userID string) error
 }
 
 func NewAdminDatabase(cli *mongoutil.Client, rdb redis.UniversalClient) (AdminDatabaseInterface, error) {
@@ -341,4 +342,8 @@ func (o *AdminDatabase) CacheToken(ctx context.Context, userID string, token str
 
 func (o *AdminDatabase) GetTokens(ctx context.Context, userID string) (map[string]int32, error) {
 	return o.cache.GetTokensWithoutError(ctx, userID)
+}
+
+func (o *AdminDatabase) DeleteToken(ctx context.Context, userID string) error {
+	return o.cache.DeleteTokenByUid(ctx, userID)
 }

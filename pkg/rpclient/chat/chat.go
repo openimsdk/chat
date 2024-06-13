@@ -16,6 +16,7 @@ package chat
 
 import (
 	"context"
+
 	"github.com/openimsdk/chat/pkg/protocol/chat"
 	"github.com/openimsdk/chat/pkg/protocol/common"
 	"github.com/openimsdk/tools/errs"
