@@ -25,6 +25,7 @@ import (
 	"github.com/openimsdk/chat/pkg/common/constant"
 	"github.com/openimsdk/chat/pkg/common/imapi"
 	"github.com/openimsdk/chat/pkg/common/mctx"
+	"github.com/openimsdk/chat/pkg/eerrs"
 	"github.com/openimsdk/chat/pkg/protocol/admin"
 	chatpb "github.com/openimsdk/chat/pkg/protocol/chat"
 	constantpb "github.com/openimsdk/protocol/constant"
@@ -100,18 +101,23 @@ func (o *Api) RegisterUser(c *gin.Context) {
 	// if phone exist, don't return err, just a condition.
 	checkResp, err := o.chatClient.CheckPhoneNumberExist(rpcCtx, &chatpb.CheckPhoneNumberExistReq{PhoneNumber: req.User.PhoneNumber})
 	if err != nil {
-		isUserNotExist, err := o.imApiCaller.AccountCheckSingle(apiCtx, checkResp.Userid)
-		if err != nil {
-			apiresp.GinError(c, err)
-			return
-		}
-		// if User is  not exist in SDK server. You need delete this user and register new user again.
-		if isUserNotExist {
-			_, err := o.adminClient.DelAdminAccount(rpcCtx, &admin.DelAdminAccountReq{UserIDs: []string{checkResp.Userid}})
+		if err == eerrs.ErrAccountAlreadyRegister.Wrap() {
+			isUserNotExist, err := o.imApiCaller.AccountCheckSingle(apiCtx, checkResp.Userid)
 			if err != nil {
 				apiresp.GinError(c, err)
 				return
 			}
+			// if User is  not exist in SDK server. You need delete this user and register new user again.
+			if isUserNotExist {
+				_, err := o.adminClient.DelAdminAccount(rpcCtx, &admin.DelAdminAccountReq{UserIDs: []string{checkResp.Userid}})
+				if err != nil {
+					apiresp.GinError(c, err)
+					return
+				}
+			}
+		} else {
+			apiresp.GinError(c, err)
+			return
 		}
 	}
 
