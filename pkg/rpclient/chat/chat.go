@@ -103,3 +103,8 @@ func (o *ChatClient) UpdateUser(ctx context.Context, req *chat.UpdateUserInfoReq
 	_, err := o.client.UpdateUserInfo(ctx, req)
 	return err
 }
+
+func (o *ChatClient) CheckPhoneNumberExist(ctx context.Context, req *chat.CheckPhoneNumberExistReq) (resp *chat.CheckPhoneNumberExistResp, err error) {
+	resp, err = o.client.CheckPhoneNumberExist(ctx, req)
+	return resp, err
+}

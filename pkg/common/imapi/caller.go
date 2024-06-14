@@ -19,6 +19,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/openimsdk/chat/pkg/eerrs"
 	"github.com/openimsdk/tools/log"
 
 	"github.com/openimsdk/protocol/auth"
@@ -174,7 +175,7 @@ func (c *Caller) AccountCheckSingle(ctx context.Context, userID string) (bool, e
 		return false, err
 	}
 	if resp.Results[0].AccountStatus != "unregistered" {
-		return false, nil
+		return false, eerrs.ErrAccountAlreadyRegister.Wrap()
 	}
 	return true, nil
 }

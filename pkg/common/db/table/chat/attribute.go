@@ -16,8 +16,9 @@ package chat
 
 import (
 	"context"
-	"github.com/openimsdk/tools/db/pagination"
 	"time"
+
+	"github.com/openimsdk/tools/db/pagination"
 )
 
 type Attribute struct {
@@ -45,11 +46,12 @@ func (Attribute) TableName() string {
 }
 
 type AttributeInterface interface {
-	//NewTx(tx any) AttributeInterface
+	// NewTx(tx any) AttributeInterface
 	Create(ctx context.Context, attribute ...*Attribute) error
 	Update(ctx context.Context, userID string, data map[string]any) error
 	Find(ctx context.Context, userIds []string) ([]*Attribute, error)
 	FindAccount(ctx context.Context, accounts []string) ([]*Attribute, error)
+	FindPhone(ctx context.Context, phoneNumber []string) ([]*Attribute, error)
 	Search(ctx context.Context, keyword string, genders []int32, pagination pagination.Pagination) (int64, []*Attribute, error)
 	TakePhone(ctx context.Context, areaCode string, phoneNumber string) (*Attribute, error)
 	TakeEmail(ctx context.Context, email string) (*Attribute, error)

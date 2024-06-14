@@ -21,6 +21,7 @@ import (
 	"github.com/openimsdk/chat/pkg/common/db/dbutil"
 	chatdb "github.com/openimsdk/chat/pkg/common/db/table/chat"
 	constantpb "github.com/openimsdk/protocol/constant"
+	"github.com/openimsdk/tools/log"
 	"github.com/openimsdk/tools/mcontext"
 
 	"github.com/openimsdk/chat/pkg/common/constant"
@@ -229,9 +230,7 @@ func (o *chatSvr) FindUserAccount(ctx context.Context, req *chat.FindUserAccount
 	if len(req.UserIDs) == 0 {
 		return nil, errs.ErrArgs.WrapMsg("user id list must be set")
 	}
-	if _, _, err := mctx.CheckAdminOrUser(ctx); err != nil {
-		return nil, err
-	}
+
 	attributes, err := o.Database.FindAttribute(ctx, req.UserIDs)
 	if err != nil {
 		return nil, err
@@ -292,4 +291,14 @@ func (o *chatSvr) checkTheUniqueness(ctx context.Context, req *chat.AddUserAccou
 		}
 	}
 	return nil
+}
+
+func (o *chatSvr) CheckPhoneNumberExist(ctx context.Context, req *chat.CheckPhoneNumberExistReq) (resp *chat.CheckPhoneNumberExistResp, err error) {
+	attribute, err := o.Database.FindAttributeByPhone(ctx, []string{req.PhoneNumber})
+	log.ZDebug(ctx, "Check Number is ", attribute[0].PhoneNumber)
+	log.ZDebug(ctx, "Check userID is ", attribute[0].UserID)
+	if attribute[0].PhoneNumber == req.PhoneNumber {
+		return &chat.CheckPhoneNumberExistResp{Userid: attribute[0].UserID}, eerrs.ErrAccountAlreadyRegister.Wrap()
+	}
+	return &chat.CheckPhoneNumberExistResp{}, nil
 }

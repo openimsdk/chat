@@ -25,7 +25,6 @@ import (
 	"github.com/openimsdk/chat/pkg/common/constant"
 	"github.com/openimsdk/chat/pkg/common/imapi"
 	"github.com/openimsdk/chat/pkg/common/mctx"
-	"github.com/openimsdk/chat/pkg/eerrs"
 	"github.com/openimsdk/chat/pkg/protocol/admin"
 	chatpb "github.com/openimsdk/chat/pkg/protocol/chat"
 	constantpb "github.com/openimsdk/protocol/constant"
@@ -90,32 +89,6 @@ func (o *Api) RegisterUser(c *gin.Context) {
 	}
 	req.Ip = ip
 
-	userInfo := &sdkws.UserInfo{
-		UserID:     req.User.UserID,
-		Nickname:   req.User.Nickname,
-		FaceURL:    req.User.FaceURL,
-		CreateTime: time.Now().UnixMilli(),
-	}
-
-	chatUser, err := o.chatClient.FindUserAccount(c, &chatpb.FindUserAccountReq{UserIDs: []string{req.User.UserID}})
-	if _, isChatUserExist := chatUser.UserAccountMap[req.User.UserID]; isChatUserExist {
-		apiresp.GinError(c, eerrs.ErrAccountAlreadyRegister.Wrap())
-		return
-	}
-
-	isUserNotExist, err := o.imApiCaller.AccountCheckSingle(c, req.User.UserID)
-	if err != nil {
-		apiresp.GinError(c, err)
-		return
-	}
-
-	if isUserNotExist {
-		if err = o.imApiCaller.RegisterUser(c, []*sdkws.UserInfo{userInfo}); err != nil {
-			apiresp.GinError(c, err)
-			return
-		}
-	}
-
 	imToken, err := o.imApiCaller.ImAdminTokenWithDefaultAdmin(c)
 	if err != nil {
 		apiresp.GinError(c, err)
@@ -124,7 +97,36 @@ func (o *Api) RegisterUser(c *gin.Context) {
 	apiCtx := mctx.WithApiToken(c, imToken)
 	rpcCtx := o.WithAdminUser(c)
 
+	// if phone exist, don't return err, just a condition.
+	checkResp, err := o.chatClient.CheckPhoneNumberExist(rpcCtx, &chatpb.CheckPhoneNumberExistReq{PhoneNumber: req.User.PhoneNumber})
+	if err != nil {
+		isUserNotExist, err := o.imApiCaller.AccountCheckSingle(apiCtx, checkResp.Userid)
+		if err != nil {
+			apiresp.GinError(c, err)
+			return
+		}
+		// if User is  not exist in SDK server. You need delete this user and register new user again.
+		if isUserNotExist {
+			_, err := o.adminClient.DelAdminAccount(rpcCtx, &admin.DelAdminAccountReq{UserIDs: []string{checkResp.Userid}})
+			if err != nil {
+				apiresp.GinError(c, err)
+				return
+			}
+		}
+	}
+
 	respRegisterUser, err := o.chatClient.RegisterUser(c, req)
+	if err != nil {
+		apiresp.GinError(c, err)
+		return
+	}
+	userInfo := &sdkws.UserInfo{
+		UserID:     respRegisterUser.UserID,
+		Nickname:   req.User.Nickname,
+		FaceURL:    req.User.FaceURL,
+		CreateTime: time.Now().UnixMilli(),
+	}
+	err = o.imApiCaller.RegisterUser(c, []*sdkws.UserInfo{userInfo})
 	if err != nil {
 		apiresp.GinError(c, err)
 		return
