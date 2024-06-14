@@ -260,11 +260,11 @@ message GetTokenForVideoMeetingResp {
   string token = 2;
 }
 
-message CheckPhoneNumberExistReq {
-  string phoneNumber = 1;
+message CheckUserExistReq {
+  RegisterUserInfo user = 1;
 }
 
-message CheckPhoneNumberExistResp {
+message CheckUserExistResp {
   string userid = 1;
 }
 
@@ -285,7 +285,7 @@ service chat {
   rpc Login(LoginReq) returns (LoginResp);
   rpc ResetPassword(ResetPasswordReq) returns (ResetPasswordResp);
   rpc ChangePassword(ChangePasswordReq) returns (ChangePasswordResp);
-  rpc CheckPhoneNumberExist(CheckPhoneNumberExistReq) returns (CheckPhoneNumberExistResp);
+  rpc CheckUserExist(CheckUserExistReq) returns (CheckUserExistResp);
 
   rpc FindUserAccount(FindUserAccountReq) returns (FindUserAccountResp);
   rpc FindAccountUser(FindAccountUserReq) returns (FindAccountUserResp);

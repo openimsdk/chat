@@ -104,7 +104,7 @@ func (o *ChatClient) UpdateUser(ctx context.Context, req *chat.UpdateUserInfoReq
 	return err
 }
 
-func (o *ChatClient) CheckPhoneNumberExist(ctx context.Context, req *chat.CheckPhoneNumberExistReq) (resp *chat.CheckPhoneNumberExistResp, err error) {
-	resp, err = o.client.CheckPhoneNumberExist(ctx, req)
+func (o *ChatClient) CheckUserExist(ctx context.Context, req *chat.CheckUserExistReq) (resp *chat.CheckUserExistResp, err error) {
+	resp, err = o.client.CheckUserExist(ctx, req)
 	return resp, err
 }

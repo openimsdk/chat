@@ -34,7 +34,6 @@ type ChatDatabaseInterface interface {
 	UpdateUseInfo(ctx context.Context, userID string, attribute map[string]any) (err error)
 	FindAttribute(ctx context.Context, userIDs []string) ([]*chatdb.Attribute, error)
 	FindAttributeByAccount(ctx context.Context, accounts []string) ([]*chatdb.Attribute, error)
-	FindAttributeByPhone(ctx context.Context, phoneNumbers []string) ([]*chatdb.Attribute, error)
 	TakeAttributeByPhone(ctx context.Context, areaCode string, phoneNumber string) (*chatdb.Attribute, error)
 	TakeAttributeByEmail(ctx context.Context, Email string) (*chatdb.Attribute, error)
 	TakeAttributeByAccount(ctx context.Context, account string) (*chatdb.Attribute, error)
@@ -120,10 +119,6 @@ func (o *ChatDatabase) FindAttribute(ctx context.Context, userIDs []string) ([]*
 
 func (o *ChatDatabase) FindAttributeByAccount(ctx context.Context, accounts []string) ([]*chatdb.Attribute, error) {
 	return o.attribute.FindAccount(ctx, accounts)
-}
-
-func (o *ChatDatabase) FindAttributeByPhone(ctx context.Context, phoneNumbers []string) ([]*chatdb.Attribute, error) {
-	return o.attribute.FindPhone(ctx, phoneNumbers)
 }
 
 func (o *ChatDatabase) TakeAttributeByPhone(ctx context.Context, areaCode string, phoneNumber string) (*chatdb.Attribute, error) {

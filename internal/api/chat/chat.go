@@ -98,8 +98,8 @@ func (o *Api) RegisterUser(c *gin.Context) {
 	apiCtx := mctx.WithApiToken(c, imToken)
 	rpcCtx := o.WithAdminUser(c)
 
-	// if phone exist, don't return err, just a condition.
-	checkResp, err := o.chatClient.CheckPhoneNumberExist(rpcCtx, &chatpb.CheckPhoneNumberExistReq{PhoneNumber: req.User.PhoneNumber})
+	// if User exist, don't return err, just a condition.
+	checkResp, err := o.chatClient.CheckUserExist(rpcCtx, &chatpb.CheckUserExistReq{User: req.User})
 	if err != nil {
 		if err == eerrs.ErrAccountAlreadyRegister.Wrap() {
 			isUserNotExist, err := o.imApiCaller.AccountCheckSingle(apiCtx, checkResp.Userid)
