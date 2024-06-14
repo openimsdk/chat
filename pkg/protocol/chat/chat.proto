@@ -266,7 +266,13 @@ message CheckUserExistReq {
 
 message CheckUserExistResp {
   string userid = 1;
+  bool isRegistered = 2;
 }
+
+message DelUserAccountReq {
+  repeated string userIDs = 1;
+}
+message DelUserAccountResp {}
 
 service chat {
   // Edit personal information - called by the user or an administrator
@@ -286,10 +292,10 @@ service chat {
   rpc ResetPassword(ResetPasswordReq) returns (ResetPasswordResp);
   rpc ChangePassword(ChangePasswordReq) returns (ChangePasswordResp);
   rpc CheckUserExist(CheckUserExistReq) returns (CheckUserExistResp);
+  rpc DelUserAccount(DelUserAccountReq) returns (DelUserAccountResp);
 
   rpc FindUserAccount(FindUserAccountReq) returns (FindUserAccountResp);
   rpc FindAccountUser(FindAccountUserReq) returns (FindAccountUserResp);
-
   rpc OpenIMCallback(OpenIMCallbackReq) returns (OpenIMCallbackResp);
 
   // Statistics

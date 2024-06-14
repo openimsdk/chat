@@ -167,3 +167,10 @@ func (o *Attribute) SearchUser(ctx context.Context, keyword string, userIDs []st
 	}
 	return mongoutil.FindPage[*chat.Attribute](ctx, o.coll, filter, pagination)
 }
+
+func (o *Attribute) Delete(ctx context.Context, userIDs []string) error {
+	if len(userIDs) == 0 {
+		return nil
+	}
+	return mongoutil.DeleteMany(ctx, o.coll, bson.M{"user_id": bson.M{"$in": userIDs}})
+}

@@ -25,7 +25,6 @@ import (
 	"github.com/openimsdk/chat/pkg/common/constant"
 	"github.com/openimsdk/chat/pkg/common/imapi"
 	"github.com/openimsdk/chat/pkg/common/mctx"
-	"github.com/openimsdk/chat/pkg/eerrs"
 	"github.com/openimsdk/chat/pkg/protocol/admin"
 	chatpb "github.com/openimsdk/chat/pkg/protocol/chat"
 	constantpb "github.com/openimsdk/protocol/constant"
@@ -33,6 +32,7 @@ import (
 	"github.com/openimsdk/tools/a2r"
 	"github.com/openimsdk/tools/apiresp"
 	"github.com/openimsdk/tools/errs"
+	"github.com/openimsdk/tools/log"
 )
 
 func New(chatClient chatpb.ChatClient, adminClient admin.AdminClient, imApiCaller imapi.CallerInterface, api *util.Api) *Api {
@@ -98,26 +98,26 @@ func (o *Api) RegisterUser(c *gin.Context) {
 	apiCtx := mctx.WithApiToken(c, imToken)
 	rpcCtx := o.WithAdminUser(c)
 
-	// if User exist, don't return err, just a condition.
 	checkResp, err := o.chatClient.CheckUserExist(rpcCtx, &chatpb.CheckUserExistReq{User: req.User})
 	if err != nil {
-		if err == eerrs.ErrAccountAlreadyRegister.Wrap() {
-			isUserNotExist, err := o.imApiCaller.AccountCheckSingle(apiCtx, checkResp.Userid)
+		log.ZDebug(rpcCtx, "Not else", errs.Unwrap(err))
+		apiresp.GinError(c, err)
+		return
+	}
+	if checkResp.IsRegistered {
+		isUserNotExist, err := o.imApiCaller.AccountCheckSingle(apiCtx, checkResp.Userid)
+		if err != nil {
+			apiresp.GinError(c, err)
+			return
+		}
+		// if User is  not exist in SDK server. You need delete this user and register new user again.
+		if isUserNotExist {
+			_, err := o.chatClient.DelUserAccount(rpcCtx, &chatpb.DelUserAccountReq{UserIDs: []string{checkResp.Userid}})
+			log.ZDebug(c, "Delete Succsssss", checkResp.Userid)
 			if err != nil {
 				apiresp.GinError(c, err)
 				return
 			}
-			// if User is  not exist in SDK server. You need delete this user and register new user again.
-			if isUserNotExist {
-				_, err := o.adminClient.DelAdminAccount(rpcCtx, &admin.DelAdminAccountReq{UserIDs: []string{checkResp.Userid}})
-				if err != nil {
-					apiresp.GinError(c, err)
-					return
-				}
-			}
-		} else {
-			apiresp.GinError(c, err)
-			return
 		}
 	}
 

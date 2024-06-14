@@ -23,6 +23,7 @@ import (
 	constantpb "github.com/openimsdk/protocol/constant"
 	"github.com/openimsdk/tools/log"
 	"github.com/openimsdk/tools/mcontext"
+	"go.mongodb.org/mongo-driver/mongo"
 
 	"github.com/openimsdk/chat/pkg/common/constant"
 	"github.com/openimsdk/chat/pkg/common/mctx"
@@ -298,25 +299,38 @@ func (o *chatSvr) checkTheUniqueness(ctx context.Context, req *chat.AddUserAccou
 func (o *chatSvr) CheckUserExist(ctx context.Context, req *chat.CheckUserExistReq) (resp *chat.CheckUserExistResp, err error) {
 	if req.User.PhoneNumber != "" {
 		attributeByPhone, err := o.Database.TakeAttributeByPhone(ctx, req.User.AreaCode, req.User.PhoneNumber)
-		// err != nil is not found
-		if err != nil {
+		// err != nil is not found User
+		if err != nil && errs.Unwrap(err) != mongo.ErrNoDocuments {
 			return nil, err
 		}
-		log.ZDebug(ctx, "Check Number is ", attributeByPhone.PhoneNumber)
-		log.ZDebug(ctx, "Check userID is ", attributeByPhone.UserID)
-		if attributeByPhone.PhoneNumber == req.User.PhoneNumber {
-			return &chat.CheckUserExistResp{Userid: attributeByPhone.UserID}, eerrs.ErrAccountAlreadyRegister.Wrap()
+		if attributeByPhone != nil {
+			log.ZDebug(ctx, "Check Number is ", attributeByPhone.PhoneNumber)
+			log.ZDebug(ctx, "Check userID is ", attributeByPhone.UserID)
+			if attributeByPhone.PhoneNumber == req.User.PhoneNumber {
+				return &chat.CheckUserExistResp{Userid: attributeByPhone.UserID, IsRegistered: true}, nil
+			}
 		}
-	} else if req.User.Email != "" {
-		attributeByEmail, err := o.Database.TakeAttributeByEmail(ctx, req.User.Email)
-		if err != nil {
-			return nil, err
+	} else {
+		if req.User.Email != "" {
+			attributeByEmail, err := o.Database.TakeAttributeByEmail(ctx, req.User.Email)
+			if err != nil && errs.Unwrap(err) != mongo.ErrNoDocuments {
+				return nil, err
+			}
+			if attributeByEmail != nil {
+				log.ZDebug(ctx, "Check email is ", attributeByEmail.Email)
+				log.ZDebug(ctx, "Check userID is ", attributeByEmail.UserID)
+				if attributeByEmail.Email == req.User.Email {
+					return &chat.CheckUserExistResp{Userid: attributeByEmail.UserID, IsRegistered: true}, nil
+				}
+			}
 		}
-		log.ZDebug(ctx, "Check email is ", attributeByEmail.Email)
-		log.ZDebug(ctx, "Check userID is ", attributeByEmail.UserID)
-		if attributeByEmail.Email == req.User.Email {
-			return &chat.CheckUserExistResp{Userid: attributeByEmail.UserID}, eerrs.ErrAccountAlreadyRegister.Wrap()
-		}
+	}
+	return nil, nil
+}
+
+func (o *chatSvr) DelUserAccount(ctx context.Context, req *chat.DelUserAccountReq) (resp *chat.DelUserAccountResp, err error) {
+	if err := o.Database.DelUserAccount(ctx, req.UserIDs); err != nil && errs.Unwrap(err) != mongo.ErrNoDocuments {
+		return nil, err
 	}
 	return nil, nil
 }

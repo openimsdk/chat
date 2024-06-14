@@ -58,4 +58,5 @@ type AttributeInterface interface {
 	Take(ctx context.Context, userID string) (*Attribute, error)
 	SearchNormalUser(ctx context.Context, keyword string, forbiddenID []string, gender int32, pagination pagination.Pagination) (int64, []*Attribute, error)
 	SearchUser(ctx context.Context, keyword string, userIDs []string, genders []int32, pagination pagination.Pagination) (int64, []*Attribute, error)
+	Delete(ctx context.Context, userIDs []string) error
 }

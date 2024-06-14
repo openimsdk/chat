@@ -174,7 +174,7 @@ func (c *Caller) AccountCheckSingle(ctx context.Context, userID string) (bool, e
 	if err != nil {
 		return false, err
 	}
-	if resp.Results[0].AccountStatus != "unregistered" {
+	if resp.Results[0].AccountStatus == "registered" {
 		return false, eerrs.ErrAccountAlreadyRegister.Wrap()
 	}
 	return true, nil

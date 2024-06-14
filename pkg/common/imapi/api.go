@@ -32,5 +32,5 @@ var (
 	getGroupsInfo     = NewApiCaller[group.GetGroupsInfoReq, group.GetGroupsInfoResp]("/group/get_groups_info")
 	registerUserCount = NewApiCaller[user.UserRegisterCountReq, user.UserRegisterCountResp]("/statistics/user/register")
 	friendUserIDs     = NewApiCaller[friend.GetFriendIDsReq, friend.GetFriendIDsResp]("/friend/get_friend_id")
-	accountCheck      = NewApiCaller[user.AccountCheckReq, user.AccountCheckResp]("/account_check")
+	accountCheck      = NewApiCaller[user.AccountCheckReq, user.AccountCheckResp]("/user/account_check")
 )
