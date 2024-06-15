@@ -32,6 +32,7 @@ import (
 	"github.com/openimsdk/tools/a2r"
 	"github.com/openimsdk/tools/apiresp"
 	"github.com/openimsdk/tools/errs"
+	"github.com/openimsdk/tools/log"
 )
 
 func New(chatClient chatpb.ChatClient, adminClient admin.AdminClient, imApiCaller imapi.CallerInterface, api *util.Api) *Api {
@@ -88,6 +89,38 @@ func (o *Api) RegisterUser(c *gin.Context) {
 		return
 	}
 	req.Ip = ip
+
+	imToken, err := o.imApiCaller.ImAdminTokenWithDefaultAdmin(c)
+	if err != nil {
+		apiresp.GinError(c, err)
+		return
+	}
+	apiCtx := mctx.WithApiToken(c, imToken)
+	rpcCtx := o.WithAdminUser(c)
+
+	checkResp, err := o.chatClient.CheckUserExist(rpcCtx, &chatpb.CheckUserExistReq{User: req.User})
+	if err != nil {
+		log.ZDebug(rpcCtx, "Not else", errs.Unwrap(err))
+		apiresp.GinError(c, err)
+		return
+	}
+	if checkResp.IsRegistered {
+		isUserNotExist, err := o.imApiCaller.AccountCheckSingle(apiCtx, checkResp.Userid)
+		if err != nil {
+			apiresp.GinError(c, err)
+			return
+		}
+		// if User is  not exist in SDK server. You need delete this user and register new user again.
+		if isUserNotExist {
+			_, err := o.chatClient.DelUserAccount(rpcCtx, &chatpb.DelUserAccountReq{UserIDs: []string{checkResp.Userid}})
+			log.ZDebug(c, "Delete Succsssss", checkResp.Userid)
+			if err != nil {
+				apiresp.GinError(c, err)
+				return
+			}
+		}
+	}
+
 	respRegisterUser, err := o.chatClient.RegisterUser(c, req)
 	if err != nil {
 		apiresp.GinError(c, err)
@@ -104,13 +137,7 @@ func (o *Api) RegisterUser(c *gin.Context) {
 		apiresp.GinError(c, err)
 		return
 	}
-	imToken, err := o.imApiCaller.ImAdminTokenWithDefaultAdmin(c)
-	if err != nil {
-		apiresp.GinError(c, err)
-		return
-	}
-	apiCtx := mctx.WithApiToken(c, imToken)
-	rpcCtx := o.WithAdminUser(c)
+
 	if resp, err := o.adminClient.FindDefaultFriend(rpcCtx, &admin.FindDefaultFriendReq{}); err == nil {
 		_ = o.imApiCaller.ImportFriend(apiCtx, respRegisterUser.UserID, resp.UserIDs)
 	}

@@ -21,7 +21,9 @@ import (
 	"github.com/openimsdk/chat/pkg/common/db/dbutil"
 	chatdb "github.com/openimsdk/chat/pkg/common/db/table/chat"
 	constantpb "github.com/openimsdk/protocol/constant"
+	"github.com/openimsdk/tools/log"
 	"github.com/openimsdk/tools/mcontext"
+	"go.mongodb.org/mongo-driver/mongo"
 
 	"github.com/openimsdk/chat/pkg/common/constant"
 	"github.com/openimsdk/chat/pkg/common/mctx"
@@ -292,4 +294,43 @@ func (o *chatSvr) checkTheUniqueness(ctx context.Context, req *chat.AddUserAccou
 		}
 	}
 	return nil
+}
+
+func (o *chatSvr) CheckUserExist(ctx context.Context, req *chat.CheckUserExistReq) (resp *chat.CheckUserExistResp, err error) {
+	if req.User.PhoneNumber != "" {
+		attributeByPhone, err := o.Database.TakeAttributeByPhone(ctx, req.User.AreaCode, req.User.PhoneNumber)
+		// err != nil is not found User
+		if err != nil && errs.Unwrap(err) != mongo.ErrNoDocuments {
+			return nil, err
+		}
+		if attributeByPhone != nil {
+			log.ZDebug(ctx, "Check Number is ", attributeByPhone.PhoneNumber)
+			log.ZDebug(ctx, "Check userID is ", attributeByPhone.UserID)
+			if attributeByPhone.PhoneNumber == req.User.PhoneNumber {
+				return &chat.CheckUserExistResp{Userid: attributeByPhone.UserID, IsRegistered: true}, nil
+			}
+		}
+	} else {
+		if req.User.Email != "" {
+			attributeByEmail, err := o.Database.TakeAttributeByEmail(ctx, req.User.Email)
+			if err != nil && errs.Unwrap(err) != mongo.ErrNoDocuments {
+				return nil, err
+			}
+			if attributeByEmail != nil {
+				log.ZDebug(ctx, "Check email is ", attributeByEmail.Email)
+				log.ZDebug(ctx, "Check userID is ", attributeByEmail.UserID)
+				if attributeByEmail.Email == req.User.Email {
+					return &chat.CheckUserExistResp{Userid: attributeByEmail.UserID, IsRegistered: true}, nil
+				}
+			}
+		}
+	}
+	return nil, nil
+}
+
+func (o *chatSvr) DelUserAccount(ctx context.Context, req *chat.DelUserAccountReq) (resp *chat.DelUserAccountResp, err error) {
+	if err := o.Database.DelUserAccount(ctx, req.UserIDs); err != nil && errs.Unwrap(err) != mongo.ErrNoDocuments {
+		return nil, err
+	}
+	return nil, nil
 }

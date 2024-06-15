@@ -19,6 +19,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/openimsdk/chat/pkg/eerrs"
 	"github.com/openimsdk/tools/log"
 
 	"github.com/openimsdk/protocol/auth"
@@ -40,6 +41,7 @@ type CallerInterface interface {
 	FindGroupInfo(ctx context.Context, groupIDs []string) ([]*sdkws.GroupInfo, error)
 	UserRegisterCount(ctx context.Context, start int64, end int64) (map[string]int64, int64, error)
 	FriendUserIDs(ctx context.Context, userID string) ([]string, error)
+	AccountCheckSingle(ctx context.Context, userID string) (bool, error)
 }
 
 type Caller struct {
@@ -164,4 +166,16 @@ func (c *Caller) FriendUserIDs(ctx context.Context, userID string) ([]string, er
 		return nil, err
 	}
 	return resp.FriendIDs, nil
+}
+
+// return true when isUserNotExist.
+func (c *Caller) AccountCheckSingle(ctx context.Context, userID string) (bool, error) {
+	resp, err := accountCheck.Call(ctx, c.imApi, &user.AccountCheckReq{CheckUserIDs: []string{userID}})
+	if err != nil {
+		return false, err
+	}
+	if resp.Results[0].AccountStatus == "registered" {
+		return false, eerrs.ErrAccountAlreadyRegister.Wrap()
+	}
+	return true, nil
 }

@@ -57,6 +57,7 @@ type ChatDatabaseInterface interface {
 	NewUserCountTotal(ctx context.Context, before *time.Time) (int64, error)
 	UserLoginCountTotal(ctx context.Context, before *time.Time) (int64, error)
 	UserLoginCountRangeEverydayTotal(ctx context.Context, start *time.Time, end *time.Time) (map[string]int64, int64, error)
+	DelUserAccount(ctx context.Context, userIDs []string) error
 }
 
 func NewChatDatabase(cli *mongoutil.Client) (ChatDatabaseInterface, error) {
@@ -259,4 +260,19 @@ func (o *ChatDatabase) UserLoginCountTotal(ctx context.Context, before *time.Tim
 
 func (o *ChatDatabase) UserLoginCountRangeEverydayTotal(ctx context.Context, start *time.Time, end *time.Time) (map[string]int64, int64, error) {
 	return o.userLoginRecord.CountRangeEverydayTotal(ctx, start, end)
+}
+
+func (o *ChatDatabase) DelUserAccount(ctx context.Context, userIDs []string) error {
+	return o.tx.Transaction(ctx, func(ctx context.Context) error {
+		if err := o.register.Delete(ctx, userIDs); err != nil {
+			return err
+		}
+		if err := o.account.Delete(ctx, userIDs); err != nil {
+			return err
+		}
+		if err := o.attribute.Delete(ctx, userIDs); err != nil {
+			return err
+		}
+		return nil
+	})
 }
