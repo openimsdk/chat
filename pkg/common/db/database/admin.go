@@ -16,6 +16,7 @@ package database
 
 import (
 	"context"
+	"time"
 
 	"github.com/openimsdk/chat/pkg/common/db/cache"
 	"github.com/openimsdk/protocol/constant"
@@ -74,7 +75,7 @@ type AdminDatabaseInterface interface {
 	DelUserLimitLogin(ctx context.Context, ms []*admindb.LimitUserLoginIP) error
 	CountLimitUserLoginIP(ctx context.Context, userID string) (uint32, error)
 	GetLimitUserLoginIP(ctx context.Context, userID string, ip string) (*admindb.LimitUserLoginIP, error)
-	CacheToken(ctx context.Context, userID string, token string) error
+	CacheToken(ctx context.Context, userID string, token string, expire time.Duration) error
 	GetTokens(ctx context.Context, userID string) (map[string]int32, error)
 	DeleteToken(ctx context.Context, userID string) error
 }
@@ -325,8 +326,18 @@ func (o *AdminDatabase) GetLimitUserLoginIP(ctx context.Context, userID string, 
 	return o.limitUserLoginIP.Take(ctx, userID, ip)
 }
 
-func (o *AdminDatabase) CacheToken(ctx context.Context, userID string, token string) error {
-	return o.cache.AddTokenFlag(ctx, userID, token, constant.NormalToken)
+func (o *AdminDatabase) CacheToken(ctx context.Context, userID string, token string, expire time.Duration) error {
+	isSet, err := o.cache.AddTokenFlagNXEx(ctx, userID, token, constant.NormalToken, expire)
+	if err != nil {
+		return err
+	}
+	if !isSet {
+		// already exists, update
+		if err = o.cache.AddTokenFlag(ctx, userID, token, constant.NormalToken); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (o *AdminDatabase) GetTokens(ctx context.Context, userID string) (map[string]int32, error) {
