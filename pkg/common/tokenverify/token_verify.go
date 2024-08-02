@@ -86,16 +86,16 @@ func (t *Token) getToken(str string) (string, int32, error) {
 	}
 }
 
-func (t *Token) CreateToken(UserID string, userType int32) (string, error) {
+func (t *Token) CreateToken(UserID string, userType int32) (string, time.Duration, error) {
 	if !(userType == TokenUser || userType == TokenAdmin) {
-		return "", errs.ErrTokenUnknown.WrapMsg("token type unknown")
+		return "", 0, errs.ErrTokenUnknown.WrapMsg("token type unknown")
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, t.buildClaims(UserID, userType))
 	str, err := token.SignedString([]byte(t.Secret))
 	if err != nil {
-		return "", errs.Wrap(err)
+		return "", 0, errs.Wrap(err)
 	}
-	return str, nil
+	return str, t.Expires, nil
 }
 
 func (t *Token) GetToken(token string) (string, int32, error) {
