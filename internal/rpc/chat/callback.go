@@ -19,10 +19,10 @@ import (
 	"encoding/json"
 	"fmt"
 
-	constant2 "github.com/openimsdk/chat/pkg/common/constant"
+	"github.com/openimsdk/chat/pkg/common/constant"
 	"github.com/openimsdk/chat/pkg/eerrs"
 	"github.com/openimsdk/chat/pkg/protocol/chat"
-	"github.com/openimsdk/protocol/constant"
+	constantpb "github.com/openimsdk/protocol/constant"
 	"github.com/openimsdk/tools/errs"
 )
 
@@ -42,7 +42,7 @@ func (c CallbackCommand) GetCallbackCommand() string {
 
 func (o *chatSvr) OpenIMCallback(ctx context.Context, req *chat.OpenIMCallbackReq) (*chat.OpenIMCallbackResp, error) {
 	switch req.Command {
-	case constant.CallbackBeforeAddFriendCommand:
+	case constantpb.CallbackBeforeAddFriendCommand:
 		var data CallbackBeforeAddFriendReq
 		if err := json.Unmarshal([]byte(req.Body), &data); err != nil {
 			return nil, errs.Wrap(err)
@@ -51,7 +51,7 @@ func (o *chatSvr) OpenIMCallback(ctx context.Context, req *chat.OpenIMCallbackRe
 		if err != nil {
 			return nil, err
 		}
-		if user.AllowAddFriend != constant2.OrdinaryUserAddFriendEnable {
+		if user.AllowAddFriend != constant.OrdinaryUserAddFriendEnable {
 			return nil, eerrs.ErrRefuseFriend.WrapMsg(fmt.Sprintf("state %d", user.AllowAddFriend))
 		}
 		return &chat.OpenIMCallbackResp{}, nil

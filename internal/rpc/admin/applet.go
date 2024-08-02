@@ -16,15 +16,16 @@ package admin
 
 import (
 	"context"
-	"github.com/openimsdk/tools/utils/datautil"
 	"strings"
 	"time"
+
+	"github.com/openimsdk/tools/utils/datautil"
 
 	"github.com/google/uuid"
 	"github.com/openimsdk/tools/errs"
 
 	"github.com/openimsdk/chat/pkg/common/constant"
-	admin2 "github.com/openimsdk/chat/pkg/common/db/table/admin"
+	admindb "github.com/openimsdk/chat/pkg/common/db/table/admin"
 	"github.com/openimsdk/chat/pkg/common/mctx"
 	"github.com/openimsdk/chat/pkg/protocol/admin"
 	"github.com/openimsdk/chat/pkg/protocol/common"
@@ -43,7 +44,7 @@ func (o *adminServer) AddApplet(ctx context.Context, req *admin.AddAppletReq) (*
 	if !(req.Status == constant.StatusOnShelf || req.Status == constant.StatusUnShelf) {
 		return nil, errs.ErrArgs.WrapMsg("invalid status")
 	}
-	m := admin2.Applet{
+	m := admindb.Applet{
 		ID:         req.Id,
 		Name:       req.Name,
 		AppID:      req.AppID,
@@ -59,7 +60,7 @@ func (o *adminServer) AddApplet(ctx context.Context, req *admin.AddAppletReq) (*
 	if m.ID == "" {
 		m.ID = uuid.New().String()
 	}
-	if err := o.Database.CreateApplet(ctx, []*admin2.Applet{&m}); err != nil {
+	if err := o.Database.CreateApplet(ctx, []*admindb.Applet{&m}); err != nil {
 		return nil, err
 	}
 	return &admin.AddAppletResp{}, nil
@@ -76,7 +77,7 @@ func (o *adminServer) DelApplet(ctx context.Context, req *admin.DelAppletReq) (*
 	if err != nil {
 		return nil, err
 	}
-	if ids := datautil.Single(req.AppletIds, datautil.Slice(applets, func(e *admin2.Applet) string { return e.ID })); len(ids) > 0 {
+	if ids := datautil.Single(req.AppletIds, datautil.Slice(applets, func(e *admindb.Applet) string { return e.ID })); len(ids) > 0 {
 		return nil, errs.ErrArgs.WrapMsg("ids not found: " + strings.Join(ids, ", "))
 	}
 	if err := o.Database.DelApplet(ctx, req.AppletIds); err != nil {

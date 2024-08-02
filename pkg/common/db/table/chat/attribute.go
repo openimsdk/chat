@@ -16,11 +16,11 @@ package chat
 
 import (
 	"context"
-	"github.com/openimsdk/tools/db/pagination"
 	"time"
+
+	"github.com/openimsdk/tools/db/pagination"
 )
 
-// Attribute 用户属性表.
 type Attribute struct {
 	UserID           string    `bson:"user_id"`
 	Account          string    `bson:"account"`
@@ -46,7 +46,7 @@ func (Attribute) TableName() string {
 }
 
 type AttributeInterface interface {
-	//NewTx(tx any) AttributeInterface
+	// NewTx(tx any) AttributeInterface
 	Create(ctx context.Context, attribute ...*Attribute) error
 	Update(ctx context.Context, userID string, data map[string]any) error
 	Find(ctx context.Context, userIds []string) ([]*Attribute, error)
@@ -58,4 +58,5 @@ type AttributeInterface interface {
 	Take(ctx context.Context, userID string) (*Attribute, error)
 	SearchNormalUser(ctx context.Context, keyword string, forbiddenID []string, gender int32, pagination pagination.Pagination) (int64, []*Attribute, error)
 	SearchUser(ctx context.Context, keyword string, userIDs []string, genders []int32, pagination pagination.Pagination) (int64, []*Attribute, error)
+	Delete(ctx context.Context, userIDs []string) error
 }

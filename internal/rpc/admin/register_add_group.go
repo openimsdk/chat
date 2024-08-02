@@ -21,7 +21,7 @@ import (
 
 	"github.com/openimsdk/tools/errs"
 
-	admin2 "github.com/openimsdk/chat/pkg/common/db/table/admin"
+	admindb "github.com/openimsdk/chat/pkg/common/db/table/admin"
 	"github.com/openimsdk/chat/pkg/common/mctx"
 	"github.com/openimsdk/chat/pkg/protocol/admin"
 )
@@ -44,9 +44,9 @@ func (o *adminServer) AddDefaultGroup(ctx context.Context, req *admin.AddDefault
 		return nil, errs.ErrDuplicateKey.WrapMsg("group id existed", "groupID", exists)
 	}
 	now := time.Now()
-	ms := make([]*admin2.RegisterAddGroup, 0, len(req.GroupIDs))
+	ms := make([]*admindb.RegisterAddGroup, 0, len(req.GroupIDs))
 	for _, groupID := range req.GroupIDs {
-		ms = append(ms, &admin2.RegisterAddGroup{
+		ms = append(ms, &admindb.RegisterAddGroup{
 			GroupID:    groupID,
 			CreateTime: now,
 		})
@@ -75,9 +75,9 @@ func (o *adminServer) DelDefaultGroup(ctx context.Context, req *admin.DelDefault
 		return nil, errs.ErrRecordNotFound.WrapMsg("group id not found", "groupID", ids)
 	}
 	now := time.Now()
-	ms := make([]*admin2.RegisterAddGroup, 0, len(req.GroupIDs))
+	ms := make([]*admindb.RegisterAddGroup, 0, len(req.GroupIDs))
 	for _, groupID := range req.GroupIDs {
-		ms = append(ms, &admin2.RegisterAddGroup{
+		ms = append(ms, &admindb.RegisterAddGroup{
 			GroupID:    groupID,
 			CreateTime: now,
 		})
@@ -107,5 +107,5 @@ func (o *adminServer) SearchDefaultGroup(ctx context.Context, req *admin.SearchD
 	if err != nil {
 		return nil, err
 	}
-	return &admin.SearchDefaultGroupResp{Total: uint32(total), GroupIDs: datautil.Slice(infos, func(info *admin2.RegisterAddGroup) string { return info.GroupID })}, nil
+	return &admin.SearchDefaultGroupResp{Total: uint32(total), GroupIDs: datautil.Slice(infos, func(info *admindb.RegisterAddGroup) string { return info.GroupID })}, nil
 }

@@ -3,6 +3,7 @@ package chat
 import (
 	"context"
 	"fmt"
+
 	"github.com/gin-gonic/gin"
 	chatmw "github.com/openimsdk/chat/internal/api/mw"
 	"github.com/openimsdk/chat/internal/api/util"
@@ -19,9 +20,9 @@ import (
 )
 
 type Config struct {
-	ApiConfig       config.API
-	ZookeeperConfig config.ZooKeeper
-	Share           config.Share
+	ApiConfig config.API
+	Discovery config.Discovery
+	Share     config.Share
 }
 
 func Start(ctx context.Context, index int, config *Config) error {
@@ -32,14 +33,11 @@ func Start(ctx context.Context, index int, config *Config) error {
 	if err != nil {
 		return err
 	}
-	client, err := kdisc.NewDiscoveryRegister(&config.ZookeeperConfig, &config.Share)
+	client, err := kdisc.NewDiscoveryRegister(&config.Discovery)
 	if err != nil {
 		return err
 	}
 
-	if err = client.CreateRpcRootNodes(config.Share.RpcRegisterName.GetServiceNames()); err != nil {
-		return errs.WrapMsg(err, "failed to create RPC root nodes")
-	}
 	chatConn, err := client.GetConn(ctx, config.Share.RpcRegisterName.Chat, grpc.WithTransportCredentials(insecure.NewCredentials()), mw.GrpcClient())
 	if err != nil {
 		return err
@@ -54,13 +52,13 @@ func Start(ctx context.Context, index int, config *Config) error {
 	base := util.Api{
 		ImUserID:        config.Share.OpenIM.AdminUserID,
 		ProxyHeader:     config.Share.ProxyHeader,
-		ChatAdminUserID: config.Share.ChatAdmin[0].AdminID,
+		ChatAdminUserID: config.Share.ChatAdmin[0],
 	}
 	adminApi := New(chatClient, adminClient, im, &base)
 	mwApi := chatmw.New(adminClient)
 	gin.SetMode(gin.ReleaseMode)
-	engine := gin.Default()
-	engine.Use(mw.CorsHandler(), mw.GinParseOperationID())
+	engine := gin.New()
+	engine.Use(gin.Recovery(), mw.CorsHandler(), mw.GinParseOperationID())
 	SetChatRoute(engine, adminApi, mwApi)
 	return engine.Run(fmt.Sprintf(":%d", apiPort))
 }

@@ -16,11 +16,12 @@ package chat
 
 import (
 	"context"
+	"time"
+
 	"github.com/openimsdk/tools/db/mongoutil"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"time"
 
 	"github.com/openimsdk/chat/pkg/common/db/table/chat"
 	"github.com/openimsdk/tools/errs"
@@ -56,4 +57,11 @@ func (o *Register) CountTotal(ctx context.Context, before *time.Time) (int64, er
 		filter["create_time"] = bson.M{"$lt": before}
 	}
 	return mongoutil.Count(ctx, o.coll, filter)
+}
+
+func (o *Register) Delete(ctx context.Context, userIDs []string) error {
+	if len(userIDs) == 0 {
+		return nil
+	}
+	return mongoutil.DeleteMany(ctx, o.coll, bson.M{"user_id": bson.M{"$in": userIDs}})
 }

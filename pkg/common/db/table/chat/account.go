@@ -19,7 +19,6 @@ import (
 	"time"
 )
 
-// Account 账号密码表.
 type Account struct {
 	UserID         string    `bson:"user_id"`
 	Password       string    `bson:"password"`
@@ -37,4 +36,5 @@ type AccountInterface interface {
 	Take(ctx context.Context, userId string) (*Account, error)
 	Update(ctx context.Context, userID string, data map[string]any) error
 	UpdatePassword(ctx context.Context, userId string, password string) error
+	Delete(ctx context.Context, userIDs []string) error
 }

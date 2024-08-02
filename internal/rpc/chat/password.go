@@ -16,6 +16,7 @@ package chat
 
 import (
 	"context"
+
 	"github.com/openimsdk/tools/errs"
 
 	"github.com/openimsdk/chat/pkg/common/constant"
@@ -51,10 +52,9 @@ func (o *chatSvr) ResetPassword(ctx context.Context, req *chat.ResetPasswordReq)
 			return nil, err
 		}
 		err = o.Database.UpdatePasswordAndDeleteVerifyCode(ctx, attribute.UserID, req.Password, verifyCodeID)
-	}
-
-	if err != nil {
-		return nil, err
+		if err != nil {
+			return nil, err
+		}
 	}
 	return &chat.ResetPasswordResp{}, nil
 }
@@ -99,5 +99,9 @@ func (o *chatSvr) ChangePassword(ctx context.Context, req *chat.ChangePasswordRe
 			return nil, err
 		}
 	}
+	if err := o.Admin.InvalidateToken(ctx, req.UserID); err != nil {
+		return nil, err
+	}
+
 	return &chat.ChangePasswordResp{}, nil
 }

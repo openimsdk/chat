@@ -16,12 +16,14 @@ package imapi
 
 import (
 	"context"
-	"github.com/openimsdk/tools/log"
 	"sync"
 	"time"
 
+	"github.com/openimsdk/chat/pkg/eerrs"
+	"github.com/openimsdk/tools/log"
+
 	"github.com/openimsdk/protocol/auth"
-	"github.com/openimsdk/protocol/constant"
+	constantpb "github.com/openimsdk/protocol/constant"
 	"github.com/openimsdk/protocol/friend"
 	"github.com/openimsdk/protocol/group"
 	"github.com/openimsdk/protocol/sdkws"
@@ -39,6 +41,7 @@ type CallerInterface interface {
 	FindGroupInfo(ctx context.Context, groupIDs []string) ([]*sdkws.GroupInfo, error)
 	UserRegisterCount(ctx context.Context, start int64, end int64) (map[string]int64, int64, error)
 	FriendUserIDs(ctx context.Context, userID string) ([]string, error)
+	AccountCheckSingle(ctx context.Context, userID string) (bool, error)
 }
 
 type Caller struct {
@@ -74,7 +77,7 @@ func (c *Caller) ImAdminTokenWithDefaultAdmin(ctx context.Context) (string, erro
 	defer c.lock.Unlock()
 	if c.token == "" || c.timeout.Before(time.Now()) {
 		userID := c.defaultIMUserID
-		token, err := c.UserToken(ctx, userID, constant.AdminPlatformID)
+		token, err := c.UserToken(ctx, userID, constantpb.AdminPlatformID)
 		if err != nil {
 			log.ZError(ctx, "get im admin token", err, "userID", userID)
 			return "", err
@@ -127,7 +130,7 @@ func (c *Caller) RegisterUser(ctx context.Context, users []*sdkws.UserInfo) erro
 }
 
 func (c *Caller) ForceOffLine(ctx context.Context, userID string) error {
-	for id := range constant.PlatformID2Name {
+	for id := range constantpb.PlatformID2Name {
 		_, _ = forceOffLine.Call(ctx, c.imApi, &auth.ForceLogoutReq{
 			PlatformID: int32(id),
 			UserID:     userID,
@@ -163,4 +166,16 @@ func (c *Caller) FriendUserIDs(ctx context.Context, userID string) ([]string, er
 		return nil, err
 	}
 	return resp.FriendIDs, nil
+}
+
+// return true when isUserNotExist.
+func (c *Caller) AccountCheckSingle(ctx context.Context, userID string) (bool, error) {
+	resp, err := accountCheck.Call(ctx, c.imApi, &user.AccountCheckReq{CheckUserIDs: []string{userID}})
+	if err != nil {
+		return false, err
+	}
+	if resp.Results[0].AccountStatus == "registered" {
+		return false, eerrs.ErrAccountAlreadyRegister.Wrap()
+	}
+	return true, nil
 }

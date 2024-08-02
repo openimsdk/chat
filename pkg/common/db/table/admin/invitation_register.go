@@ -20,7 +20,6 @@ import (
 	"time"
 )
 
-// 邀请码被注册使用.
 type InvitationRegister struct {
 	InvitationCode string    `bson:"invitation_code"`
 	UsedByUserID   string    `bson:"used_by_user_id"`

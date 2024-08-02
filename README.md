@@ -24,11 +24,8 @@ You may use the OpenIM source code to create compiled versions not originally pr
 ## :busts_in_silhouette: Community
 
 + 💬 [Follow our Twitter account](https://twitter.com/founder_im63606)
-+ 👫 [Join our Reddit](https://www.reddit.com/r/OpenIMessaging)
-+ 🚀 [Join our Slack community](https://join.slack.com/t/openimsdk/shared_invite/zt-22720d66b-o_FvKxMTGXtcnnnHiMqe9Q)
++ 🚀 [Join our Slack community](https://join.slack.com/t/openimsdk/shared_invite/zt-2hljfom5u-9ZuzP3NfEKW~BJKbpLm0Hw)
 + :eyes: [Join our WeChat group](https://openim-1253691595.cos.ap-nanjing.myqcloud.com/WechatIMG20.jpeg)
-+ 📚 [OpenIM Community](https://github.com/openimsdk/community)
-+ 💕 [OpenIM Interest Groups](https://github.com/Openim-sigs)
 
 ## 🛫 Quick Start
 

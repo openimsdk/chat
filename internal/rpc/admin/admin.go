@@ -17,15 +17,16 @@ package admin
 import (
 	"context"
 	"fmt"
-	"github.com/openimsdk/tools/errs"
-	"github.com/openimsdk/tools/mcontext"
-	"github.com/openimsdk/tools/utils/datautil"
 	"math/rand"
 	"time"
 
+	"github.com/openimsdk/tools/errs"
+	"github.com/openimsdk/tools/mcontext"
+	"github.com/openimsdk/tools/utils/datautil"
+
 	"github.com/openimsdk/chat/pkg/common/constant"
 	"github.com/openimsdk/chat/pkg/common/db/dbutil"
-	admin2 "github.com/openimsdk/chat/pkg/common/db/table/admin"
+	admindb "github.com/openimsdk/chat/pkg/common/db/table/admin"
 	"github.com/openimsdk/chat/pkg/common/mctx"
 	"github.com/openimsdk/chat/pkg/eerrs"
 	"github.com/openimsdk/chat/pkg/protocol/admin"
@@ -77,7 +78,7 @@ func (o *adminServer) AddAdminAccount(ctx context.Context, req *admin.AddAdminAc
 		return nil, errs.ErrDuplicateKey.WrapMsg("the account is registered")
 	}
 
-	adm := &admin2.Admin{
+	adm := &admindb.Admin{
 		Account:    req.Account,
 		Password:   req.Password,
 		FaceURL:    req.FaceURL,
@@ -86,7 +87,7 @@ func (o *adminServer) AddAdminAccount(ctx context.Context, req *admin.AddAdminAc
 		Level:      80,
 		CreateTime: time.Now(),
 	}
-	if err = o.Database.AddAdminAccount(ctx, []*admin2.Admin{adm}); err != nil {
+	if err = o.Database.AddAdminAccount(ctx, []*admindb.Admin{adm}); err != nil {
 		return nil, err
 	}
 	return &admin.AddAdminAccountResp{}, nil

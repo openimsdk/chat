@@ -16,12 +16,13 @@ package chat
 
 import (
 	"context"
+	"time"
+
 	"github.com/openimsdk/tools/db/mongoutil"
 	"github.com/openimsdk/tools/errs"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"time"
 
 	"github.com/openimsdk/chat/pkg/common/db/table/chat"
 )
@@ -61,4 +62,11 @@ func (o *Account) Update(ctx context.Context, userID string, data map[string]any
 
 func (o *Account) UpdatePassword(ctx context.Context, userId string, password string) error {
 	return mongoutil.UpdateOne(ctx, o.coll, bson.M{"user_id": userId}, bson.M{"$set": bson.M{"password": password, "change_time": time.Now()}}, false)
+}
+
+func (o *Account) Delete(ctx context.Context, userIDs []string) error {
+	if len(userIDs) == 0 {
+		return nil
+	}
+	return mongoutil.DeleteMany(ctx, o.coll, bson.M{"user_id": bson.M{"$in": userIDs}})
 }

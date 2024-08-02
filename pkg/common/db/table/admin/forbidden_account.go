@@ -20,7 +20,7 @@ import (
 	"time"
 )
 
-// ForbiddenAccount 封号表.
+// ForbiddenAccount table
 type ForbiddenAccount struct {
 	UserID         string    `bson:"user_id"`
 	Reason         string    `bson:"reason"`

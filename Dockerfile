@@ -1,48 +1,49 @@
-# Copyright © 2023 OpenIM open source community. All rights reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Use Go 1.21 Alpine as the base image for building the application
+FROM golang:1.21-alpine as builder
 
-ARG GOARCH
-ARG GOOS
+# Define the base directory for the application as an environment variable
+ENV SERVER_DIR=/openim-chat
 
-# Use golang as the builder stage
-FROM golang:1.21 AS builder
+# Set the working directory inside the container based on the environment variable
+WORKDIR $SERVER_DIR
 
-ARG GO111MODULE=on
-ARG GOPROXY=https://goproxy.io,direct
+# Set the Go proxy to improve dependency resolution speed
+ENV GOPROXY=https://goproxy.io,direct
 
-WORKDIR /openim/openim-chat
+# Copy all files from the current directory into the container
+COPY . .
 
-ENV GO111MODULE=$GO111MODULE
-ENV GOPROXY=$GOPROXY
-
-COPY go.mod go.sum ./
 RUN go mod download
 
-# Copy all files to the container
-ADD . .
+# Install Mage to use for building the application
+RUN go install github.com/magefile/mage@v1.15.0
 
-RUN make clean
-RUN make build
+# Optionally build your application if needed
+RUN mage build
 
-# Build the runtime stage
-FROM ghcr.io/openim-sigs/openim-ubuntu-image:latest
+# Using Alpine Linux with Go environment for the final image
+FROM golang:1.21-alpine
 
-WORKDIR ${CHAT_WORKDIR}
+# Install necessary packages, such as bash
+RUN apk add --no-cache bash
 
-COPY --from=builder ${OPENIM_CHAT_BINDIR} /openim/openim-chat/_output/bin
-COPY --from=builder ${CHAT_WORKDIR}/config /openim/openim-chat/config
-COPY --from=builder ${CHAT_WORKDIR}/scripts /openim/openim-chat/scripts
-COPY --from=builder ${CHAT_WORKDIR}/deployments /openim/openim-chat/deployments
+# Set the environment and work directory
+ENV SERVER_DIR=/openim-chat
+WORKDIR $SERVER_DIR
 
-CMD ["/openim/openim-chat/scripts/docker-start-all.sh"]
+
+# Copy the compiled binaries and mage from the builder image to the final image
+COPY --from=builder $SERVER_DIR/_output $SERVER_DIR/_output
+COPY --from=builder $SERVER_DIR/config $SERVER_DIR/config
+COPY --from=builder /go/bin/mage /usr/local/bin/mage
+COPY --from=builder $SERVER_DIR/magefile_windows.go $SERVER_DIR/
+COPY --from=builder $SERVER_DIR/magefile_unix.go $SERVER_DIR/
+COPY --from=builder $SERVER_DIR/magefile.go $SERVER_DIR/
+COPY --from=builder $SERVER_DIR/start-config.yml $SERVER_DIR/
+COPY --from=builder $SERVER_DIR/go.mod $SERVER_DIR/
+COPY --from=builder $SERVER_DIR/go.sum $SERVER_DIR/
+
+RUN go get github.com/openimsdk/gomake@v0.0.14-alpha.5
+
+# Set the command to run when the container starts
+ENTRYPOINT ["sh", "-c", "mage start && tail -f /dev/null"]

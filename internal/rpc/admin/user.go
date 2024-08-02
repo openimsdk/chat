@@ -22,7 +22,7 @@ import (
 	"time"
 
 	"github.com/openimsdk/chat/pkg/common/db/dbutil"
-	admin2 "github.com/openimsdk/chat/pkg/common/db/table/admin"
+	admindb "github.com/openimsdk/chat/pkg/common/db/table/admin"
 	"github.com/openimsdk/chat/pkg/common/mctx"
 	"github.com/openimsdk/chat/pkg/protocol/admin"
 	"github.com/openimsdk/chat/pkg/protocol/chat"
@@ -54,13 +54,13 @@ func (o *adminServer) BlockUser(ctx context.Context, req *admin.BlockUserReq) (*
 		return nil, err
 	}
 
-	t := &admin2.ForbiddenAccount{
+	t := &admindb.ForbiddenAccount{
 		UserID:         req.UserID,
 		Reason:         req.Reason,
 		OperatorUserID: mcontext.GetOpUserID(ctx),
 		CreateTime:     time.Now(),
 	}
-	if err := o.Database.BlockUser(ctx, []*admin2.ForbiddenAccount{t}); err != nil {
+	if err := o.Database.BlockUser(ctx, []*admindb.ForbiddenAccount{t}); err != nil {
 		return nil, err
 	}
 	return &admin.BlockUserResp{}, nil
@@ -81,7 +81,7 @@ func (o *adminServer) UnblockUser(ctx context.Context, req *admin.UnblockUserReq
 		return nil, err
 	}
 	if len(req.UserIDs) != len(bs) {
-		ids := datautil.Single(req.UserIDs, datautil.Slice(bs, func(info *admin2.ForbiddenAccount) string { return info.UserID }))
+		ids := datautil.Single(req.UserIDs, datautil.Slice(bs, func(info *admindb.ForbiddenAccount) string { return info.UserID }))
 		return nil, errs.ErrArgs.WrapMsg("user not blocked " + strings.Join(ids, ", "))
 	}
 	if err := o.Database.DelBlockUser(ctx, req.UserIDs); err != nil {
@@ -98,7 +98,7 @@ func (o *adminServer) SearchBlockUser(ctx context.Context, req *admin.SearchBloc
 	if err != nil {
 		return nil, err
 	}
-	userIDs := datautil.Slice(infos, func(info *admin2.ForbiddenAccount) string { return info.UserID })
+	userIDs := datautil.Slice(infos, func(info *admindb.ForbiddenAccount) string { return info.UserID })
 	userMap, err := o.Chat.MapUserFullInfo(ctx, userIDs)
 	if err != nil {
 		return nil, err

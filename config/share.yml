@@ -4,13 +4,14 @@ rpcRegisterName:
   admin: admin
 
 openIM:
+  # OpenIM API address
   apiURL: http://127.0.0.1:10002
+  # OpenIM secret key, must be consistent with OpenIM
   secret: openIM123
+  # OpenIM administrator userID, must be consistent with OpenIM
   adminUserID: imAdmin
 
 chatAdmin:
-  - adminID: chatAdmin
-    imUserID: imAdmin
-    nickname: chatAdmin
+   # Default username and password for the admin
+  - "chatAdmin"
 
-#proxyHeader: "X-Forwarded-For"
