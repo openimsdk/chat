@@ -17,10 +17,11 @@ package admin
 import (
 	"context"
 
+	"github.com/redis/go-redis/v9"
+
 	"github.com/openimsdk/chat/pkg/eerrs"
 	adminpb "github.com/openimsdk/chat/pkg/protocol/admin"
 	"github.com/openimsdk/tools/log"
-	"github.com/redis/go-redis/v9"
 )
 
 func (o *adminServer) CreateToken(ctx context.Context, req *adminpb.CreateTokenReq) (*adminpb.CreateTokenResp, error) {
