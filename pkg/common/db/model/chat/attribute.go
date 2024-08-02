@@ -16,6 +16,7 @@ package chat
 
 import (
 	"context"
+
 	"github.com/openimsdk/tools/db/mongoutil"
 	"github.com/openimsdk/tools/db/pagination"
 	"github.com/openimsdk/tools/errs"
@@ -79,6 +80,10 @@ func (o *Attribute) Find(ctx context.Context, userIds []string) ([]*chat.Attribu
 
 func (o *Attribute) FindAccount(ctx context.Context, accounts []string) ([]*chat.Attribute, error) {
 	return mongoutil.Find[*chat.Attribute](ctx, o.coll, bson.M{"account": bson.M{"$in": accounts}})
+}
+
+func (o *Attribute) FindPhone(ctx context.Context, phoneNumbers []string) ([]*chat.Attribute, error) {
+	return mongoutil.Find[*chat.Attribute](ctx, o.coll, bson.M{"phone_number": bson.M{"$in": phoneNumbers}})
 }
 
 func (o *Attribute) Search(ctx context.Context, keyword string, genders []int32, pagination pagination.Pagination) (int64, []*chat.Attribute, error) {
@@ -161,4 +166,11 @@ func (o *Attribute) SearchUser(ctx context.Context, keyword string, userIDs []st
 		}
 	}
 	return mongoutil.FindPage[*chat.Attribute](ctx, o.coll, filter, pagination)
+}
+
+func (o *Attribute) Delete(ctx context.Context, userIDs []string) error {
+	if len(userIDs) == 0 {
+		return nil
+	}
+	return mongoutil.DeleteMany(ctx, o.coll, bson.M{"user_id": bson.M{"$in": userIDs}})
 }

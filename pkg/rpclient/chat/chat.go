@@ -103,3 +103,13 @@ func (o *ChatClient) UpdateUser(ctx context.Context, req *chat.UpdateUserInfoReq
 	_, err := o.client.UpdateUserInfo(ctx, req)
 	return err
 }
+
+func (o *ChatClient) CheckUserExist(ctx context.Context, req *chat.CheckUserExistReq) (resp *chat.CheckUserExistResp, err error) {
+	resp, err = o.client.CheckUserExist(ctx, req)
+	return resp, err
+}
+
+func (o *ChatClient) DelUserAccount(ctx context.Context, req *chat.DelUserAccountReq) (resp *chat.DelUserAccountResp, err error) {
+	resp, err = o.client.DelUserAccount(ctx, req)
+	return resp, err
+}
