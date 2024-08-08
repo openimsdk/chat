@@ -243,8 +243,10 @@ func (o *ChatDatabase) UpdatePasswordAndDeleteVerifyCode(ctx context.Context, us
 		if err := o.account.UpdatePassword(ctx, userID, password); err != nil {
 			return err
 		}
-		if err := o.verifyCode.Delete(ctx, codeID); err != nil {
-			return err
+		if len(codeID) > 0 {
+			if err := o.verifyCode.Delete(ctx, codeID); err != nil {
+				return err
+			}
 		}
 		return nil
 	})
