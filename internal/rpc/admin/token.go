@@ -17,18 +17,20 @@ package admin
 import (
 	"context"
 
+	"github.com/redis/go-redis/v9"
+
 	"github.com/openimsdk/chat/pkg/eerrs"
 	adminpb "github.com/openimsdk/chat/pkg/protocol/admin"
 	"github.com/openimsdk/tools/log"
-	"github.com/redis/go-redis/v9"
 )
 
 func (o *adminServer) CreateToken(ctx context.Context, req *adminpb.CreateTokenReq) (*adminpb.CreateTokenResp, error) {
-	token, err := o.Token.CreateToken(req.UserID, req.UserType)
+	token, expire, err := o.Token.CreateToken(req.UserID, req.UserType)
+
 	if err != nil {
 		return nil, err
 	}
-	err = o.Database.CacheToken(ctx, req.UserID, token)
+	err = o.Database.CacheToken(ctx, req.UserID, token, expire)
 	if err != nil {
 		return nil, err
 	}
