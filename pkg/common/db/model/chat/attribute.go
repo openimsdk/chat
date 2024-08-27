@@ -136,10 +136,10 @@ func (o *Attribute) SearchNormalUser(ctx context.Context, keyword string, forbid
 	}
 	if keyword != "" {
 		filter["$or"] = []bson.M{
-			{"user_id": bson.M{"$regex": keyword, "$options": "i"}},
-			{"account": bson.M{"$regex": keyword, "$options": "i"}},
+			//{"user_id": bson.M{"$regex": keyword, "$options": "i"}},
+			//{"account": bson.M{"$regex": keyword, "$options": "i"}},
 			{"nickname": bson.M{"$regex": keyword, "$options": "i"}},
-			{"phone_number": bson.M{"$regex": keyword, "$options": "i"}},
+			//{"phone_number": bson.M{"$regex": keyword, "$options": "i"}},
 		}
 	}
 	return mongoutil.FindPage[*chat.Attribute](ctx, o.coll, filter, pagination)
