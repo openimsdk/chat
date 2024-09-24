@@ -132,7 +132,7 @@ func (o *Api) RegisterUser(c *gin.Context) {
 		FaceURL:    req.User.FaceURL,
 		CreateTime: time.Now().UnixMilli(),
 	}
-	err = o.imApiCaller.RegisterUser(c, []*sdkws.UserInfo{userInfo})
+	err = o.imApiCaller.RegisterUser(apiCtx, []*sdkws.UserInfo{userInfo})
 	if err != nil {
 		apiresp.GinError(c, err)
 		return
