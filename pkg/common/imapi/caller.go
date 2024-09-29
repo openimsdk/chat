@@ -35,7 +35,7 @@ type CallerInterface interface {
 	ImAdminTokenWithDefaultAdmin(ctx context.Context) (string, error)
 	ImportFriend(ctx context.Context, ownerUserID string, friendUserID []string) error
 	GetUserToken(ctx context.Context, userID string, platform int32) (string, error)
-	AdminToken(ctx context.Context, userID string) (string, error)
+	GetAdminToken(ctx context.Context, userID string) (string, error)
 	InviteToGroup(ctx context.Context, userID string, groupIDs []string) error
 	UpdateUserInfo(ctx context.Context, userID string, nickName string, faceURL string) error
 	ForceOffLine(ctx context.Context, userID string) error
@@ -79,7 +79,7 @@ func (c *Caller) ImAdminTokenWithDefaultAdmin(ctx context.Context) (string, erro
 	defer c.lock.Unlock()
 	if c.token == "" || c.timeout.Before(time.Now()) {
 		userID := c.defaultIMUserID
-		token, err := c.AdminToken(ctx, userID)
+		token, err := c.GetAdminToken(ctx, userID)
 		if err != nil {
 			log.ZError(ctx, "get im admin token", err, "userID", userID)
 			return "", err
@@ -91,8 +91,8 @@ func (c *Caller) ImAdminTokenWithDefaultAdmin(ctx context.Context) (string, erro
 	return c.token, nil
 }
 
-func (c *Caller) AdminToken(ctx context.Context, userID string) (string, error) {
-	resp, err := userToken.Call(ctx, c.imApi, &auth.UserTokenReq{
+func (c *Caller) GetAdminToken(ctx context.Context, userID string) (string, error) {
+	resp, err := getAdminToken.Call(ctx, c.imApi, &auth.GetAdminTokenReq{
 		Secret: c.imSecret,
 		UserID: userID,
 	})

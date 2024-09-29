@@ -24,7 +24,7 @@ import (
 // im caller.
 var (
 	importFriend      = NewApiCaller[relation.ImportFriendReq, relation.ImportFriendResp]("/friend/import_friend")
-	userToken         = NewApiCaller[auth.UserTokenReq, auth.UserTokenResp]("/auth/user_token")
+	getAdminToken     = NewApiCaller[auth.GetAdminTokenReq, auth.GetAdminTokenResp]("/auth/get_admin_token")
 	getuserToken      = NewApiCaller[auth.GetUserTokenReq, auth.GetUserTokenResp]("/auth/get_user_token")
 	inviteToGroup     = NewApiCaller[group.InviteUserToGroupReq, group.InviteUserToGroupResp]("/group/invite_user_to_group")
 	updateUserInfo    = NewApiCaller[user.UpdateUserInfoReq, user.UpdateUserInfoResp]("/user/update_user_info")
