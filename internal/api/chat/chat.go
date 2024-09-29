@@ -244,7 +244,7 @@ func (o *Api) UpdateUserInfo(c *gin.Context) {
 	if opUserType == constant.NormalUser {
 		imToken, err = o.imApiCaller.ImAdminTokenWithDefaultAdmin(c)
 	} else if opUserType == constant.AdminUser {
-		imToken, err = o.imApiCaller.AdminToken(c, o.GetDefaultIMAdminUserID())
+		imToken, err = o.imApiCaller.GetAdminToken(c, o.GetDefaultIMAdminUserID())
 	} else {
 		apiresp.GinError(c, errs.ErrArgs.WrapMsg("opUserType unknown"))
 		return
