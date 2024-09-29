@@ -24,7 +24,6 @@ import (
 	"github.com/openimsdk/chat/pkg/common/cmd"
 	"github.com/openimsdk/chat/pkg/common/config"
 	"github.com/openimsdk/chat/pkg/common/imapi"
-	constantpb "github.com/openimsdk/protocol/constant"
 	"github.com/openimsdk/tools/db/mongoutil"
 	"github.com/openimsdk/tools/db/redisutil"
 	"github.com/openimsdk/tools/discovery/etcd"
@@ -58,7 +57,7 @@ func CheckRedis(ctx context.Context, config *config.Redis) error {
 
 func CheckOpenIM(ctx context.Context, apiURL, secret, adminUserID string) error {
 	imAPI := imapi.New(apiURL, secret, adminUserID)
-	_, err := imAPI.UserToken(mcontext.SetOperationID(ctx, "CheckOpenIM"+idutil.OperationIDGenerator()), adminUserID, constantpb.AdminPlatformID)
+	_, err := imAPI.AdminToken(mcontext.SetOperationID(ctx, "CheckOpenIM"+idutil.OperationIDGenerator()), adminUserID)
 	return err
 }
 

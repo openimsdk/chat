@@ -146,7 +146,7 @@ func (o *Api) RegisterUser(c *gin.Context) {
 	}
 	var resp apistruct.UserRegisterResp
 	if req.AutoLogin {
-		resp.ImToken, err = o.imApiCaller.UserToken(c, respRegisterUser.UserID, req.Platform)
+		resp.ImToken, err = o.imApiCaller.GetUserToken(apiCtx, respRegisterUser.UserID, req.Platform)
 		if err != nil {
 			apiresp.GinError(c, err)
 			return
@@ -174,7 +174,14 @@ func (o *Api) Login(c *gin.Context) {
 		apiresp.GinError(c, err)
 		return
 	}
-	imToken, err := o.imApiCaller.UserToken(c, resp.UserID, req.Platform)
+	adminToken, err := o.imApiCaller.ImAdminTokenWithDefaultAdmin(c)
+	if err != nil {
+		apiresp.GinError(c, err)
+		return
+	}
+	apiCtx := mctx.WithApiToken(c, adminToken)
+
+	imToken, err := o.imApiCaller.GetUserToken(apiCtx, resp.UserID, req.Platform)
 	if err != nil {
 		apiresp.GinError(c, err)
 		return
@@ -237,7 +244,7 @@ func (o *Api) UpdateUserInfo(c *gin.Context) {
 	if opUserType == constant.NormalUser {
 		imToken, err = o.imApiCaller.ImAdminTokenWithDefaultAdmin(c)
 	} else if opUserType == constant.AdminUser {
-		imToken, err = o.imApiCaller.UserToken(c, o.GetDefaultIMAdminUserID(), constantpb.AdminPlatformID)
+		imToken, err = o.imApiCaller.AdminToken(c, o.GetDefaultIMAdminUserID())
 	} else {
 		apiresp.GinError(c, errs.ErrArgs.WrapMsg("opUserType unknown"))
 		return
