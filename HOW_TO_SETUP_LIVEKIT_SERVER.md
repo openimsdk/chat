@@ -9,6 +9,7 @@ OpenIM Chat uses the LiveKit server as the media server to support video calls a
 ## Quick Start
 
 To self-host LiveKit, start the server with the following Docker command:
+> replace `your-server-ip` with your server IP address
 
 ```bash
 docker run -d \
@@ -18,7 +19,8 @@ docker run -d \
     -v $PWD/livekit/livekit.yaml:/livekit.yaml \
     livekit/livekit-server \
     --config /livekit.yaml \
-    --bind 0.0.0.0
+    --bind 0.0.0.0 \
+    --node-ip=your-server-ip
 ```
 
 ## Viewing Logs
