@@ -63,8 +63,8 @@ func ToDBAttributeUpdate(req *chat.UpdateUserInfoReq) (map[string]any, error) {
 	if req.GlobalRecvMsgOpt != nil {
 		update["global_recv_msg_opt"] = req.GlobalRecvMsgOpt.Value
 	}
-	if len(update) == 0 {
-		return nil, errs.ErrArgs.WrapMsg("no update info")
-	}
+	//if len(update) == 0 {
+	//	return nil, errs.ErrArgs.WrapMsg("no update info")
+	//}
 	return update, nil
 }
