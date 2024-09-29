@@ -23,9 +23,10 @@ import (
 	"github.com/openimsdk/tools/log"
 
 	"github.com/openimsdk/protocol/auth"
+	"github.com/openimsdk/protocol/constant"
 	constantpb "github.com/openimsdk/protocol/constant"
-	"github.com/openimsdk/protocol/friend"
 	"github.com/openimsdk/protocol/group"
+	"github.com/openimsdk/protocol/relation"
 	"github.com/openimsdk/protocol/sdkws"
 	"github.com/openimsdk/protocol/user"
 )
@@ -33,7 +34,8 @@ import (
 type CallerInterface interface {
 	ImAdminTokenWithDefaultAdmin(ctx context.Context) (string, error)
 	ImportFriend(ctx context.Context, ownerUserID string, friendUserID []string) error
-	UserToken(ctx context.Context, userID string, platform int32) (string, error)
+	GetUserToken(ctx context.Context, userID string, platform int32) (string, error)
+	AdminToken(ctx context.Context, userID string) (string, error)
 	InviteToGroup(ctx context.Context, userID string, groupIDs []string) error
 	UpdateUserInfo(ctx context.Context, userID string, nickName string, faceURL string) error
 	ForceOffLine(ctx context.Context, userID string) error
@@ -65,7 +67,7 @@ func (c *Caller) ImportFriend(ctx context.Context, ownerUserID string, friendUse
 	if len(friendUserIDs) == 0 {
 		return nil
 	}
-	_, err := importFriend.Call(ctx, c.imApi, &friend.ImportFriendReq{
+	_, err := importFriend.Call(ctx, c.imApi, &relation.ImportFriendReq{
 		OwnerUserID:   ownerUserID,
 		FriendUserIDs: friendUserIDs,
 	})
@@ -77,7 +79,7 @@ func (c *Caller) ImAdminTokenWithDefaultAdmin(ctx context.Context) (string, erro
 	defer c.lock.Unlock()
 	if c.token == "" || c.timeout.Before(time.Now()) {
 		userID := c.defaultIMUserID
-		token, err := c.UserToken(ctx, userID, constantpb.AdminPlatformID)
+		token, err := c.AdminToken(ctx, userID)
 		if err != nil {
 			log.ZError(ctx, "get im admin token", err, "userID", userID)
 			return "", err
@@ -89,9 +91,19 @@ func (c *Caller) ImAdminTokenWithDefaultAdmin(ctx context.Context) (string, erro
 	return c.token, nil
 }
 
-func (c *Caller) UserToken(ctx context.Context, userID string, platformID int32) (string, error) {
+func (c *Caller) AdminToken(ctx context.Context, userID string) (string, error) {
 	resp, err := userToken.Call(ctx, c.imApi, &auth.UserTokenReq{
-		Secret:     c.imSecret,
+		Secret: c.imSecret,
+		UserID: userID,
+	})
+	if err != nil {
+		return "", err
+	}
+	return resp.Token, nil
+}
+
+func (c *Caller) GetUserToken(ctx context.Context, userID string, platformID int32) (string, error) {
+	resp, err := getuserToken.Call(ctx, c.imApi, &auth.GetUserTokenReq{
 		PlatformID: platformID,
 		UserID:     userID,
 	})
@@ -123,8 +135,7 @@ func (c *Caller) UpdateUserInfo(ctx context.Context, userID string, nickName str
 
 func (c *Caller) RegisterUser(ctx context.Context, users []*sdkws.UserInfo) error {
 	_, err := registerUser.Call(ctx, c.imApi, &user.UserRegisterReq{
-		Secret: c.imSecret,
-		Users:  users,
+		Users: users,
 	})
 	return err
 }
@@ -161,7 +172,7 @@ func (c *Caller) UserRegisterCount(ctx context.Context, start int64, end int64) 
 }
 
 func (c *Caller) FriendUserIDs(ctx context.Context, userID string) ([]string, error) {
-	resp, err := friendUserIDs.Call(ctx, c.imApi, &friend.GetFriendIDsReq{UserID: userID})
+	resp, err := friendUserIDs.Call(ctx, c.imApi, &relation.GetFriendIDsReq{UserID: userID})
 	if err != nil {
 		return nil, err
 	}
@@ -174,7 +185,7 @@ func (c *Caller) AccountCheckSingle(ctx context.Context, userID string) (bool, e
 	if err != nil {
 		return false, err
 	}
-	if resp.Results[0].AccountStatus == "registered" {
+	if resp.Results[0].AccountStatus == constant.Registered {
 		return false, eerrs.ErrAccountAlreadyRegister.Wrap()
 	}
 	return true, nil
