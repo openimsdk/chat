@@ -16,6 +16,7 @@ package admin
 
 import (
 	"context"
+
 	"github.com/openimsdk/tools/db/mongoutil"
 	"github.com/openimsdk/tools/db/pagination"
 	"go.mongodb.org/mongo-driver/bson"
@@ -23,11 +24,11 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 
 	"github.com/openimsdk/chat/pkg/common/constant"
-	"github.com/openimsdk/chat/pkg/common/db/table/admin"
+	admindb "github.com/openimsdk/chat/pkg/common/db/table/admin"
 	"github.com/openimsdk/tools/errs"
 )
 
-func NewInvitationRegister(db *mongo.Database) (admin.InvitationRegisterInterface, error) {
+func NewInvitationRegister(db *mongo.Database) (admindb.InvitationRegisterInterface, error) {
 	coll := db.Collection("invitation_register")
 	_, err := coll.Indexes().CreateOne(context.Background(), mongo.IndexModel{
 		Keys: bson.D{
@@ -47,8 +48,8 @@ type InvitationRegister struct {
 	coll *mongo.Collection
 }
 
-func (o *InvitationRegister) Find(ctx context.Context, codes []string) ([]*admin.InvitationRegister, error) {
-	return mongoutil.Find[*admin.InvitationRegister](ctx, o.coll, bson.M{"invitation_code": bson.M{"$in": codes}})
+func (o *InvitationRegister) Find(ctx context.Context, codes []string) ([]*admindb.InvitationRegister, error) {
+	return mongoutil.Find[*admindb.InvitationRegister](ctx, o.coll, bson.M{"invitation_code": bson.M{"$in": codes}})
 }
 
 func (o *InvitationRegister) Del(ctx context.Context, codes []string) error {
@@ -58,12 +59,12 @@ func (o *InvitationRegister) Del(ctx context.Context, codes []string) error {
 	return mongoutil.DeleteMany(ctx, o.coll, bson.M{"invitation_code": bson.M{"$in": codes}})
 }
 
-func (o *InvitationRegister) Create(ctx context.Context, v []*admin.InvitationRegister) error {
+func (o *InvitationRegister) Create(ctx context.Context, v []*admindb.InvitationRegister) error {
 	return mongoutil.InsertMany(ctx, o.coll, v)
 }
 
-func (o *InvitationRegister) Take(ctx context.Context, code string) (*admin.InvitationRegister, error) {
-	return mongoutil.FindOne[*admin.InvitationRegister](ctx, o.coll, bson.M{"code": code})
+func (o *InvitationRegister) Take(ctx context.Context, code string) (*admindb.InvitationRegister, error) {
+	return mongoutil.FindOne[*admindb.InvitationRegister](ctx, o.coll, bson.M{"code": code})
 }
 
 func (o *InvitationRegister) Update(ctx context.Context, code string, data map[string]any) error {
@@ -73,7 +74,7 @@ func (o *InvitationRegister) Update(ctx context.Context, code string, data map[s
 	return mongoutil.UpdateOne(ctx, o.coll, bson.M{"invitation_code": code}, bson.M{"$set": data}, false)
 }
 
-func (o *InvitationRegister) Search(ctx context.Context, keyword string, state int32, userIDs []string, codes []string, pagination pagination.Pagination) (int64, []*admin.InvitationRegister, error) {
+func (o *InvitationRegister) Search(ctx context.Context, keyword string, state int32, userIDs []string, codes []string, pagination pagination.Pagination) (int64, []*admindb.InvitationRegister, error) {
 	filter := bson.M{}
 	switch state {
 	case constant.InvitationCodeUsed:
@@ -94,5 +95,5 @@ func (o *InvitationRegister) Search(ctx context.Context, keyword string, state i
 			{"user_id": bson.M{"$regex": keyword, "$options": "i"}},
 		}
 	}
-	return mongoutil.FindPage[*admin.InvitationRegister](ctx, o.coll, filter, pagination)
+	return mongoutil.FindPage[*admindb.InvitationRegister](ctx, o.coll, filter, pagination)
 }

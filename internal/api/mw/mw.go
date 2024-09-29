@@ -20,7 +20,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/openimsdk/chat/pkg/common/constant"
 	"github.com/openimsdk/chat/pkg/protocol/admin"
-	constant2 "github.com/openimsdk/protocol/constant"
+	constantpb "github.com/openimsdk/protocol/constant"
 	"github.com/openimsdk/tools/apiresp"
 	"github.com/openimsdk/tools/errs"
 )
@@ -66,8 +66,8 @@ func (o *MW) isValidToken(c *gin.Context, userID string, token string) error {
 	}
 	if v, ok := resp.TokensMap[token]; ok {
 		switch v {
-		case constant2.NormalToken:
-		case constant2.KickedToken:
+		case constantpb.NormalToken:
+		case constantpb.KickedToken:
 			return errs.ErrTokenExpired.Wrap()
 		default:
 			return errs.ErrTokenUnknown.Wrap()

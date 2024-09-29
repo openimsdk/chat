@@ -18,7 +18,7 @@ import (
 	"context"
 	"time"
 
-	admin2 "github.com/openimsdk/chat/pkg/common/db/table/admin"
+	admindb "github.com/openimsdk/chat/pkg/common/db/table/admin"
 	"github.com/openimsdk/chat/pkg/common/mctx"
 	"github.com/openimsdk/chat/pkg/protocol/admin"
 )
@@ -51,9 +51,9 @@ func (o *adminServer) AddIPForbidden(ctx context.Context, req *admin.AddIPForbid
 		return nil, err
 	}
 	now := time.Now()
-	tables := make([]*admin2.IPForbidden, 0, len(req.Forbiddens))
+	tables := make([]*admindb.IPForbidden, 0, len(req.Forbiddens))
 	for _, forbidden := range req.Forbiddens {
-		tables = append(tables, &admin2.IPForbidden{
+		tables = append(tables, &admindb.IPForbidden{
 			IP:            forbidden.Ip,
 			LimitLogin:    forbidden.LimitLogin,
 			LimitRegister: forbidden.LimitRegister,

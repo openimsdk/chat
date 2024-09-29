@@ -16,11 +16,14 @@ package chat
 
 import (
 	"context"
-	"github.com/openimsdk/chat/pkg/common/db/dbutil"
-	chat2 "github.com/openimsdk/chat/pkg/common/db/table/chat"
-	constant2 "github.com/openimsdk/protocol/constant"
-	"github.com/openimsdk/tools/mcontext"
 	"time"
+
+	"github.com/openimsdk/chat/pkg/common/db/dbutil"
+	chatdb "github.com/openimsdk/chat/pkg/common/db/table/chat"
+	constantpb "github.com/openimsdk/protocol/constant"
+	"github.com/openimsdk/tools/log"
+	"github.com/openimsdk/tools/mcontext"
+	"go.mongodb.org/mongo-driver/mongo"
 
 	"github.com/openimsdk/chat/pkg/common/constant"
 	"github.com/openimsdk/chat/pkg/common/mctx"
@@ -29,8 +32,95 @@ import (
 	"github.com/openimsdk/tools/errs"
 )
 
+func (o *chatSvr) checkUpdateInfo(ctx context.Context, req *chat.UpdateUserInfoReq) error {
+	attribute, err := o.Database.TakeAttributeByUserID(ctx, req.UserID)
+	if err != nil {
+		return err
+	}
+	checkEmail := func() error {
+		if req.Email == nil {
+			return nil
+		}
+		if req.Email.Value == attribute.Email {
+			req.Email = nil
+			return nil
+		}
+		if req.Email.Value == "" {
+			if !(attribute.Account != "" || (attribute.AreaCode != "" && attribute.PhoneNumber != "")) {
+				return errs.ErrArgs.WrapMsg("a login method must exist")
+			}
+			return nil
+		} else {
+			if _, err := o.Database.GetAttributeByEmail(ctx, req.Email.Value); err == nil {
+				return errs.ErrDuplicateKey.WrapMsg("email already exists")
+			} else if !dbutil.IsDBNotFound(err) {
+				return err
+			}
+		}
+		return nil
+	}
+	checkPhone := func() error {
+		if req.AreaCode == nil {
+			return nil
+		}
+		if req.AreaCode.Value == attribute.AreaCode && req.PhoneNumber.Value == attribute.PhoneNumber {
+			req.AreaCode = nil
+			req.PhoneNumber = nil
+			return nil
+		}
+		if req.AreaCode.Value == "" || req.PhoneNumber.Value == "" {
+			if attribute.Email == "" || attribute.Account == "" {
+				return errs.ErrArgs.WrapMsg("a login method must exist")
+			}
+		} else {
+			if _, err := o.Database.GetAttributeByPhone(ctx, req.AreaCode.Value, req.PhoneNumber.Value); err == nil {
+				return errs.ErrDuplicateKey.WrapMsg("phone number already exists")
+			} else if !dbutil.IsDBNotFound(err) {
+				return err
+			}
+		}
+		return nil
+	}
+	checkAccount := func() error {
+		if req.Account == nil {
+			return nil
+		}
+		if req.Account.Value == attribute.Account {
+			req.Account = nil
+			return nil
+		}
+		if req.Account.Value == "" {
+			if !(attribute.Email == "" && (attribute.AreaCode == "" || attribute.PhoneNumber == "")) {
+				return errs.ErrArgs.WrapMsg("a login method must exist")
+			}
+		} else {
+			if _, err := o.Database.GetAttributeByAccount(ctx, req.Account.Value); err == nil {
+				return errs.ErrDuplicateKey.WrapMsg("account already exists")
+			} else if !dbutil.IsDBNotFound(err) {
+				return err
+			}
+		}
+		return nil
+	}
+	for _, fn := range []func() error{checkEmail, checkPhone, checkAccount} {
+		if err := fn(); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func (o *chatSvr) UpdateUserInfo(ctx context.Context, req *chat.UpdateUserInfoReq) (*chat.UpdateUserInfoResp, error) {
-	resp := &chat.UpdateUserInfoResp{}
+	if req.AreaCode != nil || req.PhoneNumber != nil {
+		if !(req.AreaCode != nil && req.PhoneNumber != nil) {
+			return nil, errs.ErrArgs.WrapMsg("areaCode and phoneNumber must be set together")
+		}
+		if req.AreaCode.Value == "" || req.PhoneNumber.Value == "" {
+			if req.AreaCode.Value != req.PhoneNumber.Value {
+				return nil, errs.ErrArgs.WrapMsg("areaCode and phoneNumber must be set together")
+			}
+		}
+	}
 	opUserID, userType, err := mctx.Check(ctx)
 	if err != nil {
 		return nil, err
@@ -62,44 +152,19 @@ func (o *chatSvr) UpdateUserInfo(ctx context.Context, req *chat.UpdateUserInfoRe
 	default:
 		return nil, errs.ErrNoPermission.WrapMsg("user type error")
 	}
+	if err := o.checkUpdateInfo(ctx, req); err != nil {
+		return nil, err
+	}
 	update, err := ToDBAttributeUpdate(req)
 	if err != nil {
 		return nil, err
 	}
-	attribute, err := o.Database.TakeAttributeByUserID(ctx, req.UserID)
-	if err != nil {
-		return nil, err
-	}
-	if req.Account != nil && req.Account.Value != attribute.Account {
-		_, err := o.Database.TakeAttributeByAccount(ctx, req.Account.Value)
-		if err == nil {
-			return nil, eerrs.ErrAccountAlreadyRegister.Wrap()
-		} else if !dbutil.IsDBNotFound(err) {
+	if len(update) > 0 {
+		if err := o.Database.UpdateUseInfo(ctx, req.UserID, update); err != nil {
 			return nil, err
 		}
 	}
-	if req.AreaCode != nil || req.PhoneNumber != nil {
-		areaCode := attribute.AreaCode
-		phoneNumber := attribute.PhoneNumber
-		if req.AreaCode != nil {
-			areaCode = req.AreaCode.Value
-		}
-		if req.PhoneNumber != nil {
-			phoneNumber = req.PhoneNumber.Value
-		}
-		if attribute.AreaCode != areaCode || attribute.PhoneNumber != phoneNumber {
-			_, err := o.Database.TakeAttributeByPhone(ctx, areaCode, phoneNumber)
-			if err == nil {
-				return nil, eerrs.ErrAccountAlreadyRegister.Wrap()
-			} else if !dbutil.IsDBNotFound(err) {
-				return nil, err
-			}
-		}
-	}
-	if err := o.Database.UpdateUseInfo(ctx, req.UserID, update); err != nil {
-		return nil, err
-	}
-	return resp, nil
+	return &chat.UpdateUserInfoResp{}, nil
 }
 
 func (o *chatSvr) FindUserPublicInfo(ctx context.Context, req *chat.FindUserPublicInfoReq) (*chat.FindUserPublicInfoResp, error) {
@@ -142,23 +207,23 @@ func (o *chatSvr) AddUserAccount(ctx context.Context, req *chat.AddUserAccountRe
 		}
 	}
 
-	register := &chat2.Register{
+	register := &chatdb.Register{
 		UserID:      req.User.UserID,
 		DeviceID:    req.DeviceID,
 		IP:          req.Ip,
-		Platform:    constant2.PlatformID2Name[int(req.Platform)],
+		Platform:    constantpb.PlatformID2Name[int(req.Platform)],
 		AccountType: "",
 		Mode:        constant.UserMode,
 		CreateTime:  time.Now(),
 	}
-	account := &chat2.Account{
+	account := &chatdb.Account{
 		UserID:         req.User.UserID,
 		Password:       req.User.Password,
 		OperatorUserID: mcontext.GetOpUserID(ctx),
 		ChangeTime:     register.CreateTime,
 		CreateTime:     register.CreateTime,
 	}
-	attribute := &chat2.Attribute{
+	attribute := &chatdb.Attribute{
 		UserID:         req.User.UserID,
 		Account:        req.User.Account,
 		PhoneNumber:    req.User.PhoneNumber,
@@ -291,4 +356,43 @@ func (o *chatSvr) checkTheUniqueness(ctx context.Context, req *chat.AddUserAccou
 		}
 	}
 	return nil
+}
+
+func (o *chatSvr) CheckUserExist(ctx context.Context, req *chat.CheckUserExistReq) (resp *chat.CheckUserExistResp, err error) {
+	if req.User.PhoneNumber != "" {
+		attributeByPhone, err := o.Database.TakeAttributeByPhone(ctx, req.User.AreaCode, req.User.PhoneNumber)
+		// err != nil is not found User
+		if err != nil && errs.Unwrap(err) != mongo.ErrNoDocuments {
+			return nil, err
+		}
+		if attributeByPhone != nil {
+			log.ZDebug(ctx, "Check Number is ", attributeByPhone.PhoneNumber)
+			log.ZDebug(ctx, "Check userID is ", attributeByPhone.UserID)
+			if attributeByPhone.PhoneNumber == req.User.PhoneNumber {
+				return &chat.CheckUserExistResp{Userid: attributeByPhone.UserID, IsRegistered: true}, nil
+			}
+		}
+	} else {
+		if req.User.Email != "" {
+			attributeByEmail, err := o.Database.TakeAttributeByEmail(ctx, req.User.Email)
+			if err != nil && errs.Unwrap(err) != mongo.ErrNoDocuments {
+				return nil, err
+			}
+			if attributeByEmail != nil {
+				log.ZDebug(ctx, "Check email is ", attributeByEmail.Email)
+				log.ZDebug(ctx, "Check userID is ", attributeByEmail.UserID)
+				if attributeByEmail.Email == req.User.Email {
+					return &chat.CheckUserExistResp{Userid: attributeByEmail.UserID, IsRegistered: true}, nil
+				}
+			}
+		}
+	}
+	return nil, nil
+}
+
+func (o *chatSvr) DelUserAccount(ctx context.Context, req *chat.DelUserAccountReq) (resp *chat.DelUserAccountResp, err error) {
+	if err := o.Database.DelUserAccount(ctx, req.UserIDs); err != nil && errs.Unwrap(err) != mongo.ErrNoDocuments {
+		return nil, err
+	}
+	return nil, nil
 }

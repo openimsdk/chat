@@ -17,6 +17,7 @@ package kdisc
 import (
 	"github.com/openimsdk/chat/pkg/common/config"
 	"github.com/openimsdk/tools/discovery"
+	"github.com/openimsdk/tools/discovery/etcd"
 	"github.com/openimsdk/tools/discovery/zookeeper"
 	"github.com/openimsdk/tools/errs"
 	"time"
@@ -29,20 +30,25 @@ const (
 )
 
 // NewDiscoveryRegister creates a new service discovery and registry client based on the provided environment type.
-func NewDiscoveryRegister(zookeeperConfig *config.ZooKeeper, share *config.Share) (discovery.SvcDiscoveryRegistry, error) {
-	switch share.Env {
-	case zookeeperConst:
+func NewDiscoveryRegister(discovery *config.Discovery) (discovery.SvcDiscoveryRegistry, error) {
+	switch discovery.Enable {
+	case "zookeeper":
 		return zookeeper.NewZkClient(
-			zookeeperConfig.Address,
-			zookeeperConfig.Schema,
+			discovery.ZooKeeper.Address,
+			discovery.ZooKeeper.Schema,
 			zookeeper.WithFreq(time.Hour),
-			zookeeper.WithUserNameAndPassword(zookeeperConfig.Username, zookeeperConfig.Password),
+			zookeeper.WithUserNameAndPassword(discovery.ZooKeeper.Username, discovery.ZooKeeper.Password),
 			zookeeper.WithRoundRobin(),
 			zookeeper.WithTimeout(10),
 		)
-	//case directConst:
-	//	return direct.NewConnDirect(config)
+	case "etcd":
+		return etcd.NewSvcDiscoveryRegistry(
+			discovery.Etcd.RootDirectory,
+			discovery.Etcd.Address,
+			etcd.WithDialTimeout(10*time.Second),
+			etcd.WithMaxCallSendMsgSize(20*1024*1024),
+			etcd.WithUsernameAndPassword(discovery.Etcd.Username, discovery.Etcd.Password))
 	default:
-		return nil, errs.New("unsupported discovery type", "type", share.Env).Wrap()
+		return nil, errs.New("unsupported discovery type", "type", discovery.Enable).Wrap()
 	}
 }

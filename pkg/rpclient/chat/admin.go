@@ -16,6 +16,7 @@ package chat
 
 import (
 	"context"
+
 	"github.com/openimsdk/chat/pkg/common/mctx"
 	"github.com/openimsdk/chat/pkg/eerrs"
 	"github.com/openimsdk/chat/pkg/protocol/admin"
@@ -100,4 +101,9 @@ func (o *AdminClient) GetDefaultGroupID(ctx context.Context) ([]string, error) {
 		return nil, err
 	}
 	return resp.GroupIDs, nil
+}
+
+func (o *AdminClient) InvalidateToken(ctx context.Context, userID string) error {
+	_, err := o.client.InvalidateToken(ctx, &admin.InvalidateTokenReq{UserID: userID})
+	return err
 }

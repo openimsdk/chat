@@ -18,6 +18,11 @@ import (
 	"context"
 	"crypto/md5"
 	"encoding/hex"
+	"net/http"
+	"strconv"
+	"strings"
+	"time"
+
 	"github.com/gin-gonic/gin"
 	"github.com/openimsdk/chat/internal/api/util"
 	"github.com/openimsdk/chat/pkg/common/apistruct"
@@ -37,10 +42,6 @@ import (
 	"github.com/openimsdk/tools/log"
 	"github.com/openimsdk/tools/utils/datautil"
 	"github.com/openimsdk/tools/utils/encrypt"
-	"net/http"
-	"strconv"
-	"strings"
-	"time"
 )
 
 func New(chatClient chat.ChatClient, adminClient admin.AdminClient, imApiCaller imapi.CallerInterface, api *util.Api) *Api {
@@ -71,7 +72,7 @@ func (o *Api) AdminLogin(c *gin.Context) {
 		return
 	}
 	imAdminUserID := o.GetDefaultIMAdminUserID()
-	imToken, err := o.imApiCaller.UserToken(c, imAdminUserID, constant.AdminPlatformID)
+	imToken, err := o.imApiCaller.AdminToken(c, imAdminUserID)
 	if err != nil {
 		apiresp.GinError(c, err)
 		return
@@ -87,7 +88,30 @@ func (o *Api) AdminLogin(c *gin.Context) {
 }
 
 func (o *Api) ResetUserPassword(c *gin.Context) {
-	a2r.Call(chat.ChatClient.ChangePassword, o.chatClient, c)
+	req, err := a2r.ParseRequest[chat.ChangePasswordReq](c)
+	if err != nil {
+		apiresp.GinError(c, err)
+		return
+	}
+	resp, err := o.chatClient.ChangePassword(c, req)
+	if err != nil {
+		apiresp.GinError(c, err)
+		return
+	}
+
+	imToken, err := o.imApiCaller.ImAdminTokenWithDefaultAdmin(c)
+	if err != nil {
+		apiresp.GinError(c, err)
+		return
+	}
+
+	err = o.imApiCaller.ForceOffLine(mctx.WithApiToken(c, imToken), req.UserID)
+	if err != nil {
+		apiresp.GinError(c, err)
+		return
+	}
+
+	apiresp.GinSuccess(c, resp)
 }
 
 func (o *Api) AdminUpdateInfo(c *gin.Context) {
@@ -103,7 +127,7 @@ func (o *Api) AdminUpdateInfo(c *gin.Context) {
 	}
 
 	imAdminUserID := o.GetDefaultIMAdminUserID()
-	imToken, err := o.imApiCaller.UserToken(c, imAdminUserID, constant.AdminPlatformID)
+	imToken, err := o.imApiCaller.AdminToken(c, imAdminUserID)
 	if err != nil {
 		log.ZError(c, "AdminUpdateInfo ImAdminTokenWithDefaultAdmin", err, "imAdminUserID", imAdminUserID)
 		return
@@ -183,7 +207,7 @@ func (o *Api) AddDefaultGroup(c *gin.Context) {
 		apiresp.GinError(c, err)
 		return
 	}
-	imToken, err := o.imApiCaller.UserToken(c, o.GetDefaultIMAdminUserID(), constant.AdminPlatformID)
+	imToken, err := o.imApiCaller.AdminToken(c, o.GetDefaultIMAdminUserID())
 	if err != nil {
 		apiresp.GinError(c, err)
 		return
@@ -231,7 +255,7 @@ func (o *Api) SearchDefaultGroup(c *gin.Context) {
 		Groups: make([]*sdkws.GroupInfo, 0, len(searchResp.GroupIDs)),
 	}
 	if len(searchResp.GroupIDs) > 0 {
-		imToken, err := o.imApiCaller.UserToken(c, o.GetDefaultIMAdminUserID(), constant.AdminPlatformID)
+		imToken, err := o.imApiCaller.AdminToken(c, o.GetDefaultIMAdminUserID())
 		if err != nil {
 			apiresp.GinError(c, err)
 			return
@@ -313,7 +337,7 @@ func (o *Api) BlockUser(c *gin.Context) {
 		apiresp.GinError(c, err)
 		return
 	}
-	imToken, err := o.imApiCaller.UserToken(c, o.GetDefaultIMAdminUserID(), constant.AdminPlatformID)
+	imToken, err := o.imApiCaller.AdminToken(c, o.GetDefaultIMAdminUserID())
 	if err != nil {
 		apiresp.GinError(c, err)
 		return
@@ -372,7 +396,7 @@ func (o *Api) NewUserCount(c *gin.Context) {
 		apiresp.GinError(c, err)
 		return
 	}
-	imToken, err := o.imApiCaller.UserToken(c, o.GetDefaultIMAdminUserID(), constant.AdminPlatformID)
+	imToken, err := o.imApiCaller.AdminToken(c, o.GetDefaultIMAdminUserID())
 	if err != nil {
 		apiresp.GinError(c, err)
 		return

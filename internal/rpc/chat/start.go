@@ -2,6 +2,8 @@ package chat
 
 import (
 	"context"
+	"time"
+
 	"github.com/openimsdk/chat/pkg/common/mctx"
 	"github.com/openimsdk/chat/pkg/common/rtc"
 	"github.com/openimsdk/chat/pkg/protocol/admin"
@@ -12,7 +14,6 @@ import (
 	"github.com/openimsdk/tools/mw"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
-	"time"
 
 	"github.com/openimsdk/chat/pkg/common/config"
 	"github.com/openimsdk/chat/pkg/common/db/database"
@@ -22,11 +23,11 @@ import (
 )
 
 type Config struct {
-	RpcConfig       config.Chat
-	RedisConfig     config.Redis
-	MongodbConfig   config.Mongo
-	ZookeeperConfig config.ZooKeeper
-	Share           config.Share
+	RpcConfig     config.Chat
+	RedisConfig   config.Redis
+	MongodbConfig config.Mongo
+	Discovery     config.Discovery
+	Share         config.Share
 }
 
 func Start(ctx context.Context, config *Config, client discovery.SvcDiscoveryRegistry, server *grpc.Server) error {

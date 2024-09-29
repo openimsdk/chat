@@ -1,7 +1,0 @@
-directory: ./
-file_types:
-  - .go
-  - .yaml
-  - .yml
-languages:
-  - Chinese

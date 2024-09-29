@@ -16,6 +16,7 @@ package chat
 
 import (
 	"context"
+
 	"github.com/openimsdk/chat/pkg/protocol/chat"
 	"github.com/openimsdk/chat/pkg/protocol/common"
 	"github.com/openimsdk/tools/errs"
@@ -101,4 +102,14 @@ func (o *ChatClient) GetUserPublicInfo(ctx context.Context, userID string) (*com
 func (o *ChatClient) UpdateUser(ctx context.Context, req *chat.UpdateUserInfoReq) error {
 	_, err := o.client.UpdateUserInfo(ctx, req)
 	return err
+}
+
+func (o *ChatClient) CheckUserExist(ctx context.Context, req *chat.CheckUserExistReq) (resp *chat.CheckUserExistResp, err error) {
+	resp, err = o.client.CheckUserExist(ctx, req)
+	return resp, err
+}
+
+func (o *ChatClient) DelUserAccount(ctx context.Context, req *chat.DelUserAccountReq) (resp *chat.DelUserAccountResp, err error) {
+	resp, err = o.client.DelUserAccount(ctx, req)
+	return resp, err
 }

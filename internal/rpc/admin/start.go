@@ -4,13 +4,16 @@ import (
 	"context"
 	"crypto/md5"
 	"encoding/hex"
+	"math/rand"
+	"time"
+
 	"github.com/openimsdk/chat/pkg/common/config"
 	"github.com/openimsdk/chat/pkg/common/constant"
 	"github.com/openimsdk/chat/pkg/common/db/database"
 	"github.com/openimsdk/chat/pkg/common/db/dbutil"
 	"github.com/openimsdk/chat/pkg/common/db/table/admin"
 	"github.com/openimsdk/chat/pkg/common/tokenverify"
-	pbadmin "github.com/openimsdk/chat/pkg/protocol/admin"
+	adminpb "github.com/openimsdk/chat/pkg/protocol/admin"
 	"github.com/openimsdk/chat/pkg/protocol/chat"
 	chatClient "github.com/openimsdk/chat/pkg/rpclient/chat"
 	"github.com/openimsdk/tools/db/mongoutil"
@@ -20,16 +23,14 @@ import (
 	"github.com/openimsdk/tools/mw"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
-	"math/rand"
-	"time"
 )
 
 type Config struct {
-	RpcConfig       config.Admin
-	RedisConfig     config.Redis
-	MongodbConfig   config.Mongo
-	ZookeeperConfig config.ZooKeeper
-	Share           config.Share
+	RpcConfig     config.Admin
+	RedisConfig   config.Redis
+	MongodbConfig config.Mongo
+	Discovery     config.Discovery
+	Share         config.Share
 }
 
 func Start(ctx context.Context, config *Config, client discovery.SvcDiscoveryRegistry, server *grpc.Server) error {
@@ -62,7 +63,7 @@ func Start(ctx context.Context, config *Config, client discovery.SvcDiscoveryReg
 	if err := srv.initAdmin(ctx, config.Share.ChatAdmin, config.Share.OpenIM.AdminUserID); err != nil {
 		return err
 	}
-	pbadmin.RegisterAdminServer(server, &srv)
+	adminpb.RegisterAdminServer(server, &srv)
 	return nil
 }
 

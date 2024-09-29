@@ -16,14 +16,15 @@ package admin
 
 import (
 	"context"
-	"github.com/openimsdk/tools/utils/datautil"
 	"math/rand"
 	"strings"
 	"time"
 
+	"github.com/openimsdk/tools/utils/datautil"
+
 	"github.com/openimsdk/tools/errs"
 
-	admin2 "github.com/openimsdk/chat/pkg/common/db/table/admin"
+	admindb "github.com/openimsdk/chat/pkg/common/db/table/admin"
 	"github.com/openimsdk/chat/pkg/common/mctx"
 	"github.com/openimsdk/chat/pkg/eerrs"
 	"github.com/openimsdk/chat/pkg/protocol/admin"
@@ -44,13 +45,13 @@ func (o *adminServer) AddInvitationCode(ctx context.Context, req *admin.AddInvit
 		return nil, err
 	}
 	if len(irs) > 0 {
-		ids := datautil.Slice(irs, func(info *admin2.InvitationRegister) string { return info.InvitationCode })
+		ids := datautil.Slice(irs, func(info *admindb.InvitationRegister) string { return info.InvitationCode })
 		return nil, errs.ErrArgs.WrapMsg("code existed", "ids", ids)
 	}
 	now := time.Now()
-	codes := make([]*admin2.InvitationRegister, 0, len(req.Codes))
+	codes := make([]*admindb.InvitationRegister, 0, len(req.Codes))
 	for _, code := range req.Codes {
-		codes = append(codes, &admin2.InvitationRegister{
+		codes = append(codes, &admindb.InvitationRegister{
 			InvitationCode: code,
 			UsedByUserID:   "",
 			CreateTime:     now,
@@ -73,7 +74,7 @@ func (o *adminServer) GenInvitationCode(ctx context.Context, req *admin.GenInvit
 		req.Chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 	}
 	now := time.Now()
-	invitationRegisters := make([]*admin2.InvitationRegister, 0, req.Num)
+	invitationRegisters := make([]*admindb.InvitationRegister, 0, req.Num)
 	codes := make([]string, 0, req.Num)
 	for i := int32(0); i < req.Num; i++ {
 		buf := make([]byte, req.Len)
@@ -82,7 +83,7 @@ func (o *adminServer) GenInvitationCode(ctx context.Context, req *admin.GenInvit
 			buf[i] = req.Chars[b%byte(len(req.Chars))]
 		}
 		codes = append(codes, string(buf))
-		invitationRegisters = append(invitationRegisters, &admin2.InvitationRegister{
+		invitationRegisters = append(invitationRegisters, &admindb.InvitationRegister{
 			InvitationCode: string(buf),
 			UsedByUserID:   "",
 			CreateTime:     now,
@@ -96,7 +97,7 @@ func (o *adminServer) GenInvitationCode(ctx context.Context, req *admin.GenInvit
 		return nil, err
 	}
 	if len(irs) > 0 {
-		ids := datautil.Single(codes, datautil.Slice(irs, func(ir *admin2.InvitationRegister) string { return ir.InvitationCode }))
+		ids := datautil.Single(codes, datautil.Slice(irs, func(ir *admindb.InvitationRegister) string { return ir.InvitationCode }))
 		return nil, errs.ErrArgs.WrapMsg(strings.Join(ids, ", "))
 	}
 	if err := o.Database.CreatInvitationRegister(ctx, invitationRegisters); err != nil {
@@ -173,7 +174,7 @@ func (o *adminServer) DelInvitationCode(ctx context.Context, req *admin.DelInvit
 		return nil, err
 	}
 	if len(irs) != len(req.Codes) {
-		ids := datautil.Single(req.Codes, datautil.Slice(irs, func(ir *admin2.InvitationRegister) string { return ir.InvitationCode }))
+		ids := datautil.Single(req.Codes, datautil.Slice(irs, func(ir *admindb.InvitationRegister) string { return ir.InvitationCode }))
 		return nil, errs.ErrArgs.WrapMsg("code not found " + strings.Join(ids, ", "))
 	}
 	if err := o.Database.DelInvitationRegister(ctx, req.Codes); err != nil {

@@ -35,7 +35,7 @@ func NewAdminRpcCmd() *AdminRpcCmd {
 	ret.configMap = map[string]any{
 		ChatRPCAdminCfgFileName: &ret.adminConfig.RpcConfig,
 		RedisConfigFileName:     &ret.adminConfig.RedisConfig,
-		ZookeeperConfigFileName: &ret.adminConfig.ZookeeperConfig,
+		DiscoveryConfigFileName: &ret.adminConfig.Discovery,
 		MongodbConfigFileName:   &ret.adminConfig.MongodbConfig,
 		ShareFileName:           &ret.adminConfig.Share,
 	}
@@ -52,7 +52,7 @@ func (a *AdminRpcCmd) Exec() error {
 }
 
 func (a *AdminRpcCmd) runE() error {
-	return startrpc.Start(a.ctx, &a.adminConfig.ZookeeperConfig, a.adminConfig.RpcConfig.RPC.ListenIP,
+	return startrpc.Start(a.ctx, &a.adminConfig.Discovery, a.adminConfig.RpcConfig.RPC.ListenIP,
 		a.adminConfig.RpcConfig.RPC.RegisterIP, a.adminConfig.RpcConfig.RPC.Ports,
 		a.Index(), a.adminConfig.Share.RpcRegisterName.Admin, &a.adminConfig.Share, &a.adminConfig, admin.Start)
 }
