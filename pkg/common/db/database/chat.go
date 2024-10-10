@@ -73,6 +73,10 @@ func NewChatDatabase(cli *mongoutil.Client) (ChatDatabaseInterface, error) {
 	if err != nil {
 		return nil, err
 	}
+	credential, err := chat.NewCredential(cli.GetDB())
+	if err != nil {
+		return nil, err
+	}
 	userLoginRecord, err := chat.NewUserLoginRecord(cli.GetDB())
 	if err != nil {
 		return nil, err
@@ -90,6 +94,7 @@ func NewChatDatabase(cli *mongoutil.Client) (ChatDatabaseInterface, error) {
 		register:         register,
 		account:          account,
 		attribute:        attribute,
+		credential:       credential,
 		userLoginRecord:  userLoginRecord,
 		verifyCode:       verifyCode,
 		forbiddenAccount: forbiddenAccount,
@@ -101,6 +106,7 @@ type ChatDatabase struct {
 	register         chatdb.RegisterInterface
 	account          chatdb.AccountInterface
 	attribute        chatdb.AttributeInterface
+	credential       chatdb.CredentialInterface
 	userLoginRecord  chatdb.UserLoginRecordInterface
 	verifyCode       chatdb.VerifyCodeInterface
 	forbiddenAccount admin.ForbiddenAccountInterface
