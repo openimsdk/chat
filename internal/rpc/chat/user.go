@@ -16,6 +16,9 @@ package chat
 
 import (
 	"context"
+	"github.com/openimsdk/tools/utils/datautil"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/openimsdk/chat/pkg/common/db/dbutil"
@@ -185,8 +188,8 @@ func (o *chatSvr) AddUserAccount(ctx context.Context, req *chat.AddUserAccountRe
 		return nil, err
 	}
 
-	if err := o.checkTheUniqueness(ctx, req); err != nil {
-		return nil, err
+	if req.User.Email == "" && !(req.User.PhoneNumber != "" && req.User.AreaCode != "") && req.User.Account == "" {
+		return nil, errs.ErrArgs.WrapMsg("at least one valid account is required")
 	}
 
 	if req.User.UserID == "" {
@@ -205,6 +208,65 @@ func (o *chatSvr) AddUserAccount(ctx context.Context, req *chat.AddUserAccountRe
 		if req.User.UserID == "" {
 			return nil, errs.ErrInternalServer.WrapMsg("gen user id failed")
 		}
+	}
+
+	var (
+		credentials     []*chatdb.Credential
+		allowChangeRule = datautil.If(req.User.UserType == constant.CommonUser, true, false)
+	)
+
+	if req.User.PhoneNumber != "" {
+		if !strings.HasPrefix(req.User.AreaCode, "+") {
+			req.User.AreaCode = "+" + req.User.AreaCode
+		}
+		if _, err := strconv.ParseUint(req.User.AreaCode[1:], 10, 64); err != nil {
+			return nil, errs.ErrArgs.WrapMsg("area code must be number")
+		}
+		if _, err := strconv.ParseUint(req.User.PhoneNumber, 10, 64); err != nil {
+			return nil, errs.ErrArgs.WrapMsg("phone number must be number")
+		}
+		_, err := o.Database.TakeAttributeByPhone(ctx, req.User.AreaCode, req.User.PhoneNumber)
+		if err == nil {
+			return nil, eerrs.ErrPhoneAlreadyRegister.Wrap()
+		} else if !dbutil.IsDBNotFound(err) {
+			return nil, err
+		}
+		credentials = append(credentials, &chatdb.Credential{
+			UserID:      req.User.UserID,
+			Account:     req.User.AreaCode + " " + req.User.PhoneNumber,
+			Type:        constant.CredentialPhone,
+			AllowChange: allowChangeRule,
+		})
+	}
+
+	if req.User.Account != "" {
+		_, err := o.Database.TakeAttributeByAccount(ctx, req.User.Account)
+		if err == nil {
+			return nil, eerrs.ErrAccountAlreadyRegister.Wrap()
+		} else if !dbutil.IsDBNotFound(err) {
+			return nil, err
+		}
+		credentials = append(credentials, &chatdb.Credential{
+			UserID:      req.User.UserID,
+			Account:     req.User.Account,
+			Type:        constant.CredentialAccount,
+			AllowChange: allowChangeRule,
+		})
+	}
+
+	if req.User.Email != "" {
+		_, err := o.Database.TakeAttributeByEmail(ctx, req.User.Email)
+		if err == nil {
+			return nil, eerrs.ErrEmailAlreadyRegister.Wrap()
+		} else if !dbutil.IsDBNotFound(err) {
+			return nil, err
+		}
+		credentials = append(credentials, &chatdb.Credential{
+			UserID:      req.User.UserID,
+			Account:     req.User.Email,
+			Type:        constant.CredentialEmail,
+			AllowChange: allowChangeRule,
+		})
 	}
 
 	register := &chatdb.Register{
@@ -240,10 +302,14 @@ func (o *chatSvr) AddUserAccount(ctx context.Context, req *chat.AddUserAccountRe
 		AllowAddFriend: constant.DefaultAllowAddFriend,
 	}
 
-	if err := o.Database.RegisterUser(ctx, register, account, attribute); err != nil {
+	if req.User.UserType == constant.OrgUser {
+		attribute.EnglishName = req.User.EnglishName.GetValuePtr()
+		attribute.Station = req.User.Station.GetValuePtr()
+		attribute.Telephone = req.User.Telephone.GetValuePtr()
+	}
+	if err := o.Database.RegisterUser(ctx, register, account, attribute, credentials); err != nil {
 		return nil, err
 	}
-
 	return &chat.AddUserAccountResp{}, nil
 }
 
@@ -337,25 +403,6 @@ func (o *chatSvr) SearchUserInfo(ctx context.Context, req *chat.SearchUserInfoRe
 		Total: uint32(total),
 		Users: DbToPbUserFullInfos(list),
 	}, nil
-}
-
-func (o *chatSvr) checkTheUniqueness(ctx context.Context, req *chat.AddUserAccountReq) error {
-	if req.User.PhoneNumber != "" {
-		_, err := o.Database.TakeAttributeByPhone(ctx, req.User.AreaCode, req.User.PhoneNumber)
-		if err == nil {
-			return eerrs.ErrPhoneAlreadyRegister.Wrap()
-		} else if !dbutil.IsDBNotFound(err) {
-			return err
-		}
-	} else {
-		_, err := o.Database.TakeAttributeByEmail(ctx, req.User.Email)
-		if err == nil {
-			return eerrs.ErrEmailAlreadyRegister.Wrap()
-		} else if !dbutil.IsDBNotFound(err) {
-			return err
-		}
-	}
-	return nil
 }
 
 func (o *chatSvr) CheckUserExist(ctx context.Context, req *chat.CheckUserExistReq) (resp *chat.CheckUserExistResp, err error) {

@@ -33,3 +33,5 @@ liveKit:
   url: "ws://127.0.0.1:7880" # LIVEKIT_URL, LiveKit server address and port
   key: "APIGPW3gnFTzqHH"
   secret: "23ztfSqsfQ8hKkHzHTl3Z4bvaxro0snjk5jwbp5p6Q3"
+
+allowRegister: true

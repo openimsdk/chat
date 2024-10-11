@@ -72,7 +72,7 @@ func (o *Api) AdminLogin(c *gin.Context) {
 		return
 	}
 	imAdminUserID := o.GetDefaultIMAdminUserID()
-	imToken, err := o.imApiCaller.GetAdminToken(c, imAdminUserID)
+	imToken, err := o.imApiCaller.ImAdminTokenWithDefaultAdmin(c)
 	if err != nil {
 		apiresp.GinError(c, err)
 		return

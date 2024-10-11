@@ -145,6 +145,7 @@ type Chat struct {
 		Key    string `mapstructure:"key"`
 		Secret string `mapstructure:"secret"`
 	} `mapstructure:"liveKit"`
+	AllowRegister bool `mapstructure:"allowRegister"`
 }
 
 type Admin struct {

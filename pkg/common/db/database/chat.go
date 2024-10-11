@@ -45,7 +45,7 @@ type ChatDatabaseInterface interface {
 	UpdateVerifyCodeIncrCount(ctx context.Context, id string) error
 	TakeLastVerifyCode(ctx context.Context, account string) (*chatdb.VerifyCode, error)
 	DelVerifyCode(ctx context.Context, id string) error
-	RegisterUser(ctx context.Context, register *chatdb.Register, account *chatdb.Account, attribute *chatdb.Attribute) error
+	RegisterUser(ctx context.Context, register *chatdb.Register, account *chatdb.Account, attribute *chatdb.Attribute, credentials []*chatdb.Credential) error
 	GetAccount(ctx context.Context, userID string) (*chatdb.Account, error)
 	GetAttribute(ctx context.Context, userID string) (*chatdb.Attribute, error)
 	GetAttributeByAccount(ctx context.Context, account string) (*chatdb.Attribute, error)
@@ -185,7 +185,7 @@ func (o *ChatDatabase) DelVerifyCode(ctx context.Context, id string) error {
 	return o.verifyCode.Delete(ctx, id)
 }
 
-func (o *ChatDatabase) RegisterUser(ctx context.Context, register *chatdb.Register, account *chatdb.Account, attribute *chatdb.Attribute) error {
+func (o *ChatDatabase) RegisterUser(ctx context.Context, register *chatdb.Register, account *chatdb.Account, attribute *chatdb.Attribute, credentials []*chatdb.Credential) error {
 	return o.tx.Transaction(ctx, func(ctx context.Context) error {
 		if err := o.register.Create(ctx, register); err != nil {
 			return err
@@ -194,6 +194,9 @@ func (o *ChatDatabase) RegisterUser(ctx context.Context, register *chatdb.Regist
 			return err
 		}
 		if err := o.attribute.Create(ctx, attribute); err != nil {
+			return err
+		}
+		if err := o.credential.Create(ctx, credentials...); err != nil {
 			return err
 		}
 		return nil

@@ -248,13 +248,17 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 	if req.User == nil {
 		return nil, errs.ErrArgs.WrapMsg("user is nil")
 	}
-	if req.User.Email == "" {
-		if (req.User.AreaCode == "" && req.User.PhoneNumber != "") || (req.User.AreaCode != "" && req.User.PhoneNumber == "") {
-			return nil, errs.ErrArgs.WrapMsg("area code or phone number error, no email provide")
-		}
+	if req.User.Email == "" && !(req.User.PhoneNumber != "" && req.User.AreaCode != "") && (!isAdmin || req.User.Account == "") {
+		return nil, errs.ErrArgs.WrapMsg("at least one valid account is required")
 	}
 	var usedInvitationCode bool
 	if !isAdmin {
+		if !o.AllowRegister {
+			return nil, errs.ErrNoPermission.WrapMsg("register user is disabled")
+		}
+		if req.User.UserType != constant.CommonUser {
+			return nil, errs.ErrNoPermission.WrapMsg("can only register common user")
+		}
 		if req.User.UserID != "" {
 			return nil, errs.ErrNoPermission.WrapMsg("only admin can set user id")
 		}
@@ -308,7 +312,12 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 			return nil, err
 		}
 	}
-	var registerType int32
+	var (
+		credentials     []*chatdb.Credential
+		allowChangeRule = datautil.If(req.User.UserType == constant.CommonUser, true, false)
+		registerType    int32
+	)
+
 	if req.User.PhoneNumber != "" {
 		if req.User.AreaCode[0] != '+' {
 			req.User.AreaCode = "+" + req.User.AreaCode
@@ -326,6 +335,12 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 			return nil, err
 		}
 		registerType = constant.PhoneRegister
+		credentials = append(credentials, &chatdb.Credential{
+			UserID:      req.User.UserID,
+			Account:     req.User.AreaCode + " " + req.User.PhoneNumber,
+			Type:        constant.CredentialPhone,
+			AllowChange: allowChangeRule,
+		})
 	}
 
 	if req.User.Account != "" {
@@ -335,6 +350,12 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 		} else if !dbutil.IsDBNotFound(err) {
 			return nil, err
 		}
+		credentials = append(credentials, &chatdb.Credential{
+			UserID:      req.User.UserID,
+			Account:     req.User.Account,
+			Type:        constant.CredentialAccount,
+			AllowChange: allowChangeRule,
+		})
 	}
 
 	if req.User.Email != "" {
@@ -345,6 +366,12 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 		} else if !dbutil.IsDBNotFound(err) {
 			return nil, err
 		}
+		credentials = append(credentials, &chatdb.Credential{
+			UserID:      req.User.UserID,
+			Account:     req.User.Email,
+			Type:        constant.CredentialEmail,
+			AllowChange: allowChangeRule,
+		})
 	}
 	register := &chatdb.Register{
 		UserID:      req.User.UserID,
@@ -362,6 +389,7 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 		ChangeTime:     register.CreateTime,
 		CreateTime:     register.CreateTime,
 	}
+
 	attribute := &chatdb.Attribute{
 		UserID:         req.User.UserID,
 		Account:        req.User.Account,
@@ -379,7 +407,12 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 		AllowAddFriend: constant.DefaultAllowAddFriend,
 		RegisterType:   registerType,
 	}
-	if err := o.Database.RegisterUser(ctx, register, account, attribute); err != nil {
+	if req.User.UserType == constant.OrgUser {
+		attribute.EnglishName = req.User.EnglishName.GetValuePtr()
+		attribute.Station = req.User.Station.GetValuePtr()
+		attribute.Telephone = req.User.Telephone.GetValuePtr()
+	}
+	if err := o.Database.RegisterUser(ctx, register, account, attribute, credentials); err != nil {
 		return nil, err
 	}
 	if usedInvitationCode {
