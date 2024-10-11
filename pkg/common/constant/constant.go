@@ -111,3 +111,9 @@ const (
 	EmailRegister = 1
 	PhoneRegister = 2
 )
+
+const (
+	GenderFemale  = 0 // female
+	GenderMale    = 1 // male
+	GenderUnknown = 2 // unknown
+)
