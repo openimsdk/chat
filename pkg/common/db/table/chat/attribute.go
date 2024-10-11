@@ -40,10 +40,9 @@ type Attribute struct {
 	GlobalRecvMsgOpt int32     `bson:"global_recv_msg_opt"`
 	RegisterType     int32     `bson:"register_type"`
 	// tob
-	EnglishName string `bson:"column:english_name"`
-	Station     string `bson:"column:station"`
-	Telephone   string `bson:"column:telephone"`
-	Status      int32  `bson:"column:status"` //-1, 1
+	EnglishName *string `bson:"column:english_name"`
+	Station     *string `bson:"column:station"`
+	Telephone   *string `bson:"column:telephone"`
 }
 
 func (Attribute) TableName() string {
