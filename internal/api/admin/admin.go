@@ -571,3 +571,11 @@ func (o *Api) BatchImportTemplate(c *gin.Context) {
 	c.Header("ETag", md5Val)
 	c.Data(http.StatusOK, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", config.ImportTemplate)
 }
+
+func (o *Api) SetAllowRegister(c *gin.Context) {
+	a2r.Call(chat.ChatClient.SetAllowRegister, o.chatClient, c)
+}
+
+func (o *Api) GetAllowRegister(c *gin.Context) {
+	a2r.Call(chat.ChatClient.GetAllowRegister, o.chatClient, c)
+}
