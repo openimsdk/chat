@@ -51,6 +51,7 @@ type ChatDatabaseInterface interface {
 	GetAttributeByAccount(ctx context.Context, account string) (*chatdb.Attribute, error)
 	GetAttributeByPhone(ctx context.Context, areaCode string, phoneNumber string) (*chatdb.Attribute, error)
 	GetAttributeByEmail(ctx context.Context, email string) (*chatdb.Attribute, error)
+	GetCredentialByAccount(ctx context.Context, account string) (*chatdb.Credential, error)
 	LoginRecord(ctx context.Context, record *chatdb.UserLoginRecord, verifyCodeID *string) error
 	UpdatePassword(ctx context.Context, userID string, password string) error
 	UpdatePasswordAndDeleteVerifyCode(ctx context.Context, userID string, password string, codeID string) error
@@ -227,6 +228,10 @@ func (o *ChatDatabase) GetAttributeByPhone(ctx context.Context, areaCode string,
 
 func (o *ChatDatabase) GetAttributeByEmail(ctx context.Context, email string) (*chatdb.Attribute, error) {
 	return o.attribute.TakeEmail(ctx, email)
+}
+
+func (o *ChatDatabase) GetCredentialByAccount(ctx context.Context, account string) (*chatdb.Credential, error) {
+	return o.credential.TakeAccount(ctx, account)
 }
 
 func (o *ChatDatabase) LoginRecord(ctx context.Context, record *chatdb.UserLoginRecord, verifyCodeID *string) error {

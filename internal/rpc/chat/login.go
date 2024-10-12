@@ -50,7 +50,7 @@ func (o *chatSvr) SendVerifyCode(ctx context.Context, req *chat.SendVerifyCodeRe
 			if req.AreaCode == "" || req.PhoneNumber == "" {
 				return nil, errs.ErrArgs.WrapMsg("area code or phone number is empty")
 			}
-			if req.AreaCode[0] != '+' {
+			if !strings.HasPrefix(req.AreaCode, "+") {
 				req.AreaCode = "+" + req.AreaCode
 			}
 			if _, err := strconv.ParseUint(req.AreaCode[1:], 10, 64); err != nil {
@@ -319,7 +319,7 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 	)
 
 	if req.User.PhoneNumber != "" {
-		if req.User.AreaCode[0] != '+' {
+		if !strings.HasPrefix(req.User.AreaCode, "+") {
 			req.User.AreaCode = "+" + req.User.AreaCode
 		}
 		if _, err := strconv.ParseUint(req.User.AreaCode[1:], 10, 64); err != nil {
@@ -337,7 +337,7 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 		registerType = constant.PhoneRegister
 		credentials = append(credentials, &chatdb.Credential{
 			UserID:      req.User.UserID,
-			Account:     req.User.AreaCode + " " + req.User.PhoneNumber,
+			Account:     BuildCredentialPhone(req.User.AreaCode, req.User.PhoneNumber),
 			Type:        constant.CredentialPhone,
 			AllowChange: allowChangeRule,
 		})
@@ -438,33 +438,42 @@ func (o *chatSvr) Login(ctx context.Context, req *chat.LoginReq) (*chat.LoginRes
 	if req.Password == "" && req.VerifyCode == "" {
 		return nil, errs.ErrArgs.WrapMsg("password or code must be set")
 	}
-	var err error
-	var attribute *chatdb.Attribute
-	if req.Account != "" {
-		attribute, err = o.Database.GetAttributeByAccount(ctx, req.Account)
-	} else if req.PhoneNumber != "" {
+	if req.Password == "" {
+		return nil, errs.ErrArgs.WrapMsg("password must be set")
+	}
+	var (
+		err        error
+		credential *chatdb.Credential
+		acc        string
+	)
+
+	switch {
+	case req.Account != "":
+		acc = req.Account
+	case req.PhoneNumber != "":
 		if req.AreaCode == "" {
 			return nil, errs.ErrArgs.WrapMsg("area code must")
 		}
-		if req.AreaCode[0] != '+' {
+		if !strings.HasPrefix(req.AreaCode, "+") {
 			req.AreaCode = "+" + req.AreaCode
 		}
 		if _, err := strconv.ParseUint(req.AreaCode[1:], 10, 64); err != nil {
 			return nil, errs.ErrArgs.WrapMsg("area code must be number")
 		}
-		attribute, err = o.Database.GetAttributeByPhone(ctx, req.AreaCode, req.PhoneNumber)
-	} else if req.Email != "" {
-		attribute, err = o.Database.GetAttributeByEmail(ctx, req.Email)
-	} else {
-		err = errs.ErrArgs.WrapMsg("account or phone number or email must be set")
+		acc = BuildCredentialPhone(req.AreaCode, req.PhoneNumber)
+	case req.Email != "":
+		acc = req.Email
+	default:
+		return nil, errs.ErrArgs.WrapMsg("account or phone number or email must be set")
 	}
+	credential, err = o.Database.GetCredentialByAccount(ctx, acc)
 	if err != nil {
 		if dbutil.IsDBNotFound(err) {
 			return nil, eerrs.ErrAccountNotFound.WrapMsg("user unregistered")
 		}
 		return nil, err
 	}
-	if err := o.Admin.CheckLogin(ctx, attribute.UserID, req.Ip); err != nil {
+	if err := o.Admin.CheckLogin(ctx, credential.UserID, req.Ip); err != nil {
 		return nil, err
 	}
 	var verifyCodeID *string
@@ -483,7 +492,7 @@ func (o *chatSvr) Login(ctx context.Context, req *chat.LoginReq) (*chat.LoginRes
 			verifyCodeID = &id
 		}
 	} else {
-		account, err := o.Database.GetAccount(ctx, attribute.UserID)
+		account, err := o.Database.GetAccount(ctx, credential.UserID)
 		if err != nil {
 			return nil, err
 		}
@@ -491,12 +500,12 @@ func (o *chatSvr) Login(ctx context.Context, req *chat.LoginReq) (*chat.LoginRes
 			return nil, eerrs.ErrPassword.Wrap()
 		}
 	}
-	chatToken, err := o.Admin.CreateToken(ctx, attribute.UserID, constant.NormalUser)
+	chatToken, err := o.Admin.CreateToken(ctx, credential.UserID, constant.NormalUser)
 	if err != nil {
 		return nil, err
 	}
 	record := &chatdb.UserLoginRecord{
-		UserID:    attribute.UserID,
+		UserID:    credential.UserID,
 		LoginTime: time.Now(),
 		IP:        req.Ip,
 		DeviceID:  req.DeviceID,
@@ -510,7 +519,7 @@ func (o *chatSvr) Login(ctx context.Context, req *chat.LoginReq) (*chat.LoginRes
 			return nil, err
 		}
 	}
-	resp.UserID = attribute.UserID
+	resp.UserID = credential.UserID
 	resp.ChatToken = chatToken.Token
 	return resp, nil
 }
