@@ -16,8 +16,10 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/openimsdk/chat/pkg/common/config"
 	"path/filepath"
+
+	"github.com/openimsdk/chat/pkg/common/config"
+	"github.com/openimsdk/chat/version/version"
 
 	"github.com/openimsdk/tools/errs"
 	"github.com/openimsdk/tools/log"
@@ -117,16 +119,18 @@ func (r *RootCmd) applyOptions(opts ...func(*CmdOpts)) *CmdOpts {
 }
 
 func (r *RootCmd) initializeLogger(cmdOpts *CmdOpts) error {
-	err := log.InitFromConfig(
+	err := log.InitLoggerFromConfig(
 		cmdOpts.loggerPrefixName,
 		r.processName,
+		"", "",
 		r.log.RemainLogLevel,
 		r.log.IsStdout,
 		r.log.IsJson,
 		r.log.StorageLocation,
 		r.log.RemainRotationCount,
 		r.log.RotationTime,
-		config.Version,
+		version.Version,
+		r.log.IsSimplify,
 	)
 	if err != nil {
 		return errs.Wrap(err)
