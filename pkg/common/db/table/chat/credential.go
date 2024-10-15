@@ -19,7 +19,7 @@ func (Credential) TableName() string {
 type CredentialInterface interface {
 	Create(ctx context.Context, credential ...*Credential) error
 	Update(ctx context.Context, userID string, data map[string]any) error
-	Find(ctx context.Context, userIds []string) ([]*Credential, error)
+	Find(ctx context.Context, userID string) ([]*Credential, error)
 	FindAccount(ctx context.Context, accounts []string) ([]*Credential, error)
 	Search(ctx context.Context, keyword string, pagination pagination.Pagination) (int64, []*Credential, error)
 	TakeAccount(ctx context.Context, account string) (*Credential, error)

@@ -16,7 +16,11 @@ package chat
 
 import (
 	"context"
+	"errors"
+	"github.com/openimsdk/chat/pkg/eerrs"
+	"github.com/openimsdk/protocol/wrapperspb"
 	"github.com/openimsdk/tools/utils/datautil"
+	"github.com/openimsdk/tools/utils/stringutil"
 	"strconv"
 	"strings"
 	"time"
@@ -30,83 +34,119 @@ import (
 
 	"github.com/openimsdk/chat/pkg/common/constant"
 	"github.com/openimsdk/chat/pkg/common/mctx"
-	"github.com/openimsdk/chat/pkg/eerrs"
 	"github.com/openimsdk/chat/pkg/protocol/chat"
 	"github.com/openimsdk/tools/errs"
 )
 
 func (o *chatSvr) checkUpdateInfo(ctx context.Context, req *chat.UpdateUserInfoReq) error {
-	attribute, err := o.Database.TakeAttributeByUserID(ctx, req.UserID)
+	if req.AreaCode != nil || req.PhoneNumber != nil {
+		if !(req.AreaCode != nil && req.PhoneNumber != nil) {
+			return errs.ErrArgs.WrapMsg("areaCode and phoneNumber must be set together")
+		}
+		if req.AreaCode.Value == "" || req.PhoneNumber.Value == "" {
+			if req.AreaCode.Value != req.PhoneNumber.Value {
+				return errs.ErrArgs.WrapMsg("areaCode and phoneNumber must be set together")
+			}
+		}
+	}
+	if req.UserID == "" {
+		return errs.ErrArgs.WrapMsg("user id is empty")
+	}
+
+	credentials, err := o.Database.TakeCredentialsByUserID(ctx, req.UserID)
 	if err != nil {
 		return err
 	}
-	checkEmail := func() error {
-		if req.Email == nil {
-			return nil
-		}
-		if req.Email.Value == attribute.Email {
-			req.Email = nil
-			return nil
-		}
-		if req.Email.Value == "" {
-			if !(attribute.Account != "" || (attribute.AreaCode != "" && attribute.PhoneNumber != "")) {
-				return errs.ErrArgs.WrapMsg("a login method must exist")
-			}
-			return nil
-		} else {
-			if _, err := o.Database.GetAttributeByEmail(ctx, req.Email.Value); err == nil {
-				return errs.ErrDuplicateKey.WrapMsg("email already exists")
-			} else if !dbutil.IsDBNotFound(err) {
-				return err
+	var (
+		credNum, delNum, addNum = len(credentials), 0, 0
+	)
+
+	addFunc := func(s *wrapperspb.StringValue) {
+		if s != nil {
+			if s.Value != "" {
+				addNum++
 			}
 		}
-		return nil
 	}
-	checkPhone := func() error {
-		if req.AreaCode == nil {
-			return nil
-		}
-		if req.AreaCode.Value == attribute.AreaCode && req.PhoneNumber.Value == attribute.PhoneNumber {
-			req.AreaCode = nil
-			req.PhoneNumber = nil
-			return nil
-		}
-		if req.AreaCode.Value == "" || req.PhoneNumber.Value == "" {
-			if attribute.Email == "" || attribute.Account == "" {
-				return errs.ErrArgs.WrapMsg("a login method must exist")
-			}
-		} else {
-			if _, err := o.Database.GetAttributeByPhone(ctx, req.AreaCode.Value, req.PhoneNumber.Value); err == nil {
-				return errs.ErrDuplicateKey.WrapMsg("phone number already exists")
-			} else if !dbutil.IsDBNotFound(err) {
-				return err
-			}
-		}
-		return nil
+
+	for _, s := range []*wrapperspb.StringValue{req.Account, req.PhoneNumber, req.Email} {
+		addFunc(s)
 	}
-	checkAccount := func() error {
-		if req.Account == nil {
-			return nil
-		}
-		if req.Account.Value == attribute.Account {
-			req.Account = nil
-			return nil
-		}
-		if req.Account.Value == "" {
-			if !(attribute.Email == "" && (attribute.AreaCode == "" || attribute.PhoneNumber == "")) {
-				return errs.ErrArgs.WrapMsg("a login method must exist")
+
+	for _, credential := range credentials {
+		switch credential.Type {
+		case constant.CredentialAccount:
+			if req.Account != nil {
+				if req.Account.Value == credential.Account {
+					req.Account = nil
+				} else if req.Account.Value == "" {
+					delNum += 1
+				}
+				return nil
 			}
-		} else {
-			if _, err := o.Database.GetAttributeByAccount(ctx, req.Account.Value); err == nil {
-				return errs.ErrDuplicateKey.WrapMsg("account already exists")
-			} else if !dbutil.IsDBNotFound(err) {
-				return err
+		case constant.CredentialPhone:
+			if req.PhoneNumber != nil {
+				phoneAccount := BuildCredentialPhone(req.AreaCode.Value, req.PhoneNumber.Value)
+				if phoneAccount == credential.Account {
+					req.AreaCode = nil
+					req.PhoneNumber = nil
+				} else if req.PhoneNumber.Value == "" {
+					delNum += 1
+				}
+				return nil
+			}
+		case constant.CredentialEmail:
+			if req.Email != nil {
+				if req.Email.Value == credential.Account {
+					req.Email = nil
+				} else if req.Email.Value == "" {
+					delNum += 1
+				}
+				return nil
 			}
 		}
-		return nil
 	}
-	for _, fn := range []func() error{checkEmail, checkPhone, checkAccount} {
-		if err := fn(); err != nil {
+
+	if addNum+credNum-delNum <= 0 {
+		return errs.ErrArgs.WrapMsg("a login method must exist")
+	}
+
+	if req.PhoneNumber.GetValue() != "" {
+		if !strings.HasPrefix(req.AreaCode.GetValue(), "+") {
+			req.AreaCode.Value = "+" + req.AreaCode.Value
+		}
+		if _, err := strconv.ParseUint(req.AreaCode.Value[1:], 10, 64); err != nil {
+			return errs.ErrArgs.WrapMsg("area code must be number")
+		}
+		if _, err := strconv.ParseUint(req.PhoneNumber.GetValue(), 10, 64); err != nil {
+			return errs.ErrArgs.WrapMsg("phone number must be number")
+		}
+		_, err := o.Database.TakeAttributeByPhone(ctx, req.AreaCode.GetValue(), req.PhoneNumber.GetValue())
+		if err == nil {
+			return eerrs.ErrPhoneAlreadyRegister.Wrap()
+		} else if !dbutil.IsDBNotFound(err) {
+			return err
+		}
+	}
+	if req.Account.GetValue() != "" {
+		if !stringutil.IsAlphanumeric(req.Account.GetValue()) {
+			return errs.ErrArgs.WrapMsg("account must be alphanumeric")
+		}
+		_, err := o.Database.TakeAttributeByAccount(ctx, req.Account.GetValue())
+		if err == nil {
+			return eerrs.ErrAccountAlreadyRegister.Wrap()
+		} else if !dbutil.IsDBNotFound(err) {
+			return err
+		}
+	}
+	if req.Email.GetValue() != "" {
+		if !stringutil.IsValidEmail(req.Email.GetValue()) {
+			return errs.ErrArgs.WrapMsg("invalid email")
+		}
+		_, err := o.Database.TakeAttributeByAccount(ctx, req.Email.GetValue())
+		if err == nil {
+			return eerrs.ErrAccountAlreadyRegister.Wrap()
+		} else if !dbutil.IsDBNotFound(err) {
 			return err
 		}
 	}
@@ -114,56 +154,84 @@ func (o *chatSvr) checkUpdateInfo(ctx context.Context, req *chat.UpdateUserInfoR
 }
 
 func (o *chatSvr) UpdateUserInfo(ctx context.Context, req *chat.UpdateUserInfoReq) (*chat.UpdateUserInfoResp, error) {
-	if req.AreaCode != nil || req.PhoneNumber != nil {
-		if !(req.AreaCode != nil && req.PhoneNumber != nil) {
-			return nil, errs.ErrArgs.WrapMsg("areaCode and phoneNumber must be set together")
-		}
-		if req.AreaCode.Value == "" || req.PhoneNumber.Value == "" {
-			if req.AreaCode.Value != req.PhoneNumber.Value {
-				return nil, errs.ErrArgs.WrapMsg("areaCode and phoneNumber must be set together")
-			}
-		}
-	}
+
 	opUserID, userType, err := mctx.Check(ctx)
 	if err != nil {
 		return nil, err
 	}
-	if req.UserID == "" {
-		return nil, errs.ErrArgs.WrapMsg("user id is empty")
+
+	if err = o.checkUpdateInfo(ctx, req); err != nil {
+		return nil, err
 	}
+
+	isOrgUser, err := o.Database.IsOrgUser(ctx, req.UserID)
+	if err != nil {
+		return nil, err
+	}
+
 	switch userType {
 	case constant.NormalUser:
-		//if req.UserID == "" {
-		//	req.UserID = opUserID
-		//}
-		if req.UserID != opUserID {
-			return nil, errs.ErrNoPermission.WrapMsg("only admin can update other user info")
+		if isOrgUser {
+			if req.UserID != opUserID {
+				return nil, errs.ErrNoPermission.WrapMsg("only admin can update other user info")
+			}
+			if req.AreaCode != nil {
+				return nil, errs.ErrNoPermission.WrapMsg("areaCode can not be updated")
+			}
+			if req.PhoneNumber != nil {
+				return nil, errs.ErrNoPermission.WrapMsg("phoneNumber can not be updated")
+			}
+			if req.Account != nil {
+				return nil, errs.ErrNoPermission.WrapMsg("account can not be updated")
+			}
+			if req.Email != nil {
+				return nil, errs.ErrNoPermission.WrapMsg("email can not be updated")
+			}
+			if req.Level != nil {
+				return nil, errs.ErrNoPermission.WrapMsg("level can not be updated")
+			}
+
+			if req.Nickname != nil {
+				return nil, errs.ErrNoPermission.WrapMsg("nickname can not be updated")
+			}
+			if req.FaceURL != nil {
+				return nil, errs.ErrNoPermission.WrapMsg("faceURL can not be updated")
+			}
+			if req.Gender != nil {
+				return nil, errs.ErrNoPermission.WrapMsg("gender can not be updated")
+			}
+			if req.Birth != nil {
+				return nil, errs.ErrNoPermission.WrapMsg("birth can not be updated")
+			}
+			if req.EnglishName != nil {
+				return nil, errs.ErrNoPermission.WrapMsg("englishName can not be updated")
+			}
+			if req.Station != nil {
+				return nil, errs.ErrNoPermission.WrapMsg("station can not be updated")
+			}
+			if req.Telephone != nil {
+				return nil, errs.ErrNoPermission.WrapMsg("telephone can not be updated")
+			}
 		}
-		if req.AreaCode != nil {
-			return nil, errs.ErrNoPermission.WrapMsg("areaCode can not be updated")
+		if req.RegisterType != nil {
+			return nil, errs.ErrNoPermission.WrapMsg("registerType can not be updated")
 		}
-		if req.PhoneNumber != nil {
-			return nil, errs.ErrNoPermission.WrapMsg("phoneNumber can not be updated")
-		}
-		if req.Account != nil {
-			return nil, errs.ErrNoPermission.WrapMsg("account can not be updated")
-		}
-		if req.Level != nil {
-			return nil, errs.ErrNoPermission.WrapMsg("level can not be updated")
-		}
+
 	case constant.AdminUser:
 	default:
 		return nil, errs.ErrNoPermission.WrapMsg("user type error")
 	}
-	if err := o.checkUpdateInfo(ctx, req); err != nil {
+
+	update, err := ToDBAttributeUpdate(req, isOrgUser)
+	if err != nil {
 		return nil, err
 	}
-	update, err := ToDBAttributeUpdate(req)
+	credUpdate, credDel, err := ToDBCredentialUpdate(req, !isOrgUser)
 	if err != nil {
 		return nil, err
 	}
 	if len(update) > 0 {
-		if err := o.Database.UpdateUseInfo(ctx, req.UserID, update); err != nil {
+		if err := o.Database.UpdateUseInfo(ctx, req.UserID, update, credUpdate, credDel); err != nil {
 			return nil, err
 		}
 	}
@@ -188,8 +256,8 @@ func (o *chatSvr) AddUserAccount(ctx context.Context, req *chat.AddUserAccountRe
 		return nil, err
 	}
 
-	if req.User.Email == "" && !(req.User.PhoneNumber != "" && req.User.AreaCode != "") && req.User.Account == "" {
-		return nil, errs.ErrArgs.WrapMsg("at least one valid account is required")
+	if err := o.checkRegisterInfo(ctx, req.User, true); err != nil {
+		return nil, err
 	}
 
 	if req.User.UserID == "" {
@@ -208,6 +276,13 @@ func (o *chatSvr) AddUserAccount(ctx context.Context, req *chat.AddUserAccountRe
 		if req.User.UserID == "" {
 			return nil, errs.ErrInternalServer.WrapMsg("gen user id failed")
 		}
+	} else {
+		_, err := o.Database.GetUser(ctx, req.User.UserID)
+		if err == nil {
+			return nil, errs.ErrArgs.WrapMsg("appoint user id already register")
+		} else if !dbutil.IsDBNotFound(err) {
+			return nil, err
+		}
 	}
 
 	var (
@@ -216,36 +291,15 @@ func (o *chatSvr) AddUserAccount(ctx context.Context, req *chat.AddUserAccountRe
 	)
 
 	if req.User.PhoneNumber != "" {
-		if !strings.HasPrefix(req.User.AreaCode, "+") {
-			req.User.AreaCode = "+" + req.User.AreaCode
-		}
-		if _, err := strconv.ParseUint(req.User.AreaCode[1:], 10, 64); err != nil {
-			return nil, errs.ErrArgs.WrapMsg("area code must be number")
-		}
-		if _, err := strconv.ParseUint(req.User.PhoneNumber, 10, 64); err != nil {
-			return nil, errs.ErrArgs.WrapMsg("phone number must be number")
-		}
-		_, err := o.Database.TakeAttributeByPhone(ctx, req.User.AreaCode, req.User.PhoneNumber)
-		if err == nil {
-			return nil, eerrs.ErrPhoneAlreadyRegister.Wrap()
-		} else if !dbutil.IsDBNotFound(err) {
-			return nil, err
-		}
 		credentials = append(credentials, &chatdb.Credential{
 			UserID:      req.User.UserID,
-			Account:     req.User.AreaCode + " " + req.User.PhoneNumber,
+			Account:     BuildCredentialPhone(req.User.AreaCode, req.User.PhoneNumber),
 			Type:        constant.CredentialPhone,
 			AllowChange: allowChangeRule,
 		})
 	}
 
 	if req.User.Account != "" {
-		_, err := o.Database.TakeAttributeByAccount(ctx, req.User.Account)
-		if err == nil {
-			return nil, eerrs.ErrAccountAlreadyRegister.Wrap()
-		} else if !dbutil.IsDBNotFound(err) {
-			return nil, err
-		}
 		credentials = append(credentials, &chatdb.Credential{
 			UserID:      req.User.UserID,
 			Account:     req.User.Account,
@@ -255,12 +309,6 @@ func (o *chatSvr) AddUserAccount(ctx context.Context, req *chat.AddUserAccountRe
 	}
 
 	if req.User.Email != "" {
-		_, err := o.Database.TakeAttributeByEmail(ctx, req.User.Email)
-		if err == nil {
-			return nil, eerrs.ErrEmailAlreadyRegister.Wrap()
-		} else if !dbutil.IsDBNotFound(err) {
-			return nil, err
-		}
 		credentials = append(credentials, &chatdb.Credential{
 			UserID:      req.User.UserID,
 			Account:     req.User.Email,
@@ -303,9 +351,9 @@ func (o *chatSvr) AddUserAccount(ctx context.Context, req *chat.AddUserAccountRe
 	}
 
 	if req.User.UserType == constant.OrgUser {
-		attribute.EnglishName = req.User.EnglishName.GetValuePtr()
-		attribute.Station = req.User.Station.GetValuePtr()
-		attribute.Telephone = req.User.Telephone.GetValuePtr()
+		attribute.EnglishName = datautil.ToPtr(req.User.EnglishName.GetValue())
+		attribute.Station = datautil.ToPtr(req.User.Station.GetValue())
+		attribute.Telephone = datautil.ToPtr(req.User.Telephone.GetValue())
 	}
 	if err := o.Database.RegisterUser(ctx, register, account, attribute, credentials); err != nil {
 		return nil, err
@@ -324,6 +372,23 @@ func (o *chatSvr) SearchUserPublicInfo(ctx context.Context, req *chat.SearchUser
 	return &chat.SearchUserPublicInfoResp{
 		Total: uint32(total),
 		Users: DbToPbAttributes(list),
+	}, nil
+}
+
+func (o *chatSvr) SearchUserID(ctx context.Context, req *chat.SearchUserIDReq) (*chat.SearchUserIDResp, error) {
+	if req.Pagination == nil {
+		return nil, errs.ErrArgs.WrapMsg("pagination is nil")
+	}
+	if _, _, err := mctx.Check(ctx); err != nil {
+		return nil, err
+	}
+	total, userIDs, err := o.Database.SearchID(ctx, req.Keyword, req.OrUserIDs, req.Pagination)
+	if err != nil {
+		return nil, err
+	}
+	return &chat.SearchUserIDResp{
+		Total:   uint32(total),
+		UserIDs: userIDs,
 	}, nil
 }
 
@@ -406,32 +471,41 @@ func (o *chatSvr) SearchUserInfo(ctx context.Context, req *chat.SearchUserInfoRe
 }
 
 func (o *chatSvr) CheckUserExist(ctx context.Context, req *chat.CheckUserExistReq) (resp *chat.CheckUserExistResp, err error) {
+	if req.User == nil {
+		return nil, errs.ErrArgs.WrapMsg("user is nil")
+	}
 	if req.User.PhoneNumber != "" {
-		attributeByPhone, err := o.Database.TakeAttributeByPhone(ctx, req.User.AreaCode, req.User.PhoneNumber)
+		account, err := o.Database.TakeCredentialByAccount(ctx, BuildCredentialPhone(req.User.AreaCode, req.User.PhoneNumber))
 		// err != nil is not found User
-		if err != nil && errs.Unwrap(err) != mongo.ErrNoDocuments {
+		if err != nil && !errors.Is(err, mongo.ErrNoDocuments) {
 			return nil, err
 		}
-		if attributeByPhone != nil {
-			log.ZDebug(ctx, "Check Number is ", attributeByPhone.PhoneNumber)
-			log.ZDebug(ctx, "Check userID is ", attributeByPhone.UserID)
-			if attributeByPhone.PhoneNumber == req.User.PhoneNumber {
-				return &chat.CheckUserExistResp{Userid: attributeByPhone.UserID, IsRegistered: true}, nil
-			}
+		if account != nil {
+			log.ZDebug(ctx, "Check Number is ", account.Account)
+			log.ZDebug(ctx, "Check userID is ", account.UserID)
+			return &chat.CheckUserExistResp{Userid: account.UserID, IsRegistered: true}, nil
 		}
-	} else {
-		if req.User.Email != "" {
-			attributeByEmail, err := o.Database.TakeAttributeByEmail(ctx, req.User.Email)
-			if err != nil && errs.Unwrap(err) != mongo.ErrNoDocuments {
-				return nil, err
-			}
-			if attributeByEmail != nil {
-				log.ZDebug(ctx, "Check email is ", attributeByEmail.Email)
-				log.ZDebug(ctx, "Check userID is ", attributeByEmail.UserID)
-				if attributeByEmail.Email == req.User.Email {
-					return &chat.CheckUserExistResp{Userid: attributeByEmail.UserID, IsRegistered: true}, nil
-				}
-			}
+	}
+	if req.User.Email != "" {
+		account, err := o.Database.TakeCredentialByAccount(ctx, req.User.AreaCode)
+		if err != nil && !errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, err
+		}
+		if account != nil {
+			log.ZDebug(ctx, "Check email is ", account.Account)
+			log.ZDebug(ctx, "Check userID is ", account.UserID)
+			return &chat.CheckUserExistResp{Userid: account.UserID, IsRegistered: true}, nil
+		}
+	}
+	if req.User.Account != "" {
+		account, err := o.Database.TakeCredentialByAccount(ctx, req.User.Account)
+		if err != nil && !errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, err
+		}
+		if account != nil {
+			log.ZDebug(ctx, "Check account is ", account.Account)
+			log.ZDebug(ctx, "Check userID is ", account.UserID)
+			return &chat.CheckUserExistResp{Userid: account.UserID, IsRegistered: true}, nil
 		}
 	}
 	return nil, nil

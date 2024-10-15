@@ -47,8 +47,8 @@ func (o *Credential) Update(ctx context.Context, userID string, data map[string]
 	return mongoutil.UpdateOne(ctx, o.coll, bson.M{"user_id": userID}, bson.M{"$set": data}, false)
 }
 
-func (o *Credential) Find(ctx context.Context, userIds []string) ([]*chat.Credential, error) {
-	return mongoutil.Find[*chat.Credential](ctx, o.coll, bson.M{"user_id": bson.M{"$in": userIds}})
+func (o *Credential) Find(ctx context.Context, userID string) ([]*chat.Credential, error) {
+	return mongoutil.Find[*chat.Credential](ctx, o.coll, bson.M{"user_id": userID})
 }
 
 func (o *Credential) FindAccount(ctx context.Context, accounts []string) ([]*chat.Credential, error) {
