@@ -56,6 +56,8 @@ func (o *chatSvr) checkUpdateInfo(ctx context.Context, req *chat.UpdateUserInfoR
 	credentials, err := o.Database.TakeCredentialsByUserID(ctx, req.UserID)
 	if err != nil {
 		return err
+	} else if len(credentials) == 0 {
+		return errs.ErrArgs.WrapMsg("user not found")
 	}
 	var (
 		credNum, delNum, addNum = len(credentials), 0, 0
@@ -82,7 +84,6 @@ func (o *chatSvr) checkUpdateInfo(ctx context.Context, req *chat.UpdateUserInfoR
 				} else if req.Account.Value == "" {
 					delNum += 1
 				}
-				return nil
 			}
 		case constant.CredentialPhone:
 			if req.PhoneNumber != nil {
@@ -93,7 +94,6 @@ func (o *chatSvr) checkUpdateInfo(ctx context.Context, req *chat.UpdateUserInfoR
 				} else if req.PhoneNumber.Value == "" {
 					delNum += 1
 				}
-				return nil
 			}
 		case constant.CredentialEmail:
 			if req.Email != nil {
@@ -102,7 +102,6 @@ func (o *chatSvr) checkUpdateInfo(ctx context.Context, req *chat.UpdateUserInfoR
 				} else if req.Email.Value == "" {
 					delNum += 1
 				}
-				return nil
 			}
 		}
 	}
@@ -121,7 +120,7 @@ func (o *chatSvr) checkUpdateInfo(ctx context.Context, req *chat.UpdateUserInfoR
 		if _, err := strconv.ParseUint(req.PhoneNumber.GetValue(), 10, 64); err != nil {
 			return errs.ErrArgs.WrapMsg("phone number must be number")
 		}
-		_, err := o.Database.TakeAttributeByPhone(ctx, req.AreaCode.GetValue(), req.PhoneNumber.GetValue())
+		_, err := o.Database.TakeCredentialByAccount(ctx, BuildCredentialPhone(req.AreaCode.GetValue(), req.PhoneNumber.GetValue()))
 		if err == nil {
 			return eerrs.ErrPhoneAlreadyRegister.Wrap()
 		} else if !dbutil.IsDBNotFound(err) {
@@ -132,7 +131,7 @@ func (o *chatSvr) checkUpdateInfo(ctx context.Context, req *chat.UpdateUserInfoR
 		if !stringutil.IsAlphanumeric(req.Account.GetValue()) {
 			return errs.ErrArgs.WrapMsg("account must be alphanumeric")
 		}
-		_, err := o.Database.TakeAttributeByAccount(ctx, req.Account.GetValue())
+		_, err := o.Database.TakeCredentialByAccount(ctx, req.Account.GetValue())
 		if err == nil {
 			return eerrs.ErrAccountAlreadyRegister.Wrap()
 		} else if !dbutil.IsDBNotFound(err) {
@@ -143,7 +142,7 @@ func (o *chatSvr) checkUpdateInfo(ctx context.Context, req *chat.UpdateUserInfoR
 		if !stringutil.IsValidEmail(req.Email.GetValue()) {
 			return errs.ErrArgs.WrapMsg("invalid email")
 		}
-		_, err := o.Database.TakeAttributeByAccount(ctx, req.Email.GetValue())
+		_, err := o.Database.TakeCredentialByAccount(ctx, req.Email.GetValue())
 		if err == nil {
 			return eerrs.ErrAccountAlreadyRegister.Wrap()
 		} else if !dbutil.IsDBNotFound(err) {
@@ -154,7 +153,6 @@ func (o *chatSvr) checkUpdateInfo(ctx context.Context, req *chat.UpdateUserInfoR
 }
 
 func (o *chatSvr) UpdateUserInfo(ctx context.Context, req *chat.UpdateUserInfoReq) (*chat.UpdateUserInfoResp, error) {
-
 	opUserID, userType, err := mctx.Check(ctx)
 	if err != nil {
 		return nil, err
@@ -172,9 +170,6 @@ func (o *chatSvr) UpdateUserInfo(ctx context.Context, req *chat.UpdateUserInfoRe
 	switch userType {
 	case constant.NormalUser:
 		if isOrgUser {
-			if req.UserID != opUserID {
-				return nil, errs.ErrNoPermission.WrapMsg("only admin can update other user info")
-			}
 			if req.AreaCode != nil {
 				return nil, errs.ErrNoPermission.WrapMsg("areaCode can not be updated")
 			}
@@ -215,6 +210,9 @@ func (o *chatSvr) UpdateUserInfo(ctx context.Context, req *chat.UpdateUserInfoRe
 		}
 		if req.RegisterType != nil {
 			return nil, errs.ErrNoPermission.WrapMsg("registerType can not be updated")
+		}
+		if req.UserID != opUserID {
+			return nil, errs.ErrNoPermission.WrapMsg("only admin can update other user info")
 		}
 
 	case constant.AdminUser:

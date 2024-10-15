@@ -13,6 +13,7 @@ import (
 	"github.com/openimsdk/chat/internal/api/util"
 	"github.com/openimsdk/chat/pkg/common/apistruct"
 	"github.com/openimsdk/chat/pkg/common/config"
+	chatConstant "github.com/openimsdk/chat/pkg/common/constant"
 	"github.com/openimsdk/chat/pkg/common/imapi"
 	"github.com/openimsdk/chat/pkg/common/mctx"
 	"github.com/openimsdk/chat/pkg/common/xlsx"
@@ -159,6 +160,12 @@ func (o *Api) AddUserAccount(c *gin.Context) {
 		return
 	}
 
+	if resp, err := o.adminClient.FindDefaultFriend(c, &admin.FindDefaultFriendReq{}); err == nil {
+		_ = o.imApiCaller.ImportFriend(c, req.User.UserID, resp.UserIDs)
+	}
+	if resp, err := o.adminClient.FindDefaultGroup(c, &admin.FindDefaultGroupReq{}); err == nil {
+		_ = o.imApiCaller.InviteToGroup(c, req.User.UserID, resp.GroupIDs)
+	}
 	apiresp.GinSuccess(c, nil)
 
 }
@@ -533,6 +540,7 @@ func (o *Api) registerChatUser(ctx context.Context, ip string, users []*chat.Reg
 		if err = o.imApiCaller.RegisterUser(ctx, []*sdkws.UserInfo{userInfo}); err != nil {
 			return err
 		}
+
 		if resp, err := o.adminClient.FindDefaultFriend(ctx, &admin.FindDefaultFriendReq{}); err == nil {
 			_ = o.imApiCaller.ImportFriend(ctx, respRegisterUser.UserID, resp.UserIDs)
 		}

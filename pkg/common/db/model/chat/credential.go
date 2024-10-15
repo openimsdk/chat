@@ -4,6 +4,7 @@ import (
 	"context"
 	"go.mongodb.org/mongo-driver/mongo/options"
 
+	"github.com/openimsdk/chat/pkg/common/db/table/chat"
 	"github.com/openimsdk/tools/db/mongoutil"
 	"github.com/openimsdk/tools/db/pagination"
 	"github.com/openimsdk/tools/errs"
@@ -17,7 +18,9 @@ func NewCredential(db *mongo.Database) (chat.CredentialInterface, error) {
 		{
 			Keys: bson.D{
 				{Key: "user_id", Value: 1},
+				{Key: "type", Value: 1},
 			},
+			Options: options.Index().SetUnique(true),
 		},
 		{
 			Keys: bson.D{
@@ -36,8 +39,24 @@ type Credential struct {
 	coll *mongo.Collection
 }
 
-func (o *Credential) Create(ctx context.Context, attribute ...*chat.Credential) error {
-	return mongoutil.InsertMany(ctx, o.coll, attribute)
+func (o *Credential) Create(ctx context.Context, credential ...*chat.Credential) error {
+	return mongoutil.InsertMany(ctx, o.coll, credential)
+}
+
+func (o *Credential) CreateOrUpdateAccount(ctx context.Context, credential *chat.Credential) error {
+	return mongoutil.UpdateOne(ctx, o.coll, bson.M{
+		"user_id": credential.UserID,
+		"type":    credential.Type,
+	}, bson.M{
+		"$set": bson.M{
+			"account": credential.Account,
+		},
+		"$setOnInsert": bson.M{
+			"user_id":      credential.UserID,
+			"type":         credential.Type,
+			"allow_change": credential.AllowChange,
+		},
+	}, false, options.Update().SetUpsert(true))
 }
 
 func (o *Credential) Update(ctx context.Context, userID string, data map[string]any) error {
@@ -106,4 +125,18 @@ func (o *Credential) Delete(ctx context.Context, userIDs []string) error {
 		return nil
 	}
 	return mongoutil.DeleteMany(ctx, o.coll, bson.M{"user_id": bson.M{"$in": userIDs}})
+}
+
+func (o *Credential) DeleteByUserIDType(ctx context.Context, credentials ...*chat.Credential) error {
+	var filters []bson.M
+	for _, credential := range credentials {
+		filters = append(filters, bson.M{
+			"user_id": credential.UserID,
+			"type":    credential.Type,
+		})
+	}
+
+	query := bson.M{"$or": filters}
+
+	return mongoutil.DeleteMany(ctx, o.coll, query)
 }
