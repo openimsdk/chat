@@ -2,7 +2,6 @@ package chat
 
 import (
 	"context"
-	"go.mongodb.org/mongo-driver/mongo/options"
 
 	"github.com/openimsdk/chat/pkg/common/db/table/chat"
 	"github.com/openimsdk/tools/db/mongoutil"
@@ -11,8 +10,6 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-
-	"github.com/openimsdk/chat/pkg/common/db/table/chat"
 )
 
 func NewCredential(db *mongo.Database) (chat.CredentialInterface, error) {
@@ -22,7 +19,6 @@ func NewCredential(db *mongo.Database) (chat.CredentialInterface, error) {
 			Keys: bson.D{
 				{Key: "user_id", Value: 1},
 			},
-			Options: options.Index().SetUnique(true),
 		},
 		{
 			Keys: bson.D{
