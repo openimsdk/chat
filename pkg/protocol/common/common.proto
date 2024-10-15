@@ -14,9 +14,6 @@
 
 syntax = "proto3";
 package openim.chat.common;
-
-import "wrapperspb/wrapperspb.proto";
-
 option go_package = "github.com/openimsdk/chat/pkg/protocol/common";
 
 
