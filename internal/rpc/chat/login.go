@@ -227,9 +227,6 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 		if !o.AllowRegister {
 			return nil, errs.ErrNoPermission.WrapMsg("register user is disabled")
 		}
-		if req.User.UserType != constant.CommonUser {
-			return nil, errs.ErrNoPermission.WrapMsg("can only register common user")
-		}
 		if req.User.UserID != "" {
 			return nil, errs.ErrNoPermission.WrapMsg("only admin can set user id")
 		}
@@ -284,9 +281,8 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 		}
 	}
 	var (
-		credentials     []*chatdb.Credential
-		allowChangeRule = datautil.If(req.User.UserType == constant.CommonUser, true, false)
-		registerType    int32
+		credentials  []*chatdb.Credential
+		registerType int32
 	)
 
 	if req.User.PhoneNumber != "" {
@@ -295,7 +291,7 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 			UserID:      req.User.UserID,
 			Account:     BuildCredentialPhone(req.User.AreaCode, req.User.PhoneNumber),
 			Type:        constant.CredentialPhone,
-			AllowChange: allowChangeRule,
+			AllowChange: true,
 		})
 	}
 
@@ -304,7 +300,7 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 			UserID:      req.User.UserID,
 			Account:     req.User.Account,
 			Type:        constant.CredentialAccount,
-			AllowChange: allowChangeRule,
+			AllowChange: true,
 		})
 		registerType = constant.AccountRegister
 	}
@@ -315,7 +311,7 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 			UserID:      req.User.UserID,
 			Account:     req.User.Email,
 			Type:        constant.CredentialEmail,
-			AllowChange: allowChangeRule,
+			AllowChange: true,
 		})
 	}
 	register := &chatdb.Register{
@@ -351,11 +347,6 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 		AllowBeep:      constant.DefaultAllowBeep,
 		AllowAddFriend: constant.DefaultAllowAddFriend,
 		RegisterType:   registerType,
-	}
-	if req.User.UserType == constant.OrgUser {
-		attribute.EnglishName = datautil.ToPtr(req.User.EnglishName.GetValue())
-		attribute.Station = datautil.ToPtr(req.User.Station.GetValue())
-		attribute.Telephone = datautil.ToPtr(req.User.Telephone.GetValue())
 	}
 	if err := o.Database.RegisterUser(ctx, register, account, attribute, credentials); err != nil {
 		return nil, err

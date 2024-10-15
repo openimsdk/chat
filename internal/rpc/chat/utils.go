@@ -7,7 +7,6 @@ import (
 	"github.com/openimsdk/chat/pkg/eerrs"
 	"github.com/openimsdk/chat/pkg/protocol/chat"
 	"github.com/openimsdk/chat/pkg/protocol/common"
-	"github.com/openimsdk/protocol/wrapperspb"
 	"github.com/openimsdk/tools/errs"
 	"github.com/openimsdk/tools/utils/datautil"
 	"github.com/openimsdk/tools/utils/stringutil"
@@ -52,10 +51,6 @@ func DbToPbUserFullInfo(attribute *table.Attribute) *common.UserFullInfo {
 		AllowVibration:   attribute.AllowVibration,
 		GlobalRecvMsgOpt: attribute.GlobalRecvMsgOpt,
 		RegisterType:     attribute.RegisterType,
-
-		EnglishName: wrapperspb.StringPtr(attribute.EnglishName),
-		Station:     wrapperspb.StringPtr(attribute.Station),
-		Telephone:   wrapperspb.StringPtr(attribute.Telephone),
 	}
 }
 

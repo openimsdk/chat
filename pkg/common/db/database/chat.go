@@ -31,7 +31,7 @@ import (
 
 type ChatDatabaseInterface interface {
 	GetUser(ctx context.Context, userID string) (account *chatdb.Account, err error)
-	UpdateUseInfo(ctx context.Context, userID string, attribute map[string]any) (err error)
+	UpdateUseInfo(ctx context.Context, userID string, attribute map[string]any, updateCred, delCred []*chatdb.Credential) (err error)
 	FindAttribute(ctx context.Context, userIDs []string) ([]*chatdb.Attribute, error)
 	FindAttributeByAccount(ctx context.Context, accounts []string) ([]*chatdb.Attribute, error)
 	TakeAttributeByPhone(ctx context.Context, areaCode string, phoneNumber string) (*chatdb.Attribute, error)
@@ -114,8 +114,21 @@ func (o *ChatDatabase) GetUser(ctx context.Context, userID string) (account *cha
 	return o.account.Take(ctx, userID)
 }
 
-func (o *ChatDatabase) UpdateUseInfo(ctx context.Context, userID string, attribute map[string]any) (err error) {
-	return o.attribute.Update(ctx, userID, attribute)
+func (o *ChatDatabase) UpdateUseInfo(ctx context.Context, userID string, attribute map[string]any, updateCred, delCred []*chatdb.Credential) (err error) {
+	return o.tx.Transaction(ctx, func(ctx context.Context) error {
+		if err = o.attribute.Update(ctx, userID, attribute); err != nil {
+			return err
+		}
+		for _, credential := range updateCred {
+			if err = o.credential.CreateOrUpdateAccount(ctx, credential); err != nil {
+				return err
+			}
+		}
+		if err = o.credential.DeleteByUserIDType(ctx, delCred...); err != nil {
+			return err
+		}
+		return nil
+	})
 }
 
 func (o *ChatDatabase) FindAttribute(ctx context.Context, userIDs []string) ([]*chatdb.Attribute, error) {

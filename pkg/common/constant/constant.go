@@ -104,3 +104,10 @@ const (
 	GenderMale    = 1 // male
 	GenderUnknown = 2 // unknown
 )
+
+// Credential Type
+const (
+	CredentialAccount = iota
+	CredentialPhone
+	CredentialEmail
+)

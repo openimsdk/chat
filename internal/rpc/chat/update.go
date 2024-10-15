@@ -15,6 +15,8 @@
 package chat
 
 import (
+	"github.com/openimsdk/chat/pkg/common/constant"
+	chatdb "github.com/openimsdk/chat/pkg/common/db/table/chat"
 	"time"
 
 	"github.com/openimsdk/tools/errs"
@@ -67,4 +69,57 @@ func ToDBAttributeUpdate(req *chat.UpdateUserInfoReq) (map[string]any, error) {
 	//	return nil, errs.ErrArgs.WrapMsg("no update info")
 	//}
 	return update, nil
+}
+
+func ToDBCredentialUpdate(req *chat.UpdateUserInfoReq, allowChange bool) ([]*chatdb.Credential, []*chatdb.Credential, error) {
+	update := make([]*chatdb.Credential, 0)
+	del := make([]*chatdb.Credential, 0)
+	if req.Account != nil {
+		if req.Account.GetValue() == "" {
+			del = append(del, &chatdb.Credential{
+				UserID: req.UserID,
+				Type:   constant.CredentialAccount,
+			})
+		} else {
+			update = append(update, &chatdb.Credential{
+				UserID:      req.UserID,
+				Account:     req.Account.GetValue(),
+				Type:        constant.CredentialAccount,
+				AllowChange: allowChange,
+			})
+		}
+	}
+
+	if req.Email != nil {
+		if req.Email.GetValue() == "" {
+			del = append(del, &chatdb.Credential{
+				UserID: req.UserID,
+				Type:   constant.CredentialEmail,
+			})
+		} else {
+			update = append(update, &chatdb.Credential{
+				UserID:      req.UserID,
+				Account:     req.Account.GetValue(),
+				Type:        constant.CredentialEmail,
+				AllowChange: allowChange,
+			})
+		}
+	}
+	if req.PhoneNumber != nil {
+		if req.PhoneNumber.GetValue() == "" {
+			del = append(del, &chatdb.Credential{
+				UserID: req.UserID,
+				Type:   constant.CredentialPhone,
+			})
+		} else {
+			update = append(update, &chatdb.Credential{
+				UserID:      req.UserID,
+				Account:     BuildCredentialPhone(req.AreaCode.GetValue(), req.PhoneNumber.GetValue()),
+				Type:        constant.CredentialPhone,
+				AllowChange: allowChange,
+			})
+		}
+	}
+
+	return update, del, nil
 }

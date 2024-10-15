@@ -19,7 +19,6 @@ import (
 	"errors"
 	"github.com/openimsdk/chat/pkg/eerrs"
 	"github.com/openimsdk/protocol/wrapperspb"
-	"github.com/openimsdk/tools/utils/datautil"
 	"github.com/openimsdk/tools/utils/stringutil"
 	"strconv"
 	"strings"
@@ -162,52 +161,8 @@ func (o *chatSvr) UpdateUserInfo(ctx context.Context, req *chat.UpdateUserInfoRe
 		return nil, err
 	}
 
-	isOrgUser, err := o.Database.IsOrgUser(ctx, req.UserID)
-	if err != nil {
-		return nil, err
-	}
-
 	switch userType {
 	case constant.NormalUser:
-		if isOrgUser {
-			if req.AreaCode != nil {
-				return nil, errs.ErrNoPermission.WrapMsg("areaCode can not be updated")
-			}
-			if req.PhoneNumber != nil {
-				return nil, errs.ErrNoPermission.WrapMsg("phoneNumber can not be updated")
-			}
-			if req.Account != nil {
-				return nil, errs.ErrNoPermission.WrapMsg("account can not be updated")
-			}
-			if req.Email != nil {
-				return nil, errs.ErrNoPermission.WrapMsg("email can not be updated")
-			}
-			if req.Level != nil {
-				return nil, errs.ErrNoPermission.WrapMsg("level can not be updated")
-			}
-
-			if req.Nickname != nil {
-				return nil, errs.ErrNoPermission.WrapMsg("nickname can not be updated")
-			}
-			if req.FaceURL != nil {
-				return nil, errs.ErrNoPermission.WrapMsg("faceURL can not be updated")
-			}
-			if req.Gender != nil {
-				return nil, errs.ErrNoPermission.WrapMsg("gender can not be updated")
-			}
-			if req.Birth != nil {
-				return nil, errs.ErrNoPermission.WrapMsg("birth can not be updated")
-			}
-			if req.EnglishName != nil {
-				return nil, errs.ErrNoPermission.WrapMsg("englishName can not be updated")
-			}
-			if req.Station != nil {
-				return nil, errs.ErrNoPermission.WrapMsg("station can not be updated")
-			}
-			if req.Telephone != nil {
-				return nil, errs.ErrNoPermission.WrapMsg("telephone can not be updated")
-			}
-		}
 		if req.RegisterType != nil {
 			return nil, errs.ErrNoPermission.WrapMsg("registerType can not be updated")
 		}
@@ -220,11 +175,11 @@ func (o *chatSvr) UpdateUserInfo(ctx context.Context, req *chat.UpdateUserInfoRe
 		return nil, errs.ErrNoPermission.WrapMsg("user type error")
 	}
 
-	update, err := ToDBAttributeUpdate(req, isOrgUser)
+	update, err := ToDBAttributeUpdate(req)
 	if err != nil {
 		return nil, err
 	}
-	credUpdate, credDel, err := ToDBCredentialUpdate(req, !isOrgUser)
+	credUpdate, credDel, err := ToDBCredentialUpdate(req, true)
 	if err != nil {
 		return nil, err
 	}
@@ -284,8 +239,7 @@ func (o *chatSvr) AddUserAccount(ctx context.Context, req *chat.AddUserAccountRe
 	}
 
 	var (
-		credentials     []*chatdb.Credential
-		allowChangeRule = datautil.If(req.User.UserType == constant.CommonUser, true, false)
+		credentials []*chatdb.Credential
 	)
 
 	if req.User.PhoneNumber != "" {
@@ -293,7 +247,7 @@ func (o *chatSvr) AddUserAccount(ctx context.Context, req *chat.AddUserAccountRe
 			UserID:      req.User.UserID,
 			Account:     BuildCredentialPhone(req.User.AreaCode, req.User.PhoneNumber),
 			Type:        constant.CredentialPhone,
-			AllowChange: allowChangeRule,
+			AllowChange: true,
 		})
 	}
 
@@ -302,7 +256,7 @@ func (o *chatSvr) AddUserAccount(ctx context.Context, req *chat.AddUserAccountRe
 			UserID:      req.User.UserID,
 			Account:     req.User.Account,
 			Type:        constant.CredentialAccount,
-			AllowChange: allowChangeRule,
+			AllowChange: true,
 		})
 	}
 
@@ -311,7 +265,7 @@ func (o *chatSvr) AddUserAccount(ctx context.Context, req *chat.AddUserAccountRe
 			UserID:      req.User.UserID,
 			Account:     req.User.Email,
 			Type:        constant.CredentialEmail,
-			AllowChange: allowChangeRule,
+			AllowChange: true,
 		})
 	}
 
@@ -348,11 +302,6 @@ func (o *chatSvr) AddUserAccount(ctx context.Context, req *chat.AddUserAccountRe
 		AllowAddFriend: constant.DefaultAllowAddFriend,
 	}
 
-	if req.User.UserType == constant.OrgUser {
-		attribute.EnglishName = datautil.ToPtr(req.User.EnglishName.GetValue())
-		attribute.Station = datautil.ToPtr(req.User.Station.GetValue())
-		attribute.Telephone = datautil.ToPtr(req.User.Telephone.GetValue())
-	}
 	if err := o.Database.RegisterUser(ctx, register, account, attribute, credentials); err != nil {
 		return nil, err
 	}
@@ -370,23 +319,6 @@ func (o *chatSvr) SearchUserPublicInfo(ctx context.Context, req *chat.SearchUser
 	return &chat.SearchUserPublicInfoResp{
 		Total: uint32(total),
 		Users: DbToPbAttributes(list),
-	}, nil
-}
-
-func (o *chatSvr) SearchUserID(ctx context.Context, req *chat.SearchUserIDReq) (*chat.SearchUserIDResp, error) {
-	if req.Pagination == nil {
-		return nil, errs.ErrArgs.WrapMsg("pagination is nil")
-	}
-	if _, _, err := mctx.Check(ctx); err != nil {
-		return nil, err
-	}
-	total, userIDs, err := o.Database.SearchID(ctx, req.Keyword, req.OrUserIDs, req.Pagination)
-	if err != nil {
-		return nil, err
-	}
-	return &chat.SearchUserIDResp{
-		Total:   uint32(total),
-		UserIDs: userIDs,
 	}, nil
 }
 
