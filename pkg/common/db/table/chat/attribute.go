@@ -25,10 +25,6 @@ type Attribute struct {
 	AllowAddFriend   int32     `bson:"allow_add_friend"`
 	GlobalRecvMsgOpt int32     `bson:"global_recv_msg_opt"`
 	RegisterType     int32     `bson:"register_type"`
-	// tob
-	EnglishName *string `bson:"column:english_name,omitempty"`
-	Station     *string `bson:"column:station,omitempty"`
-	Telephone   *string `bson:"column:telephone,omitempty"`
 }
 
 func (Attribute) TableName() string {
