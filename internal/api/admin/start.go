@@ -81,6 +81,10 @@ func SetAdminRoute(router gin.IRouter, admin *Api, mw *chatmw.MW) {
 	importGroup.POST("/xlsx", mw.CheckAdmin, admin.ImportUserByXlsx)
 	importGroup.GET("/xlsx", admin.BatchImportTemplate)
 
+	allowRegisterGroup := router.Group("/user/allow_register", mw.CheckAdmin)
+	allowRegisterGroup.POST("/get", admin.GetAllowRegister)
+	allowRegisterGroup.POST("/set", admin.SetAllowRegister)
+
 	defaultRouter := router.Group("/default", mw.CheckAdmin)
 	defaultUserRouter := defaultRouter.Group("/user")
 	defaultUserRouter.POST("/add", admin.AddDefaultFriend)       // Add default friend at registration

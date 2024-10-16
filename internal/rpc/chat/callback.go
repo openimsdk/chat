@@ -47,7 +47,7 @@ func (o *chatSvr) OpenIMCallback(ctx context.Context, req *chat.OpenIMCallbackRe
 		if err := json.Unmarshal([]byte(req.Body), &data); err != nil {
 			return nil, errs.Wrap(err)
 		}
-		user, err := o.Database.GetAttribute(ctx, data.ToUserID)
+		user, err := o.Database.TakeAttributeByUserID(ctx, data.ToUserID)
 		if err != nil {
 			return nil, err
 		}

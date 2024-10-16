@@ -31,26 +31,24 @@ import (
 
 type ChatDatabaseInterface interface {
 	GetUser(ctx context.Context, userID string) (account *chatdb.Account, err error)
-	UpdateUseInfo(ctx context.Context, userID string, attribute map[string]any) (err error)
+	UpdateUseInfo(ctx context.Context, userID string, attribute map[string]any, updateCred, delCred []*chatdb.Credential) (err error)
 	FindAttribute(ctx context.Context, userIDs []string) ([]*chatdb.Attribute, error)
 	FindAttributeByAccount(ctx context.Context, accounts []string) ([]*chatdb.Attribute, error)
 	TakeAttributeByPhone(ctx context.Context, areaCode string, phoneNumber string) (*chatdb.Attribute, error)
 	TakeAttributeByEmail(ctx context.Context, Email string) (*chatdb.Attribute, error)
 	TakeAttributeByAccount(ctx context.Context, account string) (*chatdb.Attribute, error)
 	TakeAttributeByUserID(ctx context.Context, userID string) (*chatdb.Attribute, error)
+	TakeAccount(ctx context.Context, userID string) (*chatdb.Account, error)
+	TakeCredentialByAccount(ctx context.Context, account string) (*chatdb.Credential, error)
+	TakeCredentialsByUserID(ctx context.Context, userID string) ([]*chatdb.Credential, error)
+	TakeLastVerifyCode(ctx context.Context, account string) (*chatdb.VerifyCode, error)
 	Search(ctx context.Context, normalUser int32, keyword string, gender int32, pagination pagination.Pagination) (int64, []*chatdb.Attribute, error)
 	SearchUser(ctx context.Context, keyword string, userIDs []string, genders []int32, pagination pagination.Pagination) (int64, []*chatdb.Attribute, error)
 	CountVerifyCodeRange(ctx context.Context, account string, start time.Time, end time.Time) (int64, error)
 	AddVerifyCode(ctx context.Context, verifyCode *chatdb.VerifyCode, fn func() error) error
 	UpdateVerifyCodeIncrCount(ctx context.Context, id string) error
-	TakeLastVerifyCode(ctx context.Context, account string) (*chatdb.VerifyCode, error)
 	DelVerifyCode(ctx context.Context, id string) error
-	RegisterUser(ctx context.Context, register *chatdb.Register, account *chatdb.Account, attribute *chatdb.Attribute) error
-	GetAccount(ctx context.Context, userID string) (*chatdb.Account, error)
-	GetAttribute(ctx context.Context, userID string) (*chatdb.Attribute, error)
-	GetAttributeByAccount(ctx context.Context, account string) (*chatdb.Attribute, error)
-	GetAttributeByPhone(ctx context.Context, areaCode string, phoneNumber string) (*chatdb.Attribute, error)
-	GetAttributeByEmail(ctx context.Context, email string) (*chatdb.Attribute, error)
+	RegisterUser(ctx context.Context, register *chatdb.Register, account *chatdb.Account, attribute *chatdb.Attribute, credentials []*chatdb.Credential) error
 	LoginRecord(ctx context.Context, record *chatdb.UserLoginRecord, verifyCodeID *string) error
 	UpdatePassword(ctx context.Context, userID string, password string) error
 	UpdatePasswordAndDeleteVerifyCode(ctx context.Context, userID string, password string, codeID string) error
@@ -73,6 +71,10 @@ func NewChatDatabase(cli *mongoutil.Client) (ChatDatabaseInterface, error) {
 	if err != nil {
 		return nil, err
 	}
+	credential, err := chat.NewCredential(cli.GetDB())
+	if err != nil {
+		return nil, err
+	}
 	userLoginRecord, err := chat.NewUserLoginRecord(cli.GetDB())
 	if err != nil {
 		return nil, err
@@ -90,6 +92,7 @@ func NewChatDatabase(cli *mongoutil.Client) (ChatDatabaseInterface, error) {
 		register:         register,
 		account:          account,
 		attribute:        attribute,
+		credential:       credential,
 		userLoginRecord:  userLoginRecord,
 		verifyCode:       verifyCode,
 		forbiddenAccount: forbiddenAccount,
@@ -101,6 +104,7 @@ type ChatDatabase struct {
 	register         chatdb.RegisterInterface
 	account          chatdb.AccountInterface
 	attribute        chatdb.AttributeInterface
+	credential       chatdb.CredentialInterface
 	userLoginRecord  chatdb.UserLoginRecordInterface
 	verifyCode       chatdb.VerifyCodeInterface
 	forbiddenAccount admin.ForbiddenAccountInterface
@@ -110,8 +114,21 @@ func (o *ChatDatabase) GetUser(ctx context.Context, userID string) (account *cha
 	return o.account.Take(ctx, userID)
 }
 
-func (o *ChatDatabase) UpdateUseInfo(ctx context.Context, userID string, attribute map[string]any) (err error) {
-	return o.attribute.Update(ctx, userID, attribute)
+func (o *ChatDatabase) UpdateUseInfo(ctx context.Context, userID string, attribute map[string]any, updateCred, delCred []*chatdb.Credential) (err error) {
+	return o.tx.Transaction(ctx, func(ctx context.Context) error {
+		if err = o.attribute.Update(ctx, userID, attribute); err != nil {
+			return err
+		}
+		for _, credential := range updateCred {
+			if err = o.credential.CreateOrUpdateAccount(ctx, credential); err != nil {
+				return err
+			}
+		}
+		if err = o.credential.DeleteByUserIDType(ctx, delCred...); err != nil {
+			return err
+		}
+		return nil
+	})
 }
 
 func (o *ChatDatabase) FindAttribute(ctx context.Context, userIDs []string) ([]*chatdb.Attribute, error) {
@@ -136,6 +153,22 @@ func (o *ChatDatabase) TakeAttributeByAccount(ctx context.Context, account strin
 
 func (o *ChatDatabase) TakeAttributeByUserID(ctx context.Context, userID string) (*chatdb.Attribute, error) {
 	return o.attribute.Take(ctx, userID)
+}
+
+func (o *ChatDatabase) TakeLastVerifyCode(ctx context.Context, account string) (*chatdb.VerifyCode, error) {
+	return o.verifyCode.TakeLast(ctx, account)
+}
+
+func (o *ChatDatabase) TakeAccount(ctx context.Context, userID string) (*chatdb.Account, error) {
+	return o.account.Take(ctx, userID)
+}
+
+func (o *ChatDatabase) TakeCredentialByAccount(ctx context.Context, account string) (*chatdb.Credential, error) {
+	return o.credential.TakeAccount(ctx, account)
+}
+
+func (o *ChatDatabase) TakeCredentialsByUserID(ctx context.Context, userID string) ([]*chatdb.Credential, error) {
+	return o.credential.Find(ctx, userID)
 }
 
 func (o *ChatDatabase) Search(ctx context.Context, normalUser int32, keyword string, genders int32, pagination pagination.Pagination) (total int64, attributes []*chatdb.Attribute, err error) {
@@ -177,15 +210,11 @@ func (o *ChatDatabase) UpdateVerifyCodeIncrCount(ctx context.Context, id string)
 	return o.verifyCode.Incr(ctx, id)
 }
 
-func (o *ChatDatabase) TakeLastVerifyCode(ctx context.Context, account string) (*chatdb.VerifyCode, error) {
-	return o.verifyCode.TakeLast(ctx, account)
-}
-
 func (o *ChatDatabase) DelVerifyCode(ctx context.Context, id string) error {
 	return o.verifyCode.Delete(ctx, id)
 }
 
-func (o *ChatDatabase) RegisterUser(ctx context.Context, register *chatdb.Register, account *chatdb.Account, attribute *chatdb.Attribute) error {
+func (o *ChatDatabase) RegisterUser(ctx context.Context, register *chatdb.Register, account *chatdb.Account, attribute *chatdb.Attribute, credentials []*chatdb.Credential) error {
 	return o.tx.Transaction(ctx, func(ctx context.Context) error {
 		if err := o.register.Create(ctx, register); err != nil {
 			return err
@@ -196,28 +225,11 @@ func (o *ChatDatabase) RegisterUser(ctx context.Context, register *chatdb.Regist
 		if err := o.attribute.Create(ctx, attribute); err != nil {
 			return err
 		}
+		if err := o.credential.Create(ctx, credentials...); err != nil {
+			return err
+		}
 		return nil
 	})
-}
-
-func (o *ChatDatabase) GetAccount(ctx context.Context, userID string) (*chatdb.Account, error) {
-	return o.account.Take(ctx, userID)
-}
-
-func (o *ChatDatabase) GetAttribute(ctx context.Context, userID string) (*chatdb.Attribute, error) {
-	return o.attribute.Take(ctx, userID)
-}
-
-func (o *ChatDatabase) GetAttributeByAccount(ctx context.Context, account string) (*chatdb.Attribute, error) {
-	return o.attribute.TakeAccount(ctx, account)
-}
-
-func (o *ChatDatabase) GetAttributeByPhone(ctx context.Context, areaCode string, phoneNumber string) (*chatdb.Attribute, error) {
-	return o.attribute.TakePhone(ctx, areaCode, phoneNumber)
-}
-
-func (o *ChatDatabase) GetAttributeByEmail(ctx context.Context, email string) (*chatdb.Attribute, error) {
-	return o.attribute.TakeEmail(ctx, email)
 }
 
 func (o *ChatDatabase) LoginRecord(ctx context.Context, record *chatdb.UserLoginRecord, verifyCodeID *string) error {
