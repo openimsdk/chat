@@ -1,17 +1,3 @@
-// Copyright © 2023 OpenIM open source community. All rights reserved.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
 package chat
 
 import (
@@ -50,7 +36,7 @@ func (o *chatSvr) SendVerifyCode(ctx context.Context, req *chat.SendVerifyCodeRe
 			if req.AreaCode == "" || req.PhoneNumber == "" {
 				return nil, errs.ErrArgs.WrapMsg("area code or phone number is empty")
 			}
-			if req.AreaCode[0] != '+' {
+			if !strings.HasPrefix(req.AreaCode, "+") {
 				req.AreaCode = "+" + req.AreaCode
 			}
 			if _, err := strconv.ParseUint(req.AreaCode[1:], 10, 64); err != nil {
@@ -59,21 +45,9 @@ func (o *chatSvr) SendVerifyCode(ctx context.Context, req *chat.SendVerifyCodeRe
 			if _, err := strconv.ParseUint(req.PhoneNumber, 10, 64); err != nil {
 				return nil, errs.ErrArgs.WrapMsg("phone number must be number")
 			}
-			_, err := o.Database.TakeAttributeByPhone(ctx, req.AreaCode, req.PhoneNumber)
-			if err == nil {
-				return nil, eerrs.ErrPhoneAlreadyRegister.WrapMsg("phone already register")
-			} else if !dbutil.IsDBNotFound(err) {
-				return nil, err
-			}
 		} else {
 			if err := chat.EmailCheck(req.Email); err != nil {
 				return nil, errs.ErrArgs.WrapMsg("email must be right")
-			}
-			_, err := o.Database.TakeAttributeByEmail(ctx, req.Email)
-			if err == nil {
-				return nil, eerrs.ErrEmailAlreadyRegister.WrapMsg("email already register")
-			} else if !dbutil.IsDBNotFound(err) {
-				return nil, err
 			}
 		}
 		conf, err := o.Admin.GetConfig(ctx)
@@ -245,16 +219,14 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 	if err != nil {
 		return nil, err
 	}
-	if req.User == nil {
-		return nil, errs.ErrArgs.WrapMsg("user is nil")
-	}
-	if req.User.Email == "" {
-		if (req.User.AreaCode == "" && req.User.PhoneNumber != "") || (req.User.AreaCode != "" && req.User.PhoneNumber == "") {
-			return nil, errs.ErrArgs.WrapMsg("area code or phone number error, no email provide")
-		}
+	if err = o.checkRegisterInfo(ctx, req.User, isAdmin); err != nil {
+		return nil, err
 	}
 	var usedInvitationCode bool
 	if !isAdmin {
+		if !o.AllowRegister {
+			return nil, errs.ErrNoPermission.WrapMsg("register user is disabled")
+		}
 		if req.User.UserID != "" {
 			return nil, errs.ErrNoPermission.WrapMsg("only admin can set user id")
 		}
@@ -308,43 +280,39 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 			return nil, err
 		}
 	}
-	var registerType int32
+	var (
+		credentials  []*chatdb.Credential
+		registerType int32
+	)
+
 	if req.User.PhoneNumber != "" {
-		if req.User.AreaCode[0] != '+' {
-			req.User.AreaCode = "+" + req.User.AreaCode
-		}
-		if _, err := strconv.ParseUint(req.User.AreaCode[1:], 10, 64); err != nil {
-			return nil, errs.ErrArgs.WrapMsg("area code must be number")
-		}
-		if _, err := strconv.ParseUint(req.User.PhoneNumber, 10, 64); err != nil {
-			return nil, errs.ErrArgs.WrapMsg("phone number must be number")
-		}
-		_, err := o.Database.TakeAttributeByPhone(ctx, req.User.AreaCode, req.User.PhoneNumber)
-		if err == nil {
-			return nil, eerrs.ErrPhoneAlreadyRegister.Wrap()
-		} else if !dbutil.IsDBNotFound(err) {
-			return nil, err
-		}
 		registerType = constant.PhoneRegister
+		credentials = append(credentials, &chatdb.Credential{
+			UserID:      req.User.UserID,
+			Account:     BuildCredentialPhone(req.User.AreaCode, req.User.PhoneNumber),
+			Type:        constant.CredentialPhone,
+			AllowChange: true,
+		})
 	}
 
 	if req.User.Account != "" {
-		_, err := o.Database.TakeAttributeByAccount(ctx, req.User.Account)
-		if err == nil {
-			return nil, eerrs.ErrAccountAlreadyRegister.Wrap()
-		} else if !dbutil.IsDBNotFound(err) {
-			return nil, err
-		}
+		credentials = append(credentials, &chatdb.Credential{
+			UserID:      req.User.UserID,
+			Account:     req.User.Account,
+			Type:        constant.CredentialAccount,
+			AllowChange: true,
+		})
+		registerType = constant.AccountRegister
 	}
 
 	if req.User.Email != "" {
-		_, err := o.Database.TakeAttributeByEmail(ctx, req.User.Email)
 		registerType = constant.EmailRegister
-		if err == nil {
-			return nil, eerrs.ErrEmailAlreadyRegister.Wrap()
-		} else if !dbutil.IsDBNotFound(err) {
-			return nil, err
-		}
+		credentials = append(credentials, &chatdb.Credential{
+			UserID:      req.User.UserID,
+			Account:     req.User.Email,
+			Type:        constant.CredentialEmail,
+			AllowChange: true,
+		})
 	}
 	register := &chatdb.Register{
 		UserID:      req.User.UserID,
@@ -362,6 +330,7 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 		ChangeTime:     register.CreateTime,
 		CreateTime:     register.CreateTime,
 	}
+
 	attribute := &chatdb.Attribute{
 		UserID:         req.User.UserID,
 		Account:        req.User.Account,
@@ -379,7 +348,7 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 		AllowAddFriend: constant.DefaultAllowAddFriend,
 		RegisterType:   registerType,
 	}
-	if err := o.Database.RegisterUser(ctx, register, account, attribute); err != nil {
+	if err := o.Database.RegisterUser(ctx, register, account, attribute, credentials); err != nil {
 		return nil, err
 	}
 	if usedInvitationCode {
@@ -405,33 +374,42 @@ func (o *chatSvr) Login(ctx context.Context, req *chat.LoginReq) (*chat.LoginRes
 	if req.Password == "" && req.VerifyCode == "" {
 		return nil, errs.ErrArgs.WrapMsg("password or code must be set")
 	}
-	var err error
-	var attribute *chatdb.Attribute
-	if req.Account != "" {
-		attribute, err = o.Database.GetAttributeByAccount(ctx, req.Account)
-	} else if req.PhoneNumber != "" {
+	if req.Password == "" {
+		return nil, errs.ErrArgs.WrapMsg("password must be set")
+	}
+	var (
+		err        error
+		credential *chatdb.Credential
+		acc        string
+	)
+
+	switch {
+	case req.Account != "":
+		acc = req.Account
+	case req.PhoneNumber != "":
 		if req.AreaCode == "" {
 			return nil, errs.ErrArgs.WrapMsg("area code must")
 		}
-		if req.AreaCode[0] != '+' {
+		if !strings.HasPrefix(req.AreaCode, "+") {
 			req.AreaCode = "+" + req.AreaCode
 		}
 		if _, err := strconv.ParseUint(req.AreaCode[1:], 10, 64); err != nil {
 			return nil, errs.ErrArgs.WrapMsg("area code must be number")
 		}
-		attribute, err = o.Database.GetAttributeByPhone(ctx, req.AreaCode, req.PhoneNumber)
-	} else if req.Email != "" {
-		attribute, err = o.Database.GetAttributeByEmail(ctx, req.Email)
-	} else {
-		err = errs.ErrArgs.WrapMsg("account or phone number or email must be set")
+		acc = BuildCredentialPhone(req.AreaCode, req.PhoneNumber)
+	case req.Email != "":
+		acc = req.Email
+	default:
+		return nil, errs.ErrArgs.WrapMsg("account or phone number or email must be set")
 	}
+	credential, err = o.Database.TakeCredentialByAccount(ctx, acc)
 	if err != nil {
 		if dbutil.IsDBNotFound(err) {
 			return nil, eerrs.ErrAccountNotFound.WrapMsg("user unregistered")
 		}
 		return nil, err
 	}
-	if err := o.Admin.CheckLogin(ctx, attribute.UserID, req.Ip); err != nil {
+	if err := o.Admin.CheckLogin(ctx, credential.UserID, req.Ip); err != nil {
 		return nil, err
 	}
 	var verifyCodeID *string
@@ -450,7 +428,7 @@ func (o *chatSvr) Login(ctx context.Context, req *chat.LoginReq) (*chat.LoginRes
 			verifyCodeID = &id
 		}
 	} else {
-		account, err := o.Database.GetAccount(ctx, attribute.UserID)
+		account, err := o.Database.TakeAccount(ctx, credential.UserID)
 		if err != nil {
 			return nil, err
 		}
@@ -458,12 +436,12 @@ func (o *chatSvr) Login(ctx context.Context, req *chat.LoginReq) (*chat.LoginRes
 			return nil, eerrs.ErrPassword.Wrap()
 		}
 	}
-	chatToken, err := o.Admin.CreateToken(ctx, attribute.UserID, constant.NormalUser)
+	chatToken, err := o.Admin.CreateToken(ctx, credential.UserID, constant.NormalUser)
 	if err != nil {
 		return nil, err
 	}
 	record := &chatdb.UserLoginRecord{
-		UserID:    attribute.UserID,
+		UserID:    credential.UserID,
 		LoginTime: time.Now(),
 		IP:        req.Ip,
 		DeviceID:  req.DeviceID,
@@ -477,7 +455,7 @@ func (o *chatSvr) Login(ctx context.Context, req *chat.LoginReq) (*chat.LoginRes
 			return nil, err
 		}
 	}
-	resp.UserID = attribute.UserID
+	resp.UserID = credential.UserID
 	resp.ChatToken = chatToken.Token
 	return resp, nil
 }

@@ -1,17 +1,3 @@
-// Copyright © 2023 OpenIM open source community. All rights reserved.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
 package admin
 
 import (
@@ -72,7 +58,7 @@ func (o *Api) AdminLogin(c *gin.Context) {
 		return
 	}
 	imAdminUserID := o.GetDefaultIMAdminUserID()
-	imToken, err := o.imApiCaller.GetAdminToken(c, imAdminUserID)
+	imToken, err := o.imApiCaller.ImAdminTokenWithDefaultAdmin(c)
 	if err != nil {
 		apiresp.GinError(c, err)
 		return
@@ -173,6 +159,12 @@ func (o *Api) AddUserAccount(c *gin.Context) {
 		return
 	}
 
+	if resp, err := o.adminClient.FindDefaultFriend(c, &admin.FindDefaultFriendReq{}); err == nil {
+		_ = o.imApiCaller.ImportFriend(c, req.User.UserID, resp.UserIDs)
+	}
+	if resp, err := o.adminClient.FindDefaultGroup(c, &admin.FindDefaultGroupReq{}); err == nil {
+		_ = o.imApiCaller.InviteToGroup(c, req.User.UserID, resp.GroupIDs)
+	}
 	apiresp.GinSuccess(c, nil)
 
 }
@@ -547,6 +539,7 @@ func (o *Api) registerChatUser(ctx context.Context, ip string, users []*chat.Reg
 		if err = o.imApiCaller.RegisterUser(ctx, []*sdkws.UserInfo{userInfo}); err != nil {
 			return err
 		}
+
 		if resp, err := o.adminClient.FindDefaultFriend(ctx, &admin.FindDefaultFriendReq{}); err == nil {
 			_ = o.imApiCaller.ImportFriend(ctx, respRegisterUser.UserID, resp.UserIDs)
 		}
@@ -570,4 +563,12 @@ func (o *Api) BatchImportTemplate(c *gin.Context) {
 	c.Header("Content-Length", strconv.Itoa(len(config.ImportTemplate)))
 	c.Header("ETag", md5Val)
 	c.Data(http.StatusOK, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", config.ImportTemplate)
+}
+
+func (o *Api) SetAllowRegister(c *gin.Context) {
+	a2r.Call(chat.ChatClient.SetAllowRegister, o.chatClient, c)
+}
+
+func (o *Api) GetAllowRegister(c *gin.Context) {
+	a2r.Call(chat.ChatClient.GetAllowRegister, o.chatClient, c)
 }
