@@ -2,6 +2,7 @@ package chat
 
 import (
 	"context"
+
 	"go.mongodb.org/mongo-driver/mongo/options"
 
 	"github.com/openimsdk/chat/pkg/common/db/table/chat"
@@ -128,6 +129,9 @@ func (o *Credential) Delete(ctx context.Context, userIDs []string) error {
 }
 
 func (o *Credential) DeleteByUserIDType(ctx context.Context, credentials ...*chat.Credential) error {
+	if len(credentials) == 0 {
+		return nil
+	}
 	var filters []bson.M
 	for _, credential := range credentials {
 		filters = append(filters, bson.M{
