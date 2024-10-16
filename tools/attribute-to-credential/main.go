@@ -13,7 +13,9 @@ import (
 	"github.com/openimsdk/protocol/sdkws"
 	"github.com/openimsdk/tools/db/mongoutil"
 	"github.com/openimsdk/tools/system/program"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"path/filepath"
 )
 
@@ -39,7 +41,7 @@ func initConfig(configDir string) (*config.Mongo, error) {
 }
 
 func pageGetAttribute(ctx context.Context, coll *mongo.Collection, pagination *sdkws.RequestPagination) (int64, []*table.Attribute, error) {
-	return mongoutil.FindPage[*table.Attribute](ctx, coll, nil, pagination)
+	return mongoutil.FindPage[*table.Attribute](ctx, coll, bson.M{}, pagination)
 }
 
 func doAttributeToCredential() error {
@@ -116,10 +118,18 @@ func doAttributeToCredential() error {
 				}
 
 			}
-			err = mongoutil.InsertMany[*table.Credential](ctx, credColl, credentials)
-			if err != nil {
-				return err
+			for _, credential := range credentials {
+				err = mongoutil.UpdateOne(ctx, credColl, bson.M{
+					"user_id": credential.UserID,
+					"type":    credential.Type,
+				}, bson.M{
+					"$set": credential,
+				}, false, options.Update().SetUpsert(true))
+				if err != nil {
+					return err
+				}
 			}
+
 			pagination.PageNumber++
 			if total < pageNum {
 				break
