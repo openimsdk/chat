@@ -240,8 +240,6 @@ func (o *chatSvr) genVerifyCode() string {
 }
 
 func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (*chat.RegisterUserResp, error) {
-	resp := &chat.RegisterUserResp{}
-
 	isAdmin, err := o.Admin.CheckNilOrAdmin(ctx)
 	ctx = o.WithAdminUser(ctx)
 	if err != nil {
@@ -389,6 +387,7 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 			log.ZError(ctx, "UseInvitationCode", err, "userID", req.User.UserID, "invitationCode", req.InvitationCode)
 		}
 	}
+	var resp chat.RegisterUserResp
 	if req.AutoLogin {
 		chatToken, err := o.Admin.CreateToken(ctx, req.User.UserID, constant.NormalUser)
 		if err == nil {
@@ -398,7 +397,7 @@ func (o *chatSvr) RegisterUser(ctx context.Context, req *chat.RegisterUserReq) (
 		}
 	}
 	resp.UserID = req.User.UserID
-	return resp, nil
+	return &resp, nil
 }
 
 func (o *chatSvr) Login(ctx context.Context, req *chat.LoginReq) (*chat.LoginResp, error) {
