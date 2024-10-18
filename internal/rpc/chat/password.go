@@ -46,6 +46,9 @@ func (o *chatSvr) ResetPassword(ctx context.Context, req *chat.ResetPasswordReq)
 			return nil, err
 		}
 		err = o.Database.UpdatePasswordAndDeleteVerifyCode(ctx, attribute.UserID, req.Password, verifyCodeID)
+		if err != nil {
+			return nil, err
+		}
 	} else {
 		attribute, err := o.Database.TakeAttributeByEmail(ctx, req.Email)
 		if err != nil {
