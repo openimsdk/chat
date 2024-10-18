@@ -140,6 +140,7 @@ func (o *Attribute) SearchNormalUser(ctx context.Context, keyword string, forbid
 			{"account": bson.M{"$regex": keyword, "$options": "i"}},
 			{"nickname": bson.M{"$regex": keyword, "$options": "i"}},
 			{"phone_number": bson.M{"$regex": keyword, "$options": "i"}},
+			{"email": bson.M{"$regex": keyword, "$options": "i"}},
 		}
 	}
 	return mongoutil.FindPage[*chat.Attribute](ctx, o.coll, filter, pagination)

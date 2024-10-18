@@ -142,35 +142,24 @@ func (o *Api) AddUserAccount(c *gin.Context) {
 		apiresp.GinError(c, err)
 		return
 	}
-	if _, err := o.chatClient.AddUserAccount(c, req); err != nil {
+	ip, err := o.GetClientIP(c)
+	if err != nil {
 		apiresp.GinError(c, err)
 		return
-	}
-
-	userInfo := &sdkws.UserInfo{
-		UserID:     req.User.UserID,
-		Nickname:   req.User.Nickname,
-		FaceURL:    req.User.FaceURL,
-		CreateTime: time.Now().UnixMilli(),
 	}
 	imToken, err := o.imApiCaller.ImAdminTokenWithDefaultAdmin(c)
 	if err != nil {
 		apiresp.GinError(c, err)
 		return
 	}
+
 	ctx := o.WithAdminUser(mctx.WithApiToken(c, imToken))
-	err = o.imApiCaller.RegisterUser(ctx, []*sdkws.UserInfo{userInfo})
+
+	err = o.registerChatUser(ctx, ip, []*chat.RegisterUserInfo{req.User})
 	if err != nil {
-		apiresp.GinError(c, err)
 		return
 	}
 
-	if resp, err := o.adminClient.FindDefaultFriend(c, &admin.FindDefaultFriendReq{}); err == nil {
-		_ = o.imApiCaller.ImportFriend(c, req.User.UserID, resp.UserIDs)
-	}
-	if resp, err := o.adminClient.FindDefaultGroup(c, &admin.FindDefaultGroupReq{}); err == nil {
-		_ = o.imApiCaller.InviteToGroup(c, req.User.UserID, resp.GroupIDs)
-	}
 	apiresp.GinSuccess(c, nil)
 }
 
