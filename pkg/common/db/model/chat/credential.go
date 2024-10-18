@@ -2,14 +2,13 @@ package chat
 
 import (
 	"context"
-	"go.mongodb.org/mongo-driver/mongo/options"
-
 	"github.com/openimsdk/chat/pkg/common/db/table/chat"
 	"github.com/openimsdk/tools/db/mongoutil"
 	"github.com/openimsdk/tools/db/pagination"
 	"github.com/openimsdk/tools/errs"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func NewCredential(db *mongo.Database) (chat.CredentialInterface, error) {
@@ -128,6 +127,9 @@ func (o *Credential) Delete(ctx context.Context, userIDs []string) error {
 }
 
 func (o *Credential) DeleteByUserIDType(ctx context.Context, credentials ...*chat.Credential) error {
+	if len(credentials) == 0 {
+		return nil
+	}
 	var filters []bson.M
 	for _, credential := range credentials {
 		filters = append(filters, bson.M{
