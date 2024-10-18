@@ -153,7 +153,13 @@ func (o *Api) AddUserAccount(c *gin.Context) {
 		FaceURL:    req.User.FaceURL,
 		CreateTime: time.Now().UnixMilli(),
 	}
-	err = o.imApiCaller.RegisterUser(c, []*sdkws.UserInfo{userInfo})
+	imToken, err := o.imApiCaller.ImAdminTokenWithDefaultAdmin(c)
+	if err != nil {
+		apiresp.GinError(c, err)
+		return
+	}
+	ctx := o.WithAdminUser(mctx.WithApiToken(c, imToken))
+	err = o.imApiCaller.RegisterUser(ctx, []*sdkws.UserInfo{userInfo})
 	if err != nil {
 		apiresp.GinError(c, err)
 		return
@@ -166,7 +172,6 @@ func (o *Api) AddUserAccount(c *gin.Context) {
 		_ = o.imApiCaller.InviteToGroup(c, req.User.UserID, resp.GroupIDs)
 	}
 	apiresp.GinSuccess(c, nil)
-
 }
 
 func (o *Api) DelAdminAccount(c *gin.Context) {

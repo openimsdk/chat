@@ -2,12 +2,11 @@ package imapi
 
 import (
 	"context"
+	"github.com/openimsdk/tools/log"
 	"sync"
 	"time"
 
 	"github.com/openimsdk/chat/pkg/eerrs"
-	"github.com/openimsdk/tools/log"
-
 	"github.com/openimsdk/protocol/auth"
 	"github.com/openimsdk/protocol/constant"
 	constantpb "github.com/openimsdk/protocol/constant"
@@ -61,18 +60,20 @@ func (c *Caller) ImportFriend(ctx context.Context, ownerUserID string, friendUse
 }
 
 func (c *Caller) ImAdminTokenWithDefaultAdmin(ctx context.Context) (string, error) {
-	c.lock.Lock()
-	defer c.lock.Unlock()
 	if c.token == "" || c.timeout.Before(time.Now()) {
-		userID := c.defaultIMUserID
-		token, err := c.GetAdminToken(ctx, userID)
-		if err != nil {
-			log.ZError(ctx, "get im admin token", err, "userID", userID)
-			return "", err
+		c.lock.Lock()
+		if c.token == "" || c.timeout.Before(time.Now()) {
+			userID := c.defaultIMUserID
+			token, err := c.GetAdminToken(ctx, userID)
+			if err != nil {
+				log.ZError(ctx, "get im admin token", err, "userID", userID)
+				return "", err
+			}
+			log.ZDebug(ctx, "get im admin token", "userID", userID)
+			c.token = token
+			c.timeout = time.Now().Add(time.Minute * 5)
 		}
-		log.ZDebug(ctx, "get im admin token", "userID", userID)
-		c.token = token
-		c.timeout = time.Now().Add(time.Minute * 5)
+		c.lock.Unlock()
 	}
 	return c.token, nil
 }
