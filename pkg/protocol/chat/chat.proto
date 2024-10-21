@@ -158,6 +158,7 @@ message ResetPasswordReq {
   string verifyCode = 3;
   string password = 4;
   string email = 5;
+  string account = 6;
 }
 
 message ResetPasswordResp {}
