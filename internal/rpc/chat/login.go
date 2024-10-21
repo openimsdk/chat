@@ -374,9 +374,6 @@ func (o *chatSvr) Login(ctx context.Context, req *chat.LoginReq) (*chat.LoginRes
 	if req.Password == "" && req.VerifyCode == "" {
 		return nil, errs.ErrArgs.WrapMsg("password or code must be set")
 	}
-	if req.Password == "" {
-		return nil, errs.ErrArgs.WrapMsg("password must be set")
-	}
 	var (
 		err        error
 		credential *chatdb.Credential
