@@ -103,7 +103,7 @@ func (o *chatSvr) checkRegisterInfo(ctx context.Context, user *chat.RegisterUser
 		}
 		_, err := o.Database.TakeAttributeByAccount(ctx, user.Email)
 		if err == nil {
-			return eerrs.ErrAccountAlreadyRegister.Wrap()
+			return eerrs.ErrEmailAlreadyRegister.Wrap()
 		} else if !dbutil.IsDBNotFound(err) {
 			return err
 		}
