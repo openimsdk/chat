@@ -143,7 +143,7 @@ func (o *chatSvr) checkUpdateInfo(ctx context.Context, req *chat.UpdateUserInfoR
 		}
 		_, err := o.Database.TakeCredentialByAccount(ctx, req.Email.GetValue())
 		if err == nil {
-			return eerrs.ErrAccountAlreadyRegister.Wrap()
+			return eerrs.ErrEmailAlreadyRegister.Wrap()
 		} else if !dbutil.IsDBNotFound(err) {
 			return err
 		}
