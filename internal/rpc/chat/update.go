@@ -99,7 +99,7 @@ func ToDBCredentialUpdate(req *chat.UpdateUserInfoReq, allowChange bool) ([]*cha
 		} else {
 			update = append(update, &chatdb.Credential{
 				UserID:      req.UserID,
-				Account:     req.Account.GetValue(),
+				Account:     req.Email.GetValue(),
 				Type:        constant.CredentialEmail,
 				AllowChange: allowChange,
 			})
