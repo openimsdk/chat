@@ -43,7 +43,7 @@ type TokenCacheRedis struct {
 }
 
 func NewTokenInterface(rdb redis.UniversalClient, token *tokenverify.Token) *TokenCacheRedis {
-	return &TokenCacheRedis{rdb: rdb}
+	return &TokenCacheRedis{rdb: rdb, token: token}
 }
 
 func (t *TokenCacheRedis) GetTokensWithoutError(ctx context.Context, userID string) (map[string]int32, error) {
