@@ -20,7 +20,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/openimsdk/chat/pkg/common/constant"
 	"github.com/openimsdk/chat/pkg/protocol/admin"
-	constantpb "github.com/openimsdk/protocol/constant"
 	"github.com/openimsdk/tools/apiresp"
 	"github.com/openimsdk/tools/errs"
 )
@@ -56,40 +55,13 @@ func (o *MW) parseTokenType(c *gin.Context, userType int32) (string, string, err
 	return userID, token, nil
 }
 
-func (o *MW) isValidToken(c *gin.Context, userID string, token string) error {
-	resp, err := o.client.GetUserToken(c, &admin.GetUserTokenReq{UserID: userID})
-	if err != nil {
-		return err
-	}
-	if len(resp.TokensMap) == 0 {
-		return errs.ErrTokenExpired.Wrap()
-	}
-	if v, ok := resp.TokensMap[token]; ok {
-		switch v {
-		case constantpb.NormalToken:
-		case constantpb.KickedToken:
-			return errs.ErrTokenExpired.Wrap()
-		default:
-			return errs.ErrTokenUnknown.Wrap()
-		}
-	} else {
-		return errs.ErrTokenExpired.Wrap()
-	}
-	return nil
-}
-
 func (o *MW) setToken(c *gin.Context, userID string, userType int32) {
 	SetToken(c, userID, userType)
 }
 
 func (o *MW) CheckToken(c *gin.Context) {
-	userID, userType, token, err := o.parseToken(c)
+	userID, userType, _, err := o.parseToken(c)
 	if err != nil {
-		c.Abort()
-		apiresp.GinError(c, err)
-		return
-	}
-	if err := o.isValidToken(c, userID, token); err != nil {
 		c.Abort()
 		apiresp.GinError(c, err)
 		return
@@ -98,13 +70,8 @@ func (o *MW) CheckToken(c *gin.Context) {
 }
 
 func (o *MW) CheckAdmin(c *gin.Context) {
-	userID, token, err := o.parseTokenType(c, constant.AdminUser)
+	userID, _, err := o.parseTokenType(c, constant.AdminUser)
 	if err != nil {
-		c.Abort()
-		apiresp.GinError(c, err)
-		return
-	}
-	if err := o.isValidToken(c, userID, token); err != nil {
 		c.Abort()
 		apiresp.GinError(c, err)
 		return
@@ -113,13 +80,8 @@ func (o *MW) CheckAdmin(c *gin.Context) {
 }
 
 func (o *MW) CheckUser(c *gin.Context) {
-	userID, token, err := o.parseTokenType(c, constant.NormalUser)
+	userID, _, err := o.parseTokenType(c, constant.NormalUser)
 	if err != nil {
-		c.Abort()
-		apiresp.GinError(c, err)
-		return
-	}
-	if err := o.isValidToken(c, userID, token); err != nil {
 		c.Abort()
 		apiresp.GinError(c, err)
 		return

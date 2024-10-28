@@ -26,7 +26,6 @@ import (
 
 func (o *adminServer) CreateToken(ctx context.Context, req *adminpb.CreateTokenReq) (*adminpb.CreateTokenResp, error) {
 	token, expire, err := o.Token.CreateToken(req.UserID, req.UserType)
-
 	if err != nil {
 		return nil, err
 	}

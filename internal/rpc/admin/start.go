@@ -47,7 +47,11 @@ func Start(ctx context.Context, config *Config, client discovery.SvcDiscoveryReg
 		return err
 	}
 	var srv adminServer
-	srv.Database, err = database.NewAdminDatabase(mgocli, rdb)
+	srv.Token = &tokenverify.Token{
+		Expires: time.Duration(config.RpcConfig.TokenPolicy.Expire) * time.Hour * 24,
+		Secret:  config.RpcConfig.Secret,
+	}
+	srv.Database, err = database.NewAdminDatabase(mgocli, rdb, srv.Token)
 	if err != nil {
 		return err
 	}
@@ -56,10 +60,6 @@ func Start(ctx context.Context, config *Config, client discovery.SvcDiscoveryReg
 		return err
 	}
 	srv.Chat = chatClient.NewChatClient(chat.NewChatClient(conn))
-	srv.Token = &tokenverify.Token{
-		Expires: time.Duration(config.RpcConfig.TokenPolicy.Expire) * time.Hour * 24,
-		Secret:  config.RpcConfig.Secret,
-	}
 	if err := srv.initAdmin(ctx, config.Share.ChatAdmin, config.Share.OpenIM.AdminUserID); err != nil {
 		return err
 	}
