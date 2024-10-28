@@ -16,8 +16,9 @@ package cache
 
 import (
 	"context"
-
+	"github.com/openimsdk/chat/pkg/common/tokenverify"
 	"github.com/openimsdk/tools/utils/stringutil"
+	"sort"
 	"time"
 
 	"github.com/openimsdk/tools/errs"
@@ -25,44 +26,24 @@ import (
 )
 
 const (
-	chatToken = "CHAT_UID_TOKEN_STATUS:"
+	chatToken       = "CHAT_UID_TOKEN_STATUS:"
+	userMaxTokenNum = 10
 )
 
 type TokenInterface interface {
-	AddTokenFlag(ctx context.Context, userID string, token string, flag int) error
-	AddTokenFlagNXEx(ctx context.Context, userID string, token string, flag int, expire time.Duration) (bool, error)
+	SetTokenExpire(ctx context.Context, userID string, token string, expire time.Duration) error
 	GetTokensWithoutError(ctx context.Context, userID string) (map[string]int32, error)
 	DeleteTokenByUid(ctx context.Context, userID string) error
 }
 
 type TokenCacheRedis struct {
+	token        *tokenverify.Token
 	rdb          redis.UniversalClient
 	accessExpire int64
 }
 
-func NewTokenInterface(rdb redis.UniversalClient) *TokenCacheRedis {
-	return &TokenCacheRedis{rdb: rdb}
-}
-
-func (t *TokenCacheRedis) AddTokenFlag(ctx context.Context, userID string, token string, flag int) error {
-	key := chatToken + userID
-	return errs.Wrap(t.rdb.HSet(ctx, key, token, flag).Err())
-}
-
-func (t *TokenCacheRedis) AddTokenFlagNXEx(ctx context.Context, userID string, token string, flag int, expire time.Duration) (bool, error) {
-	key := chatToken + userID
-	isSet, err := t.rdb.HSetNX(ctx, key, token, flag).Result()
-	if err != nil {
-		return false, errs.Wrap(err)
-	}
-	if !isSet {
-		// key already exists
-		return false, nil
-	}
-	if err = t.rdb.Expire(ctx, key, expire).Err(); err != nil {
-		return false, errs.Wrap(err)
-	}
-	return isSet, nil
+func NewTokenInterface(rdb redis.UniversalClient, token *tokenverify.Token) *TokenCacheRedis {
+	return &TokenCacheRedis{rdb: rdb, token: token}
 }
 
 func (t *TokenCacheRedis) GetTokensWithoutError(ctx context.Context, userID string) (map[string]int32, error) {
@@ -81,4 +62,72 @@ func (t *TokenCacheRedis) GetTokensWithoutError(ctx context.Context, userID stri
 func (t *TokenCacheRedis) DeleteTokenByUid(ctx context.Context, userID string) error {
 	key := chatToken + userID
 	return errs.Wrap(t.rdb.Del(ctx, key).Err())
+}
+
+func (t *TokenCacheRedis) SetTokenExpire(ctx context.Context, userID string, token string, expire time.Duration) error {
+	key := chatToken + userID
+	if err := t.rdb.HSet(ctx, key, token, "0").Err(); err != nil {
+		return errs.Wrap(err)
+	}
+	if err := t.rdb.Expire(ctx, key, expire).Err(); err != nil {
+		return errs.Wrap(err)
+	}
+	mm, err := t.rdb.HGetAll(ctx, key).Result()
+	if err != nil {
+		return errs.Wrap(err)
+	}
+	if len(mm) <= 1 {
+		return nil
+	}
+	var (
+		fields []string
+		ts     tokenTimes
+	)
+	now := time.Now()
+	for k := range mm {
+		if k == token {
+			continue
+		}
+		val := t.token.GetExpire(k)
+		if val.IsZero() || val.Before(now) {
+			fields = append(fields, k)
+		} else {
+			ts = append(ts, tokenTime{Token: k, Time: val})
+		}
+	}
+	var sorted bool
+	var index int
+	for i := len(mm) - len(fields); i > userMaxTokenNum; i-- {
+		if !sorted {
+			sorted = true
+			sort.Sort(ts)
+		}
+		fields = append(fields, ts[index].Token)
+		index++
+	}
+	if len(fields) > 0 {
+		if err := t.rdb.HDel(ctx, key, fields...).Err(); err != nil {
+			return errs.Wrap(err)
+		}
+	}
+	return nil
+}
+
+type tokenTime struct {
+	Token string
+	Time  time.Time
+}
+
+type tokenTimes []tokenTime
+
+func (t tokenTimes) Len() int {
+	return len(t)
+}
+
+func (t tokenTimes) Less(i, j int) bool {
+	return t[i].Time.Before(t[j].Time)
+}
+
+func (t tokenTimes) Swap(i, j int) {
+	t[i], t[j] = t[j], t[i]
 }
