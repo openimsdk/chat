@@ -27,7 +27,7 @@ import (
 
 const (
 	chatToken       = "CHAT_UID_TOKEN_STATUS:"
-	userMaxTokenNum = 20
+	userMaxTokenNum = 10
 )
 
 type TokenInterface interface {
@@ -96,15 +96,19 @@ func (t *TokenCacheRedis) SetTokenExpire(ctx context.Context, userID string, tok
 		}
 	}
 	var sorted bool
+	var index int
 	for i := len(mm) - len(fields); i > userMaxTokenNum; i-- {
 		if !sorted {
 			sorted = true
 			sort.Sort(ts)
 		}
-		fields = append(fields, ts[i].Token)
+		fields = append(fields, ts[index].Token)
+		index++
 	}
-	if err := t.rdb.HDel(ctx, key, fields...).Err(); err != nil {
-		return errs.Wrap(err)
+	if len(fields) > 0 {
+		if err := t.rdb.HDel(ctx, key, fields...).Err(); err != nil {
+			return errs.Wrap(err)
+		}
 	}
 	return nil
 }
