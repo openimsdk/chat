@@ -11,15 +11,15 @@ on:
       milestone_name:
         description: 'Milestone name to collect closed PRs from'
         required: true
-        default: 'v3.8.2'
+        default: 'v1.8.2'
       target_branch:
         description: 'Target branch to merge the consolidated PR'
         required: true
-        default: 'pre-release-v3.8.2'
+        default: 'pre-release-v1.8.2'
 
 env:
-  MILESTONE_NAME: ${{ github.event.inputs.milestone_name || 'v3.8.2' }}
-  TARGET_BRANCH: ${{ github.event.inputs.target_branch || 'pre-release-v3.8.2' }}
+  MILESTONE_NAME: ${{ github.event.inputs.milestone_name || 'v1.8.2' }}
+  TARGET_BRANCH: ${{ github.event.inputs.target_branch || 'pre-release-v1.8.2' }}
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
   LABEL_NAME: cherry-picked
