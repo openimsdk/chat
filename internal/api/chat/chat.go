@@ -360,3 +360,11 @@ func (o *Api) SearchFriend(c *gin.Context) {
 	}
 	apiresp.GinSuccess(c, resp)
 }
+
+func (o *Api) LatestApplicationVersion(c *gin.Context) {
+	a2r.Call(admin.AdminClient.LatestApplicationVersion, o.adminClient, c)
+}
+
+func (o *Api) PageApplicationVersion(c *gin.Context) {
+	a2r.Call(admin.AdminClient.PageApplicationVersion, o.adminClient, c)
+}
