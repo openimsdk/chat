@@ -135,4 +135,11 @@ func SetAdminRoute(router gin.IRouter, admin *Api, mw *chatmw.MW) {
 	statistic := router.Group("/statistic", mw.CheckAdmin)
 	statistic.POST("/new_user_count", admin.NewUserCount)
 	statistic.POST("/login_user_count", admin.LoginUserCount)
+
+	applicationGroup := router.Group("application")
+	applicationGroup.POST("/add_version", mw.CheckAdmin, admin.AddApplicationVersion)
+	applicationGroup.POST("/update_version", mw.CheckAdmin, admin.UpdateApplicationVersion)
+	applicationGroup.POST("/delete_version", mw.CheckAdmin, admin.DeleteApplicationVersion)
+	applicationGroup.POST("/latest_version", admin.LatestApplicationVersion)
+	applicationGroup.POST("/page_versions", admin.PageApplicationVersion)
 }

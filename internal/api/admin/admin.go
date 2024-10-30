@@ -566,3 +566,23 @@ func (o *Api) SetAllowRegister(c *gin.Context) {
 func (o *Api) GetAllowRegister(c *gin.Context) {
 	a2r.Call(chat.ChatClient.GetAllowRegister, o.chatClient, c)
 }
+
+func (o *Api) LatestApplicationVersion(c *gin.Context) {
+	a2r.Call(admin.AdminClient.LatestApplicationVersion, o.adminClient, c)
+}
+
+func (o *Api) PageApplicationVersion(c *gin.Context) {
+	a2r.Call(admin.AdminClient.PageApplicationVersion, o.adminClient, c)
+}
+
+func (o *Api) AddApplicationVersion(c *gin.Context) {
+	a2r.Call(admin.AdminClient.AddApplicationVersion, o.adminClient, c)
+}
+
+func (o *Api) UpdateApplicationVersion(c *gin.Context) {
+	a2r.Call(admin.AdminClient.UpdateApplicationVersion, o.adminClient, c)
+}
+
+func (o *Api) DeleteApplicationVersion(c *gin.Context) {
+	a2r.Call(admin.AdminClient.DeleteApplicationVersion, o.adminClient, c)
+}
