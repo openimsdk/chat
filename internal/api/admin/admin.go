@@ -113,7 +113,7 @@ func (o *Api) AdminUpdateInfo(c *gin.Context) {
 	}
 
 	imAdminUserID := o.GetDefaultIMAdminUserID()
-	imToken, err := o.imApiCaller.GetAdminToken(c, imAdminUserID)
+	imToken, err := o.imApiCaller.GetAdminTokenCache(c, imAdminUserID)
 	if err != nil {
 		log.ZError(c, "AdminUpdateInfo ImAdminTokenWithDefaultAdmin", err, "imAdminUserID", imAdminUserID)
 		return
@@ -193,7 +193,7 @@ func (o *Api) AddDefaultGroup(c *gin.Context) {
 		apiresp.GinError(c, err)
 		return
 	}
-	imToken, err := o.imApiCaller.GetAdminToken(c, o.GetDefaultIMAdminUserID())
+	imToken, err := o.imApiCaller.ImAdminTokenWithDefaultAdmin(c)
 	if err != nil {
 		apiresp.GinError(c, err)
 		return
@@ -241,7 +241,7 @@ func (o *Api) SearchDefaultGroup(c *gin.Context) {
 		Groups: make([]*sdkws.GroupInfo, 0, len(searchResp.GroupIDs)),
 	}
 	if len(searchResp.GroupIDs) > 0 {
-		imToken, err := o.imApiCaller.GetAdminToken(c, o.GetDefaultIMAdminUserID())
+		imToken, err := o.imApiCaller.ImAdminTokenWithDefaultAdmin(c)
 		if err != nil {
 			apiresp.GinError(c, err)
 			return
@@ -323,7 +323,7 @@ func (o *Api) BlockUser(c *gin.Context) {
 		apiresp.GinError(c, err)
 		return
 	}
-	imToken, err := o.imApiCaller.GetAdminToken(c, o.GetDefaultIMAdminUserID())
+	imToken, err := o.imApiCaller.ImAdminTokenWithDefaultAdmin(c)
 	if err != nil {
 		apiresp.GinError(c, err)
 		return
@@ -382,7 +382,7 @@ func (o *Api) NewUserCount(c *gin.Context) {
 		apiresp.GinError(c, err)
 		return
 	}
-	imToken, err := o.imApiCaller.GetAdminToken(c, o.GetDefaultIMAdminUserID())
+	imToken, err := o.imApiCaller.ImAdminTokenWithDefaultAdmin(c)
 	if err != nil {
 		apiresp.GinError(c, err)
 		return

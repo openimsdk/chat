@@ -109,7 +109,7 @@ func (t *Token) GetToken(token string) (string, int32, error) {
 	return userID, userType, nil
 }
 
-//func (t *Token) GetAdminToken(token string) (string, error) {
+//func (t *Token) GetAdminTokenCache(token string) (string, error) {
 //	userID, userType, err := getToken(token)
 //	if err != nil {
 //		return "", err
