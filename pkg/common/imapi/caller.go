@@ -49,6 +49,8 @@ func New(imApi string, imSecret string, defaultIMUserID string) CallerInterface 
 		imApi:           imApi,
 		imSecret:        imSecret,
 		defaultIMUserID: defaultIMUserID,
+		tokenCache:      make(map[string]*authToken),
+		lock:            sync.RWMutex{},
 	}
 }
 
