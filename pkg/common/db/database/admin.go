@@ -16,10 +16,12 @@ package database
 
 import (
 	"context"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"time"
 
+	"go.mongodb.org/mongo-driver/bson/primitive"
+
 	"github.com/openimsdk/chat/pkg/common/db/cache"
+	"github.com/openimsdk/chat/pkg/common/tokenverify"
 	"github.com/openimsdk/tools/db/mongoutil"
 	"github.com/openimsdk/tools/db/pagination"
 	"github.com/openimsdk/tools/db/tx"
@@ -138,7 +140,7 @@ func NewAdminDatabase(cli *mongoutil.Client, rdb redis.UniversalClient, token *t
 		applet:             applet,
 		clientConfig:       clientConfig,
 		application:        application,
-		cache:              cache.NewTokenInterface(rdb),
+		cache:              cache.NewTokenInterface(rdb, token),
 	}, nil
 }
 
