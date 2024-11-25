@@ -86,5 +86,9 @@ func SetChatRoute(router gin.IRouter, chat *Api, mw *chatmw.MW) {
 
 	router.Group("/client_config").POST("/get", chat.GetClientConfig) // Get client initialization configuration
 
+	applicationGroup := router.Group("application")
+	applicationGroup.POST("/latest_version", chat.LatestApplicationVersion)
+	applicationGroup.POST("/page_versions", chat.PageApplicationVersion)
+
 	router.Group("/callback").POST("/open_im", chat.OpenIMCallback) // Callback
 }
