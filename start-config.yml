@@ -5,4 +5,5 @@ serviceBinaries:
   admin-rpc: 1
 toolBinaries:
   - check-component
+  - attribute-to-credential
 maxFileDescriptors: 10000

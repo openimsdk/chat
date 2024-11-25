@@ -109,22 +109,7 @@ func (t *Token) GetToken(token string) (string, int32, error) {
 	return userID, userType, nil
 }
 
-func (t *Token) GetExpire(token string) time.Time {
-	val, err := jwt.ParseWithClaims(token, &claims{}, t.secret())
-	if err != nil {
-		return time.Time{}
-	}
-	c, ok := val.Claims.(*claims)
-	if !ok {
-		return time.Time{}
-	}
-	if c.ExpiresAt == nil {
-		return time.Time{}
-	}
-	return c.ExpiresAt.Time
-}
-
-//func (t *Token) GetAdminToken(token string) (string, error) {
+//func (t *Token) GetAdminTokenCache(token string) (string, error) {
 //	userID, userType, err := getToken(token)
 //	if err != nil {
 //		return "", err

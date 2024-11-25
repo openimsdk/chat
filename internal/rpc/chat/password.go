@@ -16,7 +16,6 @@ package chat
 
 import (
 	"context"
-
 	"github.com/openimsdk/tools/errs"
 
 	"github.com/openimsdk/chat/pkg/common/constant"
@@ -27,6 +26,11 @@ import (
 func (o *chatSvr) ResetPassword(ctx context.Context, req *chat.ResetPasswordReq) (*chat.ResetPasswordResp, error) {
 	if req.Password == "" {
 		return nil, errs.ErrArgs.WrapMsg("password must be set")
+	}
+	if req.AreaCode == "" || req.PhoneNumber == "" {
+		if !(req.AreaCode == "" && req.PhoneNumber == "") {
+			return nil, errs.ErrArgs.WrapMsg("area code and phone number must set together")
+		}
 	}
 	var verifyCodeID string
 	var err error
@@ -39,22 +43,19 @@ func (o *chatSvr) ResetPassword(ctx context.Context, req *chat.ResetPasswordReq)
 	if err != nil {
 		return nil, err
 	}
-
+	var account string
 	if req.Email == "" {
-		attribute, err := o.Database.GetAttributeByPhone(ctx, req.AreaCode, req.PhoneNumber)
-		if err != nil {
-			return nil, err
-		}
-		err = o.Database.UpdatePasswordAndDeleteVerifyCode(ctx, attribute.UserID, req.Password, verifyCodeID)
+		account = BuildCredentialPhone(req.AreaCode, req.PhoneNumber)
 	} else {
-		attribute, err := o.Database.GetAttributeByEmail(ctx, req.Email)
-		if err != nil {
-			return nil, err
-		}
-		err = o.Database.UpdatePasswordAndDeleteVerifyCode(ctx, attribute.UserID, req.Password, verifyCodeID)
-		if err != nil {
-			return nil, err
-		}
+		account = req.Email
+	}
+	cred, err := o.Database.TakeCredentialByAccount(ctx, account)
+	if err != nil {
+		return nil, err
+	}
+	err = o.Database.UpdatePasswordAndDeleteVerifyCode(ctx, cred.UserID, req.Password, verifyCodeID)
+	if err != nil {
+		return nil, err
 	}
 	return &chat.ResetPasswordResp{}, nil
 }

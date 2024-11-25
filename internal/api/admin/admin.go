@@ -1,17 +1,3 @@
-// Copyright © 2023 OpenIM open source community. All rights reserved.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
 package admin
 
 import (
@@ -72,7 +58,7 @@ func (o *Api) AdminLogin(c *gin.Context) {
 		return
 	}
 	imAdminUserID := o.GetDefaultIMAdminUserID()
-	imToken, err := o.imApiCaller.GetAdminToken(c, imAdminUserID)
+	imToken, err := o.imApiCaller.ImAdminTokenWithDefaultAdmin(c)
 	if err != nil {
 		apiresp.GinError(c, err)
 		return
@@ -127,7 +113,7 @@ func (o *Api) AdminUpdateInfo(c *gin.Context) {
 	}
 
 	imAdminUserID := o.GetDefaultIMAdminUserID()
-	imToken, err := o.imApiCaller.GetAdminToken(c, imAdminUserID)
+	imToken, err := o.imApiCaller.GetAdminTokenCache(c, imAdminUserID)
 	if err != nil {
 		log.ZError(c, "AdminUpdateInfo ImAdminTokenWithDefaultAdmin", err, "imAdminUserID", imAdminUserID)
 		return
@@ -156,25 +142,25 @@ func (o *Api) AddUserAccount(c *gin.Context) {
 		apiresp.GinError(c, err)
 		return
 	}
-	if _, err := o.chatClient.AddUserAccount(c, req); err != nil {
+	ip, err := o.GetClientIP(c)
+	if err != nil {
 		apiresp.GinError(c, err)
 		return
 	}
-
-	userInfo := &sdkws.UserInfo{
-		UserID:     req.User.UserID,
-		Nickname:   req.User.Nickname,
-		FaceURL:    req.User.FaceURL,
-		CreateTime: time.Now().UnixMilli(),
-	}
-	err = o.imApiCaller.RegisterUser(c, []*sdkws.UserInfo{userInfo})
+	imToken, err := o.imApiCaller.ImAdminTokenWithDefaultAdmin(c)
 	if err != nil {
 		apiresp.GinError(c, err)
 		return
 	}
 
-	apiresp.GinSuccess(c, nil)
+	ctx := o.WithAdminUser(mctx.WithApiToken(c, imToken))
 
+	err = o.registerChatUser(ctx, ip, []*chat.RegisterUserInfo{req.User})
+	if err != nil {
+		return
+	}
+
+	apiresp.GinSuccess(c, nil)
 }
 
 func (o *Api) DelAdminAccount(c *gin.Context) {
@@ -207,7 +193,7 @@ func (o *Api) AddDefaultGroup(c *gin.Context) {
 		apiresp.GinError(c, err)
 		return
 	}
-	imToken, err := o.imApiCaller.GetAdminToken(c, o.GetDefaultIMAdminUserID())
+	imToken, err := o.imApiCaller.ImAdminTokenWithDefaultAdmin(c)
 	if err != nil {
 		apiresp.GinError(c, err)
 		return
@@ -255,7 +241,7 @@ func (o *Api) SearchDefaultGroup(c *gin.Context) {
 		Groups: make([]*sdkws.GroupInfo, 0, len(searchResp.GroupIDs)),
 	}
 	if len(searchResp.GroupIDs) > 0 {
-		imToken, err := o.imApiCaller.GetAdminToken(c, o.GetDefaultIMAdminUserID())
+		imToken, err := o.imApiCaller.ImAdminTokenWithDefaultAdmin(c)
 		if err != nil {
 			apiresp.GinError(c, err)
 			return
@@ -337,7 +323,7 @@ func (o *Api) BlockUser(c *gin.Context) {
 		apiresp.GinError(c, err)
 		return
 	}
-	imToken, err := o.imApiCaller.GetAdminToken(c, o.GetDefaultIMAdminUserID())
+	imToken, err := o.imApiCaller.ImAdminTokenWithDefaultAdmin(c)
 	if err != nil {
 		apiresp.GinError(c, err)
 		return
@@ -396,7 +382,7 @@ func (o *Api) NewUserCount(c *gin.Context) {
 		apiresp.GinError(c, err)
 		return
 	}
-	imToken, err := o.imApiCaller.GetAdminToken(c, o.GetDefaultIMAdminUserID())
+	imToken, err := o.imApiCaller.ImAdminTokenWithDefaultAdmin(c)
 	if err != nil {
 		apiresp.GinError(c, err)
 		return
@@ -547,6 +533,7 @@ func (o *Api) registerChatUser(ctx context.Context, ip string, users []*chat.Reg
 		if err = o.imApiCaller.RegisterUser(ctx, []*sdkws.UserInfo{userInfo}); err != nil {
 			return err
 		}
+
 		if resp, err := o.adminClient.FindDefaultFriend(ctx, &admin.FindDefaultFriendReq{}); err == nil {
 			_ = o.imApiCaller.ImportFriend(ctx, respRegisterUser.UserID, resp.UserIDs)
 		}
@@ -570,4 +557,32 @@ func (o *Api) BatchImportTemplate(c *gin.Context) {
 	c.Header("Content-Length", strconv.Itoa(len(config.ImportTemplate)))
 	c.Header("ETag", md5Val)
 	c.Data(http.StatusOK, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", config.ImportTemplate)
+}
+
+func (o *Api) SetAllowRegister(c *gin.Context) {
+	a2r.Call(chat.ChatClient.SetAllowRegister, o.chatClient, c)
+}
+
+func (o *Api) GetAllowRegister(c *gin.Context) {
+	a2r.Call(chat.ChatClient.GetAllowRegister, o.chatClient, c)
+}
+
+func (o *Api) LatestApplicationVersion(c *gin.Context) {
+	a2r.Call(admin.AdminClient.LatestApplicationVersion, o.adminClient, c)
+}
+
+func (o *Api) PageApplicationVersion(c *gin.Context) {
+	a2r.Call(admin.AdminClient.PageApplicationVersion, o.adminClient, c)
+}
+
+func (o *Api) AddApplicationVersion(c *gin.Context) {
+	a2r.Call(admin.AdminClient.AddApplicationVersion, o.adminClient, c)
+}
+
+func (o *Api) UpdateApplicationVersion(c *gin.Context) {
+	a2r.Call(admin.AdminClient.UpdateApplicationVersion, o.adminClient, c)
+}
+
+func (o *Api) DeleteApplicationVersion(c *gin.Context) {
+	a2r.Call(admin.AdminClient.DeleteApplicationVersion, o.adminClient, c)
 }

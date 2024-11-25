@@ -57,7 +57,7 @@ func CheckRedis(ctx context.Context, config *config.Redis) error {
 
 func CheckOpenIM(ctx context.Context, apiURL, secret, adminUserID string) error {
 	imAPI := imapi.New(apiURL, secret, adminUserID)
-	_, err := imAPI.GetAdminToken(mcontext.SetOperationID(ctx, "CheckOpenIM"+idutil.OperationIDGenerator()), adminUserID)
+	_, err := imAPI.GetAdminTokenCache(mcontext.SetOperationID(ctx, "CheckOpenIM"+idutil.OperationIDGenerator()), adminUserID)
 	return err
 }
 
