@@ -8,7 +8,7 @@ jobs:
   update-version:
     runs-on: ubuntu-latest
     env:
-      TAG_VERSION: ${{ github.event.release.tag_name }} 
+      TAG_VERSION: ${{ github.event.release.tag_name }}
     steps:
       # Step 1: Checkout the original repository's code
       - name: Checkout code
@@ -26,33 +26,33 @@ jobs:
       - name: Check and delete existing tag
         run: |
           if git rev-parse ${{ env.TAG_VERSION }} >/dev/null 2>&1; then
-            git tag -d ${{ env.TAG_VERSION }}
-            git push --delete origin ${{ env.TAG_VERSION }}
+            git tag -d ${{ env.TAG_VERSION }}  # Delete local tag
+            git push --delete origin ${{ env.TAG_VERSION }}  # Delete remote tag
           fi
 
       # Step 4: Update version file
       - name: Update version file
         run: |
-          echo "${{ env.TAG_VERSION }}" > version/version
+          echo "${{ env.TAG_VERSION }}" > version/version  # Write the version to the file
 
-      # Step 5: Commit and push changes
+      # Step 5: Commit and push changes to the correct branch
       - name: Commit and push changes
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git add version/version
           git commit -m "Update version to ${{ env.TAG_VERSION }}"
-          git push origin HEAD:${{ github.ref }}
+          git push origin HEAD:${{ github.ref }}  # Push to the current branch
 
-      # Step 6: Create and push tag
+      # Step 6: Create and push new tag
       - name: Create and push tag
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git tag ${{ env.TAG_VERSION }}
-          git push origin ${{ env.TAG_VERSION }}
+          git tag ${{ env.TAG_VERSION }}  # Create new tag
+          git push origin ${{ env.TAG_VERSION }}  # Push the tag
 
-      # Step 8: Find and Publish Draft Release
+      # Step 7: Find and Publish Draft Release
       - name: Find and Publish Draft Release
         uses: actions/github-script@v6
         with:
