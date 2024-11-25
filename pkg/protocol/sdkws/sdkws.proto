@@ -389,7 +389,6 @@ message FriendApplicationRejectedTips {
   FromToUserID fromToUserID = 1; //from: rejecter; to: requester
   string handleMsg = 2;
 }
-}
 
 // FromUserID  Added a friend ToUserID
 message FriendAddedTips {

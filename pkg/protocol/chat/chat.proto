@@ -274,6 +274,21 @@ message DelUserAccountReq {
 }
 message DelUserAccountResp {}
 
+message SetAllowRegisterReq {
+  bool allowRegister = 1;
+}
+
+message SetAllowRegisterResp {
+}
+
+message GetAllowRegisterReq {
+}
+
+message GetAllowRegisterResp {
+  bool allowRegister = 1;
+}
+
+
 service chat {
   // Edit personal information - called by the user or an administrator
   rpc UpdateUserInfo(UpdateUserInfoReq) returns (UpdateUserInfoResp);
@@ -305,4 +320,7 @@ service chat {
 
   // Audio/video call and video meeting
   rpc GetTokenForVideoMeeting(GetTokenForVideoMeetingReq) returns (GetTokenForVideoMeetingResp);
+
+  rpc SetAllowRegister(SetAllowRegisterReq) returns(SetAllowRegisterResp);
+  rpc GetAllowRegister(GetAllowRegisterReq) returns(GetAllowRegisterResp);
 }

@@ -68,6 +68,7 @@ func Start(ctx context.Context, config *Config, client discovery.SvcDiscoveryReg
 		Len:        config.RpcConfig.VerifyCode.Len,
 	}
 	srv.Livekit = rtc.NewLiveKit(config.RpcConfig.LiveKit.Key, config.RpcConfig.LiveKit.Secret, config.RpcConfig.LiveKit.URL)
+	srv.AllowRegister = config.RpcConfig.AllowRegister
 	chat.RegisterChatServer(server, &srv)
 	return nil
 }
@@ -80,6 +81,7 @@ type chatSvr struct {
 	Code            verifyCode
 	Livekit         *rtc.LiveKit
 	ChatAdminUserID string
+	AllowRegister   bool
 }
 
 func (o *chatSvr) WithAdminUser(ctx context.Context) context.Context {

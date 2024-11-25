@@ -16,6 +16,7 @@ package database
 
 import (
 	"context"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"time"
 
 	"github.com/openimsdk/chat/pkg/common/db/cache"
@@ -78,6 +79,11 @@ type AdminDatabaseInterface interface {
 	CacheToken(ctx context.Context, userID string, token string, expire time.Duration) error
 	GetTokens(ctx context.Context, userID string) (map[string]int32, error)
 	DeleteToken(ctx context.Context, userID string) error
+	LatestVersion(ctx context.Context, platform string) (*admindb.Application, error)
+	AddVersion(ctx context.Context, val *admindb.Application) error
+	UpdateVersion(ctx context.Context, id primitive.ObjectID, update map[string]any) error
+	DeleteVersion(ctx context.Context, id []primitive.ObjectID) error
+	PageVersion(ctx context.Context, platforms []string, page pagination.Pagination) (int64, []*admindb.Application, error)
 }
 
 func NewAdminDatabase(cli *mongoutil.Client, rdb redis.UniversalClient) (AdminDatabaseInterface, error) {
@@ -117,6 +123,10 @@ func NewAdminDatabase(cli *mongoutil.Client, rdb redis.UniversalClient) (AdminDa
 	if err != nil {
 		return nil, err
 	}
+	application, err := admin.NewApplication(cli.GetDB())
+	if err != nil {
+		return nil, err
+	}
 	return &AdminDatabase{
 		tx:                 cli.GetTx(),
 		admin:              a,
@@ -128,6 +138,7 @@ func NewAdminDatabase(cli *mongoutil.Client, rdb redis.UniversalClient) (AdminDa
 		registerAddGroup:   registerAddGroup,
 		applet:             applet,
 		clientConfig:       clientConfig,
+		application:        application,
 		cache:              cache.NewTokenInterface(rdb),
 	}, nil
 }
@@ -143,6 +154,7 @@ type AdminDatabase struct {
 	registerAddGroup   admindb.RegisterAddGroupInterface
 	applet             admindb.AppletInterface
 	clientConfig       admindb.ClientConfigInterface
+	application        admindb.ApplicationInterface
 	cache              cache.TokenInterface
 }
 
@@ -346,4 +358,24 @@ func (o *AdminDatabase) GetTokens(ctx context.Context, userID string) (map[strin
 
 func (o *AdminDatabase) DeleteToken(ctx context.Context, userID string) error {
 	return o.cache.DeleteTokenByUid(ctx, userID)
+}
+
+func (o *AdminDatabase) LatestVersion(ctx context.Context, platform string) (*admindb.Application, error) {
+	return o.application.LatestVersion(ctx, platform)
+}
+
+func (o *AdminDatabase) AddVersion(ctx context.Context, val *admindb.Application) error {
+	return o.application.AddVersion(ctx, val)
+}
+
+func (o *AdminDatabase) UpdateVersion(ctx context.Context, id primitive.ObjectID, update map[string]any) error {
+	return o.application.UpdateVersion(ctx, id, update)
+}
+
+func (o *AdminDatabase) DeleteVersion(ctx context.Context, id []primitive.ObjectID) error {
+	return o.application.DeleteVersion(ctx, id)
+}
+
+func (o *AdminDatabase) PageVersion(ctx context.Context, platforms []string, page pagination.Pagination) (int64, []*admindb.Application, error) {
+	return o.application.PageVersion(ctx, platforms, page)
 }

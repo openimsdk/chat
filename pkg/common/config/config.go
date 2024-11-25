@@ -2,6 +2,7 @@ package config
 
 import (
 	_ "embed"
+
 	"github.com/openimsdk/tools/db/mongoutil"
 	"github.com/openimsdk/tools/db/redisutil"
 )
@@ -144,6 +145,7 @@ type Chat struct {
 		Key    string `mapstructure:"key"`
 		Secret string `mapstructure:"secret"`
 	} `mapstructure:"liveKit"`
+	AllowRegister bool `mapstructure:"allowRegister"`
 }
 
 type Admin struct {
@@ -165,5 +167,6 @@ type Log struct {
 	RemainLogLevel      int    `mapstructure:"remainLogLevel"`
 	IsStdout            bool   `mapstructure:"isStdout"`
 	IsJson              bool   `mapstructure:"isJson"`
+	IsSimplify          bool   `mapstructure:"isSimplify"`
 	WithStack           bool   `mapstructure:"withStack"`
 }

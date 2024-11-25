@@ -1,27 +1,12 @@
-// Copyright © 2023 OpenIM open source community. All rights reserved.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
 package imapi
 
 import (
 	"context"
+	"github.com/openimsdk/tools/log"
 	"sync"
 	"time"
 
 	"github.com/openimsdk/chat/pkg/eerrs"
-	"github.com/openimsdk/tools/log"
-
 	"github.com/openimsdk/protocol/auth"
 	"github.com/openimsdk/protocol/constant"
 	constantpb "github.com/openimsdk/protocol/constant"
@@ -35,7 +20,7 @@ type CallerInterface interface {
 	ImAdminTokenWithDefaultAdmin(ctx context.Context) (string, error)
 	ImportFriend(ctx context.Context, ownerUserID string, friendUserID []string) error
 	GetUserToken(ctx context.Context, userID string, platform int32) (string, error)
-	AdminToken(ctx context.Context, userID string) (string, error)
+	GetAdminTokenCache(ctx context.Context, userID string) (string, error)
 	InviteToGroup(ctx context.Context, userID string, groupIDs []string) error
 	UpdateUserInfo(ctx context.Context, userID string, nickName string, faceURL string) error
 	ForceOffLine(ctx context.Context, userID string) error
@@ -46,13 +31,17 @@ type CallerInterface interface {
 	AccountCheckSingle(ctx context.Context, userID string) (bool, error)
 }
 
+type authToken struct {
+	token   string
+	timeout time.Time
+}
+
 type Caller struct {
 	imApi           string
 	imSecret        string
 	defaultIMUserID string
-	token           string
-	timeout         time.Time
-	lock            sync.Mutex
+	tokenCache      map[string]*authToken
+	lock            sync.RWMutex
 }
 
 func New(imApi string, imSecret string, defaultIMUserID string) CallerInterface {
@@ -60,6 +49,8 @@ func New(imApi string, imSecret string, defaultIMUserID string) CallerInterface 
 		imApi:           imApi,
 		imSecret:        imSecret,
 		defaultIMUserID: defaultIMUserID,
+		tokenCache:      make(map[string]*authToken),
+		lock:            sync.RWMutex{},
 	}
 }
 
@@ -75,24 +66,33 @@ func (c *Caller) ImportFriend(ctx context.Context, ownerUserID string, friendUse
 }
 
 func (c *Caller) ImAdminTokenWithDefaultAdmin(ctx context.Context) (string, error) {
-	c.lock.Lock()
-	defer c.lock.Unlock()
-	if c.token == "" || c.timeout.Before(time.Now()) {
-		userID := c.defaultIMUserID
-		token, err := c.AdminToken(ctx, userID)
-		if err != nil {
-			log.ZError(ctx, "get im admin token", err, "userID", userID)
-			return "", err
-		}
-		log.ZDebug(ctx, "get im admin token", "userID", userID)
-		c.token = token
-		c.timeout = time.Now().Add(time.Minute * 5)
-	}
-	return c.token, nil
+	return c.GetAdminTokenCache(ctx, c.defaultIMUserID)
 }
 
-func (c *Caller) AdminToken(ctx context.Context, userID string) (string, error) {
-	resp, err := userToken.Call(ctx, c.imApi, &auth.UserTokenReq{
+func (c *Caller) GetAdminTokenCache(ctx context.Context, userID string) (string, error) {
+	c.lock.RLock()
+	t, ok := c.tokenCache[userID]
+	c.lock.RUnlock()
+	if !ok || t.timeout.Before(time.Now()) {
+		c.lock.Lock()
+		t, ok = c.tokenCache[userID]
+		if !ok || t.timeout.Before(time.Now()) {
+			token, err := c.getAdminTokenServer(ctx, userID)
+			if err != nil {
+				log.ZError(ctx, "get im admin token", err, "userID", userID)
+				return "", err
+			}
+			log.ZDebug(ctx, "get im admin token", "userID", userID)
+			t = &authToken{token: token, timeout: time.Now().Add(time.Minute * 5)}
+			c.tokenCache[userID] = t
+		}
+		c.lock.Unlock()
+	}
+	return t.token, nil
+}
+
+func (c *Caller) getAdminTokenServer(ctx context.Context, userID string) (string, error) {
+	resp, err := getAdminToken.Call(ctx, c.imApi, &auth.GetAdminTokenReq{
 		Secret: c.imSecret,
 		UserID: userID,
 	})
