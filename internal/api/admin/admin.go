@@ -113,7 +113,7 @@ func (o *Api) AdminUpdateInfo(c *gin.Context) {
 	}
 
 	imAdminUserID := o.GetDefaultIMAdminUserID()
-	imToken, err := o.imApiCaller.GetAdminToken(c, imAdminUserID)
+	imToken, err := o.imApiCaller.GetAdminTokenCache(c, imAdminUserID)
 	if err != nil {
 		log.ZError(c, "AdminUpdateInfo ImAdminTokenWithDefaultAdmin", err, "imAdminUserID", imAdminUserID)
 		return
@@ -193,7 +193,7 @@ func (o *Api) AddDefaultGroup(c *gin.Context) {
 		apiresp.GinError(c, err)
 		return
 	}
-	imToken, err := o.imApiCaller.GetAdminToken(c, o.GetDefaultIMAdminUserID())
+	imToken, err := o.imApiCaller.ImAdminTokenWithDefaultAdmin(c)
 	if err != nil {
 		apiresp.GinError(c, err)
 		return
@@ -241,7 +241,7 @@ func (o *Api) SearchDefaultGroup(c *gin.Context) {
 		Groups: make([]*sdkws.GroupInfo, 0, len(searchResp.GroupIDs)),
 	}
 	if len(searchResp.GroupIDs) > 0 {
-		imToken, err := o.imApiCaller.GetAdminToken(c, o.GetDefaultIMAdminUserID())
+		imToken, err := o.imApiCaller.ImAdminTokenWithDefaultAdmin(c)
 		if err != nil {
 			apiresp.GinError(c, err)
 			return
@@ -323,7 +323,7 @@ func (o *Api) BlockUser(c *gin.Context) {
 		apiresp.GinError(c, err)
 		return
 	}
-	imToken, err := o.imApiCaller.GetAdminToken(c, o.GetDefaultIMAdminUserID())
+	imToken, err := o.imApiCaller.ImAdminTokenWithDefaultAdmin(c)
 	if err != nil {
 		apiresp.GinError(c, err)
 		return
@@ -382,7 +382,7 @@ func (o *Api) NewUserCount(c *gin.Context) {
 		apiresp.GinError(c, err)
 		return
 	}
-	imToken, err := o.imApiCaller.GetAdminToken(c, o.GetDefaultIMAdminUserID())
+	imToken, err := o.imApiCaller.ImAdminTokenWithDefaultAdmin(c)
 	if err != nil {
 		apiresp.GinError(c, err)
 		return
@@ -565,4 +565,24 @@ func (o *Api) SetAllowRegister(c *gin.Context) {
 
 func (o *Api) GetAllowRegister(c *gin.Context) {
 	a2r.Call(chat.ChatClient.GetAllowRegister, o.chatClient, c)
+}
+
+func (o *Api) LatestApplicationVersion(c *gin.Context) {
+	a2r.Call(admin.AdminClient.LatestApplicationVersion, o.adminClient, c)
+}
+
+func (o *Api) PageApplicationVersion(c *gin.Context) {
+	a2r.Call(admin.AdminClient.PageApplicationVersion, o.adminClient, c)
+}
+
+func (o *Api) AddApplicationVersion(c *gin.Context) {
+	a2r.Call(admin.AdminClient.AddApplicationVersion, o.adminClient, c)
+}
+
+func (o *Api) UpdateApplicationVersion(c *gin.Context) {
+	a2r.Call(admin.AdminClient.UpdateApplicationVersion, o.adminClient, c)
+}
+
+func (o *Api) DeleteApplicationVersion(c *gin.Context) {
+	a2r.Call(admin.AdminClient.DeleteApplicationVersion, o.adminClient, c)
 }

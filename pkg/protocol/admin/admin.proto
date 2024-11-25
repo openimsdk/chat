@@ -485,6 +485,76 @@ message GetUserTokenResp {
   map<string, int32> tokensMap = 1;
 }
 
+
+message ApplicationVersion {
+  string id = 1;
+  string platform = 2;
+  string version = 3;
+  string url = 4;
+  string text = 5;
+  bool force = 6;
+  bool latest = 7;
+  bool hot = 8;
+  int64 createTime = 9;
+}
+
+message LatestApplicationVersionReq {
+  string platform = 2;
+  string version = 3;
+}
+
+message LatestApplicationVersionResp {
+  ApplicationVersion version = 1;
+}
+
+message AddApplicationVersionReq {
+  string platform = 1;
+  string version = 2;
+  string url = 3;
+  string text = 4;
+  bool force = 5;
+  bool latest = 6;
+  bool hot = 7;
+}
+
+message AddApplicationVersionResp {
+
+}
+
+message UpdateApplicationVersionReq {
+  string id = 1;
+  openim.protobuf.StringValue platform = 2;
+  openim.protobuf.StringValue version = 3;
+  openim.protobuf.StringValue url = 4;
+  openim.protobuf.StringValue text = 5;
+  openim.protobuf.BoolValue force = 6;
+  openim.protobuf.BoolValue latest = 7;
+  openim.protobuf.BoolValue hot = 8;
+}
+
+message UpdateApplicationVersionResp {
+
+}
+
+message DeleteApplicationVersionReq {
+  repeated string id = 1;
+}
+
+message DeleteApplicationVersionResp {
+
+}
+
+message PageApplicationVersionReq {
+  repeated string platform = 1;
+  openim.sdkws.RequestPagination pagination = 2;
+}
+
+message PageApplicationVersionResp {
+  int64 total = 1;
+  repeated ApplicationVersion versions = 2;
+}
+
+
 service admin {
   // Login
   rpc Login(LoginReq) returns (LoginResp);
@@ -557,4 +627,10 @@ service admin {
 
   // invalidate token
   rpc InvalidateToken(InvalidateTokenReq) returns (InvalidateTokenResp);
+
+  rpc LatestApplicationVersion(LatestApplicationVersionReq) returns (LatestApplicationVersionResp);
+  rpc AddApplicationVersion(AddApplicationVersionReq) returns (AddApplicationVersionResp);
+  rpc UpdateApplicationVersion(UpdateApplicationVersionReq) returns (UpdateApplicationVersionResp);
+  rpc DeleteApplicationVersion(DeleteApplicationVersionReq) returns (DeleteApplicationVersionResp);
+  rpc PageApplicationVersion(PageApplicationVersionReq) returns (PageApplicationVersionResp);
 }

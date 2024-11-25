@@ -22,7 +22,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/openimsdk/chat/pkg/common/apistruct"
-	"github.com/openimsdk/chat/pkg/common/constant"
 	"github.com/openimsdk/chat/pkg/common/imapi"
 	"github.com/openimsdk/chat/pkg/common/mctx"
 	"github.com/openimsdk/chat/pkg/protocol/admin"
@@ -235,20 +234,9 @@ func (o *Api) UpdateUserInfo(c *gin.Context) {
 		apiresp.GinError(c, err)
 		return
 	}
-	opUserType, err := mctx.GetUserType(c)
-	if err != nil {
-		apiresp.GinError(c, err)
-		return
-	}
+
 	var imToken string
-	if opUserType == constant.NormalUser {
-		imToken, err = o.imApiCaller.ImAdminTokenWithDefaultAdmin(c)
-	} else if opUserType == constant.AdminUser {
-		imToken, err = o.imApiCaller.GetAdminToken(c, o.GetDefaultIMAdminUserID())
-	} else {
-		apiresp.GinError(c, errs.ErrArgs.WrapMsg("opUserType unknown"))
-		return
-	}
+	imToken, err = o.imApiCaller.ImAdminTokenWithDefaultAdmin(c)
 	if err != nil {
 		apiresp.GinError(c, err)
 		return
@@ -359,4 +347,12 @@ func (o *Api) SearchFriend(c *gin.Context) {
 		return
 	}
 	apiresp.GinSuccess(c, resp)
+}
+
+func (o *Api) LatestApplicationVersion(c *gin.Context) {
+	a2r.Call(admin.AdminClient.LatestApplicationVersion, o.adminClient, c)
+}
+
+func (o *Api) PageApplicationVersion(c *gin.Context) {
+	a2r.Call(admin.AdminClient.PageApplicationVersion, o.adminClient, c)
 }
