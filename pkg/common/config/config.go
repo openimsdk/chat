@@ -15,9 +15,7 @@ var (
 )
 
 type Share struct {
-	Env             string          `mapstructure:"env"`
-	RpcRegisterName RpcRegisterName `mapstructure:"rpcRegisterName"`
-	OpenIM          struct {
+	OpenIM struct {
 		ApiURL      string `mapstructure:"apiURL"`
 		Secret      string `mapstructure:"secret"`
 		AdminUserID string `mapstructure:"adminUserID"`
@@ -26,12 +24,12 @@ type Share struct {
 	ProxyHeader string   `mapstructure:"proxyHeader"`
 }
 
-type RpcRegisterName struct {
+type RpcService struct {
 	Chat  string `mapstructure:"chat"`
 	Admin string `mapstructure:"admin"`
 }
 
-func (r *RpcRegisterName) GetServiceNames() []string {
+func (r *RpcService) GetServiceNames() []string {
 	return []string{
 		r.Chat,
 		r.Admin,
@@ -88,17 +86,15 @@ func (r *Redis) Build() *redisutil.Config {
 	}
 }
 
-type ZooKeeper struct {
-	Schema   string   `mapstructure:"schema"`
-	Address  []string `mapstructure:"address"`
-	Username string   `mapstructure:"username"`
-	Password string   `mapstructure:"password"`
+type Discovery struct {
+	Enable     string     `mapstructure:"enable"`
+	Etcd       Etcd       `mapstructure:"etcd"`
+	Kubernetes Kubernetes `mapstructure:"kubernetes"`
+	RpcService RpcService `mapstructure:"rpcService"`
 }
 
-type Discovery struct {
-	Enable    string    `mapstructure:"enable"`
-	Etcd      Etcd      `mapstructure:"etcd"`
-	ZooKeeper ZooKeeper `mapstructure:"zooKeeper"`
+type Kubernetes struct {
+	Namespace string `mapstructure:"namespace"`
 }
 
 type Etcd struct {

@@ -16,13 +16,14 @@ package cmd
 
 import (
 	"fmt"
-	"path/filepath"
 
 	"github.com/openimsdk/chat/pkg/common/config"
 	"github.com/openimsdk/chat/version/version"
 
 	"github.com/openimsdk/tools/errs"
 	"github.com/openimsdk/tools/log"
+	"github.com/openimsdk/tools/utils/runtimeenv"
+
 	"github.com/spf13/cobra"
 )
 
@@ -95,18 +96,21 @@ func (r *RootCmd) initializeConfiguration(cmd *cobra.Command, opts *CmdOpts) err
 	if err != nil {
 		return err
 	}
+
+	runtimeEnv := runtimeenv.PrintRuntimeEnvironment()
+
 	// Load common configuration file
 	//opts.configMap[ShareFileName] = StructEnvPrefix{EnvPrefix: shareEnvPrefix, ConfigStruct: &r.share}
 	for configFileName, configStruct := range opts.configMap {
-		err := config.LoadConfig(filepath.Join(configDirectory, configFileName),
-			ConfigEnvPrefixMap[configFileName], configStruct)
+		err := config.Load(configDirectory, configFileName,
+			ConfigEnvPrefixMap[configFileName], runtimeEnv, configStruct)
 		if err != nil {
 			return err
 		}
 	}
 	// Load common log configuration file
-	return config.LoadConfig(filepath.Join(configDirectory, LogConfigFileName),
-		ConfigEnvPrefixMap[LogConfigFileName], &r.log)
+	return config.Load(configDirectory, LogConfigFileName,
+		ConfigEnvPrefixMap[LogConfigFileName], runtimeEnv, &r.log)
 }
 
 func (r *RootCmd) applyOptions(opts ...func(*CmdOpts)) *CmdOpts {

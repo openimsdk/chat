@@ -15,33 +15,34 @@
 package kdisc
 
 import (
+	"time"
+
 	"github.com/openimsdk/chat/pkg/common/config"
 	"github.com/openimsdk/tools/discovery"
 	"github.com/openimsdk/tools/discovery/etcd"
-	"github.com/openimsdk/tools/discovery/zookeeper"
+	"github.com/openimsdk/tools/discovery/kubernetes"
 	"github.com/openimsdk/tools/errs"
-	"time"
+	"google.golang.org/grpc"
 )
 
 const (
-	zookeeperConst = "zookeeper"
-	kubenetesConst = "k8s"
-	directConst    = "direct"
+	ETCDCONST       = "etcd"
+	KUBERNETESCONST = "kubernetes"
+	DIRECTCONST     = "direct"
 )
 
 // NewDiscoveryRegister creates a new service discovery and registry client based on the provided environment type.
-func NewDiscoveryRegister(discovery *config.Discovery) (discovery.SvcDiscoveryRegistry, error) {
-	switch discovery.Enable {
-	case "zookeeper":
-		return zookeeper.NewZkClient(
-			discovery.ZooKeeper.Address,
-			discovery.ZooKeeper.Schema,
-			zookeeper.WithFreq(time.Hour),
-			zookeeper.WithUserNameAndPassword(discovery.ZooKeeper.Username, discovery.ZooKeeper.Password),
-			zookeeper.WithRoundRobin(),
-			zookeeper.WithTimeout(10),
+func NewDiscoveryRegister(discovery *config.Discovery, runtimeEnv string) (discovery.SvcDiscoveryRegistry, error) {
+	if runtimeEnv == KUBERNETESCONST {
+		return kubernetes.NewKubernetesConnManager(discovery.Kubernetes.Namespace,
+			grpc.WithDefaultCallOptions(
+				grpc.MaxCallSendMsgSize(1024*1024*20),
+			),
 		)
-	case "etcd":
+	}
+
+	switch discovery.Enable {
+	case ETCDCONST:
 		return etcd.NewSvcDiscoveryRegistry(
 			discovery.Etcd.RootDirectory,
 			discovery.Etcd.Address,

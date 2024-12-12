@@ -16,6 +16,7 @@ package cmd
 
 import (
 	"context"
+
 	"github.com/openimsdk/chat/internal/rpc/chat"
 	"github.com/openimsdk/chat/pkg/common/config"
 	"github.com/openimsdk/chat/pkg/common/startrpc"
@@ -54,5 +55,5 @@ func (a *ChatRpcCmd) Exec() error {
 func (a *ChatRpcCmd) runE() error {
 	return startrpc.Start(a.ctx, &a.chatConfig.Discovery, a.chatConfig.RpcConfig.RPC.ListenIP,
 		a.chatConfig.RpcConfig.RPC.RegisterIP, a.chatConfig.RpcConfig.RPC.Ports,
-		a.Index(), a.chatConfig.Share.RpcRegisterName.Chat, &a.chatConfig.Share, &a.chatConfig, chat.Start)
+		a.Index(), a.chatConfig.Discovery.RpcService.Chat, &a.chatConfig.Share, &a.chatConfig, chat.Start)
 }
