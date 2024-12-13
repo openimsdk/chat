@@ -18,7 +18,7 @@ import (
 	"fmt"
 
 	"github.com/openimsdk/chat/pkg/common/config"
-	"github.com/openimsdk/chat/version/version"
+	"github.com/openimsdk/chat/version"
 
 	"github.com/openimsdk/tools/errs"
 	"github.com/openimsdk/tools/log"
