@@ -3,6 +3,12 @@ package constant
 import "github.com/openimsdk/protocol/constant"
 
 const (
+	MountConfigFilePath = "CONFIG_PATH"
+	KUBERNETES          = "kubernetes"
+	ETCD                = "etcd"
+)
+
+const (
 	// verificationCode used for.
 	VerificationCodeForRegister      = 1 // Register
 	VerificationCodeForResetPassword = 2 // Reset password

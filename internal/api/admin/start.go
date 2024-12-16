@@ -3,6 +3,7 @@ package admin
 import (
 	"context"
 	"fmt"
+
 	"github.com/gin-gonic/gin"
 	chatmw "github.com/openimsdk/chat/internal/api/mw"
 	"github.com/openimsdk/chat/internal/api/util"
@@ -16,6 +17,8 @@ import (
 	"github.com/openimsdk/tools/utils/datautil"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+
+	"github.com/openimsdk/tools/utils/runtimeenv"
 )
 
 type Config struct {
@@ -23,9 +26,13 @@ type Config struct {
 
 	Discovery config.Discovery
 	Share     config.Share
+
+	RuntimeEnv string
 }
 
 func Start(ctx context.Context, index int, config *Config) error {
+	config.RuntimeEnv = runtimeenv.PrintRuntimeEnvironment()
+
 	if len(config.Share.ChatAdmin) == 0 {
 		return errs.New("share chat admin not configured")
 	}
@@ -33,16 +40,16 @@ func Start(ctx context.Context, index int, config *Config) error {
 	if err != nil {
 		return err
 	}
-	client, err := kdisc.NewDiscoveryRegister(&config.Discovery)
+	client, err := kdisc.NewDiscoveryRegister(&config.Discovery, config.RuntimeEnv)
 	if err != nil {
 		return err
 	}
 
-	chatConn, err := client.GetConn(ctx, config.Share.RpcRegisterName.Chat, grpc.WithTransportCredentials(insecure.NewCredentials()), mw.GrpcClient())
+	chatConn, err := client.GetConn(ctx, config.Discovery.RpcService.Chat, grpc.WithTransportCredentials(insecure.NewCredentials()), mw.GrpcClient())
 	if err != nil {
 		return err
 	}
-	adminConn, err := client.GetConn(ctx, config.Share.RpcRegisterName.Admin, grpc.WithTransportCredentials(insecure.NewCredentials()), mw.GrpcClient())
+	adminConn, err := client.GetConn(ctx, config.Discovery.RpcService.Admin, grpc.WithTransportCredentials(insecure.NewCredentials()), mw.GrpcClient())
 	if err != nil {
 		return err
 	}

@@ -17,9 +17,6 @@ package startrpc
 import (
 	"context"
 	"fmt"
-	"github.com/openimsdk/chat/pkg/common/config"
-	"github.com/openimsdk/chat/pkg/common/kdisc"
-	"github.com/openimsdk/tools/utils/datautil"
 	"net"
 	"os"
 	"os/signal"
@@ -27,6 +24,11 @@ import (
 	"sync"
 	"syscall"
 	"time"
+
+	"github.com/openimsdk/chat/pkg/common/config"
+	"github.com/openimsdk/chat/pkg/common/kdisc"
+	"github.com/openimsdk/tools/utils/datautil"
+	"github.com/openimsdk/tools/utils/runtimeenv"
 
 	"github.com/openimsdk/tools/discovery"
 	"github.com/openimsdk/tools/errs"
@@ -43,11 +45,13 @@ func Start[T any](ctx context.Context, discovery *config.Discovery, listenIP,
 	registerIP string, rpcPorts []int, index int, rpcRegisterName string, share *config.Share, config T, rpcFn func(ctx context.Context,
 	config T, client discovery.SvcDiscoveryRegistry, server *grpc.Server) error, options ...grpc.ServerOption) error {
 
+	runtimeEnv := runtimeenv.PrintRuntimeEnvironment()
+
 	rpcPort, err := datautil.GetElemByIndex(rpcPorts, index)
 	if err != nil {
 		return err
 	}
-	log.CInfo(ctx, "RPC server is initializing", "rpcRegisterName", rpcRegisterName, "rpcPort", rpcPort)
+	log.CInfo(ctx, "RPC server is initializing", " runtimeEnv ", runtimeEnv, "rpcRegisterName", rpcRegisterName, "rpcPort", rpcPort)
 	rpcTcpAddr := net.JoinHostPort(network.GetListenIP(listenIP), strconv.Itoa(rpcPort))
 	listener, err := net.Listen(
 		"tcp",
@@ -58,7 +62,7 @@ func Start[T any](ctx context.Context, discovery *config.Discovery, listenIP,
 	}
 
 	defer listener.Close()
-	client, err := kdisc.NewDiscoveryRegister(discovery)
+	client, err := kdisc.NewDiscoveryRegister(discovery, runtimeEnv)
 	if err != nil {
 		return err
 	}

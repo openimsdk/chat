@@ -27,17 +27,13 @@ import (
 	"github.com/openimsdk/tools/db/mongoutil"
 	"github.com/openimsdk/tools/db/redisutil"
 	"github.com/openimsdk/tools/discovery/etcd"
-	"github.com/openimsdk/tools/discovery/zookeeper"
 	"github.com/openimsdk/tools/mcontext"
 	"github.com/openimsdk/tools/system/program"
 	"github.com/openimsdk/tools/utils/idutil"
+	"github.com/openimsdk/tools/utils/runtimeenv"
 )
 
 const maxRetry = 180
-
-func CheckZookeeper(ctx context.Context, config *config.ZooKeeper) error {
-	return zookeeper.Check(ctx, config.Address, config.Schema, zookeeper.WithUserNameAndPassword(config.Username, config.Password))
-}
 
 func CheckEtcd(ctx context.Context, config *config.Etcd) error {
 	return etcd.Check(ctx, config.Address, "/check_chat_component",
@@ -68,21 +64,24 @@ func initConfig(configDir string) (*config.Mongo, *config.Redis, *config.Discove
 		discoveryConfig = &config.Discovery{}
 		shareConfig     = &config.Share{}
 	)
-	err := config.LoadConfig(filepath.Join(configDir, cmd.MongodbConfigFileName), cmd.ConfigEnvPrefixMap[cmd.MongodbConfigFileName], mongoConfig)
+
+	runtimeEnv := runtimeenv.PrintRuntimeEnvironment()
+
+	err := config.Load(configDir, cmd.MongodbConfigFileName, cmd.ConfigEnvPrefixMap[cmd.MongodbConfigFileName], runtimeEnv, mongoConfig)
 	if err != nil {
 		return nil, nil, nil, nil, err
 	}
 
-	err = config.LoadConfig(filepath.Join(configDir, cmd.RedisConfigFileName), cmd.ConfigEnvPrefixMap[cmd.RedisConfigFileName], redisConfig)
+	err = config.Load(configDir, cmd.RedisConfigFileName, cmd.ConfigEnvPrefixMap[cmd.RedisConfigFileName], runtimeEnv, redisConfig)
 	if err != nil {
 		return nil, nil, nil, nil, err
 	}
 
-	err = config.LoadConfig(filepath.Join(configDir, cmd.DiscoveryConfigFileName), cmd.ConfigEnvPrefixMap[cmd.DiscoveryConfigFileName], discoveryConfig)
+	err = config.Load(configDir, cmd.DiscoveryConfigFileName, cmd.ConfigEnvPrefixMap[cmd.DiscoveryConfigFileName], runtimeEnv, discoveryConfig)
 	if err != nil {
 		return nil, nil, nil, nil, err
 	}
-	err = config.LoadConfig(filepath.Join(configDir, cmd.ShareFileName), cmd.ConfigEnvPrefixMap[cmd.ShareFileName], shareConfig)
+	err = config.Load(configDir, cmd.ShareFileName, cmd.ConfigEnvPrefixMap[cmd.ShareFileName], runtimeEnv, shareConfig)
 	if err != nil {
 		return nil, nil, nil, nil, err
 	}
@@ -132,10 +131,6 @@ func performChecks(ctx context.Context, mongoConfig *config.Mongo, redisConfig *
 	if discovery.Enable == "etcd" {
 		checks["Etcd"] = func(ctx context.Context) error {
 			return CheckEtcd(ctx, &discovery.Etcd)
-		}
-	} else if discovery.Enable == "zookeeper" {
-		checks["Zookeeper"] = func(ctx context.Context) error {
-			return CheckZookeeper(ctx, &discovery.ZooKeeper)
 		}
 	}
 
