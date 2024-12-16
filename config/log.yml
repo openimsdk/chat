@@ -7,7 +7,7 @@ remainRotationCount: 2
 # Log level settings: 3 for production environment; 6 for more verbose logging in debugging environments
 remainLogLevel: 6
 # Whether to output to standard output, default is acceptable
-isStdout: false
+isStdout: true
 # Whether to log in JSON format, default is acceptable
 isJson: false
 # output simplify log when KeyAndValues's value len is bigger than 50 in rpc method log

@@ -22,7 +22,6 @@ import (
 	"github.com/openimsdk/tools/discovery/etcd"
 	"github.com/openimsdk/tools/discovery/kubernetes"
 	"github.com/openimsdk/tools/errs"
-	"google.golang.org/grpc"
 )
 
 const (
@@ -34,11 +33,7 @@ const (
 // NewDiscoveryRegister creates a new service discovery and registry client based on the provided environment type.
 func NewDiscoveryRegister(discovery *config.Discovery, runtimeEnv string) (discovery.SvcDiscoveryRegistry, error) {
 	if runtimeEnv == KUBERNETESCONST {
-		return kubernetes.NewKubernetesConnManager(discovery.Kubernetes.Namespace,
-			grpc.WithDefaultCallOptions(
-				grpc.MaxCallSendMsgSize(1024*1024*20),
-			),
-		)
+		return kubernetes.NewKubernetesConnManager(discovery.Kubernetes.Namespace)
 	}
 
 	switch discovery.Enable {
