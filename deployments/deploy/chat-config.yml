@@ -1,0 +1,179 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: openim-chat-config
+data:
+  discovery.yml: |
+    enable: kubernetes
+    kubernetes:
+      namespace: default
+    etcd:
+      rootDirectory: openim
+      address: [ localhost:12379 ]
+      username: ''
+      password: ''
+
+    rpcService:
+      chat: chat-rpc-service
+      admin: admin-rpc-service
+
+  log.yml: |
+    # Log storage path, default is acceptable, change to a full path if modification is needed
+    # storageLocation: ../../../../logs/
+    storageLocation: ./logs/
+    # Log rotation period (in hours), default is acceptable
+    rotationTime: 24
+    # Number of log files to retain, default is acceptable
+    remainRotationCount: 2
+    # Log level settings: 3 for production environment; 6 for more verbose logging in debugging environments
+    remainLogLevel: 6
+    # Whether to output to standard output, default is acceptable
+    isStdout: true
+    # Whether to log in JSON format, default is acceptable
+    isJson: false
+    # output simplify log when KeyAndValues's value len is bigger than 50 in rpc method log
+    isSimplify: true
+
+  mongodb.yml: |
+    # URI for database connection, leave empty if using address and credential settings directly
+    uri: ''
+    # List of MongoDB server addresses
+    address: [ mongo-service:37017 ]
+    # Name of the database
+    database: openim_v3
+    # Username for database authentication
+    username: openIM
+    # Password for database authentication
+    password: # openIM123
+    # Authentication source for database authentication, if use root user, set it to admin
+    authSource: openim_v3
+    # Maximum number of connections in the connection pool
+    maxPoolSize: 100
+    # Maximum number of retry attempts for a failed database connection
+    maxRetry: 10
+
+  redis.yml: |
+    # List of Redis server addresses
+    address: [ redis-service:16379 ]
+    # Username for Redis authentication (leave blank if not used)
+    username: ''
+    # Password for Redis authentication
+    password:   # openIM123
+    # Enable or disable pipeline processing
+    enablePipeline: false
+    # Enable or disable cluster mode
+    clusterMode: false
+    # Database index to be used
+    db: 0
+    # Maximum number of retry attempts for a failed connection
+    maxRetry: 10
+
+  share.yml: |
+    openIM:
+      # OpenIM API address
+      apiURL: http://openim-api-service:10002
+      # OpenIM secret key, must be consistent with OpenIM
+      secret: openIM123
+      # OpenIM administrator userID, must be consistent with OpenIM
+      adminUserID: imAdmin
+
+    chatAdmin:
+       # Default username and password for the admin
+      - "chatAdmin"
+
+  chat-api-admin.yml: |
+    api:
+      # Listening IP; 0.0.0.0 means both internal and external IPs are listened to, default is recommended
+      listenIP: 0.0.0.0
+      # Listening ports; if multiple are configured, multiple instances will be launched
+      ports: [ 10009 ]
+
+  chat-rpc-admin.yml: |
+    rpc:
+      # The IP address where this RPC service registers itself; if left blank, it defaults to the internal network IP
+      registerIP: ''
+      # IP address that the RPC service listens on; setting to 0.0.0.0 listens on both internal and external IPs. If left blank, it automatically uses the internal network IP
+      listenIP: 0.0.0.0
+      # List of ports that the RPC service listens on; configuring multiple ports will launch multiple instances.
+      ports: [ 30200 ]
+
+    tokenPolicy:
+      expire: 90
+
+    secret: chat123
+  chat-api-chat.yml: |
+    api:
+      # Listening IP; 0.0.0.0 means both internal and external IPs are listened to, default is recommended
+      listenIP: 0.0.0.0
+      # Listening ports; if multiple are configured, multiple instances will be launched
+      ports: [ 10008 ]
+
+  chat-rpc-chat.yml: |
+    rpc:
+      # The IP address where this RPC service registers itself; if left blank, it defaults to the internal network IP
+      registerIP: ''
+      # IP address that the RPC service listens on; setting to 0.0.0.0 listens on both internal and external IPs. If left blank, it automatically uses the internal network IP
+      listenIP: 0.0.0.0
+      # List of ports that the RPC service listens on; configuring multiple ports will launch multiple instances.
+      ports: [ 30300 ]
+
+    verifyCode:
+      validTime: 300
+      validCount: 5
+      uintTime: 86400
+      maxCount: 10
+      superCode: "666666"
+      len: 6
+      phone:
+        use: ""
+        ali:
+          endpoint: ""
+          accessKeyId: ""
+          accessKeySecret: ""
+          signName: ""
+          verificationCodeTemplateCode: ""
+      mail:
+        enable: false
+        title: ""
+        senderMail: ""
+        senderAuthorizationCode: ""
+        smtpAddr: ""
+        smtpPort:
+
+    liveKit:
+      url: "ws://127.0.0.1:7880" # LIVEKIT_URL, LiveKit server address and port
+      key: "APIGPW3gnFTzqHH"
+      secret: "23ztfSqsfQ8hKkHzHTl3Z4bvaxro0snjk5jwbp5p6Q3"
+
+    allowRegister: true
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mongo-secret
+type: Opaque
+data:
+  mongo_initdb_root_username: cm9vdA== # base64 for "root"
+  mongo_initdb_root_password: b3BlbklNMTIz # base64 for "openIM123"
+  mongo_initdb_database: b3BlbmltX3Yz # base64 for "openim_v3"
+  mongo_openim_username: b3BlbklN # base64 for "openIM"
+  mongo_openim_password: b3BlbklNMTIz # base64 for "openIM123"
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: redis-secret
+type: Opaque
+data:
+  redis-password: b3BlbklNMTIz # "openIM123" in base64
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: share-secret
+type: Opaque
+data:
+  openim-secret: b3BlbklNMTIz # "openIM123" in base64

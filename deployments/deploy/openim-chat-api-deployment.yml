@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chat-api-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: chat-api-server
+  template:
+    metadata:
+      labels:
+        app: chat-api-server
+    spec:
+      containers:
+        - name: openim-chat-api-container
+          image: openim/openim-chat-api:v3.8.3
+          env:
+            - name: CONFIG_PATH
+              value: "/config"
+            - name: CHATENV_REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: redis-secret
+                  key: redis-password
+            - name: CHATENV_MONGODB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-secret
+                  key: mongo_openim_password
+            - name: CHATENV_SHARE_OPENIM_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: share-secret
+                  key: openim-secret
+
+          volumeMounts:
+            - name: openim-chat-config
+              mountPath: "/config"
+              readOnly: true
+          ports:
+            - containerPort: 10008
+      volumes:
+        - name: openim-chat-config
+          configMap:
+            name: openim-chat-config
