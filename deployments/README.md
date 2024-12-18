@@ -29,7 +29,7 @@ You need to modify the `chat-config.yml` file to match your environment. Focus o
 **mongodb.yml**
 
 - `address`: set to your already mongodb address or mongo Service name and port in your deployed.
-- `database`: set to your mongodb database name.
+- `database`: set to your mongodb database name.(Need have a created database.)
 - `authSource`: et to your mongodb authSource. (authSource is specify the database name associated with the user's credentials, user need create in this database.)
 
 **redis.yml**
@@ -39,17 +39,15 @@ You need to modify the `chat-config.yml` file to match your environment. Focus o
 **share.yml**
 
 - `openIM.apiURL`: modify to your already API address or use your `openim-api` service name and port
-- `openIM.adminUserID`: same to IM Server `imAdminUserID` field value.
+- `openIM.secret`: same to IM Server `share.secret` value.
 
 ### Set the secret
 
 A Secret is an object that contains a small amount of sensitive data. Such as password and secret. Secret is similar to ConfigMaps.
 
-#### Example:
+#### Redis:
 
-create a secret for redis password. You can update `redis-secret.yml`.
-
-you need update `redis-password` value to your redis password in base64.
+Update the `redis-password` value in `redis-secret.yml` to your Redis password encoded in base64.
 
 ```yaml
 apiVersion: v1
@@ -58,40 +56,25 @@ metadata:
   name: openim-redis-secret
 type: Opaque
 data:
-  redis-password: b3BlbklNMTIz # you need update to your redis password in base64
+  redis-password: b3BlbklNMTIz # update to your redis password encoded in base64
 ```
 
-#### Usage:
+#### Mongo:
 
-use secret in deployment file. If you apply the secret to IM Server, you need adapt the Env Name to config file and all toupper.
-
-OpenIM Chat use prefix `CHATENV_`. Next adapt is the config file name. Like `redis.yml`. Such as `CHATENV_REDIS_PASSWORD` is mapped to `redis.yml` password filed in OpenIM Server.
+Update the `mongo_openim_username`, `mongo_openim_password` value in `mongo-secret.yml` to your Mongo username and password encoded in base64.
 
 ```yaml
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: v1
+kind: Secret
 metadata:
-  name: chat-rpc-server
-spec:
-  template:
-    spec:
-      containers:
-        - name: chat-rpc-server
-          env:
-            - name: CHATENV_REDIS_PASSWORD # adapt to redis.yml password field in OpenIM Server config, Don't modify it.
-              valueFrom:
-                secretKeyRef:
-                  name: openim-redis-secret # You deployed secret name
-                  key: redis-password # You deployed secret key name
+  name: openim-mongo-secret
+type: Opaque
+data:
+  mongo_openim_username: b3BlbklN # update to your mongo username encoded in base64, this user credentials need in authSource database.
+  mongo_openim_password: b3BlbklNMTIz # update to your mongo password encoded in base64
 ```
 
-So, you need following configurations to set secret:
-
-- `MONGODB_USERNAME`
-- `MONGODB_PASSWORD`
-- `REDIS_PASSWORD`
-
-Apply the secret.
+### Apply the secret.
 
 ```shell
 kubectl apply -f redis-secret.yml -f mongo-secret.yml
