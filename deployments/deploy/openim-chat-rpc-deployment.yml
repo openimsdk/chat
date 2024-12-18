@@ -23,6 +23,11 @@ spec:
                 secretKeyRef:
                   name: redis-secret
                   key: redis-password
+            - name: IMENV_MONGODB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: openim-mongo-secret
+                  key: mongo_openim_username
             - name: CHATENV_MONGODB_PASSWORD
               valueFrom:
                 secretKeyRef:
