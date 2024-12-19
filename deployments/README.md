@@ -56,7 +56,7 @@ metadata:
   name: openim-redis-secret
 type: Opaque
 data:
-  redis-password: b3BlbklNMTIz # update to your redis password encoded in base64
+  redis-password: b3BlbklNMTIz # update to your redis password encoded in base64, if need empty, you can set to ""
 ```
 
 #### Mongo:
@@ -70,8 +70,8 @@ metadata:
   name: openim-mongo-secret
 type: Opaque
 data:
-  mongo_openim_username: b3BlbklN # update to your mongo username encoded in base64, this user credentials need in authSource database.
-  mongo_openim_password: b3BlbklNMTIz # update to your mongo password encoded in base64
+  mongo_openim_username: b3BlbklN # update to your mongo username encoded in base64, if need empty, you can set to "" (this user credentials need in authSource database)
+  mongo_openim_password: b3BlbklNMTIz # update to your mongo password encoded in base64, if need empty, you can set to ""
 ```
 
 ### Apply the secret.
