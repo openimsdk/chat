@@ -97,5 +97,4 @@ mage stop
 :heart: Contributions to this project are welcome! Please see [CONTRIBUTING.md](./CONTRIBUTING.md) for details.
 
 ## 🚨 License
-
-:scroll: chat is licensed under the [GPL-3.0 license](https://github.com/openimsdk/chat#GPL-3.0-1-ov-file). See the [LICENSE](https://github.com/openimsdk/chat/tree/main/LICENSE) for the full license text.
+See the [LICENSE](https://github.com/openimsdk/chat/tree/main/LICENSE) for the full license text.
