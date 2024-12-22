@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: admin-rpc-service
+spec:
+  selector:
+    app: admin-rpc-server
+  ports:
+    - name: rpc-30200
+      protocol: TCP
+      port: 30200
+      targetPort: 30200
+  type: ClusterIP

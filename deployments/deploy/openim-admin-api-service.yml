@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: admin-api-service
+spec:
+  selector:
+    app: admin-api-server
+  ports:
+    - name: http-10009
+      protocol: TCP
+      port: 10009
+      targetPort: 10009
+  type: NodePort
