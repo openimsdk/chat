@@ -1,19 +1,5 @@
 # openim-chat
 
-## 📄 License Options for OpenIM Source Code
-
-You may use the OpenIM source code to create compiled versions not originally produced by OpenIM under one of the following two licensing options:
-
-### 1. GNU General Public License v3.0 (GPLv3) 🆓
-
-+ This option is governed by the Free Software Foundation's [GPL v3.0](https://www.gnu.org/licenses/gpl-3.0.en.html).
-+ Usage is subject to certain exceptions as outlined in this policy.
-
-### 2. Commercial License 💼
-
-+ Obtain a commercial license by contacting OpenIM.
-+ For more details and licensing inquiries, please email 📧 [contact@openim.io](mailto:contact@openim.io).
-
 ## 🧩 Feature Overview
 
 1. This repository implements a business system, which consists of two parts: User System and Backend Management System.
@@ -97,5 +83,4 @@ mage stop
 :heart: Contributions to this project are welcome! Please see [CONTRIBUTING.md](./CONTRIBUTING.md) for details.
 
 ## 🚨 License
-
-:scroll: chat is licensed under the [GPL-3.0 license](https://github.com/openimsdk/chat#GPL-3.0-1-ov-file). See the [LICENSE](https://github.com/openimsdk/chat/tree/main/LICENSE) for the full license text.
+See the [LICENSE](https://github.com/openimsdk/chat/tree/main/LICENSE) for the full license text.
