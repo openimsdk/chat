@@ -7,7 +7,6 @@ import (
 	"path/filepath"
 
 	"github.com/openimsdk/chat/internal/rpc/chat"
-	"github.com/openimsdk/chat/pkg/common/cmd"
 	"github.com/openimsdk/chat/pkg/common/config"
 	"github.com/openimsdk/chat/pkg/common/constant"
 	table "github.com/openimsdk/chat/pkg/common/db/table/chat"
@@ -37,7 +36,7 @@ func initConfig(configDir string) (*config.Mongo, error) {
 
 	runtimeEnv := runtimeenv.PrintRuntimeEnvironment()
 
-	err := config.Load(configDir, cmd.MongodbConfigFileName, cmd.ConfigEnvPrefixMap[cmd.MongodbConfigFileName], runtimeEnv, mongoConfig)
+	err := config.Load(configDir, config.MongodbConfigFileName, config.EnvPrefixMap[config.MongodbConfigFileName], runtimeEnv, mongoConfig)
 	if err != nil {
 		return nil, err
 	}
