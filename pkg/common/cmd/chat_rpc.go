@@ -34,11 +34,11 @@ type ChatRpcCmd struct {
 func NewChatRpcCmd() *ChatRpcCmd {
 	var ret ChatRpcCmd
 	ret.configMap = map[string]any{
-		ChatRPCChatCfgFileName:  &ret.chatConfig.RpcConfig,
-		RedisConfigFileName:     &ret.chatConfig.RedisConfig,
-		DiscoveryConfigFileName: &ret.chatConfig.Discovery,
-		MongodbConfigFileName:   &ret.chatConfig.MongodbConfig,
-		ShareFileName:           &ret.chatConfig.Share,
+		config.ChatRPCChatCfgFileName:  &ret.chatConfig.RpcConfig,
+		config.RedisConfigFileName:     &ret.chatConfig.RedisConfig,
+		config.DiscoveryConfigFileName: &ret.chatConfig.Discovery,
+		config.MongodbConfigFileName:   &ret.chatConfig.MongodbConfig,
+		config.ShareFileName:           &ret.chatConfig.Share,
 	}
 	ret.RootCmd = NewRootCmd(program.GetProcessName(), WithConfigMap(ret.configMap))
 	ret.ctx = context.WithValue(context.Background(), "version", config.Version)
@@ -55,5 +55,13 @@ func (a *ChatRpcCmd) Exec() error {
 func (a *ChatRpcCmd) runE() error {
 	return startrpc.Start(a.ctx, &a.chatConfig.Discovery, a.chatConfig.RpcConfig.RPC.ListenIP,
 		a.chatConfig.RpcConfig.RPC.RegisterIP, a.chatConfig.RpcConfig.RPC.Ports,
-		a.Index(), a.chatConfig.Discovery.RpcService.Chat, &a.chatConfig.Share, &a.chatConfig, chat.Start)
+		a.Index(), a.chatConfig.Discovery.RpcService.Chat, &a.chatConfig.Share, &a.chatConfig,
+		[]string{
+			config.ChatRPCChatCfgFileName,
+			config.RedisConfigFileName,
+			config.DiscoveryConfigFileName,
+			config.MongodbConfigFileName,
+			config.ShareFileName,
+		},
+		chat.Start)
 }

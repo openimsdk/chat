@@ -21,7 +21,6 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/openimsdk/chat/pkg/common/cmd"
 	"github.com/openimsdk/chat/pkg/common/config"
 	"github.com/openimsdk/chat/pkg/common/imapi"
 	"github.com/openimsdk/tools/db/mongoutil"
@@ -67,21 +66,21 @@ func initConfig(configDir string) (*config.Mongo, *config.Redis, *config.Discove
 
 	runtimeEnv := runtimeenv.PrintRuntimeEnvironment()
 
-	err := config.Load(configDir, cmd.MongodbConfigFileName, cmd.ConfigEnvPrefixMap[cmd.MongodbConfigFileName], runtimeEnv, mongoConfig)
+	err := config.Load(configDir, config.MongodbConfigFileName, config.EnvPrefixMap[config.MongodbConfigFileName], runtimeEnv, mongoConfig)
 	if err != nil {
 		return nil, nil, nil, nil, err
 	}
 
-	err = config.Load(configDir, cmd.RedisConfigFileName, cmd.ConfigEnvPrefixMap[cmd.RedisConfigFileName], runtimeEnv, redisConfig)
+	err = config.Load(configDir, config.RedisConfigFileName, config.EnvPrefixMap[config.RedisConfigFileName], runtimeEnv, redisConfig)
 	if err != nil {
 		return nil, nil, nil, nil, err
 	}
 
-	err = config.Load(configDir, cmd.DiscoveryConfigFileName, cmd.ConfigEnvPrefixMap[cmd.DiscoveryConfigFileName], runtimeEnv, discoveryConfig)
+	err = config.Load(configDir, config.DiscoveryConfigFileName, config.EnvPrefixMap[config.DiscoveryConfigFileName], runtimeEnv, discoveryConfig)
 	if err != nil {
 		return nil, nil, nil, nil, err
 	}
-	err = config.Load(configDir, cmd.ShareFileName, cmd.ConfigEnvPrefixMap[cmd.ShareFileName], runtimeEnv, shareConfig)
+	err = config.Load(configDir, config.ShareFileName, config.EnvPrefixMap[config.ShareFileName], runtimeEnv, shareConfig)
 	if err != nil {
 		return nil, nil, nil, nil, err
 	}
