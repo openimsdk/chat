@@ -2,7 +2,13 @@ package admin
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	chatmw "github.com/openimsdk/chat/internal/api/mw"
@@ -10,24 +16,26 @@ import (
 	"github.com/openimsdk/chat/pkg/common/config"
 	"github.com/openimsdk/chat/pkg/common/imapi"
 	"github.com/openimsdk/chat/pkg/common/kdisc"
+	disetcd "github.com/openimsdk/chat/pkg/common/kdisc/etcd"
 	adminclient "github.com/openimsdk/chat/pkg/protocol/admin"
 	chatclient "github.com/openimsdk/chat/pkg/protocol/chat"
+	"github.com/openimsdk/tools/discovery"
+	"github.com/openimsdk/tools/discovery/etcd"
 	"github.com/openimsdk/tools/errs"
 	"github.com/openimsdk/tools/mw"
+	"github.com/openimsdk/tools/system/program"
 	"github.com/openimsdk/tools/utils/datautil"
+	"github.com/openimsdk/tools/utils/runtimeenv"
+	clientv3 "go.etcd.io/etcd/client/v3"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
-
-	"github.com/openimsdk/tools/utils/runtimeenv"
 )
 
 type Config struct {
-	ApiConfig config.API
-
-	Discovery config.Discovery
-	Share     config.Share
+	*config.AllConfig
 
 	RuntimeEnv string
+	ConfigPath string
 }
 
 func Start(ctx context.Context, index int, config *Config) error {
@@ -36,7 +44,7 @@ func Start(ctx context.Context, index int, config *Config) error {
 	if len(config.Share.ChatAdmin) == 0 {
 		return errs.New("share chat admin not configured")
 	}
-	apiPort, err := datautil.GetElemByIndex(config.ApiConfig.Api.Ports, index)
+	apiPort, err := datautil.GetElemByIndex(config.AdminAPI.Api.Ports, index)
 	if err != nil {
 		return err
 	}
@@ -66,11 +74,51 @@ func Start(ctx context.Context, index int, config *Config) error {
 	gin.SetMode(gin.ReleaseMode)
 	engine := gin.New()
 	engine.Use(gin.Recovery(), mw.CorsHandler(), mw.GinParseOperationID())
-	SetAdminRoute(engine, adminApi, mwApi)
-	return engine.Run(fmt.Sprintf(":%d", apiPort))
+	SetAdminRoute(engine, adminApi, mwApi, config, client)
+
+	if config.Discovery.Enable == kdisc.ETCDCONST {
+		cm := disetcd.NewConfigManager(client.(*etcd.SvcDiscoveryRegistryImpl).GetClient(), config.GetConfigNames())
+		cm.Watch(ctx)
+	}
+	var (
+		netDone = make(chan struct{}, 1)
+		netErr  error
+	)
+	server := http.Server{Addr: fmt.Sprintf(":%d", apiPort), Handler: engine}
+	go func() {
+		err = server.ListenAndServe()
+		if err != nil && !errors.Is(err, http.ErrServerClosed) {
+			netErr = errs.WrapMsg(err, fmt.Sprintf("api start err: %s", server.Addr))
+			netDone <- struct{}{}
+		}
+	}()
+	shutdown := func() error {
+		ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+		defer cancel()
+		err := server.Shutdown(ctx)
+		if err != nil {
+			return errs.WrapMsg(err, "shutdown err")
+		}
+		return nil
+	}
+	disetcd.RegisterShutDown(shutdown)
+
+	sigs := make(chan os.Signal, 1)
+	signal.Notify(sigs, syscall.SIGTERM)
+	select {
+	case <-sigs:
+		program.SIGTERMExit()
+		if err := shutdown(); err != nil {
+			return err
+		}
+	case <-netDone:
+		close(netDone)
+		return netErr
+	}
+	return nil
 }
 
-func SetAdminRoute(router gin.IRouter, admin *Api, mw *chatmw.MW) {
+func SetAdminRoute(router gin.IRouter, admin *Api, mw *chatmw.MW, cfg *Config, client discovery.SvcDiscoveryRegistry) {
 
 	adminRouterGroup := router.Group("/account")
 	adminRouterGroup.POST("/login", admin.AdminLogin)                                   // Login
@@ -149,4 +197,20 @@ func SetAdminRoute(router gin.IRouter, admin *Api, mw *chatmw.MW) {
 	applicationGroup.POST("/delete_version", mw.CheckAdmin, admin.DeleteApplicationVersion)
 	applicationGroup.POST("/latest_version", admin.LatestApplicationVersion)
 	applicationGroup.POST("/page_versions", admin.PageApplicationVersion)
+
+	var etcdClient *clientv3.Client
+	if cfg.Discovery.Enable == kdisc.ETCDCONST {
+		etcdClient = client.(*etcd.SvcDiscoveryRegistryImpl).GetClient()
+	}
+	cm := NewConfigManager(cfg.AllConfig, etcdClient, cfg.ConfigPath, cfg.RuntimeEnv)
+	{
+		configGroup := router.Group("/config", mw.CheckAdmin)
+		configGroup.POST("/get_config_list", cm.GetConfigList)
+		configGroup.POST("/get_config", cm.GetConfig)
+		configGroup.POST("/set_config", cm.SetConfig)
+		configGroup.POST("/reset_config", cm.ResetConfig)
+	}
+	{
+		router.POST("/restart", mw.CheckAdmin, cm.Restart)
+	}
 }

@@ -168,3 +168,54 @@ type Log struct {
 	IsSimplify          bool   `mapstructure:"isSimplify"`
 	WithStack           bool   `mapstructure:"withStack"`
 }
+
+type AllConfig struct {
+	AdminAPI  API
+	ChatAPI   API
+	Admin     Admin
+	Chat      Chat
+	Discovery Discovery
+	Log       Log
+	Mongo     Mongo
+	Redis     Redis
+	Share     Share
+}
+
+func (a *AllConfig) Name2Config(name string) any {
+	switch name {
+	case ChatAPIAdminCfgFileName:
+		return a.AdminAPI
+	case ChatAPIChatCfgFileName:
+		return a.ChatAPI
+	case ChatRPCAdminCfgFileName:
+		return a.Admin
+	case ChatRPCChatCfgFileName:
+		return a.Chat
+	case DiscoveryConfigFileName:
+		return a.Discovery
+	case LogConfigFileName:
+		return a.Log
+	case MongodbConfigFileName:
+		return a.Mongo
+	case RedisConfigFileName:
+		return a.Redis
+	case ShareFileName:
+		return a.Share
+	default:
+		return nil
+	}
+}
+
+func (a *AllConfig) GetConfigNames() []string {
+	return []string{
+		ShareFileName,
+		RedisConfigFileName,
+		DiscoveryConfigFileName,
+		MongodbConfigFileName,
+		LogConfigFileName,
+		ChatAPIAdminCfgFileName,
+		ChatAPIChatCfgFileName,
+		ChatRPCAdminCfgFileName,
+		ChatRPCChatCfgFileName,
+	}
+}
