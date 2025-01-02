@@ -502,6 +502,7 @@ func (o *Api) xlsxBirth(s string) time.Time {
 			separator = b
 		}
 	}
+
 	arr := strings.Split(s, string([]byte{separator}))
 	if len(arr) != 3 {
 		return time.Now()

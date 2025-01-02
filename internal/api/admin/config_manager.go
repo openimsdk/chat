@@ -1,6 +1,7 @@
 package admin
 
 import (
+	"context"
 	"encoding/json"
 	"reflect"
 	"strconv"
@@ -17,6 +18,11 @@ import (
 	"github.com/openimsdk/tools/log"
 	"github.com/openimsdk/tools/utils/runtimeenv"
 	clientv3 "go.etcd.io/etcd/client/v3"
+)
+
+const (
+	// wait for Restart http call return
+	waitHttp = time.Millisecond * 200
 )
 
 type ConfigManager struct {
@@ -193,10 +199,88 @@ func (cm *ConfigManager) Restart(c *gin.Context) {
 }
 
 func (cm *ConfigManager) restart(c *gin.Context) {
-	time.Sleep(time.Millisecond * 200) // wait for Restart http call return
+	time.Sleep(waitHttp) // wait for Restart http call return
 	t := time.Now().Unix()
 	_, err := cm.client.Put(c, etcd.BuildKey(etcd.RestartKey), strconv.Itoa(int(t)))
 	if err != nil {
 		log.ZError(c, "restart etcd put key failed", err)
 	}
+}
+
+func (cm *ConfigManager) SetEnableConfigManager(c *gin.Context) {
+	var req apistruct.SetEnableConfigManagerReq
+	if err := c.BindJSON(&req); err != nil {
+		apiresp.GinError(c, errs.ErrArgs.WithDetail(err.Error()).Wrap())
+		return
+	}
+	var enableStr string
+	if req.Enable {
+		enableStr = etcd.Enable
+	} else {
+		enableStr = etcd.Disable
+	}
+	resp, err := cm.client.Get(c, etcd.BuildKey(etcd.EnableConfigCenterKey))
+	if err != nil {
+		apiresp.GinError(c, errs.WrapMsg(err, "getEnableConfigManager failed"))
+		return
+	}
+	if !(resp.Count > 0 && string(resp.Kvs[0].Value) == etcd.Enable) && req.Enable {
+		go func() {
+			time.Sleep(waitHttp) // wait for Restart http call return
+			err := cm.writeAllConfig(c, clientv3.OpPut(etcd.BuildKey(etcd.EnableConfigCenterKey), enableStr))
+			if err != nil {
+				log.ZError(c, "writeAllConfig failed", err)
+			}
+		}()
+	} else {
+		_, err = cm.client.Put(c, etcd.BuildKey(etcd.EnableConfigCenterKey), enableStr)
+		if err != nil {
+			apiresp.GinError(c, errs.WrapMsg(err, "setEnableConfigManager failed"))
+			return
+		}
+	}
+
+	apiresp.GinSuccess(c, nil)
+}
+
+func (cm *ConfigManager) GetEnableConfigManager(c *gin.Context) {
+	resp, err := cm.client.Get(c, etcd.BuildKey(etcd.EnableConfigCenterKey))
+	if err != nil {
+		apiresp.GinError(c, errs.WrapMsg(err, "getEnableConfigManager failed"))
+		return
+	}
+	var enable bool
+	if resp.Count > 0 && string(resp.Kvs[0].Value) == etcd.Enable {
+		enable = true
+	}
+	apiresp.GinSuccess(c, &apistruct.GetEnableConfigManagerResp{Enable: enable})
+}
+
+func (cm *ConfigManager) writeAllConfig(ctx context.Context, ops ...clientv3.Op) error {
+	getWriteConfigOp(ctx, config.ChatAPIAdminCfgFileName, cm.config.AdminAPI, &ops)
+	getWriteConfigOp(ctx, config.ChatAPIChatCfgFileName, cm.config.ChatAPI, &ops)
+	getWriteConfigOp(ctx, config.ChatRPCAdminCfgFileName, cm.config.Admin, &ops)
+	getWriteConfigOp(ctx, config.ChatRPCChatCfgFileName, cm.config.Chat, &ops)
+	getWriteConfigOp(ctx, config.DiscoveryConfigFileName, cm.config.Discovery, &ops)
+	getWriteConfigOp(ctx, config.LogConfigFileName, cm.config.Log, &ops)
+	getWriteConfigOp(ctx, config.MongodbConfigFileName, cm.config.Mongo, &ops)
+	getWriteConfigOp(ctx, config.RedisConfigFileName, cm.config.Redis, &ops)
+	getWriteConfigOp(ctx, config.ShareFileName, cm.config.Share, &ops)
+	txn := cm.client.Txn(ctx)
+	txn.Then(ops...)
+	_, err := txn.Commit()
+	if err != nil {
+		return errs.WrapMsg(err, "writeAllConfig failed commit")
+	}
+	return nil
+}
+
+func getWriteConfigOp[T any](ctx context.Context, key string, config T, ops *[]clientv3.Op) {
+	data, err := json.Marshal(config)
+	if err != nil {
+		log.ZError(ctx, "marshal config failed", err)
+		return
+	}
+	*ops = append(*ops, clientv3.OpPut(key, string(data)))
+	return
 }

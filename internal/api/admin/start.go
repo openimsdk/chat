@@ -209,6 +209,8 @@ func SetAdminRoute(router gin.IRouter, admin *Api, mw *chatmw.MW, cfg *Config, c
 		configGroup.POST("/get_config", cm.GetConfig)
 		configGroup.POST("/set_config", cm.SetConfig)
 		configGroup.POST("/reset_config", cm.ResetConfig)
+		configGroup.POST("/get_enable_config_manager", cm.GetEnableConfigManager)
+		configGroup.POST("/set_enable_config_manager", cm.SetEnableConfigManager)
 	}
 	{
 		router.POST("/restart", mw.CheckAdmin, cm.Restart)
