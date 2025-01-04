@@ -99,7 +99,7 @@ func (r *RootCmd) initEtcd() error {
 		return err
 	}
 	if disConfig.Enable == kdisc.ETCDCONST {
-		discov, _ := kdisc.NewDiscoveryRegister(&disConfig, env)
+		discov, _ := kdisc.NewDiscoveryRegister(&disConfig, env, nil)
 		r.etcdClient = discov.(*etcd.SvcDiscoveryRegistryImpl).GetClient()
 	}
 	return nil
@@ -118,6 +118,9 @@ func (r *RootCmd) persistentPreRun(cmd *cobra.Command, opts ...func(*CmdOpts)) e
 	}
 	if err := r.initializeLogger(cmdOpts); err != nil {
 		return errs.WrapMsg(err, "failed to initialize logger")
+	}
+	if err := r.etcdClient.Close(); err != nil {
+		return errs.WrapMsg(err, "failed to close etcd client")
 	}
 
 	return nil
@@ -150,9 +153,24 @@ func (r *RootCmd) updateConfigFromEtcd(opts *CmdOpts) error {
 	if r.etcdClient == nil {
 		return nil
 	}
+	ctx := context.TODO()
+
+	res, err := r.etcdClient.Get(ctx, disetcd.BuildKey(disetcd.EnableConfigCenterKey))
+	if err != nil {
+		log.ZWarn(ctx, "root cmd updateConfigFromEtcd, etcd Get EnableConfigCenterKey err: %v", errs.Wrap(err))
+		return nil
+	}
+	if res.Count == 0 {
+		return nil
+	} else {
+		if string(res.Kvs[0].Value) == disetcd.Disable {
+			return nil
+		} else if string(res.Kvs[0].Value) != disetcd.Enable {
+			return errs.New("unknown EnableConfigCenter value").Wrap()
+		}
+	}
 
 	update := func(configFileName string, configStruct any) error {
-		ctx := context.TODO()
 		key := disetcd.BuildKey(configFileName)
 		etcdRes, err := r.etcdClient.Get(ctx, key)
 		if err != nil {

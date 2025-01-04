@@ -47,7 +47,7 @@ func Start(ctx context.Context, index int, cfg *Config) error {
 	if err != nil {
 		return err
 	}
-	client, err := kdisc.NewDiscoveryRegister(&cfg.Discovery, cfg.RuntimeEnv)
+	client, err := kdisc.NewDiscoveryRegister(&cfg.Discovery, cfg.RuntimeEnv, nil)
 	if err != nil {
 		return err
 	}
@@ -93,6 +93,7 @@ func Start(ctx context.Context, index int, cfg *Config) error {
 				config.ChatAPIChatCfgFileName,
 				config.DiscoveryConfigFileName,
 				config.ShareFileName,
+				config.LogConfigFileName,
 			},
 		)
 		cm.Watch(ctx)

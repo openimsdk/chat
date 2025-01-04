@@ -62,6 +62,7 @@ func (a *AdminRpcCmd) runE() error {
 			config.DiscoveryConfigFileName,
 			config.MongodbConfigFileName,
 			config.ShareFileName,
-		},
+			config.LogConfigFileName,
+		}, nil,
 		admin.Start)
 }
