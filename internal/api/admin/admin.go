@@ -125,15 +125,15 @@ func (o *Api) AdminUpdateInfo(c *gin.Context) {
 }
 
 func (o *Api) AdminInfo(c *gin.Context) {
-	a2r.Call(admin.AdminClient.GetAdminInfo, o.adminClient, c)
+	a2r.Call(c, admin.AdminClient.GetAdminInfo, o.adminClient)
 }
 
 func (o *Api) ChangeAdminPassword(c *gin.Context) {
-	a2r.Call(admin.AdminClient.ChangeAdminPassword, o.adminClient, c)
+	a2r.Call(c, admin.AdminClient.ChangeAdminPassword, o.adminClient)
 }
 
 func (o *Api) AddAdminAccount(c *gin.Context) {
-	a2r.Call(admin.AdminClient.AddAdminAccount, o.adminClient, c)
+	a2r.Call(c, admin.AdminClient.AddAdminAccount, o.adminClient)
 }
 
 func (o *Api) AddUserAccount(c *gin.Context) {
@@ -164,27 +164,27 @@ func (o *Api) AddUserAccount(c *gin.Context) {
 }
 
 func (o *Api) DelAdminAccount(c *gin.Context) {
-	a2r.Call(admin.AdminClient.DelAdminAccount, o.adminClient, c)
+	a2r.Call(c, admin.AdminClient.DelAdminAccount, o.adminClient)
 }
 
 func (o *Api) SearchAdminAccount(c *gin.Context) {
-	a2r.Call(admin.AdminClient.SearchAdminAccount, o.adminClient, c)
+	a2r.Call(c, admin.AdminClient.SearchAdminAccount, o.adminClient)
 }
 
 func (o *Api) AddDefaultFriend(c *gin.Context) {
-	a2r.Call(admin.AdminClient.AddDefaultFriend, o.adminClient, c)
+	a2r.Call(c, admin.AdminClient.AddDefaultFriend, o.adminClient)
 }
 
 func (o *Api) DelDefaultFriend(c *gin.Context) {
-	a2r.Call(admin.AdminClient.DelDefaultFriend, o.adminClient, c)
+	a2r.Call(c, admin.AdminClient.DelDefaultFriend, o.adminClient)
 }
 
 func (o *Api) SearchDefaultFriend(c *gin.Context) {
-	a2r.Call(admin.AdminClient.SearchDefaultFriend, o.adminClient, c)
+	a2r.Call(c, admin.AdminClient.SearchDefaultFriend, o.adminClient)
 }
 
 func (o *Api) FindDefaultFriend(c *gin.Context) {
-	a2r.Call(admin.AdminClient.FindDefaultFriend, o.adminClient, c)
+	a2r.Call(c, admin.AdminClient.FindDefaultFriend, o.adminClient)
 }
 
 func (o *Api) AddDefaultGroup(c *gin.Context) {
@@ -218,11 +218,11 @@ func (o *Api) AddDefaultGroup(c *gin.Context) {
 }
 
 func (o *Api) DelDefaultGroup(c *gin.Context) {
-	a2r.Call(admin.AdminClient.DelDefaultGroup, o.adminClient, c)
+	a2r.Call(c, admin.AdminClient.DelDefaultGroup, o.adminClient)
 }
 
 func (o *Api) FindDefaultGroup(c *gin.Context) {
-	a2r.Call(admin.AdminClient.FindDefaultGroup, o.adminClient, c)
+	a2r.Call(c, admin.AdminClient.FindDefaultGroup, o.adminClient)
 }
 
 func (o *Api) SearchDefaultGroup(c *gin.Context) {
@@ -269,47 +269,47 @@ func (o *Api) SearchDefaultGroup(c *gin.Context) {
 }
 
 func (o *Api) AddInvitationCode(c *gin.Context) {
-	a2r.Call(admin.AdminClient.AddInvitationCode, o.adminClient, c)
+	a2r.Call(c, admin.AdminClient.AddInvitationCode, o.adminClient)
 }
 
 func (o *Api) GenInvitationCode(c *gin.Context) {
-	a2r.Call(admin.AdminClient.GenInvitationCode, o.adminClient, c)
+	a2r.Call(c, admin.AdminClient.GenInvitationCode, o.adminClient)
 }
 
 func (o *Api) DelInvitationCode(c *gin.Context) {
-	a2r.Call(admin.AdminClient.DelInvitationCode, o.adminClient, c)
+	a2r.Call(c, admin.AdminClient.DelInvitationCode, o.adminClient)
 }
 
 func (o *Api) SearchInvitationCode(c *gin.Context) {
-	a2r.Call(admin.AdminClient.SearchInvitationCode, o.adminClient, c)
+	a2r.Call(c, admin.AdminClient.SearchInvitationCode, o.adminClient)
 }
 
 func (o *Api) AddUserIPLimitLogin(c *gin.Context) {
-	a2r.Call(admin.AdminClient.AddUserIPLimitLogin, o.adminClient, c)
+	a2r.Call(c, admin.AdminClient.AddUserIPLimitLogin, o.adminClient)
 }
 
 func (o *Api) SearchUserIPLimitLogin(c *gin.Context) {
-	a2r.Call(admin.AdminClient.SearchUserIPLimitLogin, o.adminClient, c)
+	a2r.Call(c, admin.AdminClient.SearchUserIPLimitLogin, o.adminClient)
 }
 
 func (o *Api) DelUserIPLimitLogin(c *gin.Context) {
-	a2r.Call(admin.AdminClient.DelUserIPLimitLogin, o.adminClient, c)
+	a2r.Call(c, admin.AdminClient.DelUserIPLimitLogin, o.adminClient)
 }
 
 func (o *Api) SearchIPForbidden(c *gin.Context) {
-	a2r.Call(admin.AdminClient.SearchIPForbidden, o.adminClient, c)
+	a2r.Call(c, admin.AdminClient.SearchIPForbidden, o.adminClient)
 }
 
 func (o *Api) AddIPForbidden(c *gin.Context) {
-	a2r.Call(admin.AdminClient.AddIPForbidden, o.adminClient, c)
+	a2r.Call(c, admin.AdminClient.AddIPForbidden, o.adminClient)
 }
 
 func (o *Api) DelIPForbidden(c *gin.Context) {
-	a2r.Call(admin.AdminClient.DelIPForbidden, o.adminClient, c)
+	a2r.Call(c, admin.AdminClient.DelIPForbidden, o.adminClient)
 }
 
 func (o *Api) ParseToken(c *gin.Context) {
-	a2r.Call(admin.AdminClient.ParseToken, o.adminClient, c)
+	a2r.Call(c, admin.AdminClient.ParseToken, o.adminClient)
 }
 
 func (o *Api) BlockUser(c *gin.Context) {
@@ -337,43 +337,43 @@ func (o *Api) BlockUser(c *gin.Context) {
 }
 
 func (o *Api) UnblockUser(c *gin.Context) {
-	a2r.Call(admin.AdminClient.UnblockUser, o.adminClient, c)
+	a2r.Call(c, admin.AdminClient.UnblockUser, o.adminClient)
 }
 
 func (o *Api) SearchBlockUser(c *gin.Context) {
-	a2r.Call(admin.AdminClient.SearchBlockUser, o.adminClient, c)
+	a2r.Call(c, admin.AdminClient.SearchBlockUser, o.adminClient)
 }
 
 func (o *Api) SetClientConfig(c *gin.Context) {
-	a2r.Call(admin.AdminClient.SetClientConfig, o.adminClient, c)
+	a2r.Call(c, admin.AdminClient.SetClientConfig, o.adminClient)
 }
 
 func (o *Api) DelClientConfig(c *gin.Context) {
-	a2r.Call(admin.AdminClient.DelClientConfig, o.adminClient, c)
+	a2r.Call(c, admin.AdminClient.DelClientConfig, o.adminClient)
 }
 
 func (o *Api) GetClientConfig(c *gin.Context) {
-	a2r.Call(admin.AdminClient.GetClientConfig, o.adminClient, c)
+	a2r.Call(c, admin.AdminClient.GetClientConfig, o.adminClient)
 }
 
 func (o *Api) AddApplet(c *gin.Context) {
-	a2r.Call(admin.AdminClient.AddApplet, o.adminClient, c)
+	a2r.Call(c, admin.AdminClient.AddApplet, o.adminClient)
 }
 
 func (o *Api) DelApplet(c *gin.Context) {
-	a2r.Call(admin.AdminClient.DelApplet, o.adminClient, c)
+	a2r.Call(c, admin.AdminClient.DelApplet, o.adminClient)
 }
 
 func (o *Api) UpdateApplet(c *gin.Context) {
-	a2r.Call(admin.AdminClient.UpdateApplet, o.adminClient, c)
+	a2r.Call(c, admin.AdminClient.UpdateApplet, o.adminClient)
 }
 
 func (o *Api) SearchApplet(c *gin.Context) {
-	a2r.Call(admin.AdminClient.SearchApplet, o.adminClient, c)
+	a2r.Call(c, admin.AdminClient.SearchApplet, o.adminClient)
 }
 
 func (o *Api) LoginUserCount(c *gin.Context) {
-	a2r.Call(chat.ChatClient.UserLoginCount, o.chatClient, c)
+	a2r.Call(c, chat.ChatClient.UserLoginCount, o.chatClient)
 }
 
 func (o *Api) NewUserCount(c *gin.Context) {
@@ -561,29 +561,29 @@ func (o *Api) BatchImportTemplate(c *gin.Context) {
 }
 
 func (o *Api) SetAllowRegister(c *gin.Context) {
-	a2r.Call(chat.ChatClient.SetAllowRegister, o.chatClient, c)
+	a2r.Call(c, chat.ChatClient.SetAllowRegister, o.chatClient)
 }
 
 func (o *Api) GetAllowRegister(c *gin.Context) {
-	a2r.Call(chat.ChatClient.GetAllowRegister, o.chatClient, c)
+	a2r.Call(c, chat.ChatClient.GetAllowRegister, o.chatClient)
 }
 
 func (o *Api) LatestApplicationVersion(c *gin.Context) {
-	a2r.Call(admin.AdminClient.LatestApplicationVersion, o.adminClient, c)
+	a2r.Call(c, admin.AdminClient.LatestApplicationVersion, o.adminClient)
 }
 
 func (o *Api) PageApplicationVersion(c *gin.Context) {
-	a2r.Call(admin.AdminClient.PageApplicationVersion, o.adminClient, c)
+	a2r.Call(c, admin.AdminClient.PageApplicationVersion, o.adminClient)
 }
 
 func (o *Api) AddApplicationVersion(c *gin.Context) {
-	a2r.Call(admin.AdminClient.AddApplicationVersion, o.adminClient, c)
+	a2r.Call(c, admin.AdminClient.AddApplicationVersion, o.adminClient)
 }
 
 func (o *Api) UpdateApplicationVersion(c *gin.Context) {
-	a2r.Call(admin.AdminClient.UpdateApplicationVersion, o.adminClient, c)
+	a2r.Call(c, admin.AdminClient.UpdateApplicationVersion, o.adminClient)
 }
 
 func (o *Api) DeleteApplicationVersion(c *gin.Context) {
-	a2r.Call(admin.AdminClient.DeleteApplicationVersion, o.adminClient, c)
+	a2r.Call(c, admin.AdminClient.DeleteApplicationVersion, o.adminClient)
 }
