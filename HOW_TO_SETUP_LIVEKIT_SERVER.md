@@ -33,14 +33,24 @@ docker logs livekit/livekit-server
 
 ## Configuring the LiveKit Address in OpenIM Chat
 
-Update the `config/chat-rpc-chat.yml` file to configure the LiveKit server address:
+- **If Chat is deployed from source code**, update the `config/chat-rpc-chat.yml` file to configure the LiveKit server address:
 
 ```yaml
 liveKit:
-  url: "ws://127.0.0.1:7880" # LIVEKIT_URL, LiveKit server address and port
+  url: "ws://127.0.0.1:7880"  # ws://your-server-ip:7880 or wss://your-domain/path
 ```
 
+- **If Chat is deployed via Docker**, add the following environment variable to the `docker-compose.yaml` file:
+
+```yaml
+CHATENV_CHAT_RPC_CHAT_LIVEKIT_URL="ws://your-server-ip:7880"  # or wss://your-domain/path
+```
+
+Open the following ports: TCP: 7880-7881, UDP: 7882, and UDP: 50000-60000.
+
 By following these steps, you can set up and configure the LiveKit server for use with OpenIM Chat.
+
+
 
 ## More about Deploying LiveKi
 
