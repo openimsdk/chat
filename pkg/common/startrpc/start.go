@@ -31,7 +31,7 @@ import (
 // Start rpc server.
 func Start[T any](ctx context.Context, discovery *config.Discovery, listenIP,
 	registerIP string, rpcPorts []int, index int, rpcRegisterName string, share *config.Share, config T,
-	watchConfigNames []string,
+	watchConfigNames []string, watchServiceNames []string,
 	rpcFn func(ctx context.Context, config T, client discovery.SvcDiscoveryRegistry, server *grpc.Server) error, options ...grpc.ServerOption) error {
 
 	runtimeEnv := runtimeenv.PrintRuntimeEnvironment()
@@ -51,7 +51,7 @@ func Start[T any](ctx context.Context, discovery *config.Discovery, listenIP,
 	}
 
 	defer listener.Close()
-	client, err := kdisc.NewDiscoveryRegister(discovery, runtimeEnv)
+	client, err := kdisc.NewDiscoveryRegister(discovery, runtimeEnv, watchServiceNames)
 	if err != nil {
 		return err
 	}
