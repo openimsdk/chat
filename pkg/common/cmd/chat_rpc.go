@@ -62,6 +62,6 @@ func (a *ChatRpcCmd) runE() error {
 			config.DiscoveryConfigFileName,
 			config.MongodbConfigFileName,
 			config.ShareFileName,
-		},
+		}, nil,
 		chat.Start)
 }

@@ -48,7 +48,7 @@ func Start(ctx context.Context, index int, config *Config) error {
 	if err != nil {
 		return err
 	}
-	client, err := kdisc.NewDiscoveryRegister(&config.Discovery, config.RuntimeEnv)
+	client, err := kdisc.NewDiscoveryRegister(&config.Discovery, config.RuntimeEnv, nil)
 	if err != nil {
 		return err
 	}

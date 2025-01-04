@@ -1,7 +1,6 @@
 package admin
 
 import (
-	"context"
 	"encoding/json"
 	"reflect"
 	"strconv"
@@ -132,16 +131,19 @@ func compareAndSave[T any](c *gin.Context, old any, req *apistruct.SetConfigReq,
 }
 
 func (cm *ConfigManager) ResetConfig(c *gin.Context) {
-	go cm.resetConfig(c)
+	go func() {
+		if err := cm.resetConfig(c, true); err != nil {
+			log.ZError(c, "reset config err", err)
+		}
+	}()
 	apiresp.GinSuccess(c, nil)
 }
 
-func (cm *ConfigManager) resetConfig(c *gin.Context) {
+func (cm *ConfigManager) resetConfig(c *gin.Context, checkChange bool, ops ...clientv3.Op) error {
 	txn := cm.client.Txn(c)
 	type initConf struct {
-		old       any
-		new       any
-		isChanged bool
+		old any
+		new any
 	}
 	configMap := map[string]*initConf{
 		config.DiscoveryConfigFileName: {old: &cm.config.Discovery, new: new(config.Discovery)},
@@ -168,13 +170,12 @@ func (cm *ConfigManager) resetConfig(c *gin.Context) {
 			log.ZError(c, "load config failed", err)
 			continue
 		}
-		v.isChanged = reflect.DeepEqual(v.old, v.new)
-		if !v.isChanged {
+		equal := reflect.DeepEqual(v.old, v.new)
+		if !checkChange || !equal {
 			changedKeys = append(changedKeys, k)
 		}
 	}
 
-	ops := make([]clientv3.Op, 0)
 	for _, k := range changedKeys {
 		data, err := json.Marshal(configMap[k].new)
 		if err != nil {
@@ -187,10 +188,10 @@ func (cm *ConfigManager) resetConfig(c *gin.Context) {
 		txn.Then(ops...)
 		_, err := txn.Commit()
 		if err != nil {
-			log.ZError(c, "commit etcd txn failed", err)
-			return
+			return errs.WrapMsg(err, "commit etcd txn failed")
 		}
 	}
+	return nil
 }
 
 func (cm *ConfigManager) Restart(c *gin.Context) {
@@ -227,7 +228,7 @@ func (cm *ConfigManager) SetEnableConfigManager(c *gin.Context) {
 	if !(resp.Count > 0 && string(resp.Kvs[0].Value) == etcd.Enable) && req.Enable {
 		go func() {
 			time.Sleep(waitHttp) // wait for Restart http call return
-			err := cm.writeAllConfig(c, clientv3.OpPut(etcd.BuildKey(etcd.EnableConfigCenterKey), enableStr))
+			err := cm.resetConfig(c, false, clientv3.OpPut(etcd.BuildKey(etcd.EnableConfigCenterKey), enableStr))
 			if err != nil {
 				log.ZError(c, "writeAllConfig failed", err)
 			}
@@ -254,33 +255,4 @@ func (cm *ConfigManager) GetEnableConfigManager(c *gin.Context) {
 		enable = true
 	}
 	apiresp.GinSuccess(c, &apistruct.GetEnableConfigManagerResp{Enable: enable})
-}
-
-func (cm *ConfigManager) writeAllConfig(ctx context.Context, ops ...clientv3.Op) error {
-	getWriteConfigOp(ctx, config.ChatAPIAdminCfgFileName, cm.config.AdminAPI, &ops)
-	getWriteConfigOp(ctx, config.ChatAPIChatCfgFileName, cm.config.ChatAPI, &ops)
-	getWriteConfigOp(ctx, config.ChatRPCAdminCfgFileName, cm.config.Admin, &ops)
-	getWriteConfigOp(ctx, config.ChatRPCChatCfgFileName, cm.config.Chat, &ops)
-	getWriteConfigOp(ctx, config.DiscoveryConfigFileName, cm.config.Discovery, &ops)
-	getWriteConfigOp(ctx, config.LogConfigFileName, cm.config.Log, &ops)
-	getWriteConfigOp(ctx, config.MongodbConfigFileName, cm.config.Mongo, &ops)
-	getWriteConfigOp(ctx, config.RedisConfigFileName, cm.config.Redis, &ops)
-	getWriteConfigOp(ctx, config.ShareFileName, cm.config.Share, &ops)
-	txn := cm.client.Txn(ctx)
-	txn.Then(ops...)
-	_, err := txn.Commit()
-	if err != nil {
-		return errs.WrapMsg(err, "writeAllConfig failed commit")
-	}
-	return nil
-}
-
-func getWriteConfigOp[T any](ctx context.Context, key string, config T, ops *[]clientv3.Op) {
-	data, err := json.Marshal(config)
-	if err != nil {
-		log.ZError(ctx, "marshal config failed", err)
-		return
-	}
-	*ops = append(*ops, clientv3.OpPut(key, string(data)))
-	return
 }
