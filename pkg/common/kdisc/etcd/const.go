@@ -1,7 +1,7 @@
 package etcd
 
 const (
-	ConfigKeyPrefix       = "/open-im/config/"
+	ConfigKeyPrefix       = "/chat/config/"
 	RestartKey            = "restart"
 	EnableConfigCenterKey = "enable-config-center"
 	Enable                = "enable"

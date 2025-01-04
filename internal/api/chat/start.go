@@ -93,6 +93,7 @@ func Start(ctx context.Context, index int, cfg *Config) error {
 				config.ChatAPIChatCfgFileName,
 				config.DiscoveryConfigFileName,
 				config.ShareFileName,
+				config.LogConfigFileName,
 			},
 		)
 		cm.Watch(ctx)
