@@ -16,6 +16,7 @@ package cmd
 
 import (
 	"context"
+
 	"github.com/openimsdk/chat/internal/rpc/admin"
 	"github.com/openimsdk/chat/pkg/common/config"
 	"github.com/openimsdk/chat/pkg/common/startrpc"
@@ -33,11 +34,11 @@ type AdminRpcCmd struct {
 func NewAdminRpcCmd() *AdminRpcCmd {
 	var ret AdminRpcCmd
 	ret.configMap = map[string]any{
-		ChatRPCAdminCfgFileName: &ret.adminConfig.RpcConfig,
-		RedisConfigFileName:     &ret.adminConfig.RedisConfig,
-		DiscoveryConfigFileName: &ret.adminConfig.Discovery,
-		MongodbConfigFileName:   &ret.adminConfig.MongodbConfig,
-		ShareFileName:           &ret.adminConfig.Share,
+		config.ChatRPCAdminCfgFileName: &ret.adminConfig.RpcConfig,
+		config.RedisConfigFileName:     &ret.adminConfig.RedisConfig,
+		config.DiscoveryConfigFileName: &ret.adminConfig.Discovery,
+		config.MongodbConfigFileName:   &ret.adminConfig.MongodbConfig,
+		config.ShareFileName:           &ret.adminConfig.Share,
 	}
 	ret.RootCmd = NewRootCmd(program.GetProcessName(), WithConfigMap(ret.configMap))
 	ret.ctx = context.WithValue(context.Background(), "version", config.Version)
@@ -54,5 +55,14 @@ func (a *AdminRpcCmd) Exec() error {
 func (a *AdminRpcCmd) runE() error {
 	return startrpc.Start(a.ctx, &a.adminConfig.Discovery, a.adminConfig.RpcConfig.RPC.ListenIP,
 		a.adminConfig.RpcConfig.RPC.RegisterIP, a.adminConfig.RpcConfig.RPC.Ports,
-		a.Index(), a.adminConfig.Share.RpcRegisterName.Admin, &a.adminConfig.Share, &a.adminConfig, admin.Start)
+		a.Index(), a.adminConfig.Discovery.RpcService.Admin, &a.adminConfig.Share, &a.adminConfig,
+		[]string{
+			config.ChatRPCAdminCfgFileName,
+			config.RedisConfigFileName,
+			config.DiscoveryConfigFileName,
+			config.MongodbConfigFileName,
+			config.ShareFileName,
+			config.LogConfigFileName,
+		}, nil,
+		admin.Start)
 }

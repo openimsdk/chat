@@ -21,6 +21,7 @@ import (
 	"github.com/openimsdk/tools/discovery"
 	"github.com/openimsdk/tools/errs"
 	"github.com/openimsdk/tools/mw"
+	"github.com/openimsdk/tools/utils/runtimeenv"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -31,9 +32,13 @@ type Config struct {
 	MongodbConfig config.Mongo
 	Discovery     config.Discovery
 	Share         config.Share
+
+	RuntimeEnv string
 }
 
 func Start(ctx context.Context, config *Config, client discovery.SvcDiscoveryRegistry, server *grpc.Server) error {
+	config.RuntimeEnv = runtimeenv.PrintRuntimeEnvironment()
+
 	if len(config.Share.ChatAdmin) == 0 {
 		return errs.New("share chat admin not configured")
 	}
@@ -55,7 +60,7 @@ func Start(ctx context.Context, config *Config, client discovery.SvcDiscoveryReg
 	if err != nil {
 		return err
 	}
-	conn, err := client.GetConn(ctx, config.Share.RpcRegisterName.Chat, grpc.WithTransportCredentials(insecure.NewCredentials()), mw.GrpcClient())
+	conn, err := client.GetConn(ctx, config.Discovery.RpcService.Chat, grpc.WithTransportCredentials(insecure.NewCredentials()), mw.GrpcClient())
 	if err != nil {
 		return err
 	}
