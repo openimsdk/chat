@@ -73,7 +73,7 @@ func (o *Api) SendVerifyCode(c *gin.Context) {
 }
 
 func (o *Api) VerifyCode(c *gin.Context) {
-	a2r.Call(chatpb.ChatClient.VerifyCode, o.chatClient, c)
+	a2r.Call(c, chatpb.ChatClient.VerifyCode, o.chatClient)
 }
 
 func (o *Api) RegisterUser(c *gin.Context) {
@@ -193,7 +193,7 @@ func (o *Api) Login(c *gin.Context) {
 }
 
 func (o *Api) ResetPassword(c *gin.Context) {
-	a2r.Call(chatpb.ChatClient.ResetPassword, o.chatClient, c)
+	a2r.Call(c, chatpb.ChatClient.ResetPassword, o.chatClient)
 }
 
 func (o *Api) ChangePassword(c *gin.Context) {
@@ -264,35 +264,35 @@ func (o *Api) UpdateUserInfo(c *gin.Context) {
 }
 
 func (o *Api) FindUserPublicInfo(c *gin.Context) {
-	a2r.Call(chatpb.ChatClient.FindUserPublicInfo, o.chatClient, c)
+	a2r.Call(c, chatpb.ChatClient.FindUserPublicInfo, o.chatClient)
 }
 
 func (o *Api) FindUserFullInfo(c *gin.Context) {
-	a2r.Call(chatpb.ChatClient.FindUserFullInfo, o.chatClient, c)
+	a2r.Call(c, chatpb.ChatClient.FindUserFullInfo, o.chatClient)
 }
 
 func (o *Api) SearchUserFullInfo(c *gin.Context) {
-	a2r.Call(chatpb.ChatClient.SearchUserFullInfo, o.chatClient, c)
+	a2r.Call(c, chatpb.ChatClient.SearchUserFullInfo, o.chatClient)
 }
 
 func (o *Api) SearchUserPublicInfo(c *gin.Context) {
-	a2r.Call(chatpb.ChatClient.SearchUserPublicInfo, o.chatClient, c)
+	a2r.Call(c, chatpb.ChatClient.SearchUserPublicInfo, o.chatClient)
 }
 
 func (o *Api) GetTokenForVideoMeeting(c *gin.Context) {
-	a2r.Call(chatpb.ChatClient.GetTokenForVideoMeeting, o.chatClient, c)
+	a2r.Call(c, chatpb.ChatClient.GetTokenForVideoMeeting, o.chatClient)
 }
 
 // ################## APPLET ##################
 
 func (o *Api) FindApplet(c *gin.Context) {
-	a2r.Call(admin.AdminClient.FindApplet, o.adminClient, c)
+	a2r.Call(c, admin.AdminClient.FindApplet, o.adminClient)
 }
 
 // ################## CONFIG ##################
 
 func (o *Api) GetClientConfig(c *gin.Context) {
-	a2r.Call(admin.AdminClient.GetClientConfig, o.adminClient, c)
+	a2r.Call(c, admin.AdminClient.GetClientConfig, o.adminClient)
 }
 
 // ################## CALLBACK ##################
@@ -350,9 +350,9 @@ func (o *Api) SearchFriend(c *gin.Context) {
 }
 
 func (o *Api) LatestApplicationVersion(c *gin.Context) {
-	a2r.Call(admin.AdminClient.LatestApplicationVersion, o.adminClient, c)
+	a2r.Call(c, admin.AdminClient.LatestApplicationVersion, o.adminClient)
 }
 
 func (o *Api) PageApplicationVersion(c *gin.Context) {
-	a2r.Call(admin.AdminClient.PageApplicationVersion, o.adminClient, c)
+	a2r.Call(c, admin.AdminClient.PageApplicationVersion, o.adminClient)
 }

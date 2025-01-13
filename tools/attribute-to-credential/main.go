@@ -4,8 +4,9 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"path/filepath"
+
 	"github.com/openimsdk/chat/internal/rpc/chat"
-	"github.com/openimsdk/chat/pkg/common/cmd"
 	"github.com/openimsdk/chat/pkg/common/config"
 	"github.com/openimsdk/chat/pkg/common/constant"
 	table "github.com/openimsdk/chat/pkg/common/db/table/chat"
@@ -13,10 +14,10 @@ import (
 	"github.com/openimsdk/protocol/sdkws"
 	"github.com/openimsdk/tools/db/mongoutil"
 	"github.com/openimsdk/tools/system/program"
+	"github.com/openimsdk/tools/utils/runtimeenv"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"path/filepath"
 )
 
 const (
@@ -32,7 +33,10 @@ func initConfig(configDir string) (*config.Mongo, error) {
 	var (
 		mongoConfig = &config.Mongo{}
 	)
-	err := config.LoadConfig(filepath.Join(configDir, cmd.MongodbConfigFileName), cmd.ConfigEnvPrefixMap[cmd.MongodbConfigFileName], mongoConfig)
+
+	runtimeEnv := runtimeenv.PrintRuntimeEnvironment()
+
+	err := config.Load(configDir, config.MongodbConfigFileName, config.EnvPrefixMap[config.MongodbConfigFileName], runtimeEnv, mongoConfig)
 	if err != nil {
 		return nil, err
 	}

@@ -15,9 +15,7 @@ var (
 )
 
 type Share struct {
-	Env             string          `mapstructure:"env"`
-	RpcRegisterName RpcRegisterName `mapstructure:"rpcRegisterName"`
-	OpenIM          struct {
+	OpenIM struct {
 		ApiURL      string `mapstructure:"apiURL"`
 		Secret      string `mapstructure:"secret"`
 		AdminUserID string `mapstructure:"adminUserID"`
@@ -26,12 +24,12 @@ type Share struct {
 	ProxyHeader string   `mapstructure:"proxyHeader"`
 }
 
-type RpcRegisterName struct {
+type RpcService struct {
 	Chat  string `mapstructure:"chat"`
 	Admin string `mapstructure:"admin"`
 }
 
-func (r *RpcRegisterName) GetServiceNames() []string {
+func (r *RpcService) GetServiceNames() []string {
 	return []string{
 		r.Chat,
 		r.Admin,
@@ -51,6 +49,7 @@ type Mongo struct {
 	Database    string   `mapstructure:"database"`
 	Username    string   `mapstructure:"username"`
 	Password    string   `mapstructure:"password"`
+	AuthSource  string   `mapstructure:"authSource"`
 	MaxPoolSize int      `mapstructure:"maxPoolSize"`
 	MaxRetry    int      `mapstructure:"maxRetry"`
 }
@@ -62,6 +61,7 @@ func (m *Mongo) Build() *mongoutil.Config {
 		Database:    m.Database,
 		Username:    m.Username,
 		Password:    m.Password,
+		AuthSource:  m.AuthSource,
 		MaxPoolSize: m.MaxPoolSize,
 		MaxRetry:    m.MaxRetry,
 	}
@@ -88,17 +88,15 @@ func (r *Redis) Build() *redisutil.Config {
 	}
 }
 
-type ZooKeeper struct {
-	Schema   string   `mapstructure:"schema"`
-	Address  []string `mapstructure:"address"`
-	Username string   `mapstructure:"username"`
-	Password string   `mapstructure:"password"`
+type Discovery struct {
+	Enable     string     `mapstructure:"enable"`
+	Etcd       Etcd       `mapstructure:"etcd"`
+	Kubernetes Kubernetes `mapstructure:"kubernetes"`
+	RpcService RpcService `mapstructure:"rpcService"`
 }
 
-type Discovery struct {
-	Enable    string    `mapstructure:"enable"`
-	Etcd      Etcd      `mapstructure:"etcd"`
-	ZooKeeper ZooKeeper `mapstructure:"zooKeeper"`
+type Kubernetes struct {
+	Namespace string `mapstructure:"namespace"`
 }
 
 type Etcd struct {
@@ -169,4 +167,55 @@ type Log struct {
 	IsJson              bool   `mapstructure:"isJson"`
 	IsSimplify          bool   `mapstructure:"isSimplify"`
 	WithStack           bool   `mapstructure:"withStack"`
+}
+
+type AllConfig struct {
+	AdminAPI  API
+	ChatAPI   API
+	Admin     Admin
+	Chat      Chat
+	Discovery Discovery
+	Log       Log
+	Mongo     Mongo
+	Redis     Redis
+	Share     Share
+}
+
+func (a *AllConfig) Name2Config(name string) any {
+	switch name {
+	case ChatAPIAdminCfgFileName:
+		return a.AdminAPI
+	case ChatAPIChatCfgFileName:
+		return a.ChatAPI
+	case ChatRPCAdminCfgFileName:
+		return a.Admin
+	case ChatRPCChatCfgFileName:
+		return a.Chat
+	case DiscoveryConfigFileName:
+		return a.Discovery
+	case LogConfigFileName:
+		return a.Log
+	case MongodbConfigFileName:
+		return a.Mongo
+	case RedisConfigFileName:
+		return a.Redis
+	case ShareFileName:
+		return a.Share
+	default:
+		return nil
+	}
+}
+
+func (a *AllConfig) GetConfigNames() []string {
+	return []string{
+		ShareFileName,
+		RedisConfigFileName,
+		DiscoveryConfigFileName,
+		MongodbConfigFileName,
+		LogConfigFileName,
+		ChatAPIAdminCfgFileName,
+		ChatAPIChatCfgFileName,
+		ChatRPCAdminCfgFileName,
+		ChatRPCChatCfgFileName,
+	}
 }
