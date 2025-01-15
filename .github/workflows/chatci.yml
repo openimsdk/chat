@@ -140,13 +140,12 @@ jobs:
             "userID": "imAdmin"
           }' http://127.0.0.1:10002/auth/get_admin_token)
           check_error "$get_admin_token_response"
-          adminToken=$(echo $response1 | jq -r '.data.imToken')
+          adminToken=$(echo $get_admin_token_response | jq -r '.data.imToken')
 
           # Test send message
           send_msg_response=$(curl -X POST -H "Content-Type: application/json" -H "operationID: imAdmin" -H "token: $adminToken" -d '{
             "sendID": "'$userID1'",
             "recvID": "'$userID2'",
-            "senderNickname": "testuser1",
             "senderPlatformID": 3,
             "content": {
               "content": "hello!!"
