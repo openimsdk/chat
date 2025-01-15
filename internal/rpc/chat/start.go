@@ -74,6 +74,7 @@ func Start(ctx context.Context, config *Config, client discovery.SvcDiscoveryReg
 }
 
 type chatSvr struct {
+	chat.UnimplementedChatServer
 	Database        database.ChatDatabaseInterface
 	Admin           *chatClient.AdminClient
 	SMS             sms.SMS
