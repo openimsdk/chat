@@ -84,6 +84,7 @@ jobs:
       - name: Test Chat
         run: |
           check_error() {
+            echo "Response: $1"
             errCode=$(echo $1 | jq -r '.errCode')
             if [ "$errCode" != "0" ]; then
               errMsg=$(echo $1 | jq -r '.errMsg')
@@ -152,5 +153,5 @@ jobs:
             },
             "contentType": 101,
             "sessionType": 1,
-           }' http://localhost:10002/msg/send_msg)
+           }' http://127.0.0.1:10002/msg/send_msg)
            check_error "$send_msg_response"
