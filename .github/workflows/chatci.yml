@@ -152,6 +152,6 @@ jobs:
               "content": "hello!!"
             },
             "contentType": 101,
-            "sessionType": 1,
+            "sessionType": 1
            }' http://127.0.0.1:10002/msg/send_msg)
            check_error "$send_msg_response"
