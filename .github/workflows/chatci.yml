@@ -107,15 +107,14 @@ jobs:
           }' http://127.0.0.1:10008/account/register)
           check_error "$response1"
           userID1=$(echo $response1 | jq -r '.data.userID')
+          echo "userID1: $userID1"
 
-          curl -X POST -H "Content-Type: application/json" -H "operationID: imAdmin" -d '{"username":"test2","password":"test"}' http://localhost:10008/account/register
-
-           response2=$(curl -X POST -H "Content-Type: application/json" -H "operationID: imAdmin" -d '{
+          response2=$(curl -X POST -H "Content-Type: application/json" -H "operationID: imAdmin" -d '{
             "verifyCode": "666666",
             "platform": 3,
             "autoLogin": true,
             "user":{
-            "nickname": "test12312",
+            "nickname": "test22312",
             "areaCode":"+86",
             "phoneNumber": "12345678290",
             "password":"test123456"
@@ -123,6 +122,7 @@ jobs:
           }' http://127.0.0.1:10008/account/register)
           check_error "$response2"
           userID2=$(echo $response2 | jq -r '.data.userID')
+          echo "userID2: $userID2"
 
           # Test login
           login_response=$(curl -X POST -H "Content-Type: application/json" -H "operationID: imAdmin"  -d '{
@@ -140,7 +140,8 @@ jobs:
             "userID": "imAdmin"
           }' http://127.0.0.1:10002/auth/get_admin_token)
           check_error "$get_admin_token_response"
-          adminToken=$(echo $get_admin_token_response | jq -r '.data.imToken')
+          adminToken=$(echo $get_admin_token_response | jq -r '.data.token')
+          echo "adminToken: $adminToken"
 
           # Test send message
           send_msg_response=$(curl -X POST -H "Content-Type: application/json" -H "operationID: imAdmin" -H "token: $adminToken" -d '{
