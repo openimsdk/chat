@@ -1,5 +1,5 @@
 # Use Go 1.21 Alpine as the base image for building the application
-FROM golang:1.22-alpine as builder
+FROM golang:1.22-alpine AS builder
 
 # Define the base directory for the application as an environment variable
 ENV SERVER_DIR=/openim-chat
@@ -8,12 +8,15 @@ ENV SERVER_DIR=/openim-chat
 WORKDIR $SERVER_DIR
 
 # Set the Go proxy to improve dependency resolution speed
-ENV GOPROXY=https://goproxy.io,direct
+# ENV GOPROXY=https://goproxy.io,direct
+
+COPY go.mod go.sum ./
+
+RUN go mod download
 
 # Copy all files from the current directory into the container
 COPY . .
 
-RUN go mod download
 
 # Install Mage to use for building the application
 RUN go install github.com/magefile/mage@v1.15.0

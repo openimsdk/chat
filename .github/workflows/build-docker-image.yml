@@ -3,143 +3,134 @@ name: Publish Docker image
 on:
   push:
     branches:
-      - main
+      # - main
       - release-*
-    tags:
-      - v*
+    # tags:
+    #   - v*
   workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag version to be used for Docker image"
+        required: true
+        default: "v3.8.0"
 
 env:
-  # Common versions
-  GO_VERSION: "1.20"
+  GO_VERSION: "1.22"
 
 jobs:
-  build-dockerhub:
+  build-amd64-image:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: actions/checkout@v4
 
-# docker.io/openim/openim-chat:latest
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta
-        uses: docker/metadata-action@v4.6.0
-        with:
-          images: openim/openim-chat
-          # generate Docker tags based on the following events/attributes
-          tags: |
-            type=ref,event=tag
-            type=schedule
-            type=ref,event=branch
-            type=ref,event=pr
-            type=semver,pattern={{version}}
-            type=semver,pattern=v{{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=semver,pattern={{major}}
-            type=sha
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3.8.0
 
       - name: Log in to Docker Hub
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3.3.0
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          # linux/ppc64le,linux/s390x
-          platforms: linux/amd64,linux/arm64
-          push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-
-  build-aliyun:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-# registry.cn-hangzhou.aliyuncs.com/openimsdk/openim-chat:latest
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta2
-        uses: docker/metadata-action@v4.6.0
-        with:
-          images: registry.cn-hangzhou.aliyuncs.com/openimsdk/openim-chat
-          tags: |
-            type=ref,event=tag
-            type=schedule
-            type=ref,event=branch
-            type=ref,event=pr
-            type=semver,pattern={{version}}
-            type=semver,pattern=v{{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=semver,pattern={{major}}
-            type=sha
-
-      - name: Log in to AliYun Docker Hub
-        uses: docker/login-action@v2
-        with:
-          registry: registry.cn-hangzhou.aliyuncs.com
-          username: ${{ secrets.ALIREGISTRY_USERNAME }}
-          password: ${{ secrets.ALIREGISTRY_TOKEN }}
-      
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          # linux/ppc64le,linux/s390x
-          platforms: linux/amd64,linux/arm64
-          push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.meta2.outputs.tags }}
-          labels: ${{ steps.meta2.outputs.labels }}
-
-  build-ghcr:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-# ghcr.io/openimsdk/openim-chat:latest
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta3
-        uses: docker/metadata-action@v4.6.0
-        with:
-          images: ghcr.io/openimsdk/openim-chat
-          tags: |
-            type=ref,event=tag
-            type=schedule
-            type=ref,event=branch
-            type=ref,event=pr
-            type=semver,pattern={{version}}
-            type=semver,pattern=v{{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=semver,pattern={{major}}
-            type=sha
-
       - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3.3.0
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Log in to Aliyun Container Registry
+        uses: docker/login-action@v3.3.0
+        with:
+          registry: registry.cn-hangzhou.aliyuncs.com
+          username: ${{ secrets.ALIREGISTRY_USERNAME }}
+          password: ${{ secrets.ALIREGISTRY_TOKEN }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5.6.0
+        with:
+          images: |
+            openim/openim-chat
+            ghcr.io/openimsdk/openim-chat
+            registry.cn-hangzhou.aliyuncs.com/openimsdk/openim-chat
+          tags: |
+            type=ref,event=tag
+            type=schedule
+            type=ref,event=branch
+            # type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern=v{{version}}
+            type=semver,pattern=release-{{raw}}
+            type=sha
+            type=raw,value=${{ github.event.inputs.tag }}
+
       - name: Build and push Docker image
         uses: docker/build-push-action@v4
         with:
           context: .
-          # linux/ppc64le,linux/s390x
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64
           push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.meta3.outputs.tags }}
-          labels: ${{ steps.meta3.outputs.labels }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+  build-arm64-image:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Docker Setup QEMU
+        uses: docker/setup-qemu-action@v3.3.0
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3.8.0
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3.3.0
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3.3.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Log in to Aliyun Container Registry
+        uses: docker/login-action@v3.3.0
+        with:
+          registry: registry.cn-hangzhou.aliyuncs.com
+          username: ${{ secrets.ALIREGISTRY_USERNAME }}
+          password: ${{ secrets.ALIREGISTRY_TOKEN }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5.6.0
+        with:
+          images: |
+            openim/openim-chat
+            ghcr.io/openimsdk/openim-chat
+            registry.cn-hangzhou.aliyuncs.com/openimsdk/openim-chat
+          tags: |
+            type=ref,event=tag
+            type=schedule
+            type=ref,event=branch
+            # type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern=v{{version}}
+            type=semver,pattern=release-{{raw}}
+            type=sha
+            type=raw,value=${{ github.event.inputs.tag }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          platforms: linux/arm64
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
