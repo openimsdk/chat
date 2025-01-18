@@ -1,4 +1,4 @@
-name: OpenIM CI Auto Build
+name: OpenIM Chat Build Test
 
 on:
   push:
