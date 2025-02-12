@@ -112,38 +112,40 @@ type Chat struct {
 		ListenIP   string `mapstructure:"listenIP"`
 		Ports      []int  `mapstructure:"ports"`
 	} `mapstructure:"rpc"`
-	VerifyCode struct {
-		ValidTime  int    `mapstructure:"validTime"`
-		ValidCount int    `mapstructure:"validCount"`
-		UintTime   int    `mapstructure:"uintTime"`
-		MaxCount   int    `mapstructure:"maxCount"`
-		SuperCode  string `mapstructure:"superCode"`
-		Len        int    `mapstructure:"len"`
-		Phone      struct {
-			Use string `mapstructure:"use"`
-			Ali struct {
-				Endpoint                     string `mapstructure:"endpoint"`
-				AccessKeyID                  string `mapstructure:"accessKeyId"`
-				AccessKeySecret              string `mapstructure:"accessKeySecret"`
-				SignName                     string `mapstructure:"signName"`
-				VerificationCodeTemplateCode string `mapstructure:"verificationCodeTemplateCode"`
-			} `mapstructure:"ali"`
-		} `mapstructure:"phone"`
-		Mail struct {
-			Enable                  bool   `mapstructure:"enable"`
-			Title                   string `mapstructure:"title"`
-			SenderMail              string `mapstructure:"senderMail"`
-			SenderAuthorizationCode string `mapstructure:"senderAuthorizationCode"`
-			SMTPAddr                string `mapstructure:"smtpAddr"`
-			SMTPPort                int    `mapstructure:"smtpPort"`
-		} `mapstructure:"mail"`
-	} `mapstructure:"verifyCode"`
-	LiveKit struct {
+	VerifyCode VerifyCode `mapstructure:"verifyCode"`
+	LiveKit    struct {
 		URL    string `mapstructure:"url"`
 		Key    string `mapstructure:"key"`
 		Secret string `mapstructure:"secret"`
 	} `mapstructure:"liveKit"`
 	AllowRegister bool `mapstructure:"allowRegister"`
+}
+
+type VerifyCode struct {
+	ValidTime  int    `mapstructure:"validTime"`
+	ValidCount int    `mapstructure:"validCount"`
+	UintTime   int    `mapstructure:"uintTime"`
+	MaxCount   int    `mapstructure:"maxCount"`
+	SuperCode  string `mapstructure:"superCode"`
+	Len        int    `mapstructure:"len"`
+	Phone      struct {
+		Use string `mapstructure:"use"`
+		Ali struct {
+			Endpoint                     string `mapstructure:"endpoint"`
+			AccessKeyID                  string `mapstructure:"accessKeyId"`
+			AccessKeySecret              string `mapstructure:"accessKeySecret"`
+			SignName                     string `mapstructure:"signName"`
+			VerificationCodeTemplateCode string `mapstructure:"verificationCodeTemplateCode"`
+		} `mapstructure:"ali"`
+	} `mapstructure:"phone"`
+	Mail struct {
+		Use                     string `mapstructure:"use"`
+		Title                   string `mapstructure:"title"`
+		SenderMail              string `mapstructure:"senderMail"`
+		SenderAuthorizationCode string `mapstructure:"senderAuthorizationCode"`
+		SMTPAddr                string `mapstructure:"smtpAddr"`
+		SMTPPort                int    `mapstructure:"smtpPort"`
+	} `mapstructure:"mail"`
 }
 
 type Admin struct {
