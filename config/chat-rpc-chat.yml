@@ -14,7 +14,7 @@ verifyCode:
   superCode: "666666"
   len: 6
   phone:
-    use: ""
+    use: "superCode"  # superCode: user superCode; ali: use ali verify code;
     ali:
       endpoint: ""
       accessKeyId: ""
@@ -22,7 +22,7 @@ verifyCode:
       signName: ""
       verificationCodeTemplateCode: ""
   mail:
-    enable: false
+    use: "superCode"  # superCode: user superCode; mail: use mail verify code;
     title: ""
     senderMail: ""
     senderAuthorizationCode: ""
