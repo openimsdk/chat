@@ -23,7 +23,6 @@ before:
     # you may remove this if you don't need go generate
     - go generate ./...
 
-
 git:
   # What should be used to sort tags when gathering the current and previous
   # tags if there are more than one tag in the same commit.
@@ -65,7 +64,7 @@ builds:
     goarm:
       - "6"
       - "7"
-    ignore: 
+    ignore:
       - goos: darwin
         goarch: s390x
       - goos: darwin
@@ -92,7 +91,7 @@ builds:
     goarm:
       - "6"
       - "7"
-    ignore: 
+    ignore:
       - goos: darwin
         goarch: s390x
       - goos: darwin
@@ -119,7 +118,7 @@ builds:
     goarm:
       - "6"
       - "7"
-    ignore: 
+    ignore:
       - goos: darwin
         goarch: s390x
       - goos: darwin
@@ -146,7 +145,7 @@ builds:
     goarm:
       - "6"
       - "7"
-    ignore: 
+    ignore:
       - goos: darwin
         goarch: s390x
       - goos: darwin
@@ -200,8 +199,8 @@ archives:
           mode: 0644
 
     format_overrides:
-    - goos: windows
-      format: zip
+      - goos: windows
+        format: zip
 
 changelog:
   sort: asc
@@ -378,7 +377,6 @@ nfpms:
     recommends:
       - golang
 
-
 # The lines beneath this are called `modelines`. See `:help modeline`
 # Feel free to remove those if you don't want/use them.
 # yaml-language-server: $schema=https://goreleaser.com/static/schema.json
@@ -478,7 +476,7 @@ release:
 
     **Here are some ways to get involved with the OpenIM community:**
 
-    📢 **Slack Channel**: Join our Slack channels for discussions, communication, and support. Click [here](https://join.slack.com/t/openimsdk/shared_invite/zt-1tmoj26uf-_FDy3dowVHBiGvLk9e5Xkg) to join the chat Slack team channel.
+    📢 **Slack Channel**: Join our Slack channels for discussions, communication, and support. Click [here](https://join.slack.com/t/openimsdk/shared_invite/zt-2ijy1ys1f-O0aEDCr7ExRZ7mwsHAVg9A) to join the chat Slack team channel.
 
     📧 **Gmail Contact**: If you have any questions, suggestions, or feedback for our open-source projects, please feel free to [contact us via email](https://mail.google.com/mail/?view=cm&fs=1&tf=1&to=winxu81@gmail.com).
 
