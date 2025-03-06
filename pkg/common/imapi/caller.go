@@ -2,9 +2,10 @@ package imapi
 
 import (
 	"context"
-	"github.com/openimsdk/tools/log"
 	"sync"
 	"time"
+
+	"github.com/openimsdk/tools/log"
 
 	"github.com/openimsdk/chat/pkg/eerrs"
 	"github.com/openimsdk/protocol/auth"
@@ -75,6 +76,7 @@ func (c *Caller) GetAdminTokenCache(ctx context.Context, userID string) (string,
 	c.lock.RUnlock()
 	if !ok || t.timeout.Before(time.Now()) {
 		c.lock.Lock()
+		defer c.lock.Unlock()
 		t, ok = c.tokenCache[userID]
 		if !ok || t.timeout.Before(time.Now()) {
 			token, err := c.getAdminTokenServer(ctx, userID)
@@ -86,7 +88,6 @@ func (c *Caller) GetAdminTokenCache(ctx context.Context, userID string) (string,
 			t = &authToken{token: token, timeout: time.Now().Add(time.Minute * 5)}
 			c.tokenCache[userID] = t
 		}
-		c.lock.Unlock()
 	}
 	return t.token, nil
 }
