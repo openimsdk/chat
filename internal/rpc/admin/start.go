@@ -73,6 +73,7 @@ func Start(ctx context.Context, config *Config, client discovery.SvcDiscoveryReg
 }
 
 type adminServer struct {
+	adminpb.UnimplementedAdminServer
 	Database database.AdminDatabaseInterface
 	Chat     *chatClient.ChatClient
 	Token    *tokenverify.Token
