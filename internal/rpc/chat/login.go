@@ -85,6 +85,26 @@ func (o *chatSvr) SendVerifyCode(ctx context.Context, req *chat.SendVerifyCodeRe
 	if o.SMS == nil && o.Mail == nil {
 		return &chat.SendVerifyCodeResp{}, nil // super code
 	}
+	if req.Email != "" {
+		switch o.conf.Mail.Use {
+		case constant.VerifySuperCode:
+			return &chat.SendVerifyCodeResp{}, nil // super code
+		case constant.Email:
+		default:
+			return nil, errs.ErrInternalServer.WrapMsg("email verification code is not enabled")
+		}
+	}
+
+	if req.AreaCode != "" {
+		switch o.conf.Phone.Use {
+		case constant.VerifySuperCode:
+			return &chat.SendVerifyCodeResp{}, nil // super code
+		case constant.VerifyALi:
+		default:
+			return nil, errs.ErrInternalServer.WrapMsg("phone verification code is not enabled")
+		}
+	}
+
 	isEmail := req.Email != ""
 	var (
 		code     = o.genVerifyCode()
