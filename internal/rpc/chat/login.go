@@ -102,7 +102,7 @@ func (o *chatSvr) SendVerifyCode(ctx context.Context, req *chat.SendVerifyCodeRe
 		}
 	}
 
-	if req.AreaCode == "" {
+	if req.AreaCode != "" {
 		switch o.conf.Phone.Use {
 		case constant.VerifySuperCode:
 			return &chat.SendVerifyCodeResp{}, nil // super code
