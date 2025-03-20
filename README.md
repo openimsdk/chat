@@ -9,9 +9,9 @@
 
 ## :busts_in_silhouette: Community
 
-+ 💬 [Follow our Twitter account](https://twitter.com/founder_im63606)
-+ 🚀 [Join our Slack community](https://join.slack.com/t/openimsdk/shared_invite/zt-2hljfom5u-9ZuzP3NfEKW~BJKbpLm0Hw)
-+ :eyes: [Join our WeChat group](https://openim-1253691595.cos.ap-nanjing.myqcloud.com/WechatIMG20.jpeg)
+- 💬 [Follow our Twitter account](https://twitter.com/founder_im63606)
+- 🚀 [Join our Slack community](https://join.slack.com/t/openimsdk/shared_invite/zt-2ijy1ys1f-O0aEDCr7ExRZ7mwsHAVg9A)
+- :eyes: [Join our WeChat group](https://openim-1253691595.cos.ap-nanjing.myqcloud.com/WechatIMG20.jpeg)
 
 ## 🛫 Quick Start
 
@@ -83,4 +83,5 @@ mage stop
 :heart: Contributions to this project are welcome! Please see [CONTRIBUTING.md](./CONTRIBUTING.md) for details.
 
 ## 🚨 License
+
 See the [LICENSE](https://github.com/openimsdk/chat/tree/main/LICENSE) for the full license text.

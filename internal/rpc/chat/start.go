@@ -2,8 +2,10 @@ package chat
 
 import (
 	"context"
+	"strings"
 	"time"
 
+	"github.com/openimsdk/chat/pkg/common/constant"
 	"github.com/openimsdk/chat/pkg/common/mctx"
 	"github.com/openimsdk/chat/pkg/common/rtc"
 	"github.com/openimsdk/chat/pkg/protocol/admin"
@@ -39,6 +41,9 @@ func Start(ctx context.Context, config *Config, client discovery.SvcDiscoveryReg
 		return err
 	}
 	var srv chatSvr
+	config.RpcConfig.VerifyCode.Phone.Use = strings.ToLower(config.RpcConfig.VerifyCode.Phone.Use)
+	config.RpcConfig.VerifyCode.Mail.Use = strings.ToLower(config.RpcConfig.VerifyCode.Mail.Use)
+	srv.conf = config.RpcConfig.VerifyCode
 	switch config.RpcConfig.VerifyCode.Phone.Use {
 	case "ali":
 		ali := config.RpcConfig.VerifyCode.Phone.Ali
@@ -47,7 +52,7 @@ func Start(ctx context.Context, config *Config, client discovery.SvcDiscoveryReg
 			return err
 		}
 	}
-	if mail := config.RpcConfig.VerifyCode.Mail; mail.Enable {
+	if mail := config.RpcConfig.VerifyCode.Mail; mail.Use == constant.VerifyMail {
 		srv.Mail = email.NewMail(mail.SMTPAddr, mail.SMTPPort, mail.SenderMail, mail.SenderAuthorizationCode, mail.Title)
 	}
 	srv.Database, err = database.NewChatDatabase(mgocli)
@@ -74,6 +79,8 @@ func Start(ctx context.Context, config *Config, client discovery.SvcDiscoveryReg
 }
 
 type chatSvr struct {
+	chat.UnimplementedChatServer
+	conf            config.VerifyCode
 	Database        database.ChatDatabaseInterface
 	Admin           *chatClient.AdminClient
 	SMS             sms.SMS
