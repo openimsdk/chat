@@ -11,3 +11,4 @@ kubernetes:
 rpcService:
   chat: chat-rpc-service
   admin: admin-rpc-service
+  bot: bot-rpc-service

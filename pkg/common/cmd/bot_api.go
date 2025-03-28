@@ -3,25 +3,25 @@ package cmd
 import (
 	"context"
 
-	"github.com/openimsdk/chat/internal/api/chat"
+	"github.com/openimsdk/chat/internal/api/bot"
 	"github.com/openimsdk/chat/pkg/common/config"
 	"github.com/openimsdk/tools/system/program"
 	"github.com/spf13/cobra"
 )
 
-type ChatApiCmd struct {
+type BotApiCmd struct {
 	*RootCmd
 	ctx       context.Context
 	configMap map[string]any
-	apiConfig chat.Config
+	apiConfig bot.Config
 }
 
-func NewChatApiCmd() *ChatApiCmd {
-	var ret ChatApiCmd
+func NewBotApiCmd() *BotApiCmd {
+	ret := BotApiCmd{apiConfig: bot.Config{}}
 	ret.configMap = map[string]any{
-		config.ShareFileName:           &ret.apiConfig.Share,
-		config.ChatAPIChatCfgFileName:  &ret.apiConfig.ApiConfig,
 		config.DiscoveryConfigFileName: &ret.apiConfig.Discovery,
+		config.ChatAPIBotCfgFileName:   &ret.apiConfig.ApiConfig,
+		config.ShareFileName:           &ret.apiConfig.Share,
 		config.RedisConfigFileName:     &ret.apiConfig.Redis,
 	}
 	ret.RootCmd = NewRootCmd(program.GetProcessName(), WithConfigMap(ret.configMap))
@@ -32,10 +32,10 @@ func NewChatApiCmd() *ChatApiCmd {
 	return &ret
 }
 
-func (a *ChatApiCmd) Exec() error {
+func (a *BotApiCmd) Exec() error {
 	return a.Execute()
 }
 
-func (a *ChatApiCmd) runE() error {
-	return chat.Start(a.ctx, a.Index(), &a.apiConfig)
+func (a *BotApiCmd) runE() error {
+	return bot.Start(a.ctx, a.Index(), &a.apiConfig)
 }
