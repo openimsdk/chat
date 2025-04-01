@@ -26,7 +26,7 @@ type CallerInterface interface {
 	ImportFriend(ctx context.Context, ownerUserID string, friendUserID []string) error
 	GetUserToken(ctx context.Context, userID string, platform int32) (string, error)
 	GetAdminTokenCache(ctx context.Context, userID string) (string, error)
-	GetAdminTokenServer(ctx context.Context, userID string) (string, error)
+	getAdminTokenServer(ctx context.Context, userID string) (string, error)
 	InviteToGroup(ctx context.Context, userID string, groupIDs []string) error
 
 	UpdateUserInfo(ctx context.Context, userID string, nickName string, faceURL string) error
@@ -99,15 +99,10 @@ func (c *Caller) GetAdminTokenCache(ctx context.Context, userID string) (string,
 				return "", err
 			} else if errors.Is(err, redis.Nil) {
 				// no token in redis cache
-				token, err = c.GetAdminTokenServer(ctx, userID)
+				token, err = c.getAdminTokenServer(ctx, userID)
 				if err != nil {
 					log.ZError(ctx, "get im admin token from server", err, "userID", userID)
 					return "", err
-				}
-				log.ZDebug(ctx, "get im admin token from server", "userID", userID)
-				err = c.tokenDB.SetIMToken(ctx, userID, token)
-				if err != nil {
-					log.ZWarn(ctx, "set im admin token to redis failed", err, "userID", userID)
 				}
 				t = &authToken{token: token, timeout: time.Now().Add(time.Minute * 4)}
 				c.tokenCache[userID] = t
@@ -122,13 +117,18 @@ func (c *Caller) GetAdminTokenCache(ctx context.Context, userID string) (string,
 	return t.token, nil
 }
 
-func (c *Caller) GetAdminTokenServer(ctx context.Context, userID string) (string, error) {
+func (c *Caller) getAdminTokenServer(ctx context.Context, userID string) (string, error) {
 	resp, err := getAdminToken.Call(ctx, c.imApi, &auth.GetAdminTokenReq{
 		Secret: c.imSecret,
 		UserID: userID,
 	})
 	if err != nil {
 		return "", err
+	}
+	log.ZDebug(ctx, "get im admin token from server", "userID", userID)
+	err = c.tokenDB.SetIMToken(ctx, userID, resp.Token)
+	if err != nil {
+		log.ZWarn(ctx, "set im admin token to redis failed", err, "userID", userID)
 	}
 	return resp.Token, nil
 }
