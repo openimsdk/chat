@@ -14,7 +14,6 @@ import (
 	"github.com/openimsdk/tools/a2r"
 	"github.com/openimsdk/tools/apiresp"
 	"github.com/openimsdk/tools/errs"
-	"github.com/openimsdk/tools/log"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -57,17 +56,19 @@ func (o *Api) AfterSendSingleMsg(c *gin.Context) {
 	}
 	if req.ContentType != constant.Text {
 		apiresp.GinSuccess(c, nil)
+		return
 	}
 	isAgent := botstruct.IsAgentUserID(req.RecvID)
-	log.ZDebug(c, "check agent", "id", req.RecvID, "isAgent", isAgent)
 	if !isAgent {
 		apiresp.GinSuccess(c, nil)
+		return
 	}
 
 	var elem botstruct.TextElem
 	err := json.Unmarshal([]byte(req.Content), &elem)
 	if err != nil {
 		apiresp.GinError(c, errs.ErrArgs.WrapMsg("json unmarshal error: "+err.Error()))
+		return
 	}
 	convID := getConversationIDByMsg(req.SessionType, req.SendID, req.RecvID, "")
 
