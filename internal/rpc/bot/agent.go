@@ -110,16 +110,16 @@ func (b *botSvr) PageFindAgent(ctx context.Context, req *bot.PageFindAgentReq) (
 	if err != nil {
 		return nil, err
 	}
-	_, userType, err := mctx.Check(ctx)
-	if err != nil {
-		return nil, err
+	//_, userType, err := mctx.Check(ctx)
+	//if err != nil {
+	//	return nil, err
+	//}
+	//if userType != constant.AdminUser {
+	for i := range agents {
+		agents[i].Key = ""
+		agents[i].Url = ""
 	}
-	if userType != constant.AdminUser {
-		for i := range agents {
-			agents[i].Key = ""
-			agents[i].Url = ""
-		}
-	}
+	//}
 	return &bot.PageFindAgentResp{
 		Total:  total,
 		Agents: convert.BatchDB2PBAgent(agents),
