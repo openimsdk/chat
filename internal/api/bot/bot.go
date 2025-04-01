@@ -14,6 +14,7 @@ import (
 	"github.com/openimsdk/tools/a2r"
 	"github.com/openimsdk/tools/apiresp"
 	"github.com/openimsdk/tools/errs"
+	"github.com/openimsdk/tools/log"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -58,6 +59,7 @@ func (o *Api) AfterSendSingleMsg(c *gin.Context) {
 		apiresp.GinSuccess(c, nil)
 	}
 	isAgent := botstruct.IsAgentUserID(req.RecvID)
+	log.ZDebug(c, "check agent", "id", req.RecvID, "isAgent", isAgent)
 	if !isAgent {
 		apiresp.GinSuccess(c, nil)
 	}
