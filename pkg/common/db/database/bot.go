@@ -33,9 +33,14 @@ func NewBotDatabase(cli *mongoutil.Client) (BotDatabase, error) {
 	if err != nil {
 		return nil, err
 	}
+	convRespID, err := bot.NewConversationRespID(cli.GetDB())
+	if err != nil {
+		return nil, err
+	}
 	return &botDatabase{
-		tx:    cli.GetTx(),
-		agent: agent,
+		tx:         cli.GetTx(),
+		agent:      agent,
+		convRespID: convRespID,
 	}, nil
 }
 
