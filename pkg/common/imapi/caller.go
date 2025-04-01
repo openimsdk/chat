@@ -107,7 +107,7 @@ func (c *Caller) GetAdminTokenCache(ctx context.Context, userID string) (string,
 				t = &authToken{token: token, timeout: time.Now().Add(time.Minute * 4)}
 				c.tokenCache[userID] = t
 			} else {
-				log.ZDebug(ctx, "get im admin token from cache", "userID", userID)
+				log.ZDebug(ctx, "get im admin token from cache", "userID", userID, "token", token)
 				t = &authToken{token: token, timeout: time.Now().Add(time.Minute * 4)}
 				c.tokenCache[userID] = t
 			}
@@ -125,7 +125,7 @@ func (c *Caller) GetAdminTokenServer(ctx context.Context, userID string) (string
 	if err != nil {
 		return "", err
 	}
-	log.ZDebug(ctx, "get im admin token from server", "userID", userID)
+	log.ZDebug(ctx, "get im admin token from server", "userID", userID, "token", resp.Token)
 	err = c.tokenDB.SetIMToken(ctx, userID, resp.Token)
 	if err != nil {
 		log.ZWarn(ctx, "set im admin token to redis failed", err, "userID", userID)
