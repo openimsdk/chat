@@ -52,7 +52,7 @@ func (b *botSvr) SendBotMessage(ctx context.Context, req *bot.SendBotMessageReq)
 	var botResp botstruct.Response
 	err = json.Unmarshal(postResp, &botResp)
 	if err != nil {
-		return nil, errs.WrapMsg(err, "unmarshal post body failed")
+		return nil, errs.WrapMsg(err, "unmarshal post body failed, body:", postResp)
 	}
 
 	newRespID, respContent, err := botResp.GetContentAndID()
