@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 
 	"github.com/openimsdk/chat/pkg/botstruct"
 	"github.com/openimsdk/chat/pkg/common/imapi"
@@ -52,7 +53,7 @@ func (b *botSvr) SendBotMessage(ctx context.Context, req *bot.SendBotMessageReq)
 	var botResp botstruct.Response
 	err = json.Unmarshal(postResp, &botResp)
 	if err != nil {
-		return nil, errs.WrapMsg(err, "unmarshal post body failed, body:", postResp)
+		return nil, errs.WrapMsg(err, fmt.Sprintf("unmarshal post body failed, body:%s", string(postResp)))
 	}
 
 	newRespID, respContent, err := botResp.GetContentAndID()
