@@ -60,7 +60,7 @@ func (b *botSvr) CreateAgent(ctx context.Context, req *bot.CreateAgentReq) (*bot
 
 	if err := b.imCaller.AddNotificationAccount(ctx, &user.AddNotificationAccountReq{
 		UserID:         req.Agent.UserID,
-		NickName:       req.Agent.NickName,
+		NickName:       req.Agent.Nickname,
 		FaceURL:        req.Agent.FaceURL,
 		AppMangerLevel: pbconstant.AppRobotAdmin,
 	}); err != nil {
@@ -80,12 +80,12 @@ func (b *botSvr) UpdateAgent(ctx context.Context, req *bot.UpdateAgentReq) (*bot
 		return nil, errs.ErrArgs.Wrap()
 	}
 
-	if req.FaceURL != nil || req.NickName != nil {
+	if req.FaceURL != nil || req.Nickname != nil {
 		imReq := &user.UpdateNotificationAccountInfoReq{
 			UserID: req.UserID,
 		}
-		if req.NickName != nil {
-			imReq.NickName = *req.NickName
+		if req.Nickname != nil {
+			imReq.NickName = *req.Nickname
 		}
 		if req.FaceURL != nil {
 			imReq.FaceURL = *req.FaceURL

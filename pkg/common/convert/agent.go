@@ -11,7 +11,7 @@ import (
 func DB2PBAgent(a *bot.Agent) *pbbot.Agent {
 	return &pbbot.Agent{
 		UserID:     a.UserID,
-		NickName:   a.NickName,
+		Nickname:   a.NickName,
 		FaceURL:    a.FaceURL,
 		Url:        a.Url,
 		Key:        a.Key,
@@ -25,7 +25,7 @@ func DB2PBAgent(a *bot.Agent) *pbbot.Agent {
 func PB2DBAgent(a *pbbot.Agent) *bot.Agent {
 	return &bot.Agent{
 		UserID:     a.UserID,
-		NickName:   a.NickName,
+		NickName:   a.Nickname,
 		FaceURL:    a.FaceURL,
 		Key:        a.Key,
 		Url:        a.Url,

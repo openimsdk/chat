@@ -10,8 +10,8 @@ func ToDBAgentUpdate(req *bot.UpdateAgentReq) map[string]any {
 	if req.FaceURL != nil {
 		update["face_url"] = req.FaceURL
 	}
-	if req.NickName != nil {
-		update["nick_name"] = req.NickName
+	if req.Nickname != nil {
+		update["nick_name"] = req.Nickname
 	}
 	if req.Identity != nil {
 		update["identity"] = req.Identity
