@@ -26,7 +26,7 @@ type CallerInterface interface {
 	ImportFriend(ctx context.Context, ownerUserID string, friendUserID []string) error
 	GetUserToken(ctx context.Context, userID string, platform int32) (string, error)
 	GetAdminTokenCache(ctx context.Context, userID string) (string, error)
-	getAdminTokenServer(ctx context.Context, userID string) (string, error)
+	GetAdminTokenServer(ctx context.Context, userID string) (string, error)
 	InviteToGroup(ctx context.Context, userID string, groupIDs []string) error
 
 	UpdateUserInfo(ctx context.Context, userID string, nickName string, faceURL string) error
@@ -99,7 +99,7 @@ func (c *Caller) GetAdminTokenCache(ctx context.Context, userID string) (string,
 				return "", err
 			} else if errors.Is(err, redis.Nil) {
 				// no token in redis cache
-				token, err = c.getAdminTokenServer(ctx, userID)
+				token, err = c.GetAdminTokenServer(ctx, userID)
 				if err != nil {
 					log.ZError(ctx, "get im admin token from server", err, "userID", userID)
 					return "", err
@@ -117,7 +117,7 @@ func (c *Caller) GetAdminTokenCache(ctx context.Context, userID string) (string,
 	return t.token, nil
 }
 
-func (c *Caller) getAdminTokenServer(ctx context.Context, userID string) (string, error) {
+func (c *Caller) GetAdminTokenServer(ctx context.Context, userID string) (string, error) {
 	resp, err := getAdminToken.Call(ctx, c.imApi, &auth.GetAdminTokenReq{
 		Secret: c.imSecret,
 		UserID: userID,
