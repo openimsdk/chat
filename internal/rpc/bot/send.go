@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
+	"time"
 
 	"github.com/openimsdk/chat/pkg/botstruct"
 	"github.com/openimsdk/chat/pkg/common/imapi"
@@ -12,6 +12,7 @@ import (
 	"github.com/openimsdk/chat/pkg/protocol/bot"
 	"github.com/openimsdk/protocol/constant"
 	"github.com/openimsdk/tools/errs"
+	"github.com/sashabaranov/go-openai"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -28,37 +29,30 @@ func (b *botSvr) SendBotMessage(ctx context.Context, req *bot.SendBotMessageReq)
 	if convRespID != nil {
 		respID = convRespID.PreviousResponseID
 	}
-	botreq := &botstruct.Request{
+
+	aiCfg := openai.DefaultConfig(agent.Key)
+	aiCfg.BaseURL = agent.Url
+	aiCfg.HTTPClient = b.httpClient
+	aiCfg.OrgID = respID
+	client := openai.NewClientWithConfig(aiCfg)
+	aiReq := openai.ChatCompletionRequest{
 		Model: agent.Model,
-		Input: []botstruct.InputItem{
+		Messages: []openai.ChatCompletionMessage{
 			{
-				Role:    botstruct.RoleDeveloper,
+				Role:    openai.ChatMessageRoleSystem,
 				Content: agent.Prompts,
 			},
 			{
-				Role:    botstruct.RoleUser,
+				Role:    openai.ChatMessageRoleUser,
 				Content: req.Content,
 			},
 		},
-		PreviousResponseID: respID,
 	}
-	header := map[string]string{}
-	header["Content-Type"] = "application/json"
-	header["Authorization"] = "Bearer " + agent.Key
-	postResp, err := b.httpClient.Post(ctx, agent.Url, header, botreq, b.timeout)
+	aiCtx, cancel := context.WithTimeout(ctx, time.Duration(b.timeout))
+	defer cancel()
+	completion, err := client.CreateChatCompletion(aiCtx, aiReq)
 	if err != nil {
-		return nil, errs.WrapMsg(err, "post bot failed")
-	}
-
-	var botResp botstruct.Response
-	err = json.Unmarshal(postResp, &botResp)
-	if err != nil {
-		return nil, errs.WrapMsg(err, fmt.Sprintf("unmarshal post body failed, body:%s", string(postResp)))
-	}
-
-	newRespID, respContent, err := botResp.GetContentAndID()
-	if err != nil {
-		return nil, err
+		return nil, errs.Wrap(err)
 	}
 
 	imToken, err := b.imCaller.ImAdminTokenWithDefaultAdmin(ctx)
@@ -66,15 +60,20 @@ func (b *botSvr) SendBotMessage(ctx context.Context, req *bot.SendBotMessageReq)
 		return nil, err
 	}
 	ctx = mctx.WithApiToken(ctx, imToken)
+
+	content := "no response"
+	if len(completion.Choices) > 0 {
+		content = completion.Choices[0].Message.Content
+	}
 	err = b.imCaller.SendSimpleMsg(ctx, &imapi.SendSingleMsgReq{
 		SendID:  agent.UserID,
-		Content: respContent,
+		Content: content,
 	}, req.Key)
 	if err != nil {
 		return nil, err
 	}
 
-	err = b.database.UpdateConversationRespID(ctx, req.ConversationID, agent.UserID, ToDBConversationRespIDUpdate(newRespID))
+	err = b.database.UpdateConversationRespID(ctx, req.ConversationID, agent.UserID, ToDBConversationRespIDUpdate(completion.ID))
 	if err != nil {
 		return nil, err
 	}

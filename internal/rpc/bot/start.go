@@ -2,6 +2,7 @@ package bot
 
 import (
 	"context"
+	"net/http"
 	"time"
 
 	"github.com/openimsdk/chat/pkg/common/config"
@@ -11,7 +12,6 @@ import (
 	"github.com/openimsdk/tools/db/mongoutil"
 	"github.com/openimsdk/tools/db/redisutil"
 	"github.com/openimsdk/tools/discovery"
-	"github.com/openimsdk/tools/utils/httputil"
 	"google.golang.org/grpc"
 )
 
@@ -38,10 +38,10 @@ func Start(ctx context.Context, config *Config, client discovery.SvcDiscoveryReg
 	if err != nil {
 		return err
 	}
-	httpCfg := httputil.NewClientConfig()
-	httpCfg.Timeout = time.Duration(config.RpcConfig.Timeout) * time.Second
 	srv.timeout = config.RpcConfig.Timeout
-	srv.httpClient = httputil.NewHTTPClient(httpCfg)
+	srv.httpClient = &http.Client{
+		Timeout: time.Duration(config.RpcConfig.Timeout) * time.Second,
+	}
 	im := imapi.New(config.Share.OpenIM.ApiURL, config.Share.OpenIM.Secret, config.Share.OpenIM.AdminUserID, rdb, config.Share.OpenIM.TokenRefreshInterval)
 	srv.imCaller = im
 	bot.RegisterBotServer(server, &srv)
@@ -51,7 +51,7 @@ func Start(ctx context.Context, config *Config, client discovery.SvcDiscoveryReg
 type botSvr struct {
 	bot.UnimplementedBotServer
 	database   database.BotDatabase
-	httpClient *httputil.HTTPClient
+	httpClient *http.Client
 	timeout    int
 	imCaller   imapi.CallerInterface
 	//Admin           *chatClient.AdminClient

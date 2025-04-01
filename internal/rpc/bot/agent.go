@@ -117,7 +117,6 @@ func (b *botSvr) PageFindAgent(ctx context.Context, req *bot.PageFindAgentReq) (
 	//if userType != constant.AdminUser {
 	for i := range agents {
 		agents[i].Key = ""
-		agents[i].Url = ""
 	}
 	//}
 	return &bot.PageFindAgentResp{
