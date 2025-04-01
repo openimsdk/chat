@@ -7,7 +7,7 @@ option go_package = "github.com/openimsdk/chat/pkg/protocol/bot";
 
 message Agent {
   string userID = 1;
-  string nickName = 2;
+  string nickname = 2;
   string faceURL = 3;
   string url = 4;
   string key = 5;
@@ -26,7 +26,7 @@ message CreateAgentResp {
 
 message UpdateAgentReq {
   string userID = 1;
-  optional string nickName = 2;
+  optional string nickname = 2;
   optional string faceURL = 3;
   optional string url = 4;
   optional string key = 5;
