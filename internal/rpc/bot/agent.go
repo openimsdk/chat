@@ -10,6 +10,7 @@ import (
 	"github.com/openimsdk/chat/pkg/common/mctx"
 	"github.com/openimsdk/chat/pkg/protocol/bot"
 	pbconstant "github.com/openimsdk/protocol/constant"
+	"github.com/openimsdk/protocol/sdkws"
 	"github.com/openimsdk/protocol/user"
 	"github.com/openimsdk/tools/errs"
 	"github.com/openimsdk/tools/utils/datautil"
@@ -40,18 +41,19 @@ func (b *botSvr) CreateAgent(ctx context.Context, req *bot.CreateAgentReq) (*bot
 		for i := range randUserIDs {
 			randUserIDs[i] = constant.AgentUserIDPrefix + genID(10)
 		}
-		users, err := b.imCaller.GetUsersInfo(ctx, []string{req.Agent.UserID})
+		users, err := b.imCaller.GetUsersInfo(ctx, randUserIDs)
 		if err != nil {
 			return nil, err
 		}
 		if len(users) == len(randUserIDs) {
 			return nil, errs.ErrDuplicateKey.WrapMsg("gen agent userID already exists, please try again")
 		}
-		for _, u := range users {
-			if datautil.Contain(u.UserID, randUserIDs...) {
+		userIDs := datautil.Batch(func(u *sdkws.UserInfo) string { return u.UserID }, users)
+		for _, uid := range randUserIDs {
+			if datautil.Contain(uid, userIDs...) {
 				continue
 			}
-			req.Agent.UserID = u.UserID
+			req.Agent.UserID = uid
 			break
 		}
 	}
