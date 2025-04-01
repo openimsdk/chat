@@ -48,7 +48,7 @@ func (b *botSvr) SendBotMessage(ctx context.Context, req *bot.SendBotMessageReq)
 			},
 		},
 	}
-	aiCtx, cancel := context.WithTimeout(ctx, time.Duration(b.timeout))
+	aiCtx, cancel := context.WithTimeout(ctx, time.Duration(b.timeout)*time.Second)
 	defer cancel()
 	completion, err := client.CreateChatCompletion(aiCtx, aiReq)
 	if err != nil {
