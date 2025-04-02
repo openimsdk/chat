@@ -7,6 +7,12 @@ func ToDBAgentUpdate(req *bot.UpdateAgentReq) map[string]any {
 	if req.Key != nil {
 		update["key"] = req.Key
 	}
+	if req.Prompts != nil {
+		update["prompts"] = req.Prompts
+	}
+	if req.Model != nil {
+		update["model"] = req.Model
+	}
 	if req.FaceURL != nil {
 		update["face_url"] = req.FaceURL
 	}
@@ -19,6 +25,7 @@ func ToDBAgentUpdate(req *bot.UpdateAgentReq) map[string]any {
 	if req.Url != nil {
 		update["url"] = req.Url
 	}
+
 	return update
 }
 
