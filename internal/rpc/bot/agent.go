@@ -90,7 +90,12 @@ func (b *botSvr) UpdateAgent(ctx context.Context, req *bot.UpdateAgentReq) (*bot
 		if req.FaceURL != nil {
 			imReq.FaceURL = *req.FaceURL
 		}
-		err := b.imCaller.UpdateNotificationAccount(ctx, imReq)
+		imToken, err := b.imCaller.ImAdminTokenWithDefaultAdmin(ctx)
+		if err != nil {
+			return nil, err
+		}
+		ctx = mctx.WithApiToken(ctx, imToken)
+		err = b.imCaller.UpdateNotificationAccount(ctx, imReq)
 		if err != nil {
 			return nil, err
 		}
