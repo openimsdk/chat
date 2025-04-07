@@ -62,12 +62,20 @@ jobs:
           sudo sleep 30  # Increased sleep time for better stability
         timeout-minutes: 30 # Increased timeout for Docker setup
 
+      - name: Modify Server Configuration
+        run: |
+          yq e '.secret = 123456' -i ${{ github.workspace }}/server-repo/config/share.yml
+
       - name: Build and Start IM Serevr Services
         run: |
           cd ${{ github.workspace }}/server-repo
           sudo mage
           sudo mage start
           sudo mage check
+
+      - name: Modify Chat Configuration
+        run: |
+          yq e '.openIM.secret = 123456' -i config/share.yml
 
       - name: Build, Start, Check Services and Print Logs for Linux
         run: |
