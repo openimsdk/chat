@@ -142,7 +142,7 @@ func (x *RegisterUserReq) Check() error {
 }
 
 func (x *LoginReq) Check() error {
-	if x.Platform < constantpb.IOSPlatformID || x.Platform > constantpb.AdminPlatformID {
+	if x.Platform < constantpb.IOSPlatformID || x.Platform > constantpb.HarmonyOSPlatformID {
 		return errs.ErrArgs.WrapMsg("platform is invalid")
 	}
 	if x.Email == "" {
