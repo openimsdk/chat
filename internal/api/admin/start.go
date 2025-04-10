@@ -19,6 +19,7 @@ import (
 	disetcd "github.com/openimsdk/chat/pkg/common/kdisc/etcd"
 	adminclient "github.com/openimsdk/chat/pkg/protocol/admin"
 	chatclient "github.com/openimsdk/chat/pkg/protocol/chat"
+	"github.com/openimsdk/tools/db/redisutil"
 	"github.com/openimsdk/tools/discovery"
 	"github.com/openimsdk/tools/discovery/etcd"
 	"github.com/openimsdk/tools/errs"
@@ -52,6 +53,10 @@ func Start(ctx context.Context, index int, config *Config) error {
 	if err != nil {
 		return err
 	}
+	rdb, err := redisutil.NewRedisClient(ctx, config.Redis.Build())
+	if err != nil {
+		return err
+	}
 
 	chatConn, err := client.GetConn(ctx, config.Discovery.RpcService.Chat, grpc.WithTransportCredentials(insecure.NewCredentials()), mw.GrpcClient())
 	if err != nil {
@@ -63,7 +68,7 @@ func Start(ctx context.Context, index int, config *Config) error {
 	}
 	chatClient := chatclient.NewChatClient(chatConn)
 	adminClient := adminclient.NewAdminClient(adminConn)
-	im := imapi.New(config.Share.OpenIM.ApiURL, config.Share.OpenIM.Secret, config.Share.OpenIM.AdminUserID)
+	im := imapi.New(config.Share.OpenIM.ApiURL, config.Share.OpenIM.Secret, config.Share.OpenIM.AdminUserID, rdb, config.Share.OpenIM.TokenRefreshInterval)
 	base := util.Api{
 		ImUserID:        config.Share.OpenIM.AdminUserID,
 		ProxyHeader:     config.Share.ProxyHeader,
