@@ -3,6 +3,8 @@ serviceBinaries:
   chat-rpc: 1
   admin-api: 1
   admin-rpc: 1
+  bot-api: 1
+  bot-rpc: 1
 toolBinaries:
   - check-component
   - attribute-to-credential
