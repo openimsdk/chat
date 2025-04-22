@@ -1,18 +1,17 @@
 # openim-chat
 
-## 📄 源代码的许可选项
+## 📄 开源许可证 license
 
-您可以在以下两种许可选项之一下使用 OpenIM 源代码来创建非 OpenIM 原始生产的编译版本：
+This software is licensed under a dual-license model:
 
-### 1. 通用公共许可证 v3.0 (GPLv3) 🆓
+- The GNU Affero General Public License (AGPL), Version 3 or later; **OR**
+- Commercial license terms from OpenIMSDK.
 
-- 该选项受自由软件基金会的 [GPL v3.0](https://www.gnu.org/licenses/gpl-3.0.en.html) 管理。
-- 使用受此政策概述的某些例外的约束。
+If you wish to use this software under commercial terms, please contact us at: contact@openim.io
 
-### 2. 商业许可 💼
+For more information, see: https://www.openim.io/zh/licensing
 
-- 通过联系 OpenIM 获得商业许可。
-- 有关详细信息和许可查询，请通过电子邮件 📧 [contact@openim.io](mailto:contact@openim.io)。
+
 
 ## 🧩 功能简介
 
