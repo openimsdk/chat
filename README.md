@@ -84,4 +84,13 @@ mage stop
 
 ## 🚨 License
 
-See the [LICENSE](https://github.com/openimsdk/chat/tree/main/LICENSE) for the full license text.
+This software is licensed under a dual-license model:
+
+- The GNU Affero General Public License (AGPL), Version 3 or later; **OR**
+- Commercial license terms from OpenIMSDK.
+
+If you wish to use this software under commercial terms, please contact us at: contact@openim.io
+
+For more information, see: https://www.openim.io/en/licensing
+
+
