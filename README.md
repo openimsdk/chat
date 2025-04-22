@@ -1,18 +1,17 @@
 # openim-chat
 
-## 📄 License Options for OpenIM Source Code
+## 📄 License 
 
-You may use the OpenIM source code to create compiled versions not originally produced by OpenIM under one of the following two licensing options:
+This software is licensed under a dual-license model:
 
-### 1. GNU General Public License v3.0 (GPLv3) 🆓
+- The GNU Affero General Public License (AGPL), Version 3 or later; **OR**
+- Commercial license terms from OpenIMSDK.
 
-+ This option is governed by the Free Software Foundation's [GPL v3.0](https://www.gnu.org/licenses/gpl-3.0.en.html).
-+ Usage is subject to certain exceptions as outlined in this policy.
+If you wish to use this software under commercial terms, please contact us at: contact@openim.io
 
-### 2. Commercial License 💼
+For more information, see: https://www.openim.io/en/licensing
 
-+ Obtain a commercial license by contacting OpenIM.
-+ For more details and licensing inquiries, please email 📧 [contact@openim.io](mailto:contact@openim.io).
+
 
 ## 🧩 Feature Overview
 
