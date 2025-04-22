@@ -97,4 +97,4 @@ mage stop
 
 ## 🚨 许可
 
-:scroll: chat 根据 [GPL-3.0 license](https://github.com/openimsdk/chat#GPL-3.0-1-ov-file) 许可证授权。查看 [LICENSE](https://github.com/openimsdk/chat/tree/main/LICENSE) 获取完整的许可证文本。
+This software is licensed under the Apache License 2.0
