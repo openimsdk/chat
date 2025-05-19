@@ -42,9 +42,9 @@ func (o *ConversationRespID) Update(ctx context.Context, convID, agentID string,
 	if len(data) == 0 {
 		return nil
 	}
-	return mongoutil.UpdateOne(ctx, o.coll, bson.M{"conv_id": convID, "agent_id": agentID}, bson.M{"$set": data}, false, options.Update().SetUpsert(true))
+	return mongoutil.UpdateOne(ctx, o.coll, bson.M{"conversation_id": convID, "agent_id": agentID}, bson.M{"$set": data}, false, options.Update().SetUpsert(true))
 }
 
 func (o *ConversationRespID) Delete(ctx context.Context, convID, agentID string) error {
-	return mongoutil.DeleteMany(ctx, o.coll, bson.M{"conv_id": convID, "agent_id": agentID})
+	return mongoutil.DeleteMany(ctx, o.coll, bson.M{"conversation_id": convID, "agent_id": agentID})
 }

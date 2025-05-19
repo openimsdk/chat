@@ -94,7 +94,7 @@ func (o *Api) AfterSendSingleMsg(c *gin.Context) {
 
 func (o *Api) AfterSendGroupMsg(c *gin.Context) {
 	var (
-		req = imwebhook.CallbackAfterSendSingleMsgReq{}
+		req = imwebhook.CallbackAfterSendGroupMsgReq{}
 	)
 	if err := c.BindJSON(&req); err != nil {
 		apiresp.GinError(c, errs.ErrArgs.WithDetail(err.Error()).Wrap())
@@ -115,7 +115,7 @@ func (o *Api) AfterSendGroupMsg(c *gin.Context) {
 		reqs []*bot.SendBotMessageReq
 	)
 
-	convID := getConversationIDByMsg(req.SessionType, req.SendID, req.RecvID, "")
+	convID := getConversationIDByMsg(req.SessionType, req.SendID, "", req.GroupID)
 	err := json.Unmarshal([]byte(req.Content), &elem)
 	if err != nil {
 		apiresp.GinError(c, errs.ErrArgs.WrapMsg("json unmarshal error: "+err.Error()))
