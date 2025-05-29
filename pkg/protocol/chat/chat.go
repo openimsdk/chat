@@ -116,7 +116,7 @@ func (x *RegisterUserReq) Check() error {
 	if x.User.Nickname == "" {
 		return errs.ErrArgs.WrapMsg("Nickname is nil")
 	}
-	if x.Platform < constantpb.IOSPlatformID || x.Platform > constantpb.AdminPlatformID {
+	if x.Platform < constantpb.IOSPlatformID || x.Platform > constantpb.HarmonyOSPlatformID {
 		return errs.ErrArgs.WrapMsg("platform is invalid")
 	}
 	if x.User == nil {
