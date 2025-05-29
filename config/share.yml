@@ -5,6 +5,8 @@ openIM:
   secret: openIM123
   # OpenIM administrator userID, must be consistent with OpenIM
   adminUserID: imAdmin
+  # Refresh OpenIM token interval
+  tokenRefreshInterval: 120  # unit: minute
 
 chatAdmin:
    # Default username and password for the admin

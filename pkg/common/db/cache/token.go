@@ -16,10 +16,9 @@ package cache
 
 import (
 	"context"
-	"github.com/openimsdk/chat/pkg/common/tokenverify"
-	"github.com/openimsdk/tools/utils/stringutil"
-	"sort"
 	"time"
+
+	"github.com/openimsdk/tools/utils/stringutil"
 
 	"github.com/openimsdk/tools/errs"
 	"github.com/redis/go-redis/v9"
