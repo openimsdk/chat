@@ -116,7 +116,7 @@ data:
       listenIP: 0.0.0.0
       # List of ports that the RPC service listens on; configuring multiple ports will launch multiple instances.
       ports: [ 30300 ]
-
+    
     verifyCode:
       validTime: 300
       validCount: 5
@@ -125,7 +125,7 @@ data:
       superCode: "666666"
       len: 6
       phone:
-        use: ""
+        use: "superCode"  # superCode: user superCode; ali: use ali verify code;
         ali:
           endpoint: ""
           accessKeyId: ""
@@ -133,16 +133,17 @@ data:
           signName: ""
           verificationCodeTemplateCode: ""
       mail:
-        enable: false
+        use: "superCode"  # superCode: user superCode; mail: use mail verify code;
         title: ""
         senderMail: ""
         senderAuthorizationCode: ""
         smtpAddr: ""
         smtpPort:
-
+    
     liveKit:
       url: "ws://127.0.0.1:7880" # LIVEKIT_URL, LiveKit server address and port
       key: "APIGPW3gnFTzqHH"
       secret: "23ztfSqsfQ8hKkHzHTl3Z4bvaxro0snjk5jwbp5p6Q3"
-
+    
     allowRegister: true
+
