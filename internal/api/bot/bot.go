@@ -114,7 +114,6 @@ func (o *Api) AfterSendGroupMsg(c *gin.Context) {
 		elem botstruct.AtElem
 		reqs []*bot.SendBotMessageReq
 	)
-
 	convID := getConversationIDByMsg(req.SessionType, req.SendID, "", req.GroupID)
 	err := json.Unmarshal([]byte(req.Content), &elem)
 	if err != nil {

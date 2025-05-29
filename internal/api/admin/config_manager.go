@@ -15,6 +15,7 @@ import (
 	"github.com/openimsdk/tools/apiresp"
 	"github.com/openimsdk/tools/errs"
 	"github.com/openimsdk/tools/log"
+	"github.com/openimsdk/tools/utils/datautil"
 	"github.com/openimsdk/tools/utils/runtimeenv"
 	clientv3 "go.etcd.io/etcd/client/v3"
 )
@@ -107,6 +108,84 @@ func (cm *ConfigManager) SetConfig(c *gin.Context) {
 		return
 	}
 	apiresp.GinSuccess(c, nil)
+}
+
+func (cm *ConfigManager) SetConfigs(c *gin.Context) {
+	if cm.config.Discovery.Enable != kdisc.ETCDCONST {
+		apiresp.GinError(c, errs.New("only etcd support set config").Wrap())
+		return
+	}
+	var req apistruct.SetConfigsReq
+	if err := c.BindJSON(&req); err != nil {
+		apiresp.GinError(c, errs.ErrArgs.WithDetail(err.Error()).Wrap())
+		return
+	}
+	var (
+		err error
+		ops []*clientv3.Op
+	)
+
+	for _, cf := range req.Configs {
+		var op *clientv3.Op
+		switch cf.ConfigName {
+		case config.DiscoveryConfigFileName:
+			op, err = compareAndOp[config.Discovery](c, cm.config.Name2Config(cf.ConfigName), &cf, cm.client)
+		case config.LogConfigFileName:
+			op, err = compareAndOp[config.Log](c, cm.config.Name2Config(cf.ConfigName), &cf, cm.client)
+		case config.MongodbConfigFileName:
+			op, err = compareAndOp[config.Mongo](c, cm.config.Name2Config(cf.ConfigName), &cf, cm.client)
+		case config.ChatAPIAdminCfgFileName:
+			op, err = compareAndOp[config.API](c, cm.config.Name2Config(cf.ConfigName), &cf, cm.client)
+		case config.ChatAPIChatCfgFileName:
+			op, err = compareAndOp[config.API](c, cm.config.Name2Config(cf.ConfigName), &cf, cm.client)
+		case config.ChatRPCAdminCfgFileName:
+			op, err = compareAndOp[config.Admin](c, cm.config.Name2Config(cf.ConfigName), &cf, cm.client)
+		case config.ChatRPCChatCfgFileName:
+			op, err = compareAndOp[config.Chat](c, cm.config.Name2Config(cf.ConfigName), &cf, cm.client)
+		case config.ShareFileName:
+			op, err = compareAndOp[config.Share](c, cm.config.Name2Config(cf.ConfigName), &cf, cm.client)
+		case config.RedisConfigFileName:
+			op, err = compareAndOp[config.Redis](c, cm.config.Name2Config(cf.ConfigName), &cf, cm.client)
+		default:
+			apiresp.GinError(c, errs.ErrArgs.Wrap())
+			return
+		}
+		if err != nil {
+			apiresp.GinError(c, errs.ErrArgs.WithDetail(err.Error()).Wrap())
+			return
+		}
+		if op != nil {
+			ops = append(ops, op)
+		}
+	}
+	if len(ops) > 0 {
+		tx := cm.client.Txn(c)
+		if _, err = tx.Then(datautil.Batch(func(op *clientv3.Op) clientv3.Op { return *op }, ops)...).Commit(); err != nil {
+			apiresp.GinError(c, errs.WrapMsg(err, "save to etcd failed"))
+			return
+		}
+
+	}
+
+	apiresp.GinSuccess(c, nil)
+}
+
+func compareAndOp[T any](c *gin.Context, old any, req *apistruct.SetConfigReq, client *clientv3.Client) (*clientv3.Op, error) {
+	conf := new(T)
+	err := json.Unmarshal([]byte(req.Data), &conf)
+	if err != nil {
+		return nil, errs.ErrArgs.WithDetail(err.Error()).Wrap()
+	}
+	eq := reflect.DeepEqual(old, conf)
+	if eq {
+		return nil, nil
+	}
+	data, err := json.Marshal(conf)
+	if err != nil {
+		return nil, errs.ErrArgs.WithDetail(err.Error()).Wrap()
+	}
+	op := clientv3.OpPut(etcd.BuildKey(req.ConfigName), string(data))
+	return &op, nil
 }
 
 func compareAndSave[T any](c *gin.Context, old any, req *apistruct.SetConfigReq, client *clientv3.Client) error {

@@ -3,6 +3,7 @@ package bot
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"time"
 
 	"github.com/openimsdk/chat/pkg/botstruct"
@@ -12,6 +13,7 @@ import (
 	"github.com/openimsdk/protocol/constant"
 	"github.com/openimsdk/tools/errs"
 	"github.com/sashabaranov/go-openai"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 func (b *botSvr) SendBotMessage(ctx context.Context, req *bot.SendBotMessageReq) (*bot.SendBotMessageResp, error) {
@@ -19,6 +21,7 @@ func (b *botSvr) SendBotMessage(ctx context.Context, req *bot.SendBotMessageReq)
 	if err != nil {
 		return nil, errs.ErrArgs.WrapMsg("agent not found")
 	}
+
 	//convRespID, err := b.database.TakeConversationRespID(ctx, req.ConversationID, req.AgentID)
 	//if err != nil && !errors.Is(err, mongo.ErrNoDocuments) {
 	//	return nil, err
@@ -31,6 +34,7 @@ func (b *botSvr) SendBotMessage(ctx context.Context, req *bot.SendBotMessageReq)
 	aiCfg := openai.DefaultConfig(agent.Key)
 	aiCfg.BaseURL = agent.Url
 	aiCfg.HTTPClient = b.httpClient
+
 	client := openai.NewClientWithConfig(aiCfg)
 	aiReq := openai.ChatCompletionRequest{
 		Model: agent.Model,
@@ -74,6 +78,7 @@ func (b *botSvr) SendBotMessage(ctx context.Context, req *bot.SendBotMessageReq)
 	//if err != nil {
 	//	return nil, err
 	//}
+
 	return &bot.SendBotMessageResp{}, nil
 }
 

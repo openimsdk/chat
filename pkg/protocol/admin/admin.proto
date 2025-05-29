@@ -25,6 +25,7 @@ option go_package = "github.com/openimsdk/chat/pkg/protocol/admin";
 message LoginReq {
   string account = 1;
   string password = 2;
+  string version = 3;
 }
 
 message LoginResp {

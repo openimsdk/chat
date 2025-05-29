@@ -11,8 +11,8 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/jinzhu/copier v0.4.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
-	google.golang.org/grpc v1.62.1
-	google.golang.org/protobuf v1.34.2
+	google.golang.org/grpc v1.68.0
+	google.golang.org/protobuf v1.35.1
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	gorm.io/gorm v1.25.8
 )
@@ -27,14 +27,16 @@ require (
 	github.com/livekit/protocol v1.10.1
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/openimsdk/gomake v0.0.14-alpha.5
-	github.com/openimsdk/protocol v0.0.72
+	github.com/openimsdk/protocol v0.0.73-alpha.5
 	github.com/openimsdk/tools v0.0.50-alpha.65
 	github.com/redis/go-redis/v9 v9.5.1
+	github.com/sashabaranov/go-openai v1.38.1
 	github.com/spf13/cobra v1.8.0
 	github.com/spf13/viper v1.18.2
 	github.com/xuri/excelize/v2 v2.8.0
 	go.etcd.io/etcd/client/v3 v3.5.13
 	go.mongodb.org/mongo-driver v1.14.0
+	golang.org/x/sync v0.10.0
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
 )
 
@@ -123,14 +125,13 @@ require (
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.27.0 // indirect
 	golang.org/x/arch v0.3.0 // indirect
-	golang.org/x/crypto v0.24.0 // indirect
+	golang.org/x/crypto v0.32.0 // indirect
 	golang.org/x/exp v0.0.0-20240222234643-814bf88cf225 // indirect
-	golang.org/x/net v0.26.0 // indirect
-	golang.org/x/oauth2 v0.21.0 // indirect
-	golang.org/x/sync v0.7.0 // indirect
-	golang.org/x/sys v0.21.0 // indirect
-	golang.org/x/term v0.21.0 // indirect
-	golang.org/x/text v0.16.0 // indirect
+	golang.org/x/net v0.34.0 // indirect
+	golang.org/x/oauth2 v0.23.0 // indirect
+	golang.org/x/sys v0.29.0 // indirect
+	golang.org/x/term v0.28.0 // indirect
+	golang.org/x/text v0.21.0 // indirect
 	golang.org/x/time v0.5.0 // indirect
 	google.golang.org/genproto v0.0.0-20240123012728-ef4313101c80 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20240123012728-ef4313101c80 // indirect
