@@ -12,8 +12,10 @@ var (
 	LogConfigFileName       = "log.yml"
 	ChatAPIAdminCfgFileName = "chat-api-admin.yml"
 	ChatAPIChatCfgFileName  = "chat-api-chat.yml"
+	ChatAPIBotCfgFileName   = "chat-api-bot.yml"
 	ChatRPCAdminCfgFileName = "chat-rpc-admin.yml"
 	ChatRPCChatCfgFileName  = "chat-rpc-chat.yml"
+	ChatRPCBotCfgFileName   = "chat-rpc-bot.yml"
 )
 
 var EnvPrefixMap map[string]string
