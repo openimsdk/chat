@@ -89,7 +89,7 @@ func (o *chatSvr) SendVerifyCode(ctx context.Context, req *chat.SendVerifyCodeRe
 		switch o.conf.Mail.Use {
 		case constant.VerifySuperCode:
 			return &chat.SendVerifyCodeResp{}, nil // super code
-		case constant.Email:
+		case constant.VerifyMail:
 		default:
 			return nil, errs.ErrInternalServer.WrapMsg("email verification code is not enabled")
 		}
