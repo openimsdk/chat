@@ -2,6 +2,9 @@ package chat
 
 import (
 	"context"
+	"strconv"
+	"strings"
+
 	"github.com/openimsdk/chat/pkg/common/db/dbutil"
 	table "github.com/openimsdk/chat/pkg/common/db/table/chat"
 	"github.com/openimsdk/chat/pkg/eerrs"
@@ -10,8 +13,6 @@ import (
 	"github.com/openimsdk/tools/errs"
 	"github.com/openimsdk/tools/utils/datautil"
 	"github.com/openimsdk/tools/utils/stringutil"
-	"strconv"
-	"strings"
 )
 
 func DbToPbAttribute(attribute *table.Attribute) *common.UserPublicInfo {
@@ -66,6 +67,7 @@ func (o *chatSvr) checkRegisterInfo(ctx context.Context, user *chat.RegisterUser
 	if user == nil {
 		return errs.ErrArgs.WrapMsg("user is nil")
 	}
+	user.Account = strings.TrimSpace(user.Account)
 	if user.Email == "" && !(user.PhoneNumber != "" && user.AreaCode != "") && (!isAdmin || user.Account == "") {
 		return errs.ErrArgs.WrapMsg("at least one valid account is required")
 	}
