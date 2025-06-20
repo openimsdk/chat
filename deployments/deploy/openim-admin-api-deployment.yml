@@ -14,14 +14,14 @@ spec:
     spec:
       containers:
         - name: openim-admin-api-container
-          image: openim/openim-admin-api:v3.8.3
+          image: openim-admin-api:test
           env:
             - name: CONFIG_PATH
               value: "/config"
             - name: CHATENV_REDIS_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: redis-secret
+                  name: openim-redis-secret
                   key: redis-password
             - name: IMENV_MONGODB_USERNAME
               valueFrom:
@@ -31,7 +31,7 @@ spec:
             - name: CHATENV_MONGODB_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: mongo-secret
+                  name: openim-mongo-secret
                   key: mongo_openim_password
 
           volumeMounts:
