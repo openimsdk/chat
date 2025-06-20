@@ -68,7 +68,7 @@ func initConfig(configDir string) (*config.Mongo, *config.Redis, *config.Discove
 		shareConfig     = &config.Share{}
 	)
 
-	runtimeEnv := runtimeenv.PrintRuntimeEnvironment()
+	runtimeEnv := runtimeenv.RuntimeEnvironment()
 
 	err := config.Load(configDir, config.MongodbConfigFileName, config.EnvPrefixMap[config.MongodbConfigFileName], runtimeEnv, mongoConfig)
 	if err != nil {

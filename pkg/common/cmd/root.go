@@ -92,7 +92,7 @@ func (r *RootCmd) initEtcd() error {
 		return err
 	}
 	disConfig := config.Discovery{}
-	env := runtimeenv.PrintRuntimeEnvironment()
+	env := runtimeenv.RuntimeEnvironment()
 	err = config.Load(configDirectory, config.DiscoveryConfigFileName, config.EnvPrefixMap[config.DiscoveryConfigFileName],
 		env, &disConfig)
 	if err != nil {
@@ -135,7 +135,7 @@ func (r *RootCmd) initializeConfiguration(cmd *cobra.Command, opts *CmdOpts) err
 	}
 	r.configPath = configDirectory
 
-	runtimeEnv := runtimeenv.PrintRuntimeEnvironment()
+	runtimeEnv := runtimeenv.RuntimeEnvironment()
 
 	// Load common configuration file
 	//opts.configMap[ShareFileName] = StructEnvPrefix{EnvPrefix: shareEnvPrefix, ConfigStruct: &r.share}
