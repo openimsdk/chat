@@ -1,8 +1,8 @@
 module github.com/openimsdk/chat
 
-go 1.22.0
+go 1.22.7
 
-toolchain go1.23.2
+toolchain go1.24.1
 
 require (
 	github.com/gin-gonic/gin v1.9.1
@@ -26,7 +26,7 @@ require (
 require (
 	github.com/livekit/protocol v1.10.1
 	github.com/mitchellh/mapstructure v1.5.0
-	github.com/openimsdk/gomake v0.0.14-alpha.5
+	github.com/openimsdk/gomake v0.0.15-alpha.11
 	github.com/openimsdk/protocol v0.0.73-alpha.5
 	github.com/openimsdk/tools v0.0.50-alpha.65
 	github.com/redis/go-redis/v9 v9.5.1
@@ -49,7 +49,7 @@ require (
 	github.com/alibabacloud-go/tea-xml v1.1.2 // indirect
 	github.com/aliyun/credentials-go v1.1.2 // indirect
 	github.com/bytedance/sonic v1.9.1 // indirect
-	github.com/cespare/xxhash/v2 v2.2.0 // indirect
+	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/chenzhuoyu/base64x v0.0.0-20221115062448-fe3a3abad311 // indirect
 	github.com/clbanning/mxj/v2 v2.5.6 // indirect
 	github.com/coreos/go-semver v0.3.0 // indirect
@@ -133,9 +133,8 @@ require (
 	golang.org/x/term v0.28.0 // indirect
 	golang.org/x/text v0.21.0 // indirect
 	golang.org/x/time v0.5.0 // indirect
-	google.golang.org/genproto v0.0.0-20240123012728-ef4313101c80 // indirect
-	google.golang.org/genproto/googleapis/api v0.0.0-20240123012728-ef4313101c80 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20240318140521-94a12d6c2237 // indirect
+	google.golang.org/genproto/googleapis/api v0.0.0-20240903143218-8af14fe29dc1 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20240903143218-8af14fe29dc1 // indirect
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
