@@ -26,7 +26,7 @@ require (
 require (
 	github.com/livekit/protocol v1.10.1
 	github.com/mitchellh/mapstructure v1.5.0
-	github.com/openimsdk/gomake v0.0.14-alpha.5
+	github.com/openimsdk/gomake v0.0.15-alpha.11
 	github.com/openimsdk/protocol v0.0.73-alpha.5
 	github.com/openimsdk/tools v0.0.50-alpha.65
 	github.com/redis/go-redis/v9 v9.5.1
