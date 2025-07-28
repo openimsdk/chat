@@ -34,7 +34,7 @@ func Start[T any](ctx context.Context, discovery *config.Discovery, listenIP,
 	watchConfigNames []string, watchServiceNames []string,
 	rpcFn func(ctx context.Context, config T, client discovery.SvcDiscoveryRegistry, server *grpc.Server) error, options ...grpc.ServerOption) error {
 
-	runtimeEnv := runtimeenv.PrintRuntimeEnvironment()
+	runtimeEnv := runtimeenv.RuntimeEnvironment()
 
 	rpcPort, err := datautil.GetElemByIndex(rpcPorts, index)
 	if err != nil {
@@ -74,7 +74,7 @@ func Start[T any](ctx context.Context, discovery *config.Discovery, listenIP,
 		return err
 	}
 
-	if err := client.Register(rpcRegisterName, registerIP, rpcPort, grpc.WithTransportCredentials(insecure.NewCredentials())); err != nil {
+	if err := client.Register(ctx, rpcRegisterName, registerIP, rpcPort, grpc.WithTransportCredentials(insecure.NewCredentials())); err != nil {
 		return err
 	}
 
