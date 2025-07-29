@@ -12,7 +12,7 @@ require (
 	github.com/jinzhu/copier v0.4.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	google.golang.org/grpc v1.68.0
-	google.golang.org/protobuf v1.34.2
+	google.golang.org/protobuf v1.35.1
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	gorm.io/gorm v1.25.8
 )
@@ -26,8 +26,8 @@ require (
 require (
 	github.com/livekit/protocol v1.10.1
 	github.com/mitchellh/mapstructure v1.5.0
-	github.com/openimsdk/gomake v0.0.15-alpha.11
-	github.com/openimsdk/protocol v0.0.72
+	github.com/openimsdk/gomake v0.0.14-alpha.5
+	github.com/openimsdk/protocol v0.0.73-alpha.5
 	github.com/openimsdk/tools v0.0.50-alpha.65
 	github.com/redis/go-redis/v9 v9.5.1
 	github.com/spf13/cobra v1.8.0
