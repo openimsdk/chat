@@ -84,4 +84,6 @@ mage stop
 
 ## 🚨 License
 
-See the [LICENSE](https://github.com/openimsdk/chat/tree/main/LICENSE) for the full license text.
+This software is licensed under the Apache License 2.0
+
+

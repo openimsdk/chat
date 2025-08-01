@@ -1,0 +1,73 @@
+syntax = "proto3";
+package openim.bot;
+
+import "sdkws/sdkws.proto";
+
+option go_package = "github.com/openimsdk/chat/pkg/protocol/bot";
+
+message Agent {
+  string userID = 1;
+  string nickname = 2;
+  string faceURL = 3;
+  string url = 4;
+  string key = 5;
+  string identity = 6;
+  string model = 7;
+  string prompts = 8;
+  int64 createTime = 9;
+}
+
+message CreateAgentReq {
+  Agent agent = 1;
+}
+
+message CreateAgentResp {
+}
+
+message UpdateAgentReq {
+  string userID = 1;
+  optional string nickname = 2;
+  optional string faceURL = 3;
+  optional string url = 4;
+  optional string key = 5;
+  optional string identity = 6;
+  optional string model = 7;
+  optional string prompts = 8;
+}
+
+message UpdateAgentResp {
+}
+
+message PageFindAgentReq {
+  openim.sdkws.RequestPagination pagination = 1;
+  repeated string userIDs = 2;
+}
+
+message PageFindAgentResp {
+  int64 total = 1;
+  repeated Agent agents = 2;
+}
+
+message DeleteAgentReq{
+  repeated string userIDs = 1;
+}
+message DeleteAgentResp{}
+
+message SendBotMessageReq{
+  string agentID = 1;
+  string conversationID = 2;
+  int32 contentType = 3;
+  string content = 4;
+  string ex = 5;
+  string key = 6;
+}
+message SendBotMessageResp{}
+
+service bot {
+  rpc CreateAgent(CreateAgentReq) returns (CreateAgentResp);
+  rpc UpdateAgent(UpdateAgentReq) returns (UpdateAgentResp);
+  rpc PageFindAgent(PageFindAgentReq) returns (PageFindAgentResp);
+  rpc DeleteAgent(DeleteAgentReq) returns (DeleteAgentResp);
+
+  rpc SendBotMessage(SendBotMessageReq) returns (SendBotMessageResp);
+}

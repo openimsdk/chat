@@ -22,6 +22,7 @@ func NewChatApiCmd() *ChatApiCmd {
 		config.ShareFileName:           &ret.apiConfig.Share,
 		config.ChatAPIChatCfgFileName:  &ret.apiConfig.ApiConfig,
 		config.DiscoveryConfigFileName: &ret.apiConfig.Discovery,
+		config.RedisConfigFileName:     &ret.apiConfig.Redis,
 	}
 	ret.RootCmd = NewRootCmd(program.GetProcessName(), WithConfigMap(ret.configMap))
 	ret.ctx = context.WithValue(context.Background(), "version", config.Version)

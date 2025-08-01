@@ -16,9 +16,10 @@ var (
 
 type Share struct {
 	OpenIM struct {
-		ApiURL      string `mapstructure:"apiURL"`
-		Secret      string `mapstructure:"secret"`
-		AdminUserID string `mapstructure:"adminUserID"`
+		ApiURL               string `mapstructure:"apiURL"`
+		Secret               string `mapstructure:"secret"`
+		AdminUserID          string `mapstructure:"adminUserID"`
+		TokenRefreshInterval int    `mapstructure:"tokenRefreshInterval"`
 	} `mapstructure:"openIM"`
 	ChatAdmin   []string `mapstructure:"chatAdmin"`
 	ProxyHeader string   `mapstructure:"proxyHeader"`
@@ -27,6 +28,7 @@ type Share struct {
 type RpcService struct {
 	Chat  string `mapstructure:"chat"`
 	Admin string `mapstructure:"admin"`
+	Bot   string `mapstructure:"bot"`
 }
 
 func (r *RpcService) GetServiceNames() []string {
@@ -37,6 +39,13 @@ func (r *RpcService) GetServiceNames() []string {
 }
 
 type API struct {
+	Api struct {
+		ListenIP string `mapstructure:"listenIP"`
+		Ports    []int  `mapstructure:"ports"`
+	} `mapstructure:"api"`
+}
+
+type APIBot struct {
 	Api struct {
 		ListenIP string `mapstructure:"listenIP"`
 		Ports    []int  `mapstructure:"ports"`
@@ -121,6 +130,14 @@ type Chat struct {
 	AllowRegister bool `mapstructure:"allowRegister"`
 }
 
+type Bot struct {
+	RPC struct {
+		RegisterIP string `mapstructure:"registerIP"`
+		ListenIP   string `mapstructure:"listenIP"`
+		Ports      []int  `mapstructure:"ports"`
+	} `mapstructure:"rpc"`
+	Timeout int `mapstructure:"timeout"`
+}
 type VerifyCode struct {
 	ValidTime  int    `mapstructure:"validTime"`
 	ValidCount int    `mapstructure:"validCount"`
