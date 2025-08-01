@@ -10,7 +10,6 @@ import (
 	"github.com/openimsdk/chat/pkg/common/imapi"
 	"github.com/openimsdk/chat/pkg/protocol/bot"
 	"github.com/openimsdk/tools/db/mongoutil"
-	"github.com/openimsdk/tools/db/redisutil"
 	"github.com/openimsdk/tools/discovery"
 	"google.golang.org/grpc"
 )
@@ -29,10 +28,6 @@ func Start(ctx context.Context, config *Config, client discovery.SvcDiscoveryReg
 		return err
 	}
 	var srv botSvr
-	rdb, err := redisutil.NewRedisClient(ctx, config.RedisConfig.Build())
-	if err != nil {
-		return err
-	}
 
 	srv.database, err = database.NewBotDatabase(mgocli)
 	if err != nil {
@@ -42,7 +37,7 @@ func Start(ctx context.Context, config *Config, client discovery.SvcDiscoveryReg
 	srv.httpClient = &http.Client{
 		Timeout: time.Duration(config.RpcConfig.Timeout) * time.Second,
 	}
-	im := imapi.New(config.Share.OpenIM.ApiURL, config.Share.OpenIM.Secret, config.Share.OpenIM.AdminUserID, rdb, config.Share.OpenIM.TokenRefreshInterval)
+	im := imapi.New(config.Share.OpenIM.ApiURL, config.Share.OpenIM.Secret, config.Share.OpenIM.AdminUserID)
 	srv.imCaller = im
 	bot.RegisterBotServer(server, &srv)
 	return nil
