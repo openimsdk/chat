@@ -1,12 +1,13 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
+  namespace: chat
   name: openim-chat-config
 data:
   discovery.yml: |
     enable: kubernetes
     kubernetes:
-      namespace: default
+      namespace: chat
     etcd:
       rootDirectory: openim
       address: [ localhost:12379 ]
@@ -36,17 +37,17 @@ data:
 
   mongodb.yml: |
     # URI for database connection, leave empty if using address and credential settings directly
-    uri: ''
+    uri: 'mongodb://chat:rollgame_chat@202.79.169.45:27017/chat?authSource=chat&directConnection=true '
     # List of MongoDB server addresses
-    address: [ mongo-service:37017 ]
+    address: [ ]
     # Name of the database
-    database: openim_v3
+    database: 
     # Username for database authentication
-    username: openIM
+    username: 
     # Password for database authentication
-    password: # openIM123
+    password: # 
     # Authentication source for database authentication, if use root user, set it to admin
-    authSource: openim_v3
+    authSource: 
     # Maximum number of connections in the connection pool
     maxPoolSize: 100
     # Maximum number of retry attempts for a failed database connection
@@ -54,11 +55,11 @@ data:
 
   redis.yml: |
     # List of Redis server addresses
-    address: [ redis-service:16379 ]
+    address: [ 202.79.169.45:6333 ]
     # Username for Redis authentication (leave blank if not used)
     username: ''
     # Password for Redis authentication
-    password:   # openIM123
+    password: "8sshfwcxd!@1-#sc_ds"  # openIM123
     # Enable or disable pipeline processing
     enablePipeline: false
     # Enable or disable cluster mode
@@ -73,13 +74,16 @@ data:
       # OpenIM API address
       apiURL: http://openim-api-service:10002
       # OpenIM secret key, must be consistent with OpenIM
-      secret: openIM123
+      secret: wd-chat
       # OpenIM administrator userID, must be consistent with OpenIM
       adminUserID: imAdmin
+      IMAdminUser: 
+        UserIDs: ["imAdmin"]
+        Nicknames: ["imAdmin"]
 
     chatAdmin:
        # Default username and password for the admin
-      - "chatAdmin"
+      - "imAdmin"
 
   chat-api-admin.yml: |
     api:

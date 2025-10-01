@@ -1,6 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  namespace: chat
   name: chat-rpc-server
 spec:
   replicas: 1
@@ -14,14 +15,14 @@ spec:
     spec:
       containers:
         - name: openim-chat-rpc-container
-          image: openim/openim-chat-rpc:v3.8.3
+          image: openim/openim-chat-rpc:v1.8.4-patch.3
           env:
             - name: CONFIG_PATH
               value: "/config"
             - name: CHATENV_REDIS_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: redis-secret
+                  name: openim-redis-secret
                   key: redis-password
             - name: IMENV_MONGODB_USERNAME
               valueFrom:
@@ -31,7 +32,7 @@ spec:
             - name: CHATENV_MONGODB_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: mongo-secret
+                  name: openim-mongo-secret
                   key: mongo_openim_password
 
           volumeMounts:
