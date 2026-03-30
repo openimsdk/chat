@@ -5,9 +5,12 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"os"
 
+	"github.com/openimsdk/chat/version"
 	"github.com/openimsdk/gomake/mageutil"
+	"github.com/openimsdk/tools/utils/datautil"
 )
 
 var Default = Build
@@ -35,7 +38,9 @@ func Build() {
 		bin = bin[1:]
 	}
 
-	mageutil.Build(bin, nil)
+	mageutil.WithSpinner("Building binaries...", func() {
+		mageutil.Build(bin, nil, nil)
+	})
 }
 
 func BuildWithCustomConfig() {
@@ -52,7 +57,9 @@ func BuildWithCustomConfig() {
 		ToolsDir:  &customToolsDir,
 	}
 
-	mageutil.Build(bin, config)
+	mageutil.WithSpinner("Building binaries...", func() {
+		mageutil.Build(bin, config, nil)
+	})
 }
 
 func Start() {
@@ -69,7 +76,9 @@ func Start() {
 		bin = bin[1:]
 	}
 
-	mageutil.StartToolsAndServices(bin, nil)
+	mageutil.WithSpinner("Starting binaries...", func() {
+		mageutil.StartToolsAndServices(bin, nil)
+	})
 }
 
 func StartWithCustomConfig() {
@@ -92,13 +101,41 @@ func StartWithCustomConfig() {
 		ConfigDir: &customConfigDir,
 	}
 
-	mageutil.StartToolsAndServices(bin, config)
+	mageutil.WithSpinner("Starting binaries...", func() {
+		mageutil.StartToolsAndServices(bin, config)
+	})
 }
 
 func Stop() {
-	mageutil.StopAndCheckBinaries()
+	mageutil.WithSpinner("Stopping binaries...", mageutil.StopAndCheckBinaries)
 }
 
 func Check() {
-	mageutil.CheckAndReportBinariesStatus()
+	mageutil.WithSpinner("Checking binaries...", mageutil.CheckAndReportBinariesStatus)
+}
+
+func Export() {
+	mappingPaths, err := mageutil.GetDefaultExportMappingPaths([]string{
+		"cmd",
+		"internal",
+		"pkg",
+		"tools",
+		"**/*.go",
+		"go.mod",
+		"go.work",
+	})
+	if err != nil {
+		mageutil.PrintRed("GetDefaultExportMappingPaths failed " + err.Error())
+		os.Exit(1)
+	}
+
+	mageutil.WithSpinner("Exporting...", func() {
+		mageutil.ExportMageLauncherArchived(mappingPaths, &mageutil.ExportOptions{
+			ProjectName: datautil.ToPtr(fmt.Sprintf("chat-enterprise_v%s", version.Version)),
+			BuildOpt: &mageutil.BuildOptions{
+				Release:  datautil.ToPtr(true),
+				Compress: datautil.ToPtr(true),
+			},
+		})
+	})
 }
