@@ -5,6 +5,7 @@ import (
 
 	"github.com/openimsdk/tools/db/mongoutil"
 	"github.com/openimsdk/tools/db/redisutil"
+	"github.com/openimsdk/tools/utils/datautil"
 )
 
 var (
@@ -79,12 +80,12 @@ type Redis struct {
 
 func (r *Redis) Build() *redisutil.Config {
 	return &redisutil.Config{
-		ClusterMode: r.ClusterMode,
-		Address:     r.Address,
-		Username:    r.Username,
-		Password:    r.Password,
-		DB:          r.DB,
-		MaxRetry:    r.MaxRetry,
+		RedisMode: datautil.If(r.ClusterMode, redisutil.ClusterMode, redisutil.StandaloneMode),
+		Address:   r.Address,
+		Username:  r.Username,
+		Password:  r.Password,
+		DB:        r.DB,
+		MaxRetry:  r.MaxRetry,
 	}
 }
 
