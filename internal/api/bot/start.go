@@ -38,7 +38,7 @@ type Config struct {
 }
 
 func Start(ctx context.Context, index int, cfg *Config) error {
-	cfg.RuntimeEnv = runtimeenv.PrintRuntimeEnvironment()
+	cfg.RuntimeEnv = runtimeenv.RuntimeEnvironment()
 	apiPort, err := datautil.GetElemByIndex(cfg.ApiConfig.Api.Ports, index)
 	if err != nil {
 		return err

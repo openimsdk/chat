@@ -2,16 +2,10 @@ package imapi
 
 import (
 	"context"
-	"errors"
 	"sync"
 	"time"
 
 	"github.com/openimsdk/chat/pkg/botstruct"
-	"github.com/openimsdk/chat/pkg/common/db/database"
-	"github.com/openimsdk/tools/errs"
-	"github.com/openimsdk/tools/log"
-	"github.com/redis/go-redis/v9"
-
 	"github.com/openimsdk/chat/pkg/eerrs"
 	"github.com/openimsdk/protocol/auth"
 	"github.com/openimsdk/protocol/constant"
@@ -19,6 +13,8 @@ import (
 	"github.com/openimsdk/protocol/relation"
 	"github.com/openimsdk/protocol/sdkws"
 	"github.com/openimsdk/protocol/user"
+	"github.com/openimsdk/tools/errs"
+	"github.com/openimsdk/tools/log"
 )
 
 type CallerInterface interface {
@@ -46,7 +42,7 @@ type CallerInterface interface {
 
 type authToken struct {
 	token   string
-	timeout time.Time
+	expired time.Time
 }
 
 type Caller struct {
@@ -55,18 +51,15 @@ type Caller struct {
 	defaultIMUserID string
 	tokenCache      map[string]*authToken
 	lock            sync.RWMutex
-	tokenDB         database.IMTokenDatabase
 }
 
-func New(imApi string, imSecret string, defaultIMUserID string, rdb redis.UniversalClient, refreshInterval int) CallerInterface {
-	tokenDB := database.NewIMTokenDatabase(rdb, refreshInterval)
+func New(imApi string, imSecret string, defaultIMUserID string) CallerInterface {
 	return &Caller{
 		imApi:           imApi,
 		imSecret:        imSecret,
 		defaultIMUserID: defaultIMUserID,
 		tokenCache:      make(map[string]*authToken),
 		lock:            sync.RWMutex{},
-		tokenDB:         tokenDB,
 	}
 }
 
@@ -89,32 +82,21 @@ func (c *Caller) GetAdminTokenCache(ctx context.Context, userID string) (string,
 	c.lock.RLock()
 	t, ok := c.tokenCache[userID]
 	c.lock.RUnlock()
-	if !ok || t.timeout.Before(time.Now()) {
-		c.lock.Lock()
-		defer c.lock.Unlock()
-		t, ok = c.tokenCache[userID]
-		if !ok || t.timeout.Before(time.Now()) {
-			token, err := c.tokenDB.GetIMToken(ctx, userID)
-			if err != nil && !errors.Is(err, redis.Nil) {
-				return "", err
-			} else if errors.Is(err, redis.Nil) {
-				// no token in redis cache
-				token, err = c.GetAdminTokenServer(ctx, userID)
-				if err != nil {
-					log.ZError(ctx, "get im admin token from server", err, "userID", userID)
-					return "", err
-				}
-				t = &authToken{token: token, timeout: time.Now().Add(time.Minute * 4)}
-				c.tokenCache[userID] = t
-			} else {
-				log.ZDebug(ctx, "get im admin token from cache", "userID", userID, "token", token)
-				t = &authToken{token: token, timeout: time.Now().Add(time.Minute * 4)}
-				c.tokenCache[userID] = t
-			}
-
-		}
+	if ok && t.expired.After(time.Now()) {
+		return t.token, nil
 	}
-	return t.token, nil
+	c.lock.Lock()
+	defer c.lock.Unlock()
+	t, ok = c.tokenCache[userID]
+	if ok && t.expired.After(time.Now()) {
+		return t.token, nil
+	}
+	token, err := c.GetAdminTokenServer(ctx, userID)
+	if err != nil {
+		return "", err
+	}
+	c.tokenCache[userID] = &authToken{token: token, expired: time.Now().Add(time.Minute * 4)}
+	return token, nil
 }
 
 func (c *Caller) GetAdminTokenServer(ctx context.Context, userID string) (string, error) {
@@ -126,10 +108,6 @@ func (c *Caller) GetAdminTokenServer(ctx context.Context, userID string) (string
 		return "", err
 	}
 	log.ZDebug(ctx, "get im admin token from server", "userID", userID, "token", resp.Token)
-	err = c.tokenDB.SetIMToken(ctx, userID, resp.Token)
-	if err != nil {
-		log.ZWarn(ctx, "set im admin token to redis failed", err, "userID", userID)
-	}
 	return resp.Token, nil
 }
 

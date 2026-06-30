@@ -51,12 +51,8 @@ func CheckRedis(ctx context.Context, config *config.Redis) error {
 }
 
 func CheckOpenIM(ctx context.Context, apiURL, secret, adminUserID string, redisConf *config.Redis, interval int) error {
-	rdb, err := redisutil.NewRedisClient(ctx, redisConf.Build())
-	if err != nil {
-		return err
-	}
-	imAPI := imapi.New(apiURL, secret, adminUserID, rdb, interval)
-	_, err = imAPI.GetAdminTokenServer(mcontext.SetOperationID(ctx, "CheckOpenIM"+idutil.OperationIDGenerator()), adminUserID)
+	imAPI := imapi.New(apiURL, secret, adminUserID)
+	_, err := imAPI.GetAdminTokenServer(mcontext.SetOperationID(ctx, "CheckOpenIM"+idutil.OperationIDGenerator()), adminUserID)
 	return err
 }
 
@@ -68,7 +64,7 @@ func initConfig(configDir string) (*config.Mongo, *config.Redis, *config.Discove
 		shareConfig     = &config.Share{}
 	)
 
-	runtimeEnv := runtimeenv.PrintRuntimeEnvironment()
+	runtimeEnv := runtimeenv.RuntimeEnvironment()
 
 	err := config.Load(configDir, config.MongodbConfigFileName, config.EnvPrefixMap[config.MongodbConfigFileName], runtimeEnv, mongoConfig)
 	if err != nil {

@@ -19,7 +19,6 @@ import (
 	disetcd "github.com/openimsdk/chat/pkg/common/kdisc/etcd"
 	adminclient "github.com/openimsdk/chat/pkg/protocol/admin"
 	chatclient "github.com/openimsdk/chat/pkg/protocol/chat"
-	"github.com/openimsdk/tools/db/redisutil"
 	"github.com/openimsdk/tools/discovery"
 	"github.com/openimsdk/tools/discovery/etcd"
 	"github.com/openimsdk/tools/errs"
@@ -40,7 +39,7 @@ type Config struct {
 }
 
 func Start(ctx context.Context, index int, config *Config) error {
-	config.RuntimeEnv = runtimeenv.PrintRuntimeEnvironment()
+	config.RuntimeEnv = runtimeenv.RuntimeEnvironment()
 
 	if len(config.Share.ChatAdmin) == 0 {
 		return errs.New("share chat admin not configured")
@@ -50,10 +49,6 @@ func Start(ctx context.Context, index int, config *Config) error {
 		return err
 	}
 	client, err := kdisc.NewDiscoveryRegister(&config.Discovery, config.RuntimeEnv, nil)
-	if err != nil {
-		return err
-	}
-	rdb, err := redisutil.NewRedisClient(ctx, config.Redis.Build())
 	if err != nil {
 		return err
 	}
@@ -68,7 +63,7 @@ func Start(ctx context.Context, index int, config *Config) error {
 	}
 	chatClient := chatclient.NewChatClient(chatConn)
 	adminClient := adminclient.NewAdminClient(adminConn)
-	im := imapi.New(config.Share.OpenIM.ApiURL, config.Share.OpenIM.Secret, config.Share.OpenIM.AdminUserID, rdb, config.Share.OpenIM.TokenRefreshInterval)
+	im := imapi.New(config.Share.OpenIM.ApiURL, config.Share.OpenIM.Secret, config.Share.OpenIM.AdminUserID)
 	base := util.Api{
 		ImUserID:        config.Share.OpenIM.AdminUserID,
 		ProxyHeader:     config.Share.ProxyHeader,

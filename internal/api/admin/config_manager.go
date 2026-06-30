@@ -63,7 +63,7 @@ func (cm *ConfigManager) GetConfig(c *gin.Context) {
 func (cm *ConfigManager) GetConfigList(c *gin.Context) {
 	var resp apistruct.GetConfigListResp
 	resp.ConfigNames = cm.config.GetConfigNames()
-	resp.Environment = runtimeenv.PrintRuntimeEnvironment()
+	resp.Environment = runtimeenv.RuntimeEnvironment()
 	resp.Version = version.Version
 
 	apiresp.GinSuccess(c, resp)
