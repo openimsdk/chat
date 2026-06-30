@@ -32,6 +32,9 @@ func ToDBAttributeUpdate(req *chat.UpdateUserInfoReq) (map[string]any, error) {
 	if req.AreaCode != nil {
 		update["area_code"] = req.AreaCode.Value
 	}
+	if req.PhoneNumber != nil {
+		update["phone_number"] = req.PhoneNumber.Value
+	}
 	if req.Email != nil {
 		update["email"] = req.Email.Value
 	}
