@@ -417,7 +417,7 @@ func (o *chatSvr) CheckUserExist(ctx context.Context, req *chat.CheckUserExistRe
 		}
 	}
 	if req.User.Email != "" {
-		account, err := o.Database.TakeCredentialByAccount(ctx, req.User.AreaCode)
+		account, err := o.Database.TakeCredentialByAccount(ctx, req.User.Email)
 		if err != nil && !errors.Is(err, mongo.ErrNoDocuments) {
 			return nil, err
 		}
