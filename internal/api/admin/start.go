@@ -39,7 +39,7 @@ type Config struct {
 }
 
 func Start(ctx context.Context, index int, config *Config) error {
-	config.RuntimeEnv = runtimeenv.PrintRuntimeEnvironment()
+	config.RuntimeEnv = runtimeenv.RuntimeEnvironment()
 
 	if len(config.Share.ChatAdmin) == 0 {
 		return errs.New("share chat admin not configured")

@@ -33,7 +33,7 @@ const (
 // NewDiscoveryRegister creates a new service discovery and registry client based on the provided environment type.
 func NewDiscoveryRegister(discovery *config.Discovery, runtimeEnv string, watchNames []string) (discovery.SvcDiscoveryRegistry, error) {
 	if runtimeEnv == KUBERNETESCONST {
-		return kubernetes.NewKubernetesConnManager(discovery.Kubernetes.Namespace)
+		return kubernetes.NewConnManager(discovery.Kubernetes.Namespace, watchNames)
 	}
 
 	switch discovery.Enable {
