@@ -1,0 +1,40 @@
+services:
+  openim-admin-api:
+    build:
+      context: ../../..
+      dockerfile: build/images/openim-chat/Dockerfile
+      args:
+        CMD_PATH: cmd/api/admin-api
+        BINARY_NAME: openim-admin-api
+        RELEASE: ${RELEASE:-false}
+    image: openim-admin-api:test
+
+  openim-admin-rpc:
+    build:
+      context: ../../..
+      dockerfile: build/images/openim-chat/Dockerfile
+      args:
+        CMD_PATH: cmd/rpc/admin-rpc
+        BINARY_NAME: openim-admin-rpc
+        RELEASE: ${RELEASE:-false}
+    image: openim-admin-rpc:test
+
+  openim-chat-api:
+    build:
+      context: ../../..
+      dockerfile: build/images/openim-chat/Dockerfile
+      args:
+        CMD_PATH: cmd/api/chat-api
+        BINARY_NAME: openim-chat-api
+        RELEASE: ${RELEASE:-false}
+    image: openim-chat-api:test
+
+  openim-chat-rpc:
+    build:
+      context: ../../..
+      dockerfile: build/images/openim-chat/Dockerfile
+      args:
+        CMD_PATH: cmd/rpc/chat-rpc
+        BINARY_NAME: openim-chat-rpc
+        RELEASE: ${RELEASE:-false}
+    image: openim-chat-rpc:test

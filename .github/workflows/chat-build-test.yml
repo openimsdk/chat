@@ -38,19 +38,19 @@ jobs:
         arch: [amd64]
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Set up Go
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v6
         with:
-          go-version: "1.22"
+          go-version: stable
 
       - name: init
         run: sudo bash bootstrap.sh
         timeout-minutes: 20
 
       - name: Checkout chat repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           repository: "openimsdk/open-im-server"
           path: "server-repo"
