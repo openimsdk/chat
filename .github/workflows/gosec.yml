@@ -8,9 +8,11 @@ name: OpenIM Run Gosec
 # https://github.com/securego/gosec/
 on:
   push:
-    branches: "*"
+    branches:
+      - "*"
   pull_request:
-    branches: "*"
+    branches:
+      - "*"
     paths-ignore:
       - '*.md'
       - '*.yml'
@@ -23,9 +25,9 @@ jobs:
       GO111MODULE: on
     steps:
       - name: Check out code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v7
       - name: Run Gosec Security Scanner
-        uses: securego/gosec@master
+        uses: securego/gosec@v2.27.1
         with:
           args: ./...
         continue-on-error: true

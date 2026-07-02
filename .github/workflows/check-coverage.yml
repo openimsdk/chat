@@ -18,28 +18,28 @@ on:
       - "**/*.yaml"
       - "CONTRIBUTORS"
       - "CHANGELOG/**"
-env:
-  # Common versions
-  GO_VERSION: "1.20"
 
 jobs:
   coverage:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v7
 
       - name: Setup Golang with cache
-        uses: magnetikonline/action-golang-cache@v4
+        uses: actions/setup-go@v6
         with:
-          go-version: ${{ env.GO_VERSION }}
+          go-version: stable
+          cache: true
 
       - name: Install Dependencies
         run: sudo apt update && sudo apt install -y libgpgme-dev libbtrfs-dev libdevmapper-dev
 
       - name: Run Cover
-        run: make cover
+        run: go test ./... -coverprofile=coverage.txt -covermode=atomic
         continue-on-error: true
 
       - name: Upload Coverage to Codecov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v7
+        with:
+          files: coverage.txt
