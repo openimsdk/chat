@@ -17,7 +17,7 @@
 
 before:
   hooks:
-    - make clean
+    - rm -rf _output/dist
     # You may remove this if you don't use go modules.
     - go mod tidy
     # you may remove this if you don't need go generate
