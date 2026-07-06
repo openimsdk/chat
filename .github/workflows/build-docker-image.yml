@@ -7,22 +7,38 @@ on:
       - release-*
     # tags:
     #   - v*
-  release:
-    types: [published]
-
   workflow_dispatch:
     inputs:
       tag:
         description: "Tag version to be used for Docker image"
         required: true
         default: "v3.8.0"
+  workflow_call:
+    inputs:
+      tag:
+        description: "Tag version to be used for Docker image"
+        required: true
+        type: string
+      checkout_sha:
+        description: "Commit SHA to checkout"
+        required: true
+        type: string
+      checkout_short_sha:
+        description: "Short commit SHA for image tags"
+        required: true
+        type: string
 
 jobs:
   build-image:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     steps:
       - name: Checkout
         uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.checkout_sha || inputs.tag || github.event.inputs.tag }}
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
@@ -63,8 +79,10 @@ jobs:
             # type=semver,pattern={{version}}
             type=semver,pattern=v{{version}}
             type=semver,pattern=release-{{raw}}
-            type=sha
-            type=raw,value=${{ github.event.inputs.tag }}
+            type=sha,enable=${{ inputs.checkout_short_sha == '' }}
+            type=raw,value=sha-${{ inputs.checkout_short_sha }},enable=${{ inputs.checkout_short_sha != '' }}
+            type=raw,value=${{ inputs.tag || github.event.inputs.tag }}
+            type=raw,value=latest,enable=${{ github.event_name == 'release' && !github.event.release.prerelease }}
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v7
@@ -79,7 +97,8 @@ jobs:
         run: |
           images=("openim/openim-chat" "ghcr.io/openimsdk/openim-chat" "registry.cn-hangzhou.aliyuncs.com/openimsdk/openim-chat")
           for image in "${images[@]}"; do
-              for tag in $(echo "${{ steps.meta.outputs.tags }}" | tr ',' '\n'); do
+              for ref in $(echo "${{ steps.meta.outputs.tags }}" | tr ',' '\n'); do
+                  tag="${ref##*:}"
                   manifest=$(docker manifest inspect "$image:$tag" || echo "error")
                   if [[ "$manifest" == "error" ]]; then
                       echo "Manifest not found for $image:$tag"
