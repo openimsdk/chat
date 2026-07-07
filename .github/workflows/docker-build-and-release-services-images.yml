@@ -4,22 +4,61 @@ on:
   push:
     branches:
       - release-*
-  release:
-    types: [published]
   workflow_dispatch:
     inputs:
       tag:
         description: "Tag version to be used for Docker image"
         required: true
         default: "v3.8.3"
+  workflow_call:
+    inputs:
+      tag:
+        description: "Tag version to be used for Docker image"
+        required: true
+        type: string
+      checkout_sha:
+        description: "Commit SHA to checkout"
+        required: true
+        type: string
+      checkout_short_sha:
+        description: "Short commit SHA for image tags"
+        required: true
+        type: string
 
 jobs:
-  build-and-push:
+  services:
     runs-on: ubuntu-latest
+    outputs:
+      services: ${{ steps.services.outputs.services }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.checkout_sha || inputs.tag || github.event.inputs.tag }}
+
+      - name: Resolve service matrix
+        id: services
+        run: |
+          set -euo pipefail
+          services=$(docker compose -f build/images/openim-chat/docker-compose.build.yml config --services | jq -R -s -c 'split("\n") | map(select(length > 0))')
+          echo "services=$services" >> "$GITHUB_OUTPUT"
+
+  build-and-push:
+    needs: services
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        service: ${{ fromJson(needs.services.outputs.services) }}
+    permissions:
+      contents: read
+      packages: write
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.checkout_sha || inputs.tag || github.event.inputs.tag }}
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
@@ -54,16 +93,19 @@ jobs:
             type=ref,event=branch
             type=semver,pattern=v{{version}}
             type=semver,pattern=release-{{raw}}
-            type=sha
-            type=raw,value=${{ github.event.inputs.tag }}
+            type=sha,enable=${{ inputs.checkout_short_sha == '' }}
+            type=raw,value=sha-${{ inputs.checkout_short_sha }},enable=${{ inputs.checkout_short_sha != '' }}
+            type=raw,value=${{ inputs.tag || github.event.inputs.tag }}
+            type=raw,value=latest,enable=${{ github.event_name == 'release' && !github.event.release.prerelease }}
 
       - name: Build and push Docker images
         env:
           PUSH: "true"
           RELEASE: "true"
+          SERVICE: ${{ matrix.service }}
           IMAGE_TAGS: ${{ steps.meta.outputs.tags }}
           IMAGE_REGISTRIES: |
             ${{ secrets.DOCKER_USERNAME }}
             ghcr.io/${{ github.repository_owner }}
             registry.cn-hangzhou.aliyuncs.com/openimsdk
-        run: build/build.sh
+        run: build/build_single.sh
