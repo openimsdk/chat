@@ -15,6 +15,7 @@
 package kdisc
 
 import (
+	"strings"
 	"time"
 
 	"github.com/openimsdk/chat/pkg/common/config"
@@ -22,6 +23,7 @@ import (
 	"github.com/openimsdk/tools/discovery/etcd"
 	"github.com/openimsdk/tools/discovery/kubernetes"
 	"github.com/openimsdk/tools/errs"
+	"google.golang.org/grpc"
 )
 
 const (
@@ -32,11 +34,25 @@ const (
 
 // NewDiscoveryRegister creates a new service discovery and registry client based on the provided environment type.
 func NewDiscoveryRegister(discovery *config.Discovery, runtimeEnv string, watchNames []string) (discovery.SvcDiscoveryRegistry, error) {
-	if runtimeEnv == KUBERNETESCONST {
-		return kubernetes.NewConnManager(discovery.Kubernetes.Namespace, watchNames)
+	discoveryType := discovery.Enable
+	if discoveryType == "" && runtimeEnv == KUBERNETESCONST {
+		discoveryType = KUBERNETESCONST
+	}
+	if discoveryType == KUBERNETESCONST && runtimeEnv != KUBERNETESCONST {
+		return nil, errs.New("unsupported discovery type", "type", discoveryType).Wrap()
 	}
 
-	switch discovery.Enable {
+	switch discoveryType {
+	case KUBERNETESCONST:
+		for i := range watchNames {
+			watchNames[i] = strings.Split(watchNames[i], ":")[0]
+		}
+		return kubernetes.NewConnManager(discovery.Kubernetes.Namespace, watchNames,
+			grpc.WithDefaultCallOptions(
+				grpc.MaxCallSendMsgSize(1024*1024*20),
+			),
+			grpc.WithDefaultServiceConfig(`{"loadBalancingPolicy":"round_robin"}`),
+		)
 	case ETCDCONST:
 		return etcd.NewSvcDiscoveryRegistry(
 			discovery.Etcd.RootDirectory,
@@ -46,6 +62,6 @@ func NewDiscoveryRegister(discovery *config.Discovery, runtimeEnv string, watchN
 			etcd.WithMaxCallSendMsgSize(20*1024*1024),
 			etcd.WithUsernameAndPassword(discovery.Etcd.Username, discovery.Etcd.Password))
 	default:
-		return nil, errs.New("unsupported discovery type", "type", discovery.Enable).Wrap()
+		return nil, errs.New("unsupported discovery type", "type", discoveryType).Wrap()
 	}
 }
