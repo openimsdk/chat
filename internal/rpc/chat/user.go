@@ -78,9 +78,10 @@ func (o *chatSvr) checkUpdateInfo(ctx context.Context, req *chat.UpdateUserInfoR
 		switch credential.Type {
 		case constant.CredentialAccount:
 			if req.Account != nil {
-				if req.Account.Value == credential.Account {
+				switch req.Account.Value {
+				case credential.Account:
 					req.Account = nil
-				} else if req.Account.Value == "" {
+				case "":
 					delNum += 1
 				}
 			}
@@ -96,9 +97,10 @@ func (o *chatSvr) checkUpdateInfo(ctx context.Context, req *chat.UpdateUserInfoR
 			}
 		case constant.CredentialEmail:
 			if req.Email != nil {
-				if req.Email.Value == credential.Account {
+				switch req.Email.Value {
+				case credential.Account:
 					req.Email = nil
-				} else if req.Email.Value == "" {
+				case "":
 					delNum += 1
 				}
 			}
