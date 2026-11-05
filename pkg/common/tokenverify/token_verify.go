@@ -15,9 +15,11 @@
 package tokenverify
 
 import (
+	"errors"
 	"time"
 
-	"github.com/golang-jwt/jwt/v4"
+	"github.com/golang-jwt/jwt/v5"
+
 	"github.com/openimsdk/chat/pkg/common/constant"
 	"github.com/openimsdk/tools/errs"
 )
@@ -59,31 +61,29 @@ func (t *Token) buildClaims(userID string, userType int32) claims {
 }
 
 func (t *Token) getToken(str string) (string, int32, error) {
-	token, err := jwt.ParseWithClaims(str, &claims{}, t.secret())
+	c := &claims{}
+	token, err := jwt.ParseWithClaims(str, c, t.secret(), jwt.WithIssuedAt())
 	if err != nil {
-		if ve, ok := err.(*jwt.ValidationError); ok {
-			if ve.Errors&jwt.ValidationErrorMalformed != 0 {
-				return "", 0, errs.ErrTokenMalformed.Wrap()
-			} else if ve.Errors&jwt.ValidationErrorExpired != 0 {
-				return "", 0, errs.ErrTokenExpired.Wrap()
-			} else if ve.Errors&jwt.ValidationErrorNotValidYet != 0 {
-				return "", 0, errs.ErrTokenNotValidYet.Wrap()
-			} else {
-				return "", 0, errs.ErrTokenUnknown.Wrap()
-			}
-		} else {
-			return "", 0, errs.ErrTokenNotValidYet.Wrap()
-		}
-	} else {
-		claims, ok := token.Claims.(*claims)
-		if claims.PlatformID != 0 {
+		switch {
+		case errors.Is(err, jwt.ErrTokenMalformed):
+			return "", 0, errs.ErrTokenMalformed.Wrap()
+		case errors.Is(err, jwt.ErrTokenExpired):
 			return "", 0, errs.ErrTokenExpired.Wrap()
+		case errors.Is(err, jwt.ErrTokenNotValidYet),
+			errors.Is(err, jwt.ErrTokenUsedBeforeIssued):
+			return "", 0, errs.ErrTokenNotValidYet.Wrap()
+		default:
+			return "", 0, errs.ErrTokenUnknown.Wrap()
 		}
-		if ok && token.Valid {
-			return claims.UserID, claims.UserType, nil
-		}
+	}
+
+	if !token.Valid {
 		return "", 0, errs.ErrTokenNotValidYet.Wrap()
 	}
+	if c.PlatformID != 0 {
+		return "", 0, errs.ErrTokenExpired.Wrap()
+	}
+	return c.UserID, c.UserType, nil
 }
 
 func (t *Token) CreateToken(UserID string, userType int32) (string, time.Duration, error) {
